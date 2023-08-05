@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+#
+# Copyright (C) 2020-2021 Ryan Galloway (ryan@rsg.io)
+#
+
+__doc__ = """
+Subfork commandline tool.
+"""
+
+import os
+import sys
+
+from subfork import __prog__, __version__
+import subfork.config as config
+import subfork.client as client
+from subfork.logger import log, setup_stream_handler
+setup_stream_handler('subfork')
+
+
+def parse_args():
+    """sys.argv parser, returns args.
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawTextHelpFormatter)
+    subparsers = parser.add_subparsers(dest='which',
+        help='which command to run')
+    parser.add_argument('template', type=str, metavar='TEMPLATE',
+        help='the template file path')
+    parser.add_argument('--host', type=str, metavar='HOST',
+        help='subfork host', default=config.HOST)
+    parser.add_argument('-v', '--version', action='version',
+        version='%(prog)s {version}'.format(version=__version__))
+
+    deploy_parser = subparsers.add_parser('deploy')
+    # deploy_parser.add_argument('--foo', ...)
+
+    args = parser.parse_args()
+
+    return args
+
+
+def main():
+    args = parse_args()
+
+    sc = client.SubforkClient(host=args.host,
+        access_key=config.ACCESS_KEY,
+        secret_key=config.SECRET_KEY
+    )
+
+    if args.which == 'deploy':
+        sc.deploy(os.path.abspath(args.template))
+    else:
+        log.error('invalid command: {}'.format(args.which))
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
