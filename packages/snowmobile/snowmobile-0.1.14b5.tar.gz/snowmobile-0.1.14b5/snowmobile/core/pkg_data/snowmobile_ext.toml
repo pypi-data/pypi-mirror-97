@@ -1,0 +1,127 @@
+# =============================================================================
+# ../snowmobile_ext.toml
+#   DO NOT DELETE UNLESS INTENTIONALLY SPECIFYING ALTERNATE EXTENSIONS LOCATION
+#   IN SNOWMOBILE.TOML.
+# =============================================================================
+
+[script]
+
+    [script.markup.attributes]
+
+        # TODO (rename): script.markup.attributes.markers -> script.markup.markers
+#        [script.markup.markers]
+        [script.markup.attributes.markers]
+            [script.markup.attributes.markers."__script__"]
+                as-group = 'Author Information'
+                # ====/ start-attributes /====
+                team = 'Sample Team Name'
+                email = 'first.last@domain.com'
+
+            [script.markup.attributes.markers."__appendix__"]
+                as-group = ''
+                # ====/ marker-attributes /====
+
+        # TODO (rename): script.markup.attributes.reserved -> script.markup.statement.reserved
+#        [script.markup.statement.reserved.rendered-sql]
+        [script.markup.attributes.reserved.rendered-sql]
+            include-by-default = true
+            attribute-name = 'sql'
+            default-to = 'SQL***'  # 'SQL*_**'
+
+        [script.markup.attributes.reserved.query-results]
+            include-by-default = false
+            attribute-name = 'results'
+            default-to = 'results*'
+            format = 'markdown'
+
+        # TODO (rename): script.markup.attributes.from-namespace -> script.markup.statement.from-namespace
+#        [script.markup.statement.from-namespace]
+        [script.markup.attributes.from-namespace]
+            execution_time_txt = 'Execution Time'
+            outcome_txt = 'Last Outcome'
+
+        # TODO (rename): script.markup.attributes.groups -> script.markup.section.groups
+#       [script.markup.section.groups]
+        [script.markup.attributes.groups]
+            "Execution-Information**" = [
+                'execution_time_txt',
+                'outcome_txt'
+            ]
+            "QA-Specifications**" = [
+                'partition-on',
+                'end-index-at',
+                'compare-patterns',
+                'ignore-patterns',
+                'absolute-tolerance',
+                'relative-tolerance',
+            ]
+
+        # TODO (rename): script.markup.attributes.order -> script.markup.section.order
+#        [script.markup.section.order]
+        [script.markup.attributes.order]
+            attribute-order = [
+                'authored-date',
+                'author-information',
+                'execution-information',
+                'qa-specifications',
+                'outcome_txt',
+                'execution_time_txt',
+                'description',
+                'sql',
+                'results'
+            ]
+
+
+# -- Type mapping of how attribute values should be parsed based on attr name -
+[script.tag-to-type-xref]
+    string = [
+        'name', 'partition-on', 'end-index-at', 'description'
+    ]
+    list = [
+        'compare-patterns', 'ignore-patterns'
+    ]
+    float = [
+        'absolute-tolerance', 'relative-tolerance'
+    ]
+    bool = [
+        'results', 'sql'
+    ]
+
+# -- Named object, generic anchors, and keyword-exceptions for sql parsing ----
+[sql]
+    provided-over-generated = true
+    desc-is-simple = true
+
+    named-objects = [
+        # 'grant' statements
+        "select",
+        "all",
+        "drop",
+
+        # base objects
+        "temp table",
+        "transient table",
+        "table",
+        "view",
+        "schema",
+        "warehouse",
+        "file format",
+
+        # plural bases
+        "tables",
+        "views",
+        "schemas",
+    ]
+
+    [sql.generic-anchors]
+        "select" = "select data"
+        "set" = "set param"
+        "unset" = "unset param"
+        "insert" = "insert into"
+        "delete" = "delete from"
+
+    [sql.keyword-exceptions]
+        "with" = "select"
+
+    [sql.information-schema-exceptions]
+        schema = "schemata"
