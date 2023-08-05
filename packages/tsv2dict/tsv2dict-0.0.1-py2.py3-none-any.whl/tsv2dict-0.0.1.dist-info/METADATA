@@ -1,0 +1,135 @@
+Metadata-Version: 2.1
+Name: tsv2dict
+Version: 0.0.1
+Summary: Python support for linear TSV files
+Home-page: https://github.com/nkurmann/tsv2dict
+Author: Nico Kurmann
+Author-email: nico.kurmann@gmail.com
+License: MIT
+Project-URL: Documentation, https://tsv2dict.readthedocs.io/
+Project-URL: Changelog, https://tsv2dict.readthedocs.io/en/latest/changelog.html
+Project-URL: Issue Tracker, https://github.com/nkurmann/tsv2dict/issues
+Keywords: tsv,persistence,export
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Utilities
+Requires-Python: >=3.6
+Provides-Extra: dev
+Requires-Dist: autopep8 ; extra == 'dev'
+Requires-Dist: binaryornot ; extra == 'dev'
+Requires-Dist: check-manifest ; extra == 'dev'
+Requires-Dist: click ; extra == 'dev'
+Requires-Dist: flake8 ; extra == 'dev'
+Requires-Dist: jinja2-time ; extra == 'dev'
+Requires-Dist: mypy ; extra == 'dev'
+Requires-Dist: pip-chill ; extra == 'dev'
+Requires-Dist: poyo ; extra == 'dev'
+Requires-Dist: pylint ; extra == 'dev'
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: python-slugify ; extra == 'dev'
+Requires-Dist: tox ; extra == 'dev'
+Requires-Dist: tsv2dict ; extra == 'dev'
+Requires-Dist: twine ; extra == 'dev'
+
+========
+Overview
+========
+
+
+
+Python support for linear TSV files
+
+* Free software: MIT license
+
+
+What is Linear TSV
+==================
+
+In contrast to Excel's TSV dialect, linear TSV is line-based.
+
+*"But hey"*, I hear you say, *"isn't TSV always line-based?"*. Well, the issue arises when a cell contains a tab or newline character. In excel's TSV format, that cell is surrounded by quotes and the entry is continued on the next line. Now you have:
+* entries spanning several lines
+* quotes that need to be ignored (`"`)
+* quotes that are escaped by doubling them (`""`)
+
+
+All of this can be prevented if you simply:
+* escape tabs: `\t`
+* escape newlines: `\n`
+* escape carriage returns: `\r`
+* escape backslashes: `\\`
+
+That's linear tsv in a nutshell.
+
+
+
+
+Installation
+============
+
+::
+
+    pip install tsv2dict
+
+You can also install the in-development version with::
+
+    pip install https://github.com/nkurmann/tsv2dict/archive/master.zip
+
+
+Documentation
+=============
+
+
+https://tsv2dict.readthedocs.io/
+
+
+Development
+===========
+
+To run all the tests run::
+
+    tox
+
+Note, to combine the coverage data from all the tox environments run:
+
+.. list-table::
+    :widths: 10 90
+    :stub-columns: 1
+
+    - - Windows
+      - ::
+
+            set PYTEST_ADDOPTS=--cov-append
+            tox
+
+    - - Other
+      - ::
+
+            PYTEST_ADDOPTS=--cov-append tox
+
+
+Changelog
+=========
+
+0.0.0 (2021-02-28)
+------------------
+
+* First release on PyPI.
+
+
