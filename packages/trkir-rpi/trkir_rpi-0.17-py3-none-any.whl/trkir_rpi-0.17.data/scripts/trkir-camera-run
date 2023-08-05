@@ -1,0 +1,204 @@
+#!python
+
+import argparse
+import time
+from functools import partial
+import logging
+
+from src.camera_class import ThermalCamera
+from src.socket_class import SocketServer
+from src.utils import \
+    make_frame_buffer, \
+    show_frame, \
+    int16_to_bytes
+from src.constants import \
+    FPS, \
+    SOCKET_RECV_LENGTH
+
+logging.getLogger().setLevel(logging.INFO)
+
+
+def health_check_handler():
+    sleep_time = 1. / float(fps)
+    if delay and working_time:
+        while True:
+            start_time = time.time()
+            for _, frames in camera.streaming():
+                start = time.time()
+                for index, frame in enumerate(frames):
+                    show_frame(frame, index=index)
+                frame_time = time.time() - start
+                delta_time = sleep_time - frame_time
+                if delta_time > 0:
+                    time.sleep(delta_time)
+                if time.time() - start_time > working_time:
+                    break
+            time.sleep(delay)
+    else:
+        for _, frames in camera.streaming():
+            start = time.time()
+            for index, frame in enumerate(frames):
+                show_frame(frame, index=index)
+            frame_time = time.time() - start
+            delta_time = sleep_time - frame_time
+            if delta_time > 0:
+                time.sleep(delta_time)
+
+
+def get_streaming_frame():
+    return camera.get_frame()
+        
+
+def connection_handler(connection, client_address, get_frame_func):
+    sleep_time = 1. / float(fps)
+    if delay and working_time:
+        logging.info('Connection %s started...', client_address)
+        try:
+            while True:
+                start_time = time.time()
+                while True:
+                    start = time.time()
+                    data = connection.recv(SOCKET_RECV_LENGTH)
+                    if not data:
+                        logging.exception('Connection %s closed...', client_address)
+                        connection.close()
+                        break
+
+                    connection.sendall(int16_to_bytes(camera.buffer_size, length=3))
+                    try:
+                        temperatures, frames = get_frame_func()
+                        if show:
+                            for index, frame in enumerate(frames):
+                                show_frame(frame, index=index)
+                    except KeyboardInterrupt:
+                        camera.release_devices()
+                        exit()
+                    except Exception as e:
+                        logging.exception('Getting frame exception: %s', e)
+                        is_reconnected = camera.connect_devices(is_retry=True)
+                        if not is_reconnected:
+                            exit()
+                        connection.sendall(bytes([0]) * camera.buffer_size)
+                        continue
+
+                    buffer = make_frame_buffer(temperatures, frames)
+                    connection.sendall(buffer)
+
+                    frame_time = time.time() - start
+                    delta_time = sleep_time - frame_time
+                    if delta_time > 0:
+                        time.sleep(delta_time)
+                    if time.time() - start_time > working_time:
+                        break
+                time.sleep(delay)
+        except Exception as e:
+            logging.exception('Exception from client, %s', e)
+    else:
+        logging.info('Connection %s started...', client_address)
+        try:
+            while True:
+                start = time.time()
+                data = connection.recv(SOCKET_RECV_LENGTH)
+                if not data:
+                    logging.exception('Connection %s closed...', client_address)
+                    connection.close()
+                    break
+
+                connection.sendall(int16_to_bytes(camera.buffer_size, length=3))
+                try:
+                    temperatures, frames = get_frame_func()
+                    if show:
+                        for index, frame in enumerate(frames):
+                            show_frame(frame, index=index)
+                except KeyboardInterrupt:
+                    camera.release_devices()
+                    exit()
+                except Exception as e:
+                    logging.exception('Getting frame exception: %s', e)
+                    is_reconnected = camera.connect_devices(is_retry=True)
+                    if not is_reconnected:
+                        exit()
+                    connection.sendall(bytes([0]) * camera.buffer_size)
+                    continue
+
+                buffer = make_frame_buffer(temperatures, frames)
+                connection.sendall(buffer)
+
+                frame_time = time.time() - start
+                delta_time = sleep_time - frame_time
+                if delta_time > 0:
+                    time.sleep(delta_time)
+        except Exception as e:
+            logging.exception('Exception from client, %s', e)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--fps',
+        type=float,
+        required=False,
+        help='video fps',
+        default=FPS,
+    )
+    parser.add_argument(
+        '--show',
+        type=int,
+        help='if show locally enter 1 (default = 0)',
+        default=0,
+    )
+    parser.add_argument(
+        '--health_check',
+        type=int,
+        help='local picture check',
+        default=0,
+    )
+    parser.add_argument(
+        '--delay',
+        type=int,
+        required=False,
+        help='delay interval in seconds',
+        default=0,
+    )
+    parser.add_argument(
+        '--working',
+        type=int,
+        required=False,
+        help='working interval in seconds',
+        default=None,
+    )
+    parser.add_argument(
+        '--cameras_number',
+        type=int,
+        required=True,
+        help='number of cameras',
+    )
+
+    args = parser.parse_args()
+
+    fps = float(args.fps)
+    delay = int(args.delay) if args.delay else None
+    working_time = int(args.working) if args.working else None
+    cameras_number = int(args.cameras_number)
+    show = bool(args.show)
+
+    camera = ThermalCamera(cameras_number=cameras_number)
+
+    is_health_check = bool(args.health_check)
+
+    try:
+        if is_health_check:
+            health_check_handler()
+        else:
+            connection_handler_func = partial(connection_handler, get_frame_func=get_streaming_frame)
+            socket = SocketServer()
+            while True:
+                connection, client_address = socket.accept()
+                connection_handler_func(
+                    connection,
+                    client_address,
+                )
+    except Exception as e:
+        logging.exception('Error occurred %s', e)
+        logging.info('Releasing devices...')
+        camera.release_devices()
