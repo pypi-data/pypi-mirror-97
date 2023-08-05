@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:define-macro="master"
+      metal:use-macro="context/@@shell/macros/shell"
+      tal:define="
+        webhelpers nocall:view/@@webhelpers;
+        default_introduction nocall:context/@@default_introduction;
+        session view/session;
+        can_edit webhelpers/can_edit_session;
+        has_profile view/has_profile;
+      "
+      i18n:domain="euphorie"
+>
+
+  <!-- The equivalent template in the Jekyll prototype is preparation.html -->
+
+  <body>
+    <metal:slot fill-slot="content">
+      <tal:block replace="tile:statusmessages" />
+    <a class="pat-inject"
+       id="percentage-placeholder"
+       hidden="hidden"
+       href="${here/webhelpers/traversed_session/absolute_url}/@@update-completion-percentage"
+       data-pat-inject="trigger: autoload; source: #document-content; target: #percentage-placeholder::element; loading-class:; history: none"
+    >Compute completion percentage</a>
+      <form class="pat-form pat-inject pat-validation"
+        data-pat-validation="disable-selector: button[name='form.button.submit'];
+                           message-required: ${view/message_required};
+                           message-min: ${view/message_gt1};
+            "
+            action="${request/URL}"
+            method="POST"
+            data-pat-inject="history: record; source: #content; target: #content &amp;&amp; source: #navigation; target: #navigation;"
+      >
+      <div id="content-pane">
+        <nav class="page-actions">
+          <metal:actions define-slot="page-actions">
+            <a class="icon-share iconified pat-tooltip"
+               href="${request/ACTUAL_URL}#sharing-menu"
+               title="Share this OiRA-Tool"
+               data-pat-tooltip="source: ajax; position-list: tr"
+               tal:condition="webhelpers/allow_social_sharing"
+               i18n:attributes="title"
+            >Share</a>
+            <a tal:replace="structure here/@@more_badge|nothing"></a>
+          </metal:actions>
+        </nav>
+        <metal:messages_above_title define-slot="messages_above_title">
+          <p class="pat-message notice"
+            tal:repeat="message view/get_pat_messages_above_title"
+            tal:content="structure message"
+          ></p>
+        </metal:messages_above_title>
+
+        <article tal:condition="tool_notification"
+                 class="pat-well pat-rich info"
+        >
+          <h1>${tool_notification/title}</h1>
+          <tal:content content="structure tool_notification/text">
+            TEXT
+          </tal:content>
+        </article>
+
+        <article class="pat-rich">
+          <h1>${context/Title}</h1>
+          <section tal:condition="context/Description">
+            <p>${context/Description}</p>
+          </section>
+          <p>
+              <a class="show-more pat-modal"
+                 href="${here/absolute_url}/@@tool-more-info#document-content"
+                 data-pat-modal="class: small"
+                 i18n:translate=""
+                 >Learn more about this tool&hellip;</a>
+          </p>
+        </article>
+        <metal:messages_below_article define-slot="messages_below_article">
+          <div class="pat-message notice"
+               tal:repeat="multiple_message view/get_pat_multiple_messages_below_article"
+          >
+            <p tal:repeat="message multiple_message"
+               tal:content="structure message"></p>
+          </div>
+        </metal:messages_below_article>
+        <fieldset class="vertical pat-inject pat-subform pat-autosubmit"
+                  data-pat-inject="url: ; source: #osc-header; target: #osc-header"
+                  tal:condition="can_edit"
+        >
+          <metal:widgets define-slot="widgets">
+            <tal:for repeat="widgetid view/widgets">
+              <label tal:define="
+                       widget nocall:view/widgets/?widgetid;
+                       name widget/name;
+                     "
+              >
+                ${widget/label}
+                <input tal:replace="structure widget/render" />
+                <tal:error condition="widget/error"
+                           replace="structure widget/error/render|nothing"
+                />
+              </label>
+            </tal:for>
+          </metal:widgets>
+        </fieldset>
+
+        <dl class="pat-grid-list"
+            tal:condition="not:can_edit"
+        >
+        <metal:widgets define-slot="widgets">
+          <tal:for repeat="widgetid view/widgets">
+            <dt tal:define="
+                  widget nocall:view/widgets/?widgetid;
+                "
+            >
+            ${widget/label}
+            </dt>
+            <dd>${session/?widgetid}</dd>
+          </tal:for>
+        </metal:widgets>
+        </dl>
+      </div>
+        <div class="button-bar"
+             id="nav-bar"
+             tal:condition="can_edit"
+        >
+          <button class="pat-button pat-switch continue"
+                  name="form.button.submit"
+                  type="submit"
+                  data-pat-switch="selector: body; remove: sidebar-${python:has_profile and 'on' or 'off'}; add: sidebar-${python:has_profile and 'off' or 'on'}"
+                  i18n:translate="label_start_survey"
+          >Start</button>
+        </div>
+      </form>
+
+      <div id="sharing-menu"
+           hidden="hidden"
+           tal:condition="webhelpers/allow_social_sharing"
+      >
+
+        <p class="pat-message notice"
+           i18n:translate=""
+        >
+        This tool deserves to be known by the world! Share it!
+        </p>
+
+        <ul class="menu">
+          <li>
+            <a class="twitter icon-twitter"
+               href="http://twitter.com/share?url=${webhelpers/survey_url}"
+               onclick="javascript:_paq.push(['trackEvent', 'SocialSharing', 'Twitter', 'Start']);"
+               target="sharing"
+            >Twitter</a>
+          </li>
+          <li>
+            <a class="facebook icon-facebook"
+               href="http://www.facebook.com/sharer.php?u=${webhelpers/base_url}/@@tryout?${webhelpers/came_from_param}"
+               onclick="javascript:_paq.push(['trackEvent', 'SocialSharing', 'Facebook', 'Start']);"
+               target="sharing"
+            >Facebook</a>
+          </li>
+          <li>
+            <a class="email icon-mail"
+               href="mailto:?subject=OiRA &mdash; ${webhelpers/tool_name}&amp;body=${webhelpers/email_sharing_text}: ${webhelpers/survey_url}"
+               onclick="javascript:_paq.push(['trackEvent', 'SocialSharing', 'Email', 'Start']);"
+               i18n:translate=""
+            >E-mail</a>
+          </li>
+        </ul>
+      </div>
+
+    </metal:slot>
+
+    <metal:slot fill-slot="splash_message_slot">
+    <!-- SPLASH SLOT -->
+      <div class="splash-message" id="splash-message">
+      <tal:splash condition="python:tool_notification is not None">
+
+        <hr class="trigger pat-switch"
+            data-pat-switch="selector: body; remove: splash-on-tool*; add: splash-off-${tool_notification/id}; store: session"
+        />
+        <article class="pat-rich content">
+          <p>
+            <img src="${style_url}/oira-logo-colour.svg"
+                 width="20%"
+            />
+          </p>
+          <h1 tal:content="structure tool_notification/title">Message of the day!</h1>
+          <tal:content content="structure tool_notification/text">
+            <p>Sit amet consectetuer.</p>
+            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.</p>
+            <p>OiRA Team</p>
+          </tal:content>
+        </article>
+      </tal:splash>
+      </div>
+    </metal:slot>
+
+  </body>
+</html>

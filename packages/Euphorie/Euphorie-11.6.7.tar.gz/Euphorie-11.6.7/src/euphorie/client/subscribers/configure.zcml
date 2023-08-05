@@ -1,0 +1,20 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <subscriber
+      for="euphorie.client.model.ISurveySession
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".surveysession.modified"
+      />
+
+	<subscriber
+		for="plone.app.imagecropping.dx.IImageCroppingDX
+		     zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+		handler=".imagecropping.crop_on_image_edit" />
+
+  	<subscriber
+      	for="euphorie.client.model.Module
+      		 euphorie.client.interfaces.CustomRisksModifiedEvent"
+      	handler=".module.handle_custom_risks_order"
+ 	/>
+
+</configure>
