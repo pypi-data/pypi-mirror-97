@@ -1,0 +1,111 @@
+{
+  "name": "jupyterlab_requirements",
+  "version": "0.4.7",
+  "description": "JupyterLab Extension for dependency management and optimization",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "dependencies",
+    "ipython",
+    "notebook",
+    "requirements",
+    "thoth"
+  ],
+  "homepage": "https://github.com/thoth-station/jupyterlab-requirements",
+  "bugs": {
+    "url": "https://github.com/thoth-station/jupyterlab-requirements/issues"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Francesco Murdaca",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thoth-station/jupyterlab-requirements.git"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:lib": "tsc",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "clean": "jlpm run clean:lib",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "clean:labextension": "rimraf jupyterlab_requirements/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:more": "jlpm clean && rimraf build dist MANIFEST",
+    "clean:slate": "jlpm clean:more && jlpm clean:labextension && rimraf node_modules",
+    "contributors:generate": "jlpm run all-contributors generate",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/launcher": "^3.0.0",
+    "@jupyterlab/mainmenu": "^3.0.0",
+    "@jupyterlab/nbformat": "^3.0.0",
+    "@jupyterlab/notebook": "^3.0.0",
+    "@jupyterlab/services": "^6.0.0",
+    "@jupyterlab/translation": "^3.0.0",
+    "@lumino/algorithm": "^1.3.3",
+    "@lumino/coreutils": "^1.5.3",
+    "@lumino/datagrid": "^0.5.2",
+    "@lumino/disposable": "^1.4.3",
+    "@lumino/widgets": "^1.14.0",
+    "@types/lodash": "^4.14.165",
+    "axios": "^0.21.1",
+    "js-logger": "^1.6.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7",
+    "@babel/preset-env": "^7",
+    "@jupyterlab/builder": "^3.0.0",
+    "@jupyterlab/testutils": "^3.0.0",
+    "@types/jest": "^24",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^24",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^24",
+    "typescript": "~4.0.3"
+  },
+  "sideEffects": [
+    "style/*.css",
+    "style/icons/*.svg"
+  ],
+  "jupyterlab": {
+    "discovery": {
+      "server": {
+        "managers": [
+          "pip"
+        ],
+        "base": {
+          "name": "jupyterlab_requirements"
+        }
+      }
+    },
+    "extension": true,
+    "outputDir": "jupyterlab_requirements/labextension",
+    "_build": {
+      "load": "static/remoteEntry.d32e7971e8493db3e229.js",
+      "extension": "./extension",
+      "style": "./style"
+    }
+  }
+}
