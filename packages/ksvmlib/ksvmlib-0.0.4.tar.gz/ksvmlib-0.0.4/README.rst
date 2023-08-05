@@ -1,0 +1,115 @@
+
+kSVMlib
+=======
+
+Kernel SVM library based on sklearn and GPlib.
+Provides similar functionality to GPlib for SVMs.
+
+Setup kSVMlib
+-------------
+
+- Create and activate virtualenv (for python2) or
+  venv (for python3)
+
+.. code-block:: bash
+
+  # for python3
+  python3 -m venv .env
+  # or for python2
+  python2 -m virtualenv .env
+
+  source .env/bin/activate
+
+- Upgrade pip
+
+.. code-block:: bash
+
+  python -m pip install --upgrade pip
+
+- Install kSVMlib package
+
+.. code-block:: bash
+
+  python -m pip install ksvmlib
+
+
+Use kSVMlib
+----------------------
+
+- Import kSVMlib to use it in your python script.
+
+.. code-block:: python
+
+  import ksvmlib
+
+- Generate some random data.
+
+.. code-block:: python
+
+  import numpy as np
+  data = {}
+  data['X'] = np.vstack((
+      np.random.multivariate_normal([1, 1], [[1, 0], [0, 1]], 100),
+      np.random.multivariate_normal([3, 3], [[1, 0], [0, 1]], 100)
+  ))
+  data['Y'] = np.vstack((
+      np.ones((100, 1)),
+      np.zeros((100, 1)),
+  ))
+
+  validation = ksvmlib.dm.RandFold(fold_len=0.2, n_folds=1)
+  train_set, test_set = validation.get_folds(data)[0]
+
+- Initialize the KSVM model and a metric to measure the results.
+
+.. code-block:: python
+
+  model = ksvmlib.KSVM(ksvmlib.ker.SquaredExponential())
+  accuracy = ksvmlib.me.Accuracy()
+
+- Fit the model to the data.
+
+.. code-block:: python
+
+  fitting_method = ksvmlib.fit.GridSearch(
+      obj_fun=accuracy.fold_measure,
+      max_fun_call=300
+  )
+  train_validation = ksvmlib.dm.RandFold(fold_len=0.2, n_folds=3)
+
+  log = fitting_method.fit(model, train_validation.get_folds(
+      train_set
+  ))
+  print("Fitting log: {}".format(log))
+
+- Finally plot the results.
+
+.. code-block:: python
+
+  print("Accuracy: {}".format(accuracy.measure(model, train_set, test_set)))
+  ksvmlib.plot.kernel_sort_data(model, test_set)
+
+- There are more examples in examples/ directory. Check them out!
+
+Develop kSVMlib
+---------------
+
+-  Download the repository using git
+
+.. code-block:: bash
+
+  git clone https://gitlab.com/ibaidev/ksvmlib.git
+  cd ksvmlib
+  git config user.email 'MAIL'
+  git config user.name 'NAME'
+  git config credential.helper 'cache --timeout=300'
+  git config push.default simple
+
+-  Update API documentation
+
+.. code-block:: bash
+
+  source ./.env/bin/activate
+  pip install Sphinx
+  cd docs/
+  sphinx-apidoc -f -o ./ ../ksvmlib
