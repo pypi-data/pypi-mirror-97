@@ -1,0 +1,101 @@
+Metadata-Version: 2.1
+Name: pystow
+Version: 0.0.11
+Summary: Easily pick a place to store data for your python package.
+Home-page: https://github.com/cthoyt/pystow
+Author: Charles Tapley Hoyt
+Author-email: cthoyt@gmail.com
+Maintainer: Charles Tapley Hoyt
+Maintainer-email: cthoyt@gmail.com
+License: MIT
+Download-URL: https://github.com/cthoyt/pystow/releases
+Project-URL: Bug Tracker, https://github.com/cthoyt/pystow/issues
+Description: <h1 align="center">
+          PyStow
+        </h1>
+        
+        <p align="center">
+          <a href="https://github.com/cthoyt/pystow/actions">
+            <img src="https://github.com/cthoyt/pystow/workflows/Tests/badge.svg" alt="Build status" height="20" />
+          </a>
+        
+          <a href="https://pypi.org/project/pystow">
+            <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/pystow">
+          </a>
+        
+          <a href='https://opensource.org/licenses/MIT'>
+            <img src='https://img.shields.io/badge/License-MIT-blue.svg' alt='License'/>
+          </a>
+        
+          <a href="https://zenodo.org/badge/latestdoi/318194121">
+            <img src="https://zenodo.org/badge/318194121.svg" alt="DOI">
+          </a>
+        </p>
+        
+        👜 Easily pick a place to store data for your python package.
+        
+        ## 🚀 Installation
+        
+        `pip install pystow`
+        
+        ## 💪 Usage
+        
+        Get a directory for your application.
+        
+        ```python
+        import pystow
+        
+        # Get a directory (as a pathlib.Path) for ~/.data/pykeen
+        pykeen_directory = pystow.get('pykeen')
+        
+        # Get a subdirectory (as a pathlib.Path) for ~/.data/pykeen/experiments
+        pykeen_experiments_directory = pystow.get('pykeen', 'experiments')
+        
+        # You can go as deep as you want
+        pykeen_deep_directory = pystow.get('pykeen', 'experiments', 'a', 'b', 'c')
+        ```
+        
+        Ensure a file from the internet is available in your application's directory:
+        
+        ```python
+        import pystow
+        
+        url = 'https://raw.githubusercontent.com/pykeen/pykeen/master/src/pykeen/datasets/nations/test.txt'
+        path = pystow.ensure('pykeen', 'datasets', 'nations', url=url)
+        ```
+        
+        Ensure a file from the internet and load it for usage:
+        
+        ```python
+        import pystow
+        
+        url = 'https://raw.githubusercontent.com/pykeen/pykeen/master/src/pykeen/datasets/nations/test.txt'
+        df = pystow.ensure_csv('pykeen', 'datasets', 'nations', url=url)
+        
+        
+        ```
+        
+        Also see `pystow.ensure_excel()`, `pystow.ensure_rdf()`, `pystow.ensure_zip_df()`, and `pystow.ensure_tar_df()`.
+        
+        ## ⚠️ Configuration
+        
+        Data gets stored in `~/.data` by default. If you want to change the name of the directory, set the environment
+        variable `PYSTOW_NAME`. If you want to change the default parent directory to be other than the home directory,
+        set `PYSTOW_HOME`
+        
+Keywords: caching,file management
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Provides-Extra: rdf
+Provides-Extra: docs
