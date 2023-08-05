@@ -1,0 +1,307 @@
+Metadata-Version: 2.1
+Name: aoa
+Version: 3.1.1rc0
+Summary: Python client for Teradata AnalyticOps Accelerator (AOA)
+Home-page: UNKNOWN
+Author: Teradata
+Author-email: teradata.corporation@teradatacorporation.com
+License: UNKNOWN
+Description: # Teradata AnalyticOps Client
+        
+        - [Installation](#installation)
+        - [CLI](#cli)
+          * [aoa configure](#aoa-configure)
+          * [aoa clone](#aoa-clone)
+          * [aoa init](#aoa-init)
+          * [aoa list](#aoa-list)
+          * [aoa add](#aoa-add)
+          * [aoa run](#aoa-run)
+          * [pyspark](#pyspark)
+        - [Client API](#client-api)
+        - [Kerberos](#kerberos)
+        - [Release Notes](#release-notes)
+        
+        Python client for Teradata AnalyticOps Accelerator. It is composed of both an client API implementation to access the AOA Core APIs and a command line interface (cli) tool which can be used for many common tasks. 
+        
+        ## Installation
+        
+        You can install via pip. The minimum python version required is 3.5+
+        
+        ```
+        pip install aoa
+        ```
+        
+        ## CLI
+        
+        The cli can be used to perform a number of interactions and guides the user to perform those actions. 
+        
+        ```
+        > aoa -h
+        usage: aoa [-h] [--debug] [--version]
+                         {list,add,run,init,clone,configure} ...
+        
+        AOA CLI
+        
+        optional arguments:
+          -h, --help            show this help message and exit
+          --debug               Enable debug logging
+          --version             Display the version of this tool
+        
+        actions:
+          valid actions
+        
+          {list,add,run,init,clone,configure}
+            list                List projects, models, local models or datasets
+            add                 Add model
+            run                 Train and Evaluate model
+            init                Initialize model directory with basic structure
+            clone               Clone Project Repository
+            configure           Configure AOA client
+        ```
+        
+        
+        
+        ### aoa configure
+        
+        If not already performed the configuration step, start by configuring the client for your user and your environment. This allows you to set the AOA API endpoint and the authentication information for the client (basic or kerberos). The cli stores this configuration information in the users home directory under `~/.aoa/config.yaml`. Note if you are using Kerberos, you will need to install an additional library (see the Kerberos section).
+        
+        You can also use the configure command with the `--repo` argument to set repository level configuration such as the projectId of the repo. This only needs to be set once and can be committed and pushed to the repository. Note that this configuration is stored in the `.aoa/config.yaml` of the repository directory!
+        
+        ```
+        > aoa configure -h
+        usage: aoa configure [-h] [--repo] [--debug]
+        
+        optional arguments:
+        -h, --help  show this help message and exit
+        --repo      Configure the repo only
+        --debug     Enable debug logging
+        ```
+        
+        ### aoa clone
+        
+        The `clone` command provides a convenient way to perform a git clone of the repository associated with a given project. The command can be run interactively and will allow you to select the project you wish to clone. Note that by default it clones to the current working directly so you either need to make sure you create an empty folder and run it from within there or else provide the `--path ` argument.
+        
+        ```
+        > aoa clone -h
+        usage: aoa clone [-h] [-id PROJECT_ID] [-p PATH] [--debug]
+        
+        optional arguments:
+          -h, --help            show this help message and exit
+          -id PROJECT_ID, --project-id PROJECT_ID
+                                Id of Project to clone
+          -p PATH, --path PATH  Path to clone repository to
+          --debug               Enable debug logging
+        ```
+        
+        ### aoa init
+        
+        When you create a git repository, its empty by default. The `init` command allows you to initialize the repository with the structure required by the AOA. It also adds a default README.md and HOWTO.md. 
+        
+        ```
+        > aoa init -h
+        usage: aoa init [-h] [--debug]
+        
+        optional arguments:
+          -h, --help  show this help message and exit
+          --debug     Enable debug logging
+        ```
+        
+        ### aoa list
+        
+        Allows to list the aoa resources. In the cases of listing models (pushed / committed) and datasets, it will prompt the user to select a project prior showing the results. In the case of local models, it lists both committed and non-committed models.
+        ```
+        > aoa list -h
+        usage: aoa list [-h] [--debug] [-p] [-m] [-lm] [-d]
+        
+        optional arguments:
+          -h, --help           show this help message and exit
+          --debug              Enable debug logging
+          -p, --projects       List projects
+          -m, --models         List registered models (committed / pushed)
+          -lm, --local-models  List local models. Includes registered and non-
+                               registered (non-committed / non-pushed)
+          -d, --datasets       List datasets
+        ```
+        All results are shown in the format
+        ```
+        [index] (id of the resource) name
+        ```
+        for example:
+        ```
+        List of models for project Demo:
+        --------------------------------
+        [0] (03c9a01f-bd46-4e7c-9a60-4282039094e6) Diabetes Prediction
+        [1] (74eca506-e967-48f1-92ad-fb217b07e181) IMDB Sentiment Analysis
+        ```
+        
+        ### aoa add
+        
+        Adding a new model to a given repository requires a number of steps. You need to create the folder structure, configuration files, generate a modelId, etc. The `add` command is intended to simplify this for the user. It will interactively prompt you for the model name, language, description and even allow you to use a model template to get you started. This can really help reduce the boilerplate required and ensure you get started developing quicker while maintaining a standard repository structure.
+        
+        
+        ```
+        > aoa add
+        model name: my new model
+        model description: to show adding new models
+        These languages are supported: R, python, sql
+        model language: python
+        templates available for python: empty, pyspark, sklearn
+        template type (leave blank for the default one): 
+        ```
+        
+        ### aoa run
+        
+        The cli can be used to validate the model training and evaluation logic locally before committing to git. This simplifies the development lifecycle and allows you to test and validate many options. It also enables you to avoid creating the dataset definitions in the AOA UI until you are ready and have a finalised version. 
+        
+        ```
+        > aoa run -h
+        usage: aoa run [-h] [-id MODEL_ID] [-m MODE] [-d DATASET_ID]
+                       [-ld LOCAL_DATASET] [--debug]
+        
+        optional arguments:
+          -h, --help            show this help message and exit
+          -id MODEL_ID, --model-id MODEL_ID
+                                Id of model
+          -m MODE, --mode MODE  Mode (train or evaluate)
+          -d DATASET_ID, --dataset-id DATASET_ID
+                                Remote datasetId
+          -ld LOCAL_DATASET, --local-dataset LOCAL_DATASET
+                                Path to local dataset metadata file
+          --debug               Enable debug logging
+        ```
+        
+        You can run all of this as a single command or interactively by selecting some of the optional arguments, or none of them. 
+        
+        For example, if you want to run the cli interactively you just select `aoa run` but if you wanted to run it non interactively to train a given model with a given datasetId you would execte 
+        ```
+        > aoa run -id <modelId> -m <mode> -d <datasetId>
+        ```
+        
+        And if you wanted to select the model interactively but use a specific local dataset definition, you would execute
+        
+        ```
+        > aoa run -ld /path/to/my_test_dataset.json
+        ```
+        
+        
+        ### pyspark
+        
+        When using the aoa cli to train and evaluate pyspark models, there are a few additional points to be aware of. The cli for running a spark model works by configuring the `PYSPARK_SUBMIT_ARGS` which is what spark uses when creating the spark context in the model code. We also use the `findspark` library to find and configure spark based on the `SPARK_HOME` environment variable. 
+        
+        ```
+        PYSPARK_SUBMIT_ARGS="--master <master> <args> --py-files <modules.zip> $AOA_SPARK_CONF
+        ```
+        
+        The `master` and `args` come from the same location as main AOA automation uses, i.e. the `model.json -> resources -> training` 
+        
+        As you can see, the `AOA_SPARK_CONF` environment variable is appened to the end of the `PYSPARK_SUBMIT_ARGS` which means you can override any other the other values that go before it. You can specify any spark configuration option you want here and it will be passed to spark. 
+        
+        As an example, if you are using conda pack with pyspark to ensure that python libraries you use on the driver node are available all over the cluster automatically with the job, you can add this information to the `AOA_SPARK_CONF` to automatically do this for you when running it via the cli. These can be added to the users bash profile to ensure they don't need to manually do this every time in a standard data science environment or even on their own laptops. 
+        
+        ```
+        AOA_SPARK_CONF="--conf spark.pyspark.driver.python=python --conf spark.pyspark.python=./environment/bin/python --archives conda-env.tar.gz#environment"
+        ```
+        
+        ## Client API
+        
+        We have a client implementation for all of the entities exposed in the AOA API. We provide the RESTful and RPC client usage for this. We'll show an example of the Dataset API here but the same applies for all. 
+        
+        By default, creating an instance of the `AoaClient()` will use the users aoa configuration stored in `~/.aoa/config.yaml`. You can override these values by passing the relevant constructor arguments or even with env variables.
+        
+        ```
+        from aoa import AoaClient
+        from aoa import DatasetApi
+        
+        
+        client = AoaClient()
+        client.set_project_id("23e1df4b-b630-47a1-ab80-7ad5385fcd8d")
+        
+        dataset_api = DatasetApi(aoa_client=client)
+        ```
+        
+        Now, find all datasets or a specific dataset
+        ```
+        import pprint
+        
+        datasets = dataset_api.find_all()
+        pprint.pprint(datasets)
+        
+        dataset = dataset_api.find_by_id("11e1df4b-b630-47a1-ab80-7ad5385fcd8c")
+        pprint.pprint(dataset)
+        ```
+        
+        Add a dataset
+        ```
+        dataset_definition = {
+            "name": "my dataset",
+            "description": "adding sample dataset",
+            "metadata": {
+                "url": "http://nrvis.com/data/mldata/pima-indians-diabetes.csv",
+                "test_split": "0.2"
+            }
+        }
+        
+        dataset = dataset_api.save(dataset=dataset_definition)
+        pprint.pprint(dataset)
+        ```
+        
+        ## Kerberos
+        
+        If you are using kerberos, you will need to install some libraries separately. We do not include this as a default dependency as it has a large dependency stack and is not trivial to install. It can be annoying for non Kerberos installations and so we leave it to the specific environment. Note that on OSX, you should use version 1.1.14 of pykerberos. For your linux env, it may vary.
+        
+        First install the libraries with:
+            
+            sudo apt update && sudo apt install -y krb5-multidev
+        
+        Then install or reinstall the package with the option _kerberos_:
+            
+            pip install --force-reinstall --upgrade aoa[kerberos]
+        
+        **NOTE:** some other libraries may be required in the host OS in order for kerberos to be fully functional.
+        
+            
+        ## Release Notes
+        
+        ### 3.1.1
+        
+        - Bug: support Source Model ID from the backend
+        
+        ### 3.1
+        
+        - Feature: ability to separate evaluation and scoring logic into separate files for Python/R
+        
+        ### 3.0
+        
+        - Feature: Add support for Batch Scoring in run command
+        - Feature: Added STO utilities to extract metadata for micro-models
+        
+        ### 2.7.2
+        
+        - Feature: Add support for OAUTH2 token refresh flows
+        - Feature: Add dataset connections api support
+        
+        ### 2.7.1
+        
+        - Feature: Add TrainedModelArtefactsApi
+        - Bug: pyspark cli only accepted old resources format
+        - Bug: Auth mode not picked up from environment variables 
+        
+        ### 2.7.0 
+        
+        - Feature: Add support for dataset templates
+        - Feature: Add support for listing models (local and remote), datasets, projects
+        - Feature: Remove pykerberos dependency and update docs
+        - Bug: Fix tests for new dataset template api structure
+        - Bug: Unable to view/list more than 20 datasets / entities of any type in the cli 
+        
+        ### 2.6.2
+         - Bug: Added list resources command.
+         - Bug: Remove all kerberos dependencies from standard installation, as they can be now installed as an optional feature.
+         - Feature: Add cli support for new artefact path formats
+         
+        ### 2.6.1 
+         - Bug: Remove pykerberos as an install dependency. 
+        
+Platform: UNKNOWN
+Requires-Python: >=3.5.2
+Description-Content-Type: text/markdown
