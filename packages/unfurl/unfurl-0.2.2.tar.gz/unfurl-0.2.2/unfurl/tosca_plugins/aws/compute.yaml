@@ -1,0 +1,85 @@
+# Copyright (c) 2020 Adam Souzis
+# SPDX-License-Identifier: MIT
+tosca_definitions_version: tosca_simple_unfurl_1_0_0 # unfurl/v1alpha1.ServiceTemplate
+metadata:
+  template_name: AWS implementations
+  template_author: onecommons.org
+  template_version: 1.0.0
+node_types:
+  unfurl.nodes.GenericCompute:
+    derived_from: tosca.nodes.Compute
+    interfaces:
+      defaults:
+        implementation: unfurl.configurators.terraform.TerraformConfigurator
+        inputs:
+          main: |
+            provider "aws" {
+              version = "~> 3.2"
+              region = "us-west-2"
+              endpoints {
+                # mock cloudprovider endpoints for unit testing
+                ec2 = "http://localhost:5000"
+                sts = "http://localhost:5000"
+              }
+            }
+
+            data "aws_ami" "service_ami" {
+              most_recent = true
+              name_regex  = var.ami_name_regex
+              filter {
+                name   = "architecture"
+                values = [var.architecture]
+              }
+              filter {
+                name   = "virtualization-type"
+                values = ["hvm"]
+              }
+              owners = ["099720109477"] # Canonical
+            }
+
+            resource "aws_instance" my_server {
+              ami           = data.aws_ami.service_ami.id
+              instance_type = var.instance_type
+              root_block_device {
+                volume_size =  var.volume_size
+                volume_type = "gp2"
+              }
+            }
+
+            variable "instance_type" {
+              type = string
+            }
+
+            variable "volume_size" {
+              type = number
+            }
+
+            variable "ami_name_regex" {
+              type = string
+            }
+
+            variable "architecture" {
+              type = string
+            }
+
+          tfvars:
+            instance_type: t3.micro     # roughly equivalent to 1 cpu and 512mb
+            volume_size: '{{ {"get_property": ["SELF", "host", "disk_size"]}
+              | eval | regex_replace(" |G|B") }}'
+            ami_name_regex: {get_property: [SELF, os, distribution]}   # match "ubuntu"
+            architecture: {get_property: [SELF, os, architecture]} # "x86_64"
+      Standard:
+        operations:
+          delete:
+          create:
+            inputs:
+              resultTemplate:
+                attributes:
+                  id: '{{ resources[0].instances[0].attributes.id }}'
+                  private_address: '{{ resources[0].instances[0].attributes.private_ip
+                    }}'
+                  public_address: '{{ resources[0].instances[0].attributes.public_ip
+                    }}'
+      Install:
+        operations:
+          check:
