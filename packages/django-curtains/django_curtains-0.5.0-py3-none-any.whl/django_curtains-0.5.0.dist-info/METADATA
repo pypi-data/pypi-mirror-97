@@ -1,0 +1,63 @@
+Metadata-Version: 2.1
+Name: django-curtains
+Version: 0.5.0
+Summary: Middleware for only allowing access to staff members
+Home-page: http://github.com/matthiask/django-curtains/
+Author: Matthias Kestenholz
+Author-email: mk@feinheit.ch
+License: BSD-3-Clause
+Platform: OS Independent
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Description-Content-Type: text/x-rst
+Provides-Extra: tests
+Requires-Dist: coverage ; extra == 'tests'
+
+================================================================
+django-curtains - Middleware for temporarily protecting projects
+================================================================
+
+.. image:: https://github.com/matthiask/django-curtains/workflows/Tests/badge.svg
+    :target: https://github.com/matthiask/django-curtains/
+    :alt: CI Status
+
+
+Usage
+=====
+
+- Install the module using ``pip install django-curtains``
+- Add one of the included middleware to ``MIDDLEWARE``
+
+
+``curtains.middleware.only_staff``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Only allows access to authenticated staff members. The
+``ONLY_STAFF_EXEMPT`` setting (defaults to ``('/admin', 'accounts')``
+allows excluding URLs from the middleware.
+
+
+``curtains.middleware.basic_auth``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requires basic authorization to access the site. The
+``BASIC_AUTH_CREDENTIALS`` setting should be set to a list containing
+the username and the password for basic authorization, e.g.
+``BASIC_AUTH_CREDENTIALS = ['early', 'birds']``.
+
+
+``curtains.middleware.ip_networks_only``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requires a list of networks in the ``IP_NETWORKS`` setting. The default
+is ``127.0.0.0/8``.
+
+
