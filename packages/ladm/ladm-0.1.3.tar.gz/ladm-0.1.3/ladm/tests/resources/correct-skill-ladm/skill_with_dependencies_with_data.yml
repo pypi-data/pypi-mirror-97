@@ -1,0 +1,47 @@
+# skill identifier
+owner: "leftshiftone"
+name: "echo-test"
+
+# version control
+scm: ""
+
+# skill license
+license:
+  name: "Apache 2.0"
+  url: "https://apache.org/licenses/LICENSE-2.0.html"
+visibility: "public"
+
+# additional properties
+labels: ["ai", "nlp", "text", "ner"]
+authors: ["christian.weber@leftshift.one"]
+
+# the image with a python runtime
+image: "007098893018.dkr.ecr.eu-central-1.amazonaws.com/skill-runtime-python-3.7:1.0.0"
+
+resources:
+  cpu:
+    min: 100
+  memory:
+    min: 128
+properties:
+contract: ["./echo"]
+composable: true
+network_access: false # no internet access necessary
+
+permissions: ["dataApi/read"]
+
+dependencies:
+  libraries:
+    - ["zupline", "1.0.0"]
+    - ["tensorblow"]
+  system:
+    - ["libffi-dev"]
+    - ["default-jre", "2:1.11-71"]
+  data:
+    - gaia://tenant/a.txt
+    - gaia://tenant/test/b.txt
+
+# the main class to execute
+handler:
+  file: "handler"
+  function: "evaluate"
