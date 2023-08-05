@@ -1,0 +1,30 @@
+disable_existing_loggers: false
+version: 1
+formatters:
+    standard:
+        datefmt: '%Y-%m-%d %H:%M:%S'
+        format: '%(asctime)s  [%(name)-15.15s]  [%(levelname)-6.6s]  :::  %(message)s'
+handlers:
+    console:
+        class: logging.StreamHandler
+        formatter: standard
+        level: DEBUG
+    process:
+        level: DEBUG
+        class: logging.handlers.RotatingFileHandler
+        formatter: standard
+        filename: ../logs/process.log
+        maxBytes: 1000000
+        backupCount: 10
+loggers:
+    "":
+        handlers:
+            - console
+            - process
+        level: DEBUG
+        propagate: true
+    "urllib3":
+        handlers:
+            - console
+            - process
+        level: WARN
