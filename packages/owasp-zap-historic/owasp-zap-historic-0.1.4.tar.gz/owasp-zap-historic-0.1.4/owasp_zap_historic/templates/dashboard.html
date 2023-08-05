@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="https://img.icons8.com/ios-glyphs/2x/center-direction.png" rel="shortcut icon" type="image/x-icon"/>
+    <title>OWASP ZAP Historic - Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+    <script type="text/javascript">
+	   google.charts.load('current', {packages: ['corechart']});
+	</script>
+    <style>
+        .tabcontent {
+            padding: 60px 12px 0px 12px ;
+        }
+
+        .tablinks .active {
+            background-color: #666;
+            color: white;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 300;
+            background: -moz-linear-gradient(right,  #04455D 0%, #38113D 100%);
+            background: -webkit-gradient(linear, right top, left top, from(#04455D), to(#38113D));
+            color: rgb(22, 0, 0);
+        }
+
+        .tile {
+                width: 100%;
+                float: left;
+                margin: 0px;
+                list-style: none;
+                font-size: 28px;
+                color: #FFF;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                margin-bottom: 6px;
+                position: relative;
+                text-align: center;
+                color: white!important;
+                height:70px;
+            }
+
+            .tile.tile-fail {
+                background: #fc6666!important;
+            }
+            .tile.tile-pass {
+                background: #2ecc71!important;
+            }
+            .tile.tile-info {
+                background: #389b91!important;
+            }
+            .tile.tile-head {
+                /* background: #777676!important; */
+                background: rgb(96, 112, 112)!important;
+            }
+            .tile.tile-perf {
+                background: rgb(80, 140, 189)!important;
+            }
+            .tile.tile-apass {
+                background: rgb(96, 112, 112)!important;
+            }
+
+            a, a:hover {
+                text-decoration: none;
+                display: block;
+            }
+
+            span, .breadcrumb-item {
+                font-size: 15px;
+            }
+
+            .border-right {
+				border-right: 1px solid #ddd;
+			}
+			.borders {
+				border-left: 1px solid #ddd;
+				border-right: 1px solid #ddd;
+				margin: -1px;
+			}
+			.border-left {
+				border-left: 1px solid #ddd;
+			}
+			.footer {
+				position: relative;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				background-color: transparent;
+				color: white;
+				text-align: center;
+				padding: 1rem;
+			}
+
+    </style>
+</head>
+
+<body style="background-color:silver">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">OWASP ZAP Historic</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="tablinks active"><a href="./dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                    <li class="tablinks" onclick="executeDataTable()"><a href="./ehistoric"><i class="fa fa-history"></i> History</a></li>
+                    {% if session['name'] %}
+                    <li class="tablinks" onclick="executeDataTable()"><a href="./allalerts"><i class="fa fa-bolt"></i> Alerts</a></li>
+                    {% endif %}
+                    <li class="tablinks" onclick="executeDataTable()"><a href="https://rfhistoric-qe-tools.accruentsystems.com/" target="_blank"><i class="fa fa-android"></i> RF Historic</a></li>
+                    <li class="tablinks" onclick="executeDataTable()"><a href="https://dashboard-qe-tools.accruentsystems.com/" target="_blank"><i class="fa fa-asterisk"></i> QE Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tabcontent" style="background-color:silver">
+        <div class="d-flex flex-column flex-md-row align-items-center p-1 mb-3 bg-light border-bottom shadow-sm">
+            <h3 class="my-0 mr-md-auto font-weight-normal">
+				<span style="text-align:left; font-size:45px;"><b>{{db_name}} - Dashboard</b></span>
+				<span style="float:right; font-size:45px;"><b>Total Executions - {{results_data[0][0]}}</b></span>
+			</h3>
+        </div>
+        <hr>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background-color:darkgray">
+                <li class="breadcrumb-item"><a href="#"><b>Execution Statistics:</b></a></li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-3 border-right">
+                <span style="font-weight:bold; padding-left:55px;color:black">High Alerts:</span>
+				<table style="width:100%;height:200px;text-align: center;">
+					<tbody>
+						<tr style="height:60%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:100%">
+											<td style="font-size:60px; color:red">{{high_last_exe_data[0][0]}}</td>
+											<td style="font-size:60px; color:red">{{high_last_exe_data[0][1]}}</td>
+										</tr>
+										<tr>
+											<td><span style="color: black;font-size:12px">Recent High Alerts</span></td>
+											<td><span style="color: black;font-size:12px">Recent URLS Affected</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:35%">
+							<td></td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{high_overall_data[0][0]|int}}</td>
+											<td style="width: 33%; color:brown">{{high_overall_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{high_overall_data[0][2]|int}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall High Alerts: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{high_urls_data[0][0]}}</td>
+											<td style="width: 33%; color:brown">{{high_urls_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{high_urls_data[0][2]}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall URLS Affected: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+            </div>
+            <div class="col-md-3 borders">
+                <span style="font-weight:bold; padding-left:55px;color:black">Medium Alerts:</span>
+				<table style="width:100%;height:200px;text-align: center;">
+					<tbody>
+						<tr style="height:60%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:100%">
+											<td style="font-size:60px; color:#F6821F">{{medium_last_exe_data[0][0]}}</td>
+											<td style="font-size:60px; color:#F6821F">{{medium_last_exe_data[0][1]}}</td>
+										</tr>
+										<tr>
+											<td><span style="color: black;font-size:12px">Recent Medium Alerts</span></td>
+											<td><span style="color: black;font-size:12px">Recent URLS Affected</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:35%">
+							<td></td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{medium_overall_data[0][0]|int}}</td>
+											<td style="width: 33%; color:brown">{{medium_overall_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{medium_overall_data[0][2]|int}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall Medium Alerts: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{medium_urls_data[0][0]}}</td>
+											<td style="width: 33%; color:brown">{{medium_urls_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{medium_urls_data[0][2]}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall URLS Affected: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+            </div>
+            <div class="col-md-3 borders">
+                <span style="font-weight:bold; padding-left:55px;color:black">Low Alerts:</span>
+				<table style="width:100%;height:200px;text-align: center;">
+					<tbody>
+						<tr style="height:60%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:100%">
+											<td style="font-size:60px; color:#FFFF66">{{low_last_exe_data[0][0]}}</td>
+											<td style="font-size:60px; color:#FFFF66">{{low_last_exe_data[0][1]}}</td>
+										</tr>
+										<tr>
+											<td><span style="color: black;font-size:12px">Recent Low Alerts</span></td>
+											<td><span style="color: black;font-size:12px">Recent URLS Affected</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:35%">
+							<td></td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{low_overall_data[0][0]|int}}</td>
+											<td style="width: 33%; color:brown">{{low_overall_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{low_overall_data[0][2]|int}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall Low Alerts: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{low_urls_data[0][0]}}</td>
+											<td style="width: 33%; color:brown">{{low_urls_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{low_urls_data[0][2]}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall URLS Affected: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+            </div>
+            <div class="col-md-3 border-left">
+                <span style="font-weight:bold; padding-left:55px;color:black">Informational Alerts:</span>
+				<table style="width:100%;height:200px;text-align: center;">
+					<tbody>
+						<tr style="height:60%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:100%">
+											<td style="font-size:60px; color:black">{{info_last_exe_data[0][0]}}</td>
+											<td style="font-size:60px; color:black">{{info_last_exe_data[0][1]}}</td>
+										</tr>
+										<tr>
+											<td><span style="color: black;font-size:12px">Recent Informational Alerts</span></td>
+											<td><span style="color: black;font-size:12px">Recent URLS Affected</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:35%">
+							<td></td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{info_overall_data[0][0]|int}}</td>
+											<td style="width: 33%; color:brown">{{info_overall_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{info_overall_data[0][2]|int}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall Informational Alerts: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr style="height:5%">
+							<td>
+								<table style="width:100%">
+									<tbody>
+										<tr style="height:70%;font-size:25px" align="center" valign="middle">
+											<td style="width: 33%; color:green">{{info_urls_data[0][0]}}</td>
+											<td style="width: 33%; color:brown">{{info_urls_data[0][1]}}</td>
+											<td style="width: 33%; color:red">{{info_urls_data[0][2]}}</td>
+										</tr>
+										<tr style="height:30%" align="center" valign="top">
+											<td style="width: 33%"><span style="color: black;font-size:10px">Overall URLS Affected: Min</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Average</span></td>
+											<td style="width: 33%"><span style="color: black;font-size:10px">Max</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+            </div>
+        </div>
+        <hr>
+    </div>
+	<div class="footer">
+	    <a href="https://github.com/Accruent/owasp-zap-historic" target="_blank"">owasp-zap-historic</a>
+	</div>
+</body>
+
+</html>
