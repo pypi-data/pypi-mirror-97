@@ -1,0 +1,15 @@
+---
+- name: Install RPM dependencies for ogr
+  hosts: all
+  vars:
+    project_dir: "{{ playbook_dir }}/.."
+  tasks:
+    - include_tasks: tasks/generic-dnf-requirements.yaml
+    - include_tasks: tasks/build-rpm-deps.yaml
+    - name: Install deps as RPMs
+      dnf:
+        name:
+          - python3-pygithub
+          - python3-gitlab
+        state: present
+      become: true
