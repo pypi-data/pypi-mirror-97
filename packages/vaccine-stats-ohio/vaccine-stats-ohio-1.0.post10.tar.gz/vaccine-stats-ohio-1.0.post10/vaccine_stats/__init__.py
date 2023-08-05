@@ -1,0 +1,1 @@
+from .vaccine_stats import Vax_Stats
