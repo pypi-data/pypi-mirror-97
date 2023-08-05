@@ -1,0 +1,4 @@
+# UI settings
+DISABLE_SPLASH_SCREEN = True
+
+ENABLE_POSTGRES = True
