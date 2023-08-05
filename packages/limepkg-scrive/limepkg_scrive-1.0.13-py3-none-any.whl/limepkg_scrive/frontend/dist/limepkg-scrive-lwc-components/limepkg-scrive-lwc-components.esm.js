@@ -1,0 +1,1 @@
+import{p as e,b as p}from"./p-8af21e1f.js";e().then(e=>p([["p-polpjbtb",[[1,"lwc-limepkg-scrive-loader",{platform:[16],context:[16]}]]],["p-hjkpcgvs",[[1,"lwc-limepkg-scrive-test",{platform:[16],context:[16],document:[32],config:[32],includePerson:[32]}]]]],e));
