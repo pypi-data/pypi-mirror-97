@@ -1,0 +1,87 @@
+Metadata-Version: 2.1
+Name: lsreader
+Version: 0.1.27
+Summary: A reader to extract LS-DYNA results
+Home-page: UNKNOWN
+Author: LS-PrePost
+Author-email: hexi_lstc@outlook.com
+License: UNKNOWN
+Keywords: ls-dyna,d3plot,binout
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: C++
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+
+# LS-Reader Project
+
+The LS-Reader is designed to read LS-DYNA results and can extract the data of more than 1300 such as stress, strain, id, history variable, effective plastic strain, number of elements, binout data and so on now. The LS-Reader provides an uniform interface for getting these data. For convenience, input parameters, like number of state, number of integration point, are designed as keyword arguments. More details please see [LS-Reader Tutorial][tutorial].
+
+
+
+## How to use
+
+```python
+# D3plotReader
+from lsreader import D3plotReader, DataType as dt
+
+data_path = your/d3plot/file/path
+dr = D3plotReader(data_path)
+
+shell_stress = dr.get_data(dt.D3P_SHELL_STRESS, ist=0, ipt=1)
+print(shell_stress[0].x())
+
+shell_eps = dr.get_data(dt.D3P_SHELL_EFFECTIVE_PLASTIC_STRAIN, ist=0, ipt=1)
+print(shell_eps[0])
+
+thickness = dr.get_data(dt.D3P_SHELL_THICKNESS, ist=11)
+print(thickness[0])
+
+num_solid_element = dr.get_data(dt.D3P_NUM_SOLID)
+print(num_solid_element)
+
+# Get d3plot data by part
+num_solid_pid_4 = dr.get_data(dt.D3P_NUM_SOLID, ipart_user=4)
+
+shell_stress_pid_4 = dr.get_data(dt.D3P_SHELL_STRESS, ist=4, ipt=0, ipart_user=4)
+
+# Get data by part set
+num_shells = dr.get_data(dt.D3P_NUM_SHELL, ipartset_user=[1, 2])
+
+# Get numpy array(numpy is required to be installed, using "pip install numpy")
+shell_stress = dr.get_data(dt.D3P_SHELL_STRESS, ist=0, ipt=1, ask_for_numpy_array=True)
+print(shell_stress)
+
+# BinoutReader
+from lsreader import BinoutReader, BINOUT_DataType as bdt
+
+data_path = your/binout/file/path
+br = BinoutReader(data_path)
+
+branches = br.get_data(bdt.BINOUT_BRANCHES)
+print(branches)
+
+ids = br.get_data(bdt.BINOUT_NODOUT_IDS)
+print(ids)
+...
+...
+...
+
+```
+
+
+
+[Latest Tutorial][tutorial]
+
+[The examples and documents for this project is available here][example].
+
+[tutorial]: <https://github.com/LS-Reader/LS-Reader-Tutorial>
+[example]: <http://ftp.lstc.com/anonymous/outgoing/lsprepost/LS-Reader/>
+
