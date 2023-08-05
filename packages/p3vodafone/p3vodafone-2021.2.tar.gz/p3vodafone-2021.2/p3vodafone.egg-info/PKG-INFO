@@ -1,0 +1,61 @@
+Metadata-Version: 2.1
+Name: p3vodafone
+Version: 2021.2
+Summary: UNKNOWN
+Home-page: https://gitlab.com/otevrenamesta/praha3/vyuctovani-vodafone
+Author: Štěpán Štrébl
+Author-email: strebl.stepan@praha3.cz
+License: AGPL-3.0
+Description: # VyĂşÄŤtovĂˇnĂ­ Vodafone - Praha 3
+        
+        Projekt pro zpracovĂˇnĂ­ fakturace od Vodafone proti internĂ­ evidenci zamÄ›stancĹŻ, tarifĹŻ a limitĹŻ.
+        NaÄŤte soubor se zamÄ›stnanci a jejich telefonnĂ­mi ÄŤĂ­sly, projede fakturu a vyhodnotĂ­, co kdo mĂˇ zaplatit.
+        Vyjede sjetinu se srĂˇĹľkami pro personĂˇlnĂ­ a vyĂşÄŤtovĂˇnĂ­ pro jednotlivĂ© zamÄ›stnance, kterĂ© jim poĹˇle na email.
+        
+        ## VstupnĂ­ soubory
+        
+        - Seznam zamÄ›stnancĹŻ (napĹ™. "seznam-lidi.xlsx")
+        - Vodafone vyĂşÄŤtovĂˇnĂ­ (napĹ™. "report_xls_12345_123456789_202011.xlsx")
+        
+        PĹ™Ă­klady souborĹŻ jsou ve sloĹľce **example_data**
+        
+        - seznam lidĂ­ mĹŻĹľe obsahovat jak zamÄ›stnance tak telefonnĂ­ ÄŤĂ­sla, kterĂˇ jsou napĹ™Ă­klad v technickĂ©m vybavenĂ­ (EZS, parkovacĂ­ automat, atp.)
+        - vyĂşÄŤtovĂˇnĂ­ v repozitĂˇĹ™i, neobsahuje vĹˇechny listy, ale jen pro ukĂˇzku, co tato aplikace oÄŤekĂˇvĂˇ, samotnĂ˝ report z Vodafone nemusĂ­te pĹ™ed pouĹľitĂ­m nijak upravovat
+        
+        ## VĂ˝stupnĂ­ soubory
+        
+        - "srazky_{rok}_mesic.xls" - seznam zamÄ›stnancĹŻ, jejich osobnĂ­ch ÄŤĂ­sel a vĂ˝Ĺˇe srĂˇĹľky za danĂ˝ mÄ›sĂ­c
+        - "{os. ÄŤĂ­slo zamÄ›stnance}_vyuctovani_{mesic}_{rok}.pdf" - rozĂşÄŤtovĂˇnĂ­ srĂˇĹľek, vÄŤ. seznamu jednotlivĂ˝ch sluĹľeb
+        
+        VĂ˝stup se tvoĹ™Ă­ v rĂˇmci vybranĂ©ho adresĂˇĹ™e pro vĂ˝stupy, PDF vyĂşÄŤtovĂˇnĂ­ se tvoĹ™Ă­ v pod-sloĹľce "{mesic}_{rok}", soubor srĂˇĹľek pak pĹ™Ă­mo v adresĂˇĹ™i pro vĂ˝stupy
+        
+        ## DiagnostickĂˇ data
+        
+        - SQLite DatabĂˇze, kterĂˇ obsahuje jednotlivĂ© poloĹľky, vÄŤ. originĂˇlnĂ­ vĂ˝Ĺˇe ĂşÄŤtovanĂ©ho nĂˇkladu od Vodafone a pĹ™Ă­p. rozdĂ­lnĂ© vĂ˝Ĺˇe srĂˇĹľky z platu
+        - Pokud aplikaci spouĹˇtĂ­te v terminĂˇlu, diagnostickĂ© logy, napĹ™. ÄŤasovĂˇnĂ­ jednotlivĂ˝ch metod nebo zajĂ­mavĂ© detaily z jednotlivĂ˝ch funkcĂ­
+        
+        VĂ˝chozĂ­ pracovnĂ­ adresĂˇĹ™ je v aplikaÄŤnĂ­ch datech uĹľivatelskĂ©ho profilu (Linux: `~/.config/P3Vodafone`, Windows: `AppData/Local/P3Vodafone`), zde se takĂ© udrĹľuje soubor s nastavenĂ­m `p3vodafone.ini` a databĂˇze `telefonie.sqlite`,
+        pokud uĹľivatel chce, mĹŻĹľe zde vyĂşĹľĂ­vat i pĹ™ed-vytvoĹ™enĂ© adresĂˇĹ™e pro vstupnĂ­ soubory a sloĹľku pro vĂ˝stupy, tj. `outputs`
+        
+        ## Instalace
+        
+        ### ProdukÄŤnĂ­ instalace
+        
+        Pokud chcete provozovat na Windows, nainstalujte si poslednĂ­ Python 3.x vydĂˇnĂ­ z [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)
+        ```
+        # instalace
+        pip install p3vodafone
+        # spuĹˇtÄ›nĂ­
+        vyuctovani-vodafone
+        ```
+        
+        ### TestovĂˇnĂ­ / VĂ˝voj
+        
+        ```
+        git clone https://gitlab.com/otevrenamesta/praha3/vyuctovani-vodafone.git
+        cd vyuctovani-vodafone
+        python3 -m p3vodafone.user_interface
+        ```
+        
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
