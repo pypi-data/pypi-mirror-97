@@ -1,0 +1,67 @@
+Metadata-Version: 2.1
+Name: octopulse-logger
+Version: 0.1.0
+Summary: A small example package
+Home-page: https://gitlab.com/octopulse/back/octopulse-python-logger
+Author: Hugo Bauer
+Author-email: hugo@octopulse.io
+License: UNKNOWN
+Project-URL: Bug Tracker, https://gitlab.com/octopulse/back/octopulse-python-logger/-/issues
+Description: # Octopulse Python Logger Package
+        
+        This is a Python library to setup clean structured logs, for local development, and production with Google Cloud Logging.
+        
+        This logger uses these external packages:
+        * `google-cloud-logging`
+        * `structlog`
+        * `colorama`
+        * `python-json-logger`
+        
+        ## Installation
+        
+        Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the package.
+        
+        ```bash
+        pip install octopulse-logger
+        ```
+        
+        ## Setup
+        
+        To be able to sent logs to GCP, you need to provide authentication credentials to your application code by setting the environment variable `GOOGLE_APPLICATION_CREDENTIALS`
+        Replace `[PATH]` with the file path of the JSON file that contains your service account key.
+        ```commandline
+        export GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
+        ```
+        
+        Setup `_env` to `prod` to send logs to Google Cloud Logging
+        
+        ## Usage
+        
+        ```python
+        from octopulse_logger import logger_setup
+        
+        logger_setup.setup('logger_name', _env='test') # setup the logger
+        ```
+        
+        Then you can start to log with [default logger](https://docs.python.org/3/howto/logging.html) or [structlog](https://www.structlog.org/en/stable/) :
+        ```python
+        import logging
+        import structlog
+        
+        structlog.warning('Warning !', value_a=1)
+        # or
+        logging.error('An error occurred :(')
+        
+        ```
+        ## Contributing
+        Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+        
+        Please make sure to update tests as appropriate.
+        
+        ## License
+        [MIT](https://choosealicense.com/licenses/mit/)
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
