@@ -1,0 +1,101 @@
+{% set cluster_network_ipv6 = {"cidr": "fd01::/48", "hostPrefix": 64} %}
+{% set network_type = network_type|default('OpenShiftSDN') %}
+{% set cluster_network_ipv4 = {"cidr": "10.132.0.0/14", "hostPrefix": 23} %}
+{% set service_network_ipv6 = ["fd02::/112"] %}
+{% set service_network_ipv4 = ["172.30.0.0/16"] %}
+{% set machine_cidr_ipv4 = ["10.0.0.0/16"] %}
+{% set machine_cidr_ipv6 = ["fc00::/48"] %}
+{% if dualstack|default(False) %}
+{% set machine_cidrs = machine_cidr_ipv4 + machine_cidr_ipv6 %}
+{% set cluster_networks = [cluster_network_ipv4] + [cluster_network_ipv6] %}
+{% set service_networks = service_network_ipv4 + service_network_ipv6 %}
+{% if ipv6 %}
+{% set machine_cidrs = machine_cidrs|reverse %}
+{% set cluster_networks = cluster_networks|reverse %}
+{% set service_networks = service_networks|reverse %}
+{% endif %}
+{% elif ipv6 %}
+{% set machine_cidrs = machine_cidr_ipv6 %}
+{% set cluster_networks = [cluster_network_ipv6] %}
+{% set service_networks = service_network_ipv6 %}
+{% else %}
+{% set machine_cidrs = machine_cidr_ipv4 %}
+{% set cluster_networks = [cluster_network_ipv4] %}
+{% set service_networks = service_network_ipv4 %}
+{% endif %}
+apiVersion: v1
+{% if fips %}
+fips: True
+{% endif %}
+baseDomain: {{ domain }}
+{% if http_proxy != None %}
+proxy:
+    httpProxy: {{ 'http://' + http_proxy if 'http' not in http_proxy else http_proxy }}
+    httpsProxy: {{ 'http://' + http_proxy if 'http' not in http_proxy else http_proxy }}
+{% if no_proxy != None %}
+    noProxy: {{ no_proxy }}
+{% endif %}
+{% endif %}
+compute:
+- name: worker
+  replicas: {{ workers }}
+controlPlane:
+  name: master
+  replicas: {{ masters }}
+metadata:
+  name: {{ cluster }}
+networking:
+  networkType: {{ network_type }}
+{% if network_type == 'OVNKubernetes' %}
+  machineNetwork:
+{% for cidr in machine_cidrs %}
+  - cidr: {{ cidr }}
+{% endfor %}
+{% endif %}
+  clusterNetwork:
+{% for network in cluster_networks %}
+  - cidr: {{ network['cidr'] }}
+    hostPrefix: {{ network['hostPrefix'] }}
+{% endfor %}
+  serviceNetwork:
+{% for network in service_networks %}
+  - {{ network }}
+{% endfor %}
+platform:
+{% if config_type == 'vsphere' %}
+  vsphere:
+    vcenter: {{ config_host }}
+    username: {{ config_user }}
+    password: {{ config_password }}
+    datacenter: {{ config_datacenter }}
+    defaultDatastore: {{ config_pool }}
+{% else %} 
+  none: {}
+{% endif %}
+{% if sno %}
+BootstrapInPlace:
+  InstallationDisk: /dev/{{ sno_disk | basename }}
+{% endif %}
+{% if ca != None %}
+additionalTrustBundle: |
+ {{ ca | replace('\n', '\n ') }}
+{% endif %}
+pullSecret: '{{ pull_secret }}'
+sshKey: |
+  {{ pub_key }}
+{% if disconnected_url != None %}
+imageContentSources:
+- mirrors:
+  - {{ disconnected_url }}/{{ disconnected_prefix }}
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - {{ disconnected_url }}/{{ disconnected_prefix }}
+  source: {{ disconnected_origin }}/{{ 'ocp/release' if disconnected_origin != 'quay.io' else "ocp-release" }}
+{% elif imagecontentsources %}
+imageContentSources:
+{% for source in imagecontentsources %}
+- mirrors:
+  - {{ source }}
+  source: image-registry.openshift-image-registry.svc:5000/openshift/{{ source | basename | replace("openshift-", "")}}
+{% endfor %}
+{% endif %}
