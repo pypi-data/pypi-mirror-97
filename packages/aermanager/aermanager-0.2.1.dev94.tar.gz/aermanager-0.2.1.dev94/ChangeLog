@@ -1,0 +1,251 @@
+CHANGES
+=======
+
+* Restructured documentation and added N-MNIST example
+* bug fix
+* Updated notebook and fixed headings
+* Added couple of methods in pre-processing
+* Update annotation tutorial
+* Enforce the use of time\_window in aedat\_covert\_to\_video while allowing kwargs to be forwarded to dataset\_content\_generator
+* Fix typo in markdown cell
+* Update backannotation tutorial with interactive plot and usecases for annotated data loading functions
+* Add helper functions to load annotated HDF files - load\_annotated\_slice: opens a single HHDF file and returns the list of events and the list of labels - load rois LUT: loads the lookup table between tracked ROI id and label - load\_labels\_lut: loads the LUT for label id (uint8) -> CVAT label name (string)
+* Fix bug in rectangle parsing - X and Y coordinates were inverted
+* Update annotations tutorial to the new backannotation API
+* Refactor aedat\_convert\_to\_video to work with the new dataset\_content\_generator API
+* Avoid accumulating ids and labels into tuples - Refactor per\_frame\_labels implementation - Refactor unit-test accordingly - Save Id to "spikes/id" dataset in hdf5 file
+* Split cvat annotation functions in separate files
+* Add gen\_annotated\_dataset\_from\_list and save\_to\_annotated\_dataset - Only field that is not being saved is spikes/id
+* Add early exit to load\_labelled\_track\_rois - If input is None, None will be returned
+* Remove function inverse\_labels\_lut - Remove its unit-test
+* New implementation for per\_frame\_labels - Support having NaNs - Support having tuples of different sizes
+* Rename parse\_labels\_impl with \_parse\_labels
+* Refactor impl function to start with \_ in order to not be visible when imported
+* Drop duplicate rois annotations
+* Remove tests that are testing the behavior of skimage.draw .polygon - Useful to understand what was going on, not related to our product - For sure they have their own unit-tests for that :)
+* Add function to load the inverse label LUT - While the direct goes from string -> label\_id the inverse goes from label\_id -> string - The label\_id is an incremental integer
+* Add method to create track\_id -> label dictionary - Add unit-test for it - Empty dictionary in output for files with no tracks
+* Style and whitespaces refactor
+* Add function that returns the list of labels used in a frame
+* Simplify annotate\_events\_impl - Return numpy structured array - Column order 'x', 'y', 't', 'p', 'label', 'id'
+* Move annotation step after cropping and hotpixel removal - This will annotate only events that are interesting
+* Remove returning the labels LUT from annotations - It duplicates handlig the same lut when using both tags and rois - We can do it on the side with a specific function
+* Refactor dataset\_content\_generator - Accept two new optional kwargs - Return type remains consistent - xytp adds two columns 'label' and 'id' which contatins two tuples
+* Remove cyclical inclusion of modules - Minor names refactor in annotate\_events
+* Add method to annotate non-sliced events - Accepts as optional tag and roi labels
+* Improve frame\_to\_timestamp - Return the correct lambda both for sliced events and for non-sliced events
+* Add function to return labels LUT
+* Add function to create LUT between tracked roi id and label
+* Adding pandas to requirements.txt
+* Update tutorial on events backannotation
+* Add unit-tests for load\_tags and load\_annotations
+* Remove unused code in test\_annotate\_events
+* Add unit-test for label\_events with empty DFs
+* Refactor annotate\_events to allow default empty annotations DF - This improves the existing approach for annotations coming from different sources
+* Fix default type in frame\_from\_timestamp
+* Add unit-tests for label\_events
+* Add unit-test for frame\_from\_timestamp returned lambda
+* Names refactor in annotate\_aedat
+* Update demo notebook
+* Full backannotation with multilabel and multiid support
+* Drop duplicates uses all columns by default
+* Verify new backannotation cost
+* Refactor in load\_annotations functions
+* Homogenize tags and annotation output format
+* Return task tags as pandas DataFrame
+* Split label parsing and dictionary generation into separate functions
+* Use itertools to simplify parser
+* Name refactor in load\_annotations
+* Add simple unit tests for file dependent functions
+* Add unit-test for annotation loading
+* Name refacor for bb and poly parsing function
+* Major refactor in parse\_task\_annotation function - Shifted annotation logic to a new function annotate\_roi - Divided vertices parsing function in two functions: xml parsing and vertices parsing - Fix unit-tests accordingly
+* Refactor load\_annotations to new data format - Refactor unit tests accordingly - Still WIP
+* Remove dummy\_labels.json - not needed by the tests anymore
+* Minor refactor to annotate\_rectangle\_roi
+* Add the blob id information to the label
+* Compute vertices in parsing function and not during ROI annotation
+* Frame tagging works with pythonic types
+* Start refactoring tag annotation
+* Remove unit-tests for deleted code
+* Apply pep8
+* Update parser to use native python types
+* Use np.interp to associate timestamp to frames
+* Update the notebook to load tags
+* update tutorial notebook
+* Add first approach to full-frame tagging - Very similar to what was already used for polygon and ROI tagging - Improve code reuse
+* Add dummy image annotations
+* Rename load\_labels.py to parser.py
+* Move all xml parsing functions in load\_labels - Rename annotation\_labels\_as\_dictionary to parse\_task\_labels
+* Refactor unnecessary packages
+* Fix notebook documentation
+* Refactor method to load labels Labels will be parsed directly from annotations
+* Remove implementation of load\_cvat\_labels from json file
+* Disallow using spike\_count as parameter when creating annotation video
+* Apply formatting to annotate\_aedat
+* Adding dummy CVAT for image annotations
+* Refacor in separate function annotation meta information parsing
+* converting frames into floats
+* CI script updated
+* Minor url correction in the documentation
+* Documentation updated
+* converting frames into floats
+
+0.2
+---
+
+* Readme file updated
+* Doc strings for missing params added
+* tqdm progressbar added to dataset\_generator
+* Notebook/docs updated with API changes
+* parser passed to dataset generator methods
+* unittests added to CI
+* tests on datasets pass
+* Parser passed as a parameter to load method
+* added  bins to saved files
+* sped up test
+* things raise errors when files not found
+* Added parse support for bin files from N-MNIST dataset
+* fixed test on the fly accum
+* requirements file added
+* packages from requirements.txt also added to ci before script
+* ci and pbr added
+* Documentation updated and depricated files deleted
+* Minor update
+* Bug fix in label generation
+* Added how-tos notebook
+* Remove \_\_init\_\_ from tests - The issue with pytest was not related to packaging, but was related to the python environment
+* Tests init file can be empty
+* Avoid local paths for dummy\_label json file
+* Uncomment unit-tests and add \_\_init\_\_ file to test folder - Without all tests would fail
+* Update annotations notebook
+* Add sanity checks on types in lower\_bound
+* Remove empty \_\_init\_\_ files
+* Update backannotation tutorial
+* Fix packaging for aedat\_to\_video
+* Minor packaging refactor
+* Move aedat\_to\_video inside cvat submodule - Can be used to build a video conversion script - Can be used directly in a notebook to perform video conversion
+* Bugfix in loading polygon vertices - Improve unit-testing
+* Update sample notebook
+* Update dummy label to proper value
+* Improve test coverage for loading annotations
+* Splitting load\_annotation functions in separate file
+* Refactor structure for cvat related functionalities - Create submodule cvat - Move label loading function into submodule - Rename test\_load\_cvat\_labels to test\_load\_cvat\_annotations
+* Rename dummy annotations file
+* Name refactor - Rename 'load\_annotated' with 'aedat\_load\_annotated' - Renamed file backannotate to annotate\_aedat
+* Refactor backannotate and provide notebook for easy testing and interaction
+* Add dummy CVAT video annotation file in test folder
+* First backannotation working draft - Use broadcast in lower\_bound - Add annotate\_events function
+* Add \_\_init\_\_.py to aermanager folder
+* Load labels from json file - Add unit test
+* Load labels from CVAT Json file
+* Add dummy CVAT labels
+* Refactor lower\_bound
+* Add test file for backannotation utility functions
+* Add backannotation script from cvat-demo
+* Adapt aedat\_convert\_to\_video to new aermanager API
+* Copy aedat\_utils.py from cvat-demo repository
+* Copy aedat\_to\_video.py from cvat-demo repository
+* Update gitignore - .vscode config folder -  hdf5 files (maybe too harsh?) -  venv folder
+* added datasets and tests
+* Split file saving into two methods
+* tests adapted and passing, removed some files
+* removed legacy file
+* added tests
+* pep8 cleanup
+* written functions for dataset generation
+* structure for dataset generation in place
+* bug fix in datase\_content\_generator
+* Save data to h5 files now possible
+* Slice functions only return indices
+* Data preprocessing methods and tests added
+* updated transform randomness
+* removed bash stuff from tutorial
+* added torchvision to requirements
+* reshape to new size
+* transform: visualization function for multiple images
+* merged change
+* transform: reverted to using list
+* added transform to init
+* transform: changed details of 4d implementation, added test
+* transform: fixed random seed, added tests
+* support transform on 4 dim video
+* transform to resized image
+* transform to resized shape
+
+v0.1
+----
+
+* added DS\_Store to gitignore
+* fixed bug for qlen=1 in liveaer
+* requirement of 2-dim input now optional (for data collection GUI)
+* removed choice of toPIL because it didnt work
+* added documentation and removed useless part
+* added function to sanitize torchvision transforms by applying them channel by channel and relative tests
+* fixed bug found by Qian
+* changed deprecated thing
+* changed IBM gestures decoder
+* reinstated save to folder of pngs
+* fixed bug where blank lines where treated as files
+* support for file lists without labels
+* added two channel mode in live aer
+* moved back to 1,64,64 shape
+* removed breakpoint
+* implemented channels for polarity
+* merged qians review branch
+* compromise situation with channels at the end for frames
+* added channels dimension for pytorch standard shape
+* review done
+* merge with master
+* added installation to readme
+* and the png of the diagrams
+* added diagrams
+* Add LICENSE
+* formatting
+* changed name removing 4
+* download all mnist digits
+* created tutorial as notebook
+* fix installation and tests
+* added readme
+* removed benchmark file
+* refactored to aermanager
+* to\_numpy kept, but simplified
+* added docstring to liveaer
+* removed \_main\_
+* deleted convert from frames
+* removed print statement
+* live aer
+* fixed forgotten tests, and bugs in untested code
+* last updates on p
+* fixed bugs in crop, added tqdm
+* legacy aedat and struct np arrays
+* updated ms accumulator, now works, and tests
+* fixed spatial binning of the accumulator, and saved bins
+* fixed test imports
+* critical bugfix (same-name files)
+* added setup.py
+* lowercase name
+* reorganized folders
+* reintroduce asserts for future checks
+* safety check for overflow
+* output needs to be uint8
+* reviewed hot pixel removal, much faster
+* typo
+* should now work saving spiketrains correctly
+* now csv-based loading and saving
+* bugfix
+* bugfix
+* added init file
+* underscored methods
+* added documentation
+* AERFolderDataset added and test
+* small corrections to documentation
+* added documentation; saving npz files in folder; refactored names
+* added final type annot
+* cleaned and documented pytorch datasets
+* tests added
+* added hot pixel removal and reorganized + bugfix
+* cropping implemented
+* possibly working from events
+* working converter from frames
+* WIP
