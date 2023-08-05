@@ -1,0 +1,89 @@
+Metadata-Version: 2.1
+Name: take-ngram
+Version: 0.1.0
+Summary: Analysis of N-gram in a set of messages
+Home-page: UNKNOWN
+Author: Data & Analytics Research
+Author-email: analytics.dar@take.net
+Maintainer: daresearch
+Maintainer-email: anaytics.dar@take.net
+License: MIT License
+Description: # Take NGram
+        TakeNGram is a tool to provide analysis of n-grams in a dataset of messages. 
+        
+        The recommendation usage is with the InsightExtractor Cloud CSV output.
+        
+        The analysis consists in creation of a dictionary with the n-grams of all messages and their respective frequency. Besides the creation of word cloud of the n-grams.
+        
+        All analysis can be made in a group of sentences of a subject (most useful with the Insight Extractor output).
+        
+        ## Overview
+        * [Installation](#installation)
+        * [Usage](#usage)
+        
+        ## Installation
+        The `take_ngram` package cab be installed from PyPI.
+        
+        ```bash
+        pip install take_ngram
+        ```
+        
+        ## Usage
+        For usage the file must have to be a `CSV` file. 
+        
+        All the examples are based on the Insight Extractor output.
+        
+        1. Creating a BiGram of the sentences and get the WordCloud.
+        ```python
+        from take_ngram import NGram
+        bigram = NGram('file.csv',
+                       'Structured Message')
+        bigram.get_word_cloud()
+        ```
+        
+        2. Creating a BiGram of the sentences and saving the WordCloud.
+        ```python
+        from take_ngram import NGram
+        bigram = NGram('file.csv', 
+                       'Structured Message')
+        bigram.get_word_cloud(file_path='image.png')
+        ```
+        
+        3. Adding stop words
+        ```python
+        from take_ngram import NGram
+        bigram = NGram('file.csv', 
+                       'Structured Message',
+                        stop_words = ['segunda'])
+        bigram.get_word_cloud(file_path='image.png')
+        ```
+        
+        4. Removing prepositions from stop words
+        - By default prepositions are added to the stop words
+        ```python
+        from take_ngram import NGram
+        bigram = NGram('file.csv', 
+                       'Structured Message', 
+                       remove_prepositions=False)
+        bigram.get_word_cloud(file_path='image.png')
+        ```
+        
+        5. Making n-grams for some specific subjects.
+        ```python
+        from take_ngram import NGram
+        bigram = NGram('file.csv', 
+                        'Structured Message', 
+                        subject_column = 'Groups', 
+                        subject_list = ['fatura','plano'])
+        bigram.get_word_cloud(file_path='image.png')
+        ```
+        
+        
+        ## Author 
+        Take Blip Data&Analytics Research
+        
+Keywords: ngram,chatbot
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
