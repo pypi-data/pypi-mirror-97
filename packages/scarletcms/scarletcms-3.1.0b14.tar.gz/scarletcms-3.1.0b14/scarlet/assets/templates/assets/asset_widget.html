@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<div class="asset" data-api="{{ link|safe }}" data-title="{{ object.user_filename }}" data-tags="{{ asset_tags }}">
+	<div class="asset__preview" style="background-image:url({{ object.file.admin_url }})" data-src="{{ object.file.admin_url }}"></div>
+    <div class="asset__actions">
+        <div class="asset__select">
+            {{ hidden_input }}
+
+            <div class="asset__buttons">
+              {% if add_link %}
+              <a class="button button--primary asset__add-link" target="_blank" href="{{ add_link }}">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  Upload New
+              </a>
+              {% endif %}
+            <a class="button button--secondary button--disabled disabled asset__edit-link" data-base="{{ base_api_link }}" href="#">Edit Crop</a>
+          </div>
+        </div>
+        {% if sizes and show_crops %}
+            <ul class="asset__crop-list" data-base-link="{{ base_api_link }}" >
+            {% for each in sizes %}
+                <li class="asset__crop-item" data-crop-link="{{ each.post_link }}" >
+
+                    <span class="asset__crop-label">{{ each.name }} {% if each.width %}{{ each.width }}{% else %}??{% endif %}x{% if each.height %}{{ each.height }}{% else %}??{% endif %}px</span>
+                    <a href="#" class="button asset__crop-link">Edit Crop</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% if required_tags %}<p class="asset__tags">Tagged: {{ required_tags }}</p>{% endif %}
+    </div>
+</div>

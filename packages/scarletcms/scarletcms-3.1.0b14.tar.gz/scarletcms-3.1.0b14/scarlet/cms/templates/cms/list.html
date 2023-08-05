@@ -1,0 +1,196 @@
+{% extends base %}
+{% load cms %}
+
+{% block content_class %}list{% endblock %}
+{% block main_content %}
+
+  {% block filter %}
+  {% if filter_form %}
+
+  <div class="filters {% if filter_form.has_changed %}filters--filtered{% endif %}">
+    <span class="filters__label">Filter</span>
+    <i class="fa fa-angle-down"></i>
+    <form class="filters__form" action="" method="get">
+      {{ filter_form }}
+      <div class="button-group button-group--submit">
+         {% if filter_form.has_changed %}
+          <a class="button button--secondary" href="{{ request.path }}">Clear</a>
+        {% endif %}
+        <input type="submit" value="Filter" class="button button--primary" />
+      </div>
+    </form>
+  </div>
+  {% endif %}
+  {% endblock %}
+
+  {% block list %}
+  {% if show_form %}
+  <form data-form-id="list" name= "listform" action="{{ action_url }}" method="post">
+    {% csrf_token %}
+    {{ list.formset.management_form }}
+  {% endif %}
+
+  <div class="button-group button-group--actions {% if not actions %}hidden{% endif %}">
+      {% block add %}
+      {% bundle_url bundle "add" as add_url %}
+      {% if add_url and add_url != request.path_info %}
+      <div class="divider">
+        <a class="button button--primary add" href="{{ add_url }}">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>Add {{ model_name }}
+        </a>
+      </div>
+      {% endif %}
+      {% endblock %}
+
+      {% if not list.empty %}
+      {% if actions %}
+      <div class="divider">
+        {% for url, option in actions %}
+          <a class="button disabled button--disabled" data-type="batch-action" data-action="{{ option|lower }}" href="{{ url }}?_selected=">{{ option }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% block submit %}
+      {% if show_form %}
+        <div class="divider">
+          <a class="button button--secondary" href="{{ cancel_url }}">Cancel</a>
+          <input class="button button--primary" type="submit" value="Save" />
+        </div>
+      {% endif %}
+      {% endblock %}
+
+      {% block preview %}
+      {% if parent_preview_url %}
+        <div class="divider">
+          <a class="button button--primary" href="{{ parent_preview_url }}">Preview</a>
+        </div>
+      {% endif %}
+      {% endblock %}
+
+      {% endif %}
+  </div>
+  <table class="{% if list.empty %}is-empty{% endif %} list-table">
+    <thead>
+    <tr>
+      {% if actions and not list.empty %}
+        <th class="checkbox"><input type="checkbox" data-type="batch-check-all" autocomplete="off" /></th>
+        <th>ACTIONS</th>
+      {% endif %}
+          {% if not list.empty %}
+            {% for f in list.labels %}
+              <th class="{% if f.sortable %}sortable{% endif %}">
+              {% if f.sortable %}
+                <a data-id="{{f.attr}}" data-type={{f.order_type}} href="" class="sort {% if f.cur_sorted %}{{f.order_type}}{% endif %}">
+                  {{ f.name|capfirst }}
+                  {% if f.order_type == "asc" %}
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                  {% else %}
+                    <i class="fa fa-caret-up" aria-hidden="true"></i>
+                  {% endif %}
+                </a>
+              {% else %}
+                {{ f.name|capfirst }}
+              {% endif %}
+              </th>
+            {% endfor %}
+          {% else %}
+              <th>No {{ model_name_plural }} found.</th>
+          {% endif %}
+    </tr>
+    </thead>
+
+    <tbody {% if list.auto_sort %} data-current-page="{{ page_obj.number }}" data-per-page="{{page_obj.paginator.per_page}}" draggable="true"{% endif %}>
+    {% for row in list %}
+    {% if show_form %}
+      {{ row.form.non_field_errors }}
+    {% endif %}
+
+    <tr>
+    {% if actions %}
+    <td class="checkbox {% if list.auto_sort %}draggable{% endif %}">
+      <input type="checkbox" data-type="batch-check-row" name ="{{ checkbox_name }}" value="{{ row.instance.pk }}" autocomplete="off" />
+    </td>
+    {% endif %}
+      <td class="actions ">
+      {% for action_link in action_links %}
+        {% bundle_url bundle action_link.0 object=row.instance follow_parent=False as url %}
+        {% if url %}
+          <a href="{{ url }}{% if action_link.3 %}?{{ origin_var }}={{ origin_qs|urlencode }}{% endif %}" class="actions__action"  title="{{ action_link.1 }}">
+            {% if action_link.1|lower == 'edit' %}
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            {% endif %}
+            {% if action_link.1|lower == 'delete' %}
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
+            {% endif %}
+            {% if action_link.1|lower == 'publish' %}
+            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+            {% endif %}
+          </a>
+        {% elif action_link.0 == "preview" and row.instance.get_absolute_url %}
+          <a href="{{ row.instance.get_absolute_url }}" class="actions__action" title="Preview" target="_blank">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% with row.instance.status_line as line %}
+      {% if line %}
+        <div class="actions__help">{{ line }}</div>
+      {% endif %}
+      {% endwith %}
+      </td>
+
+
+      {% for elem in row %}
+        {% bundle_url bundle "edit" object=row.instance follow_parent=False as edit_url %}
+        <td  {% if edit_url and forloop.counter0 == list.link_num %}class="link-cell" data-edit-url="{{edit_url}}"{% endif %}>
+        {% if show_form and forloop.first %}
+          {% for hidden_f in row.form.hidden_fields %}
+            {{ hidden_f }}
+          {% endfor %}
+        {% endif %}
+
+        {% if elem.field %}
+          {{ elem.field }}
+        {% else %}
+                    {{ elem }}
+        {% endif %}
+
+        {% with elem.errors as errors %}
+        {% if errors %}
+          {{ errors }}
+        {% endif %}
+        {% endwith %}
+        </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if show_form %}
+  </form>
+  {% endif %}
+
+  {% if is_paginated and not list.empty %}
+    <div class="pagination">
+      <span class="page-links">
+        {% if page_obj.has_previous %}
+          <a href="{{query_string}}page={{ page_obj.previous_page_number }}" class="pagination__previous" title="Previous">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+        {% endif %}
+        <span class="pagination__current-page">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+          <a href="{{query_string}}page={{ page_obj.next_page_number }}" class="pagination__next" title="Next">
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        {% endif %}
+      </span>
+    </div>
+  {% endif %}
+  {% endblock %}
+{% endblock %}
