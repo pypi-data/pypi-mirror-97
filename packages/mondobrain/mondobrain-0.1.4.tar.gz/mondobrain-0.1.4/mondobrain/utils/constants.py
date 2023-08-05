@@ -1,0 +1,2 @@
+MIN_SOLVER_SIZE = 2
+RULE_PREFIX = "__rule"
