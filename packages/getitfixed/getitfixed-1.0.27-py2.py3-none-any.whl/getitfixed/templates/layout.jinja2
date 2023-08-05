@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="{{request.locale_name}}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="pyramid web application">
+    <meta name="author" content="Camptocamp">
+    {% if ((request.c2cgeoform_application) and (request.c2cgeoform_application.name() != "getitfixed")) %}
+    <meta name="robots" content="noindex">
+    {% endif %}
+
+    {% block title %}
+    <title>{{_('GetItFixed!')}}</title>
+    <link rel="shortcut icon" href="{{request.static_url('getitfixed:static/favicon.ico')}}">
+    {% endblock title  %}
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{request.static_url('getitfixed:static/lib/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{request.static_url('getitfixed:static/lib/bootstrap-table/dist/bootstrap-table.min.css')}}" rel="stylesheet">
+    <link href="{{request.static_url('c2cgeoform:static/theme.css')}}" rel="stylesheet">
+
+    <!-- Deform dependencies CSS -->
+    {% if deform_dependencies %}
+    <link rel="stylesheet" href="{{request.static_url('deform:static/css/form.css')}}" type="text/css" />
+    {% for css in deform_dependencies['css'] %}
+    <link rel="stylesheet" type="text/css" href="{{request.static_url(css)}}"/>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Getitfixed styles for this scaffold -->
+    <link href="{{request.static_url('getitfixed:static/theme.css')}}" rel="stylesheet">
+
+    <!-- Custom styles. Override this block to customize styling -->
+    {% block style %}
+    {% endblock style %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{request.static_url('getitfixed:static/lib/jquery/dist/jquery.min.js')}}"></script>
+    <script src="{{request.static_url('getitfixed:static/lib/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+    <script src="{{request.static_url('getitfixed:static/lib/bootstrap-table/dist/bootstrap-table.min.js')}}"></script>
+    <script src="{{request.static_url('getitfixed:static/lib/bootstrap-table/dist/bootstrap-table-locale-all.js')}}"></script>
+    <script src="{{request.static_url('getitfixed:static/lib/jquery.scrollintoview/jquery.scrollintoview.js')}}"></script>
+
+    <!-- c2cgeoform  -->
+    <script src="{{request.static_url('c2cgeoform:static/dist/index.js')}}"></script>
+    <link href="{{request.static_url('c2cgeoform:static/dist/styles.css')}}" rel="stylesheet">
+    {% for projection in request.registry.settings['getitfixed'].get('map', {}).get('projections', []) %}
+    <script>
+      // Register custom projection
+      c2cgeoform.registerProjection("{{ projection['code'] }}", "{{ projection['definition'] }}")
+    </script>
+    {% endfor %}
+
+    <!-- Deform JavaScript -->
+    {% if deform_dependencies %}
+    <script src="{{request.static_url('deform:static/scripts/deform.js')}}"></script>
+    {% for js in deform_dependencies['js'] %}
+    <script src="{{request.static_url(js)}}"></script>
+    {% endfor %}
+    {% endif %}
+  </head>
+
+  <body class="{% if request.c2cgeoform_application is not none %} app-{{request.c2cgeoform_application.name()}}{% endif %}">
+
+    {% block header %}
+    <header class="container">
+      <h3 class="title">{{_('GetItFixed!')}}</h3>
+    </header>
+    {% endblock header  %}
+
+    {% block content %}
+      <p>No content</p>
+    {% endblock content %}
+
+    {% block footer %}
+    <footer class="footer text-muted">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-4">
+            <p>
+              Made by <a href="http://www.camptocamp.com">camptocamp</a>
+            </p>
+          </div>
+          {% if request.c2cgeoform_application is not none %}
+          <div class="col-xs-8">
+            <p class="text-right">
+              <a href="{{request.route_url('c2cgeoform_locale', _query=(('language', 'en'),))}}" class="label label-{{'primary' if request.locale_name=='en' else 'default'}}">en</a>
+              <a href="{{request.route_url('c2cgeoform_locale', _query=(('language', 'fr'),))}}" class="label label-label label-{{'primary' if request.locale_name=='fr' else 'default'}}">fr</a>
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </footer>
+    {% endblock footer %}
+
+  {% block scripts %}
+  {% endblock scripts %}
+  </body>
+</html>

@@ -1,0 +1,317 @@
+/* For the footer */
+html,
+body {
+  min-height: 100%;
+  height: 100%;
+}
+html {
+  position: relative;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.breadcrumb {
+  margin-top: 1em;
+}
+
+/* For the status ribbon */
+.container .panel-body {
+  position: relative;
+  overflow: hidden;
+}
+
+/*
+ * Legend panel
+ */
+
+.legend-btn,
+.feature-legend {
+  right: 0.5em;
+  top: 0.5em;
+  position: absolute;
+  z-index: 10;
+}
+
+.feature-legend {
+  width: 15em;
+}
+.feature-legend img {
+  margin-right: 1em;
+}
+.gif-glyphicon {
+  top: 0;
+}
+.feature-legend .panel-heading {
+  padding: 0.5em 15px;
+}
+
+/*
+ * Map
+ */
+
+.map {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.map-container {
+  height: 100%;
+}
+
+.map .ol-attribution {
+  bottom: 4.5em;
+}
+
+.btn-new-issue {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  width: 11em;
+  height: 3em;
+  display: inline-grid;
+  align-items: center;
+  margin-left: -5.5em;
+  top: 8.5rem;
+  border-radius: 4px;
+  padding: 2px;
+  font-size: large;
+}
+
+.title {
+  text-align: center;
+  margin: 1em 0 1em 0;
+}
+
+@media (min-width: 768px) {
+  .content .map {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .content .map {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .content .map {
+    width: 1170px;
+  }
+  .title {
+    text-align: left;
+  }
+}
+
+/*
+ * Forms
+ */
+.form-panel > .panel-footer {
+  position: static; /* Override c2cgeoform panel-footer sticky */
+}
+
+
+/*
+ * Mobile workflow, intermediate step(`.focus`) hidden by default
+ */
+.focus {
+  display:none;
+}
+.focused {
+  overflow: hidden;
+}
+.focused footer {
+  display: none;
+}
+/* when body.focused, show intermediate step */
+.focused .focus {
+  display: block;
+}
+.focused .deform {
+  display: none;
+}
+.focus {
+  position: fixed;
+  background: white;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.focus label {
+  display: none;
+}
+/* show center pointer */
+.focus .map.cross {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+}
+@media (min-width: 768px) {
+  .map.cross {
+    max-height: 400px;
+  }
+}
+.focused [class~=item-category_id],
+.focused [class~=item-type_id] {
+  flex: 1;
+}
+.map .c2cgeoform-controls {
+  display: none;
+}
+.focused label {
+  /* multiple rules for larger shadow */
+  text-shadow: 2px 2px 2px  #fff, -2px -2px 2px  #fff, 2px -2px 2px  #fff, -2px 2px 2px  #fff;
+}
+.subform {
+  position: absolute;
+  bottom: 0;
+  width: calc(100vw - 1em);
+  left: 0.5em;
+  display: flex;
+  gap: 0.5em;
+  grid-gap: 0.5em;
+  z-index: 20;
+}
+.subform select {
+  padding: 6px 3px;
+}
+.next span {
+  display: none;
+}
+
+.map.c2cgeoform-readonly,
+.map.cross.c2cgeoform-readonly {
+  height: 150px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+
+/*
+ * New issue form
+ */
+@media (min-width: 992px) {
+  .issue-view .deform .form-group {
+    float: left;
+    width: 50%;
+  }
+  .issue-view .deform .item-geometry {
+    width: 100%;
+  }
+  .item-status label {
+    display: none;
+  }
+}
+
+/* Phone field */
+input[type=tel] {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+
+/* Status field */
+.panel-body .item-status p {
+  font-size: 0.9em;
+  position: absolute;
+  right: -4em;
+  top: 2em;
+  background-color: #17a2b8;
+  color: white;
+  font-weight: bold;
+  padding: 1em;
+  transform: rotate(45deg);
+  box-shadow: 0px 0 2px rgba(0, 0, 0, 0.5);
+  width: 15em;
+  text-align: center;
+  z-index: 10;
+}
+
+/*
+ * Event field
+ */
+.event-details {
+  background: #f5f5f5;
+}
+.event-details span {
+  float: right;
+  font-size: 0.9em;
+}
+
+.event-new {
+  background: #54a847;
+}
+.event-waiting_for_customer {
+  background: #007bff;
+}
+.event-resolved {
+  background: #dc4244;
+}
+.event-in_progress {
+  background: #f9c12f;
+}
+.event-validated {
+  background: #f96705;
+}
+
+.item-public_events {
+  display: none;
+}
+
+.event-link {
+  padding: 0;
+}
+
+/*
+ * Menu Buttons
+ */
+.dropdown-toggle .caret {
+  margin-left: 0.5em;
+}
+
+/*
+ * Footer
+ */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body > div.container {
+  padding-bottom: 4em;
+}
+
+footer {
+  border-top: 1px solid #ddd;
+  background: rgba(247, 247, 247, 0.7);
+  backdrop-filter: blur(3px);
+  position: fixed;
+  bottom: 0;
+  padding: 1em;
+  width: 100%;
+  height: 4em;
+  z-index: 100;
+}
+footer .col-xs-4 {
+  text-shadow: 0 0 3px white;
+}

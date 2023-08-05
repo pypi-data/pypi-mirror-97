@@ -1,0 +1,47 @@
+{% extends layout %}
+{% block content %}
+<div class="container {{ 'issue-view' if issue else '' }}">
+
+  <ol class="breadcrumb">
+    <li><a href="{{request.route_url('c2cgeoform_index')}}">{{_('Issues')}}</a></li>
+    <li class="active">{{request.translate(item_name[:80]) if item_name else _('Issue')}}</li>
+  </ol>
+
+  <div class="focus">
+    <div class="subform">
+      <div>
+        <button type="button" class="btn btn-primary next" title="{{_('Next')}}"><i class="glyphicon glyphicon-ok"></i><span>{{_('Next')}}</span></button>
+      </div>
+    </div>
+  </div>
+
+  {% include 'c2cgeoform:/templates/edit.jinja2' %}
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+{% if new %}
+<script>
+  {% set form_field = form.field if (form.__class__.__name__ == 'ValidationFailure') else form %}
+  window.issue = {
+    geometry_oid: '{{form_field['geometry'].oid if 'geometry' in form_field else ''}}',
+    validationFail: {{'true' if form.__class__.__name__ == 'ValidationFailure' else 'false'}},
+    categories_url: '{{request.route_url('c2cgeoform_index', table='categories.json')}}',
+  }
+</script>
+<script src="{{request.static_url('getitfixed:static/scripts/issue.js')}}"></script>
+{% else %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const geometry_oid = '{{form['geometry'].oid}}'
+  deform.addCallback(geometry_oid, function () {
+    c2cgeoform.addLayer(geometry_oid, {
+      type_: 'WMS',
+      url: '{{wms_layer}}'
+    })
+  })
+})
+</script>
+{% endif %}
+{% endblock scripts %}
