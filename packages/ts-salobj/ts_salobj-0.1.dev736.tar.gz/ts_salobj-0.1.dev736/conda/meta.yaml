@@ -1,0 +1,59 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: ts-salobj
+  version: {{ data.get('version') }}
+
+source:
+  path: ../
+
+build:
+  noarch: generic
+  script: python -m pip install --no-deps --ignore-installed .
+  script_env:
+    - PATH
+    - PYTHONPATH
+    - LD_LIBRARY_PATH
+    - OSPL_HOME
+    - PYTHON_BUILD_VERSION
+    - PYTHON_BUILD_LOCATION
+    - TS_CONFIG_OCS_DIR
+
+test:
+  requires:
+    - ts-conda-build
+    - ts-ddsconfig
+    - ts-dds
+    - ts-idl {{ idl_version }}
+  source_files:
+    - python
+    - bin
+    - tests
+    - schema
+    - setup.cfg
+    - .git
+  commands:
+    - pytest --ignore tests/test_salpy_to_either.py --ignore tests/test_salobj_to_either.py
+
+requirements:
+  host:
+    - python
+    - pip
+    - setuptools_scm
+    - setuptools
+    - pytest-runner
+    - asynctest
+    - pytest-asyncio
+    - pytest-flake8
+  run:
+    - python
+    - setuptools
+    - setuptools_scm
+    - numpy
+    - astropy
+    - jsonschema
+    - pyyaml
+    - boto3
+    - moto
+    - ts-ddsconfig
+    - ts-dds
