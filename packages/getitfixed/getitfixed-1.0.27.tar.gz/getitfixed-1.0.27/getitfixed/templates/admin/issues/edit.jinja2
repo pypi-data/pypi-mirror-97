@@ -1,0 +1,48 @@
+{% extends layout %}
+{% block content %}
+<div class="container">
+    <ol class="breadcrumb">
+      <li><a href="{{request.route_url('c2cgeoform_index', application='getitfixed' if request.c2cgeoform_application.name() == 'getitfixed_private' else 'getitfixed_admin')}}">{{_('Issues')}}</a></li>
+      <li class="active">
+        {{title[:80]}}
+        (<a class="btn btn-link event-link" href="#existing_events_form">{% trans %}See events{% endtrans %}</a>)
+      </li>
+    </ol>
+    {% include 'c2cgeoform:/templates/edit.jinja2' %}
+    <hr/>
+    <h3>{% trans %}Events{% endtrans %}</h3>
+    {{event_form.render(*event_form_render_args, **event_form_render_kwargs)|safe}}
+    <div class="panel panel-default">
+        <ul id="existing_events_form" class="list-group">
+            {% for event in events %}
+                <li class="list-group-item event-details">
+                <span class="label label-info event-{{event.status}}">{{ event.status }}</span>
+                {% if event.private %}
+                    <i class="text-muted small glyphicon glyphicon-lock" ></i>
+                {% endif %}
+                {{ event.date.strftime("%Y-%m-%d %H:%M") }}
+                {% if request.matchdict["application"] == "admin" or event.author == event_form_render_kwargs['user_admin'] %}
+                    ({{ event.author }})
+                {% else %}
+                    ({% trans %}You{% endtrans %})
+                {% endif %}
+                </li>
+                <li class="list-group-item">{{ event.comment if event.comment != "" else _("No comment") }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<script>
+deform.focusFirstInput = () => false
+
+document.addEventListener('DOMContentLoaded', () => {
+  const geometry_oid = '{{form['geometry'].oid}}'
+  deform.addCallback(geometry_oid, function () {
+    c2cgeoform.addLayer(geometry_oid, {
+      type_: 'WMS',
+      url: '{{wms_layer}}'
+    })
+  })
+})
+</script>
+{% endblock content %}
