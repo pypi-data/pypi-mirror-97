@@ -1,0 +1,768 @@
+{
+  "type": "object",
+  "title": "Play",
+  "description": "A representation of a play in its entirety.",
+  "properties": {
+    "body": {
+      "type": "array",
+      "default": [
+      ],
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Act"
+          },
+          {
+            "$ref": "#/definitions/Epilogue"
+          },
+          {
+            "$ref": "#/definitions/Prologue"
+          }
+        ]
+      }
+    },
+    "personae": {
+      "type": "array",
+      "default": [
+      ],
+      "items": {
+        "$ref": "#/definitions/Persona"
+      }
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "play"
+      ],
+      "default": "play",
+      "readOnly": true
+    },
+    "meta": {
+      "$ref": "#/definitions/Metadata"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "meta"
+  ],
+  "definitions": {
+    "Direction": {
+      "type": "object",
+      "title": "Direction",
+      "description": "A representation of a stage direction.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "stop": {
+          "type": "boolean",
+          "default": true
+        },
+        "scene": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "direction"
+          ],
+          "default": "direction",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "scene",
+        "action"
+      ]
+    },
+    "Entrance": {
+      "type": "object",
+      "title": "Entrance",
+      "description": "A representation of an entrance for character(s) in a Scene.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "personae": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "scene": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "entrance"
+          ],
+          "default": "entrance",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "scene",
+        "text"
+      ]
+    },
+    "Exit": {
+      "type": "object",
+      "title": "Exit",
+      "description": "A representation of an exit for character(s) in a Scene.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "personae": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "scene": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "exit"
+          ],
+          "default": "exit",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "scene",
+        "text"
+      ]
+    },
+    "Dialogue": {
+      "type": "object",
+      "title": "Dialogue",
+      "description": "A representation of a line of dialogue for a character in a scene.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "line": {
+          "type": "string"
+        },
+        "linepart": {
+          "type": "integer",
+          "default": 0
+        },
+        "lineno": {
+          "type": "integer"
+        },
+        "scene": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "dialogue"
+          ],
+          "default": "dialogue",
+          "readOnly": true
+        },
+        "persona": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "line",
+        "lineno",
+        "scene",
+        "persona"
+      ]
+    },
+    "Action": {
+      "type": "object",
+      "title": "Action",
+      "description": "A representation of a stage direction related to a specific character.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "scene": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "action"
+          ],
+          "default": "action",
+          "readOnly": true
+        },
+        "persona": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "scene",
+        "action",
+        "persona"
+      ]
+    },
+    "Speech": {
+      "type": "object",
+      "title": "Speech",
+      "description": "A representation of an unbroken piece of dialogue related to a single character.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Dialogue"
+              },
+              {
+                "$ref": "#/definitions/Action"
+              },
+              {
+                "$ref": "#/definitions/Direction"
+              }
+            ]
+          }
+        },
+        "scene": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "speech"
+          ],
+          "default": "speech",
+          "readOnly": true
+        },
+        "persona": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "body",
+        "scene",
+        "persona"
+      ]
+    },
+    "Scene": {
+      "type": "object",
+      "title": "Scene",
+      "description": "A representation of a single Scene in a play.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "personae": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "body": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Direction"
+              },
+              {
+                "$ref": "#/definitions/Entrance"
+              },
+              {
+                "$ref": "#/definitions/Exit"
+              },
+              {
+                "$ref": "#/definitions/Speech"
+              }
+            ]
+          }
+        },
+        "num": {
+          "type": "integer"
+        },
+        "act": {
+          "title": "Act",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "setting": {
+          "title": "Setting",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "scene"
+          ],
+          "default": "scene",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "num",
+        "text"
+      ]
+    },
+    "Intermission": {
+      "type": "object",
+      "title": "Intermission",
+      "description": "A representation of an Intermission in a play.",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "intermission"
+          ],
+          "default": "intermission",
+          "readOnly": true
+        },
+        "act": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "index",
+        "act"
+      ]
+    },
+    "Prologue": {
+      "type": "object",
+      "title": "Prologue",
+      "description": "A representation of a single Prologue in a play.\n\n    Notes:\n        Prologues (and Epilogues) may have the body structure of either an Act or Scene.\n    ",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "personae": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_act": {
+          "type": "boolean"
+        },
+        "body": {
+          "title": "Body",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Scene"
+                  },
+                  {
+                    "$ref": "#/definitions/Intermission"
+                  },
+                  {
+                    "$ref": "#/definitions/Epilogue"
+                  },
+                  {
+                    "$ref": "#/definitions/Prologue"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Direction"
+                  },
+                  {
+                    "$ref": "#/definitions/Entrance"
+                  },
+                  {
+                    "$ref": "#/definitions/Exit"
+                  },
+                  {
+                    "$ref": "#/definitions/Speech"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "act": {
+          "title": "Act",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "setting": {
+          "title": "Setting",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "prologue"
+          ],
+          "default": "prologue",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "as_act",
+        "text"
+      ]
+    },
+    "Epilogue": {
+      "type": "object",
+      "title": "Epilogue",
+      "description": "A representation of a single Epilogue in a play.\n\n    Notes:\n        Epilogues (and Prologues) may have the body structure of either an Act or Scene.\n    ",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "personae": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_act": {
+          "type": "boolean"
+        },
+        "body": {
+          "title": "Body",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Scene"
+                  },
+                  {
+                    "$ref": "#/definitions/Intermission"
+                  },
+                  {
+                    "$ref": "#/definitions/Epilogue"
+                  },
+                  {
+                    "$ref": "#/definitions/Prologue"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Direction"
+                  },
+                  {
+                    "$ref": "#/definitions/Entrance"
+                  },
+                  {
+                    "$ref": "#/definitions/Exit"
+                  },
+                  {
+                    "$ref": "#/definitions/Speech"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "act": {
+          "title": "Act",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "setting": {
+          "title": "Setting",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "epilogue"
+          ],
+          "default": "epilogue",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "as_act",
+        "text"
+      ]
+    },
+    "Act": {
+      "type": "object",
+      "title": "Act",
+      "description": "A representation of a single Act in a Play.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "body": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Scene"
+              },
+              {
+                "$ref": "#/definitions/Intermission"
+              },
+              {
+                "$ref": "#/definitions/Epilogue"
+              },
+              {
+                "$ref": "#/definitions/Prologue"
+              }
+            ]
+          }
+        },
+        "num": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "act"
+          ],
+          "default": "act",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "num",
+        "text"
+      ]
+    },
+    "Persona": {
+      "type": "object",
+      "title": "Persona",
+      "description": "A representation of a single character in a Play.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "persona"
+          ],
+          "default": "persona",
+          "readOnly": true
+        },
+        "text": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "short": {
+          "title": "Short",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "text",
+        "name"
+      ]
+    },
+    "Metadata": {
+      "type": "object",
+      "title": "Metadata",
+      "description": "General information about a given play.",
+      "properties": {
+        "subtitle": {
+          "title": "Subtitle",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "author": {
+          "type": "string",
+          "default": "William Shakespeare"
+        },
+        "edition": {
+          "type": "integer",
+          "default": 1
+        },
+        "publisher": {
+          "type": "string",
+          "default": "Published w/ ❤️ using iambic - https://pypi.org/project/iambic"
+        },
+        "rights": {
+          "type": "string",
+          "default": "Creative Commons Non-Commercial Share Alike 3.0"
+        },
+        "tags": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "editors": {
+          "type": "array",
+          "default": [
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "title": {
+          "title": "Title",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "meta"
+          ],
+          "default": "meta",
+          "readOnly": true
+        },
+        "language": {
+          "type": "string",
+          "default": "en-GB-emodeng"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+      ]
+    }
+  }
+}
