@@ -1,0 +1,68 @@
+#!python
+
+import os
+import time
+import fcntl
+import subprocess
+
+# Equivalent of the _IO('U', 20) constant in the linux kernel.
+USBDEVFS_RESET = ord('U') << (4 * 2) | 20
+HUB_NAME = 'Texas Instruments, Inc. TUSB8041 4-Port Hub'
+
+
+def get_hubs():
+    """
+        Gets the devfs path to a Texas Instruments, Inc. TUSB8041 4-Port Hub by scraping the output
+        of the lsusb command
+
+        The lsusb command outputs a list of USB devices attached to a computer
+        in the format:
+            Bus 001 Device 004: ID 16c0:0483 Texas Instruments, Inc. TUSB8041 4-Port Hub
+        The devfs path to these devices is:
+            /dev/bus/usb/<busnum>/<devnum>
+        So for the above device, it would be:
+            /dev/bus/usb/001/004
+        This function generates that path.
+    """
+    proc = subprocess.Popen(['lsusb'], stdout=subprocess.PIPE)
+    out = proc.communicate()[0].decode()
+    lines = out.split('\n')
+    devices = []
+    for line in lines:
+        print(line)
+        if HUB_NAME in line:
+            parts = line.split()
+            bus = parts[1]
+            dev = parts[3][:3]
+            devices.append('/dev/bus/usb/%s/%s' % (bus, dev))
+
+    return devices
+
+
+def send_reset(dev_path):
+    print('Resetting ', dev_path)
+    """
+        Sends the USBDEVFS_RESET IOCTL to a USB device.
+
+        dev_path - The devfs path to the USB device (under /dev/bus/usb/)
+                   See get_hub for example of how to obtain this.
+    """
+    fd = os.open(dev_path, os.O_WRONLY)
+    try:
+        fcntl.ioctl(fd, USBDEVFS_RESET, 0)
+    finally:
+        os.close(fd)
+        time.sleep(7)
+        print('Reset successfully...')
+
+
+def reset_hub():
+    """
+        Finds a hub and reset it.
+    """
+    for device in get_hubs():
+        send_reset(device)
+
+
+if __name__ == '__main__':
+    reset_hub()
