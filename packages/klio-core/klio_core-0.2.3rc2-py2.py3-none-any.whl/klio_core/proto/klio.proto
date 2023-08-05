@@ -1,0 +1,114 @@
+// Copyright 2020 Spotify AB
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+
+// Version maps klio config version to message version when actually
+// handling/parsing klio messages
+enum Version {
+    UNKNOWN = 0;  // default (per proto3 requirements)
+    V1 = 1;  // for entity_id+payload
+    V2 = 2;  // for element+payload
+}
+
+message KlioMessage {
+    message Metadata {
+        // marked for deprecation for v2
+        repeated KlioJob downstream = 1;
+        // optional - unique jobs this message has visited
+        repeated KlioJob visited = 2;
+        // optional - audit log for all jobs message has visited (complete)
+        repeated KlioJobAuditLogItem job_audit_log = 3;
+        // optional - force computation even if output exists; default = false
+        bool force = 4;
+        // optional - if true, then no transformation work is done; default = false
+        bool ping = 5;
+        // required for V2 messages
+        Recipients intended_recipients = 6;
+
+        message Recipients {
+            oneof recipients {
+                Anyone anyone = 1;
+                Limited limited = 2;
+            }
+            // FYI: since this is an empty field, intended_recipients.anyone can't simply
+            // be assigned. To set `anyone` as the intended_recipients in Python, use
+            // kmsg.metadata.intended_recipients.anyone.SetInParent()`
+            // https://stackoverflow.com/a/29651069
+            message Anyone {}  // stub message
+            message Limited {
+                // "recipients" is effectively what "downstream" is in v1 but fixes
+                // some issues. If a user only wants to trigger a particular job w/o
+                // the child jobs, the publisher of the message will need to add the job's
+                // name into recipients (like how `klio message publish --bottom-up` does).
+                // In that case, if there is no input, then the job will add its parent
+                // job to this recipients list, then publish to parent. It would not
+                // set `trigger_children_of`.
+                // Otherwise, if the message first starts in top-down, and input is missing,
+                // the job will add itself + its parent to recipients **as well as** assign
+                // `trigger_children_of` to itself. That would signify to other child
+                // jobs of the parent job to not do any work and ignore/drop the message.
+                repeated KlioJob recipients = 1;
+
+                // If this isn't set, then the whole graph execution mode is bottom-up.
+                // If set, then when the message gets to this job, it should
+                // update `metadata.recipients` to `anyone` (clearing out `limited`)
+                // so that when it publishes the output message, all children treat
+                // it as top-down
+                KlioJob trigger_children_of = 2;
+            }
+        }
+    }
+
+    message Data {
+        // required for v1 messages
+        string entity_id = 1;
+        // optional - (v1) used for non-klio messages, (v2) used for intra-pipeline state
+        bytes payload = 2;
+        // required for v2 messages
+        bytes element = 3;
+    }
+
+    Metadata metadata = 1;
+    Data data = 2;
+    // message version
+    Version version = 3;
+}
+
+
+message KlioJob {
+    // marked for deprecation for v2
+    message JobInput {
+        string topic = 1;
+        string subscription = 2;
+        string data_location = 3;
+    }
+    // required
+    string job_name = 1;
+    // required for Dataflow (job_name + gcp_project ensures unique names)
+    string gcp_project = 2;
+    // marked for deprecation for v2
+    repeated JobInput inputs = 3;
+}
+
+
+message KlioJobAuditLogItem {
+    // required - timestamp of when the log item was created
+    google.protobuf.Timestamp timestamp = 1;
+    // required
+    KlioJob klio_job = 2;
+}
