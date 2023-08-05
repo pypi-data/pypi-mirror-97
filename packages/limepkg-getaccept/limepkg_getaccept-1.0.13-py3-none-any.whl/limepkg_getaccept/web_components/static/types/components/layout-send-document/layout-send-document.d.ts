@@ -1,0 +1,30 @@
+import { IDocument } from '../../types/Document';
+import { EventEmitter } from '../../stencil-public-runtime';
+import { IListItem } from '../../types/ListItem';
+export declare class LayoutSendDocument {
+    document: IDocument;
+    template: IListItem;
+    limeDocument: IListItem;
+    setNewDocumentName: EventEmitter<string>;
+    setDocumentValue: EventEmitter<number>;
+    setIsSmsSending: EventEmitter<boolean>;
+    setSmartReminder: EventEmitter<boolean>;
+    private documentName;
+    private value;
+    private smartReminder;
+    private sendLinkBySms;
+    private documentVideo;
+    changeView: EventEmitter;
+    removeVideo: EventEmitter;
+    componentWillLoad(): void;
+    componentDidUpdate(): void;
+    constructor();
+    render(): any[];
+    private fileName;
+    private handleChangeDocumentName;
+    private handleChangeValue;
+    private handleChangeSmartReminder;
+    private handleChangeSendLinkBySms;
+    private handleAddVideo;
+    private handleRemoveVideo;
+}
