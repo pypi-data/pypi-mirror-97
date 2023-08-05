@@ -1,0 +1,361 @@
+Metadata-Version: 2.1
+Name: vnpy-extra
+Version: 0.6.20210303.0
+Summary: 基于VNPY进行功能拓展
+Home-page: https://github.com/IBATS/vnpy_extra
+Author: MG
+Author-email: mmmaaaggg@163.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: No Input/Output (Daemon)
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: Chinese (Simplified)
+Classifier: Topic :: Software Development
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: IBATS-Common (>=0.20.8)
+Requires-Dist: psutil (>=5.7.2)
+Requires-Dist: kaleido (>=0.0.3)
+Requires-Dist: openpyxl (>=3.0.5)
+Requires-Dist: xlwt (>=1.3.0)
+Requires-Dist: tqdm (>=4.51.0)
+Requires-Dist: peewee (>=3.13.3)
+Requires-Dist: mysql-connector-python (>=8.0.22)
+
+# vnpy_extra
+
+## 一、 简介
+### 1. 功能简介
+本工具包是基于vnpy的回测库的一些增强函数
+
+### 2. 版本历史
+
+2021-03-03 v0.6.20210303.0
+> feat: send_email_qq support msg list. \
+> feat: order_by(StrategyBacktestStats.short_name) on StrategyBacktestStats.get_by_status. \
+> feat: variables = ["target_pos", "target_price", "bar_count"] on template. \
+> fix: is_same_as_order for template. \
+> fix: pd.isna(short_name) check. \
+> fix: IntegrityError handler on import_data_2_tables.
+
+2021-03-02 v0.6.20210302.0
+> feat: replace insert -> on duplicate key update. \
+> feat: add trade count summary on monthly report. \
+> feat: update update_backtest_status logic. \
+> fix: reduce reject order. \
+> fix: StrategyBacktestStats.update_backtest_status.
+
+2021-03-01 v0.6.20210301.1
+> feat: add last_tick and fill default price if price <= 0. \
+> feat: drop_duplicates and create f'{key}_{date_2_str(date.today())}.xlsx' file.
+
+2021-02-28 v0.6.20210228.0
+> fix: order timeout on submit status. and clean tmp data when on_start called. \
+> fix: output f'{key}_{date_2_str(date.today())}.csv' file event if len(df_list) == 1. \
+> fix: ignore save_stats exceptions.
+
+2021-02-26 v0.6.20210226.0
+> feat: remove duplicate msg. \
+> feat: add check datetime trade available. \
+> refactor: fit INSTRUMENT_RATE_DIC.
+
+2021-02-25 v0.6.20210225.1
+> feat: email_attachment_2_tables, add csv_2_tables. \
+> refactor: logger = logging.getLogger(f'strategies.*.{strategy_name}'). \
+> refactor: write_log(f"最新持仓目标 {target_pos} {self.target_price}", 'debug').
+
+2021-02-24 v0.6.20210224.0
+> fix: annual return, calmar, sharp.
+
+2021-02-23 v0.6.20210223.1
+> feat: export_tables_and_send_email. \
+> feat: add password param for email login password.
+
+2021-02-22 v0.6.20210222.6
+> feat: export_tables_and_send_email(password). \
+> fix: Writing to Excel with MultiIndex columns and no index ('index'=False) is not yet implemented. \
+> fix: price <= 0.0 check. \
+> fix: output_file_dic = {}. \
+> fix: strategy.strategy_name is None in some cases. \
+> fix: log and ignore lock error when cleaning TradeDataModel. \
+> refactor: create a unique on strategy_class_name.
+
+2021-02-19 v0.6.20210219.3
+> feat: feat: add StopOpeningPos. \
+> feat: return output_file_dic on refresh_position_and_report. \
+> feat: use CalVer. \
+> feat: now all signal classes are sub classes of vnpy_extra.utils.enhancement.CtaSignal. \
+> feat: add filter_n_available=1 param for each sub class. 
+
+2021-02-18 v0.6.22
+> feat: add check_datetime_available.
+
+2021-02-12 v0.6.21
+> fix: some dirty data has to be clean. \
+> fix: charts_data null=True, symbols cannot be unique. \
+> refactor: bigger=1.0
+
+2021-02-11 v0.6.20
+> feat: add backtest_status_path on output path. \
+> fix: enable_join_collector. \
+> refactor: add description on progress bar.
+
+2021-02-07 v0.6.19
+> feat: add charts_data for showing echarts of strategy. \
+> feat: progress bar shows file_name_header. \
+> feat: support import strategy setting from \["cta_strategy_setting.json", "portfolio_strategy_setting.json"]. \
+> feat: auto add main_contract testcase for import_strategy_setting module. \
+> fix: case-insensitive for portfolio portfolio_strategy.engine.BacktestingEngine.
+
+2021-02-03 v0.6.7
+> feat: add algo trading on TargetPosAndPriceTemplate. \
+> feat: remove tzinfo from last_tick_time on cta's CtaTemplate and portfolio's StrategyTemplate.\
+> feat: add get_id_name function.\
+> feat: add import_strategy_setting module.\
+> fix: export/import tables and send email by io.\
+> fix: ctaTemplate algo trading logic.
+
+2021-01-26 v0.6.2
+> feat: add short_name, shown_name by default null and unique into db. \
+> feat: export/import tables and send email by io.\
+> fix: TargetPosAndPriceTemplate order missing.
+
+2021-01-22 v0.6.0
+> feat: add track performance feature. \
+> refactor: quant_vnpy -> vnpy_extra.
+
+2021-01-19 v0.5.12
+> fix: TargetPosAndPriceTemplate current_pos -> target_pos by one step. \
+> fix: strategy_class_name wrong.
+
+2021-01-15 v0.5.5
+> fix: add exception handle and logger on TradeDataCollector. \
+> fix: TargetPosAndPriceTemplate current_pos -> target_pos by one step.
+
+2021-01-14 v0.5.1
+> feat: record backtest stats. \
+> feat: add default rate for backtest. \
+> fix: DCE夜盘交易日期为下一交易日，将会被重写为当前系统日期. \
+> fix: 修复跨日报表统计错误. \
+> fix: cross_limit_method param missing for file_name_func function. \
+> fix: 主力合约、次主力合约数据复权整理 bug.
+
+2021-01-08 v0.5.0
+> refactor: merge portfolio run_backtest and cta run_backtest.
+
+2021-01-07 v0.4.13
+> feat: set_strategy_status(StrategyStatusEnum.Stopped). \
+> feat: monitor add setting.
+
+2021-01-05 v0.4.11
+> refactor: longer interval of plotly.io._orca.cleanup. \
+> feat: backtest: output param file if it's available.
+
+2021-01-04 v0.4.10
+> fix: MACDSignal.
+
+2021-01-04 v0.4.9
+> fix: check not strategy_status_monitor.is_alive().
+
+2020-12-27 v0.4.8
+> feat: backtest: reset_index on result_df. \
+> fix: portfolio template, last_order_dt -> dict. \
+> feat: add new TargetPosAndPriceTemplate, MACrossSignal.
+
+2020-12-27 v0.4.7
+> feat: backtest: default rate. \
+> feat: backtest: available filter for return_drawdown_ratio < 2 and np.round for some stats items.
+
+2020-12-25 v0.4.6
+> feat: backtest: auto search symbol size. \
+> fix: report gl calc wrong in some cases.
+
+2020-12-23 v0.4.4
+> fix: report holding pos status calc wrong. \
+> fix: stop_opening_pos on templates.
+
+2020-12-22 v0.4.2
+> fix: order_data_collector error on portfolio_strategy.template.
+
+2020-12-21 v0.4.1
+> fix: open_price -> last_price.
+
+2020-12-18 v0.4.0
+> feat: support user_name, broker_id. \
+> feat: add last_order_dt on template.
+
+2020-12-18 v0.3.9
+> fix: orm close connection. \
+> feat: position daily stat.
+
+2020-12-16 v0.3.7
+> feat: add CrossLimitMethod.fix_price for backtest. \
+> feat: add quant_vnpy.backtest.cta_strategy.template.CtaTemplate. \
+> feat: backtest cross price method.
+
+2020-12-14 v0.3.2
+> add position monitor
+
+2020-12-11 v0.2.16
+> feat: on_tick active on_bar by bg on template.py. \
+> feat: add OrderDataCollector, TradeDataCollector class. \
+> feat: add stop_if_pos_2_0 on cta template. \
+> fix: bug fix of on_tick and report error.
+
+2020-12-04 v0.2.8
+> feat: more readable log.
+
+2020-11-30 v0.2.7
+> feat: orm add symbols.
+
+2020-11-27 v0.2.3
+> fix: bug fix on log format.
+
+2020-11-25 v0.2.2
+> fix: bug fix on on_stop of portfolio template.
+>
+2020-11-25 v0.2.1
+> feat: add strategy status monitor.
+
+2020-11-24 v0.1.10
+> feat: add bar_count.
+
+2020-11-20 v0.1.8
+> bug fix on portfolio's template.
+
+2020-11-17 v0.1.7
+> feat: 对 cta 及 portfolio 增加 template 模板类. \
+> feat: signal 增加  0 判断 当 0 时，默认为 default 值. \
+> feat: add current_bar for cta, portfolio's template classes. \
+> fix: template bugs.
+
+2020-11-15 v0.1.2
+> feat: 最新依赖版本 IBATS_Common>=0.20.8，最新支持道 vnpy 2.1.7 版本. \
+> feat: 调整 INSTRUMENT_TRADE_TIME_PAIR_DIC 道 constants.py.
+
+2020-11-10 v0.1.0
+> feat: 基于vnpy 2.1.6进行的功能增强。此前版本不支持。
+
+## 二、 环境设置及组件安装（首次运行前需要）
+### 1. 系统环境包含 [Anaconda](https://repo.anaconda.com/archive/Anaconda3-2019.10-Windows-x86_64.exe) 或 Miniconda（python 3.7 版本）
+### 2. 安装 [vnpy 2.1.6或以上版本](https://download.vnpy.com/vnstudio-2.1.7.exe) \
+### 3. 运行安装相关组件 
+```cmd
+pip isntall -r requirement.txt
+conda install -c plotly plotly-orca
+conda install -c plotly python-kaleido
+```
+
+如果执行遇到问题可分别执行如下：
+1. 通用组件
+    ```cmd
+    pip install -r requirement.txt
+    ```
+
+2. orca 组件
+    orca 组件为回测功能中保存回测视图结果的组件，windows系统性需要单独安装，才可保证功能正常使用 \
+    安装步骤如下： 
+    1. 安装组件包
+
+        ```cmd
+        conda install -c plotly plotly-orca
+        ```
+
+    2. 下载并安装 orca 应用
+
+    组件下载地址：[orca组件](https://github-production-release-asset-2e65be.s3.amazonaws.com/99037241/8ebe1c00-6f72-11ea-8c70-1021f91c27bc?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20201028%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20201028T052839Z&X-Amz-Expires=300&X-Amz-Signature=2a9e44c0ac740c2335a130a8c1cb9734994f4bd01a7a55c6c12fe5330a487dbf&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=99037241&response-content-disposition=attachment%3B%20filename%3Dwindows-release.zip&response-content-type=application%2Foctet-stream)
+
+    安装后设置话就环境变了 Path 加入相应路径，默认情况下window10操作系统 orca 组件将被安装在如下路径：
+    > C:\Users\mmmaaaggg\AppData\Local\Programs\orca
+
+    3. 批量关闭 orca 进程方法
+    ```shell script
+    ps -ef | grep orca | grep -v grep | awk '{print $2}' | xargs kill -9
+    ```
+
+ 3. MD文件转word文档工具 \
+    到[pandoc官网](https://pandoc.org/installing.html)下载对应的软件并安装后即可运行 Scripts\md_2_docx.bat 脚本
+
+## 三、 常用命令
+
+### 1. 切换远程仓库地址方法
+```cmd
+>git remote
+origin
+>git remote get-url --all origin
+git@192.168.10.117:quant/quant_vnpy.git
+>git remote set-url origin http://209386rt46.51vip.biz:23987/quant/quant_vnpy.git
+>git pull
+remote: Enumerating objects: 8, done.
+remote: Counting objects:  25% (2/8)
+remote: Counting objects: 100% (8/8), done.
+remote: Total 72 (delta 8), reused 8 (delta 8), pack-reused 64
+Unpacking objects:   
+6% (5/72)Unpacking objects:  
+34% (25/72)Unpacking objects:  
+Unpacking objects: 100% (72/72), 17.93 KiB | 23.00 KiB/s, done.
+From http://209386rt46.51vip.biz:23987/quant/From http://209386rt46.51vip.biz:23987/quant/quant_vnpy
+   cb6c014..1afe166  master     -> origin/master
+Updating cb6c014..1afe166
+Fast-forward
+ README.md                                          |   7 +
+ ...
+ 8 files changed, 404 insertions(+), 106 deletions(-)
+``` 
+
+### 2. 数据库 dump 数据
+
+备份主力合约
+
+ ```cmd
+"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe" -u mg -p --databases vnpy dbbardata --where="symbol in ('rb9999', 'hc9999', 'i9999') and `interval`='1m'" > dbbardata_dump.sql
+```
+
+备份主力，次主力合约
+
+```cmd
+"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe" -u mg -p vnpy dbbardata --where="(symbol like'%9999' or symbol like'%8888') and `interval`='1m'" > dbbardata_dump.sql
+```
+
+### 3. 压缩命令
+
+```bash
+zip -r0q /media/mg/Data/output_20201220.zip output
+```
+
+### 4. 独立启动交易界面（可以多开）
+```cmd
+d:\ide\vnstudio\python.exe -m vnstation runtrader "{'gateway': {'CTP': True}, 'app': {'CtaStrategy': True, 'PortfolioStrategy': True, 'PortfolioManager': True}, 'path': 'D:\\TradeTools\\vnpy\\jianxin_11859077'}"
+```
+
+```cmd
+d:\ide\vnstudio\python.exe -m vnstation runtrader "{'gateway': {'CTP': True}, 'app': {'CtaStrategy': True, 'PortfolioStrategy': True, 'PortfolioManager': True}, 'path': r'C:\TradeTools\vnpy_work_root\simnow'}"
+```
+
+## 四、 各个版本常见错误
+### 2.0.3版本
+1. 错误提示框太长，无法看到错误信息
+	```cmd
+	python.exe -m vnstation
+	```
+
+2. 错误提示：
+	> ValueError: numpy.ufunc size changed, may indicate binary incompatibility. Expected 216 from C header, got 192 from PyObject
+	解决方法：
+	```cmd
+	Scripts\pip.exe install numpy==1.16.1 --user
+	```
+
+3. 穿透式测试通不过，采集不到CPU、硬盘、BIOS信息
+    修改环境变量
+    增加目录
+    > C:\Windows\SysWOW64\wbem
+
+
