@@ -1,0 +1,36 @@
+import { EventEmitter } from '../../stencil-public-runtime';
+import { LimeWebComponentPlatform, LimeWebComponentContext } from '@limetech/lime-web-components-interfaces';
+import { ISession } from '../../types/Session';
+import { ICustomField } from '../../types/CustomField';
+import { IListItem } from '../../types/ListItem';
+export declare class LayoutSelectFile {
+    platform: LimeWebComponentPlatform;
+    context: LimeWebComponentContext;
+    session: ISession;
+    selectedTemplate: IListItem;
+    selectedLimeDocument: IListItem;
+    customFields: ICustomField[];
+    setCustomFields: EventEmitter;
+    private errorHandler;
+    private isLoadingTemplates;
+    private templates;
+    private isLoadingFields;
+    private isLoadingLimeDocuments;
+    private limeDocuments;
+    private openSection;
+    constructor();
+    render(): any[];
+    componentWillLoad(): void;
+    private onChangeSection;
+    private loadTemplates;
+    private loadLimeDocuments;
+    private loadTemplateFields;
+    private setFields;
+    onChangeTemplate(data: IListItem): void;
+    private setTemplates;
+    onChangeDocument(data: IListItem): void;
+    private mapField;
+    private setLimeDocuments;
+    private getSelectedListItems;
+    updateFieldValue(event: any): void;
+}

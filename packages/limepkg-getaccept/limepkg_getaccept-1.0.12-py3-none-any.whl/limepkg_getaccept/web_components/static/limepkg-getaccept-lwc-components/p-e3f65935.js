@@ -1,0 +1,1 @@
+var e;!function(e){e.home="home",e.login="login",e.settings="settings",e.help="help",e.recipient="recipient",e.invite="invite",e.logout="logout",e.selectFile="selectFile",e.sendDocument="sendDocument",e.documentDetail="documentDetail",e.videoLibrary="videoLibrary",e.documentValidation="documentValidation"}(e||(e={}));export{e as E}
