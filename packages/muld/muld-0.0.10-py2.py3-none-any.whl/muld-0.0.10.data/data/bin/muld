@@ -1,0 +1,343 @@
+#!/usr/bin/env python3
+"""
+  muld (Mirror from Upstream to Local to Downstream)
+
+  For a list of repos do:
+
+  * clone/fetch from upstream to local
+    - git clone UPSTREAM_URI
+    - git remote rename origin upstream
+
+  * Fetch upstream branches and tags with local-prune
+    - git fetch -pP upstream
+    - git branch --set-upstream-to  # When local branch does not exists ..
+    - git branch --track            # .. otherwise.
+    - git pull --rebase
+
+  * When "downstream" is defined
+    - git remote add downstream DOWNSTREAM_URI
+
+  * push branches and tags, not forcing it, from local to "downstream"
+    - git push downstream --all     # Pushing branches
+    - git push downstream --tags    # Pushing tags
+
+  Basically, this is a soft way of forwarding changes from an "upstream" to a
+  "downstream" repository, via a "local" repository. When upstream has
+  conflicting changes, e.g. from force-push then muld exits leaving it up to
+  you to resolve these.
+
+  The local mirror-repository must not be used for anything else that this
+  task, in case of any kind of error, then 'muld' exits with an error-message,
+  giving the user user a chance to fix what may be wrong. There are no clever
+  tricks applied to resolve anything.
+"""
+import subprocess
+import argparse
+import pathlib
+import sys
+import os
+import yaml
+
+VERSION_MAJOR = 0
+VERSION_MINOR = 0
+VERSION_PATCH = 10
+
+
+def expand_path(path):
+    """Expands variables from the given path and turns it into absolute path"""
+
+    return pathlib.Path(
+        os.path.abspath(os.path.expanduser(os.path.expandvars(path)))
+    ).resolve()
+
+
+def args_to_conf():
+    """Parse command-line options"""
+
+    prsr = argparse.ArgumentParser(
+        description='git; Mirror Upstream to Local to Downstream',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    prsr.add_argument(
+        "--mirrors",
+        help="Path to directory containing repository mirrors",
+        default=os.getcwd(),
+    )
+    prsr.add_argument(
+        "--conf",
+        help="Path to yaml describing what to mirror and whereto",
+    )
+    prsr.add_argument(
+        '--only-match',
+        help="Only process the repos matching the given string",
+        default=None
+    )
+    prsr.add_argument(
+        '--no-fetch',
+        help="Skip fetch upstream",
+        action='store_true',
+        default=False,
+    )
+    prsr.add_argument(
+        '--no-push',
+        help="Skip pushing downstream",
+        action='store_true',
+        default=False,
+    )
+
+    args = prsr.parse_args()
+    args.mirrors = expand_path(args.mirrors)
+    if args.conf is None:
+        args.conf = os.path.join(args.mirrors, "muld.yml")
+    args.conf = expand_path(args.conf)
+
+    try:
+        conf = {}
+        with open(args.conf, 'r') as yml_file:
+            conf.update(yaml.safe_load(yml_file))
+
+        conf["mirrors"] = args.mirrors
+        conf["no_fetch"] = args.no_fetch
+        conf["no_push"] = args.no_push
+        conf["only_match"] = args.only_match
+
+        return conf
+    except FileNotFoundError:
+        print("# file-not-found; config %r" % args.conf)
+        return None
+
+
+def execute(cmd, cwd=None, pipe=False):
+    """Execute the given cmd"""
+
+    print("# %s%c %s" % (cwd, '%', " ".join(cmd)), flush=True)
+
+    proc = subprocess.Popen(
+        cmd,
+        cwd=cwd,
+        stdout=subprocess.PIPE if pipe else None,
+        stderr=subprocess.PIPE if pipe else None,
+    )
+    out, err = proc.communicate()
+    rcode = proc.returncode
+
+    if rcode:
+        print("\n## ---=={[ FAILED: above got rcode: {rcode} ]}==--- ##\n")
+
+    return (out, err, rcode)
+
+
+def repo_name(repo):
+    """Returns name of repo"""
+
+    if "name" not in repo or repo["name"] is None:
+        repo["name"] = os.path.basename(repo["upstream"])
+        if repo["name"].endswith(".git"):
+            repo["name"] = repo["name"][:-4]
+
+    return repo["name"]
+
+
+def repo_downstream(repo):
+    """Returns downstream URI or None"""
+
+    if "downstream" in repo:
+        return repo.get("downstream", None)
+
+    return None
+
+
+def repo_path(conf, repo):
+    """Returns local path on filesystem to repository inside mirrors"""
+
+    return os.path.join(conf["mirrors"], repo_name(repo))
+
+
+def repo_remote_names(conf, repo):
+    """Return a list of remote-names for the given repo"""
+
+    rnames = set()
+
+    out, _, _ = execute(
+        ["git", "remote", "-v"],
+        cwd=repo_path(conf, repo), pipe=True
+    )
+    for line in out.decode("utf-8").splitlines():
+        rnames.add(line.split()[0])
+
+    return list(rnames)
+
+
+def repo_local_branches(conf, repo):
+    """Return a list of local branches for the given repo"""
+
+    rnames = set()
+
+    out, _, _ = execute(
+        ["git", "branch", "-l"],
+        cwd=repo_path(conf, repo), pipe=True
+    )
+    for line in (ln.strip() for ln in out.decode("utf-8").splitlines()):
+        rnames.add(line.strip().replace("* ", ""))
+
+    return sorted(list(rnames))
+
+
+def repo_upstream_branches(conf, repo):
+    """Return a list of "upstream" branches for the given repo"""
+
+    rnames = set()
+
+    out, _, _ = execute(
+        ["git", "branch", "-r"],
+        cwd=repo_path(conf, repo), pipe=True
+    )
+    for line in (ln.strip() for ln in out.decode("utf-8").splitlines()):
+        if (not line.startswith("upstream")) or ("->" in line):
+            continue
+
+        rnames.add(line.strip())
+
+    return sorted(list(rnames))
+
+
+def repo_branches_update(conf, repo):
+    """Fetch and prune from upstream, tracks in local and pulls changes"""
+
+    branches_upstream = repo_upstream_branches(conf, repo)
+    branches_local = repo_local_branches(conf, repo)
+
+    _, _, rcode = execute(
+        ["git", "fetch", "-pP", "upstream"],
+        cwd=repo_path(conf, repo)
+    )
+
+    for upstream in branches_upstream:
+        local = upstream[len("upstream/"):]
+
+        if local in branches_local:
+            _, _, rcode = execute(
+                ["git", "branch", "--set-upstream-to", upstream, local],
+                cwd=repo_path(conf, repo)
+            )
+        else:
+            _, _, rcode = execute(
+                ["git", "branch", "--track", local, upstream],
+                cwd=repo_path(conf, repo)
+            )
+        if rcode:
+            print(f"# failed tracking branch: '{upstream}'")
+            return 1
+
+        _, _, rcode = execute(
+            ["git", "checkout", local],
+            cwd=repo_path(conf, repo)
+        )
+        if rcode:
+            print(f"# failed checking out branch: '{local}'")
+            return 1
+
+        _, _, rcode = execute(
+            ["git", "pull", "--rebase"],
+            cwd=repo_path(conf, repo)
+        )
+        if rcode:
+            print(f"# failed pulling branch: '{local}'")
+            return 1
+
+    return 0
+
+
+def main(conf):
+    """Main entry point"""
+    # pylint: disable=too-many-return-statements
+    # pylint: disable=too-many-branches
+    # This main function is the core logic, it will just be harder to
+    # understand what goes on if it is encapsulated / split further up into
+    # functions
+
+    if conf is None:
+        print("# failed; invalid conf")
+        return 1
+
+    os.makedirs(conf["mirrors"], exist_ok=True)
+
+    for repo in conf["repos"]:
+        match = conf["only_match"]
+        if match and (match not in repo_name(repo)):
+            print(f"# skipping: {repo}; does not match {match}")
+            continue
+
+        if "upstream" not in repo:
+            print(f"# invalid repo: {repo}; fix it, then run again")
+            return 1
+
+        print("\n## repos: %s" % repo_name(repo))
+
+        if not os.path.exists(repo_path(conf, repo)):   # Grab the repository
+            _, _, rcode = execute(
+                ["git", "clone", repo["upstream"], repo_path(conf, repo)],
+                cwd=conf["mirrors"]
+            )
+            if rcode:
+                print(f"failed cloning: {repo}; aborting for manual fixup")
+                return 1
+
+            _, _, rcode = execute(
+                ["git", "remote", "rename", "origin", "upstream"],
+                cwd=repo_path(conf, repo)
+            )
+            if rcode:
+                print(f"failed cloning: {repo}; aborting for manual fixup")
+                return 1
+
+        if conf["no_fetch"] or repo.get("no_fetch", False):
+            print("skip: fetching upstream")
+        else:
+            if repo_branches_update(conf, repo):
+                print("failed updating; aborting for manual fixup")
+                return 1
+
+        if conf["no_push"] or repo.get("no_push", False):
+            print("skip: pushing downstream")
+            continue
+
+        if repo_downstream(repo) is None:
+            print(f"no 'downstream'; skipping further handling of {repo}")
+            continue
+
+        rnames = repo_remote_names(conf, repo)
+        if "downstream" not in rnames:
+            _, _, rcode = execute(
+                ["git", "remote", "add", "downstream", repo["downstream"]],
+                cwd=repo_path(conf, repo)
+            )
+            if rcode:
+                print("# failed adding downstream; aborting for manual fixup")
+                return 1
+
+        _, _, rcode = execute(  # push branches
+            ["git", "push", repo["downstream"], "--all"],
+            cwd=repo_path(conf, repo)
+        )
+        if rcode:
+            print("# failed pushing branches; aborting for manual fixup")
+            return 1
+
+        _, _, rcode = execute(  # push tags
+            ["git", "push", repo["downstream"], "--tags"],
+            cwd=repo_path(conf, repo)
+        )
+        if rcode:
+            print("# failed pushing tags; aborting for manual fixup")
+            return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(args_to_conf()))
+    except KeyboardInterrupt:
+        print("Somebody hit Ctrl+C, bailing...")
+        sys.exit(1)
