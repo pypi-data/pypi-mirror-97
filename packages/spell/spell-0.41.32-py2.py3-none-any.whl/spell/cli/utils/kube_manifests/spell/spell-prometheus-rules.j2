@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: k8s
+    role: alert-rules
+  name: spell-prometheus-k8s-roles
+  namespace: monitoring
+spec:
+  groups:
+  - name: spell
+    rules:
+    - expr: |
+        label_replace(
+          rate(container_cpu_usage_seconds_total{namespace="serving", image!="", container!="POD"}[2m]),
+          "service",
+          "$1",
+          "pod",
+          "({{ model_server_prefix }}-[0-9]+)-(.*)"
+        )
+      record: spell:serving:cpu
+    - expr: |
+        label_replace(
+          container_memory_usage_bytes{namespace="serving", image!="", container!="POD"},
+          "service",
+          "$1",
+          "pod",
+          "({{ model_server_prefix }}-[0-9]+)-(.*)"
+        )
+      record: spell:serving:mem:bytes
