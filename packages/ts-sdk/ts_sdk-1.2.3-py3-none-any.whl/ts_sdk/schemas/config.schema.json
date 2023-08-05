@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$ref": "#/definitions/Config",
+
+  "definitions": {
+    "Config": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": ["python"]
+        },
+        "functions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Function" },
+          "minItems": 1
+        },
+        "runnerType": {
+          "type": "string",
+          "enum": ["ecs"]
+        },
+        "maxCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "memoryInMB": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8192
+        }
+      },
+      "required": ["language", "functions"],
+      "additionalProperties": false
+    },
+
+    "Function": {
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string" },
+        "function": { "type": "string" }
+      },
+      "required": ["slug", "function"],
+      "additionalProperties": false
+    }
+  }
+}
