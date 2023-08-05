@@ -1,0 +1,41 @@
+# Hierarchical syntax
+grammar            <- spacing definition+ end_of_file
+definition         <- identifier LEFTARROW expression
+expression         <- sequence (SLASH sequence)*
+sequence           <- lookahead_prefix*
+lookahead_prefix   <- (AND / NOT)? arity_suffix
+arity_suffix       <- indent_rule_prefix (QUESTION / STAR / PLUS)?
+indent_rule_prefix <- indent_rule? primary
+primary            <- OPEN expression CLOSE
+                    / literal / class / DOT
+                    / identifier !LEFTARROW
+class              <- '[' (!']' range)+ ']' spacing
+range              <- char '-' char / char
+
+# Lexical syntax
+identifier <- r'[a-zA-Z_][a-zA-Z0-9_]*' spacing
+literal    <- 'r'? "'" (!"'" char)* "'" spacing
+            / 'r'? '"' (!'"' char)* '"' spacing
+char       <- '\\' .
+            / !'\\' .
+
+indent_rule <- r'@(\*|=|>=|>)' spacing
+
+# Symbols
+LEFTARROW  <- '<-' spacing
+SLASH      <- '/' spacing
+AND        <- '&' spacing
+NOT        <- '!' spacing
+QUESTION   <- '?' spacing
+STAR       <- '*' spacing
+PLUS       <- '+' spacing
+OPEN       <- '(' spacing
+CLOSE      <- ')' spacing
+DOT        <- '.' spacing
+
+# Whitespace
+spacing      <- (space / comment)*
+comment      <- '#' (!end_of_line .)* end_of_line
+space        <- [ \t] / end_of_line
+end_of_line  <- r'\r\n|\n\r|\n|\r'
+end_of_file  <- !.
