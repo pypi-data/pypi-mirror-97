@@ -1,0 +1,46 @@
+{
+  "template": "OcfDriver",
+  "width": "600",
+  "dataSource": {
+    "type": "Service",
+    "keyProperty": "_id",
+    "objName": "OcfDriver"
+  },
+  "defaultAction": {
+    "name": "CallDataSourceForSelectedItems",
+    "title": "Добавить устройство",
+    "title_ru": "Добавить устройство",
+    "title_en": "Add device",
+    "data": {
+      "method": "add_devices"
+    }
+  },
+  "toolBar": {
+    "template": "ToolBar",
+    "visible": true,
+    "massOperationsBar": false,
+    "items": [
+    {
+      "name": "CallDataSourceForSelectedItems",
+      "icon": "mdi-radar",
+      "title": "Find devices",
+      "data": {
+        "method": "find_devices",
+        "operation": {
+          "title": "Find devices",
+          "cancelable": true,
+          "show": true,
+          "formUid": "OcfDriver/FoundDevices"
+        },
+        "dataSource": {
+          "type": "Vuex",
+          "storeName": "LongOperations",
+          "dispatchName": "run",
+          "keyProperty": "id",
+          "objName": "OcfDriver"
+        }
+      }
+    }
+    ]
+  }
+}

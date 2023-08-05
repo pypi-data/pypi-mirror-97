@@ -1,0 +1,83 @@
+{
+  "template": "OcfDriverBrowser",
+  "dataSource": {
+    "type": "Service",
+    "keyProperty": "_id",
+    "objName": "OcfDriver"
+  },
+  "toolbarItemsBeforeSearch": [
+    {
+      "template": "ActionBtn",
+      "title": "FindAllOcfDevices",
+      "primary": true,
+      "destination": "dataSourceAction",
+      "name": "Add",
+      "actionParam": {}
+    },
+    {
+      "name": "Reload",
+      "icon": "mdi-reload",
+      "title": "Reload"
+    }
+  ],
+  "filterFields": [
+    {
+      "name": "date",
+      "template": "FilterDateInterval"
+    }
+  ],
+  "operationsPanelItems": [
+    {
+      "name": "CallDataSourceForSelectedItems",
+      "icon": "mdi-radar",
+      "title": "Find devices",
+      "data": {
+        "method": "find_devices",
+        "operation": {
+          "title": "Find devices",
+          "cancelable": true,
+          "show": true,
+          "formUid": "OcfDriver/FoundDevices"
+        },
+        "dataSource": {
+          "type": "Vuex",
+          "storeName": "LongOperations",
+          "dispatchName": "run",
+          "keyProperty": "id",
+          "objName": "OcfDriver"
+        }
+      }
+    }
+  ],
+  "rowActions": [
+    {
+      "name": "CallDataSourceForSelectedItems",
+      "icon": "mdi-plus-circle-outline",
+      "title": "add devices",
+      "data": {
+        "method": "add_devices"
+      }
+    }
+  ],
+  "rowActionsField": "_actions",
+  "rowTemplate": "rowViewer",
+  "rowActivateHandler": {
+    "name": "RightDrawerFormViewer2",
+    "form": "OcfDriver/Item"
+  },
+  "rowKey": "id",
+  "columns": [
+    {
+      "width": "100%",
+      "align": "left",
+      "template": "RowCellDefault",
+      "field": "name",
+      "title_ru": "Название",
+      "title_en": "Name",
+      "title_cn": "名称"
+    }
+  ],
+  "col_xl": 6,
+  "col_lg": 7,
+  "inlineActions": {}
+}

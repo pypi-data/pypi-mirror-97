@@ -1,0 +1,90 @@
+{
+  "template": "Browser",
+  "dataSource": {
+    "type": "Service",
+    "keyProperty": "_id",
+    "objName": "OcfDevice"
+  },
+  "toolbarItemsBeforeFilter": [
+    {
+      "name": "CallDataSourceForSelectedItems",
+      "icon": "mdi-radar",
+      "title": "Discover",
+      "data": {
+        "method": "discover",
+        "operation": {
+          "title": "Discover devices",
+          "cancelable": true,
+          "show": true,
+          "formUid": "OcfDevice/FoundDevices"
+        },
+        "dataSource": {
+          "type": "Vuex",
+          "storeName": "LongOperations",
+          "dispatchName": "run",
+          "keyProperty": "_id",
+          "objName": "OcfDevice"
+        }
+      }
+    },
+    {
+      "name": "Reload",
+      "icon": "mdi-reload",
+      "title": "Reload"
+    }
+  ],
+  "filterFields": [
+    {
+      "name": "date",
+      "template": "FilterDateInterval"
+    }
+  ],
+  "operationsPanelItems": [
+    {
+      "name": "CallDataSourceForSelectedItems",
+      "icon": "mdi-delete",
+      "title": "Delete devices",
+      "data": {
+        "operation": {
+          "title": "Delete devices",
+          "cancelable": false,
+          "show": false,
+          "formUid": "OcfDevice/FoundDevices"
+        },
+        "method": "mass_delete",
+        "dataSource": {
+          "type": "Vuex",
+          "storeName": "LongOperations",
+          "dispatchName": "run",
+          "keyProperty": "id",
+          "objName": "OcfDevice"
+        }
+      }
+    }
+  ],
+  "actions": {
+    "template": "",
+    "templateOptions": {}
+  },
+  "rowTemplate": "rowViewer",
+  "rowActivateHandler": {
+    "name": "RightDrawerFormViewer2",
+    "form": "OcfDevice/Item"
+  },
+  "rowKey": "id",
+  "columns": [
+    {
+      "value": "name",
+      "width": "100%",
+      "align": "left",
+      "template": "CellOcfDeviceTitle",
+      "text": "title",
+      "title_ru": "Название",
+      "title_en": "Name",
+      "title_cn": "名称"
+    }
+  ],
+  "col_xl": 6,
+  "col_lg": 7,
+  "inlineActions": {}
+}
