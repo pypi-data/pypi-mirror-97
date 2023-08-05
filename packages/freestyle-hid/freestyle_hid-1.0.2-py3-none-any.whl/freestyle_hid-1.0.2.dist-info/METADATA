@@ -1,0 +1,79 @@
+Metadata-Version: 2.1
+Name: freestyle-hid
+Version: 1.0.2
+Summary: Python implementation of the HID protocol used by Abbott FreeStyle devices
+Home-page: https://github.com/glucometers-tech/freestyle-hid
+Author: Diego Elio Pettenò
+Author-email: flameeyes@flameeyes.com
+License: Apache-2.0
+Keywords: glucometer,diabetes,freestyle,abbott
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Requires-Python: ~=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: construct
+Provides-Extra: dev
+Requires-Dist: mypy ; extra == 'dev'
+Requires-Dist: pre-commit ; extra == 'dev'
+Requires-Dist: pytest-mypy ; extra == 'dev'
+Requires-Dist: pytest-timeout (>=1.3.0) ; extra == 'dev'
+Requires-Dist: pytest (>=6.0) ; extra == 'dev'
+Requires-Dist: setuptools-scm ; extra == 'dev'
+Provides-Extra: hidapi
+Requires-Dist: hidapi ; extra == 'hidapi'
+Provides-Extra: tools
+Requires-Dist: click ; extra == 'tools'
+Requires-Dist: click-log ; extra == 'tools'
+Requires-Dist: usbmon-tools ; extra == 'tools'
+
+<!--
+SPDX-FileCopyrightText: 2013 The freestyle-hid Authors
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+# Python library to interact with Abbott FreeStyle devices
+
+This repository includes a library and some tools to interact with Abbott
+FreeStyle devices that use their
+[shared HID protocol](https://protocols.glucometers.tech/abbott/shared-hid-protocol.html).
+
+## Tools
+
+There are a number of tools that interact with either the devices or with
+USB session captures that are installed together when selecting the `tools`
+extra:
+
+ * `freestyle-hid-console` allows sending direct text messages to a compatible
+   device on the console;
+ * `freestyle-extract-chatter` can produce a "chatter" file based on a capture
+   of an USB session, either from Linux or Windows.
+ * `freestyle-encrypted-setup-extract` is an experimental tool to extract the
+   encryption parameters of devices using the encrypted protocol (e.g. Libre2).
+
+## Development
+
+If you want to contribute code, please note that the target language
+is Python 3.7, and that the style to follow is for the most part PEP8
+compatible.
+
+To set up your development environment follow these guidelines:
+
+```shell
+$ git clone https://github.com/glucometers-tech/freestyle-hid.git
+$ cd glucometerutils
+$ python3 -m venv --python=python3.7
+$ . venv/bin/activate
+$ pip install -e .[dev,tools]
+$ pre-commit install
+```
+
+
