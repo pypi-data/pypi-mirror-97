@@ -1,0 +1,44 @@
+private_registry: False
+registry_url: registry.hub.docker.com
+username: ""
+password: ""
+repository: pkuong/airflow-run
+image: airflow-run
+tag: latest
+local_dir: {local directory where you want to mount /dags and /logs folder}
+webserver_port: 8000
+flower_port: 5555
+custom_mount_volumes: []
+env:
+  AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+  AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+  AIRFLOW__CORE__DAGS_FOLDER: /usr/local/airflow/airflow/dags
+  AIRFLOW__CORE__BASE_LOG_FOLDER: /usr/local/airflow/airflow/logs
+  AIRFLOW_HOME: /usr/local/airflow
+  AIRFLOW__CORE__FERNET_KEY: ""
+rabbitmq:
+  name: rabbitmq
+  username: {username}
+  password: {password}
+  host: {IP}
+  virtual_host: /
+  image: rabbitmq:3-management
+  home: /var/lib/rabbitmq
+  ui_port: 15672
+  port: 5672
+  env:
+    RABBITMQ_DEFAULT_USER: {username}
+    RABBITMQ_DEFAULT_PASS: {password}
+postgresql:
+  name: postgresql
+  username: {username}
+  password: {password}
+  host: {host}
+  image: postgres
+  tag: latest
+  data: /var/lib/postgresql/data
+  port: 5432
+  env:
+    PGDATA: /var/lib/postgresql/data/pgdata
+    POSTGRES_USER: {username}
+    POSTGRES_PASSWORD: {password}
