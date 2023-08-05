@@ -1,0 +1,102 @@
+Python API
+==========
+
+The Python API enables maximum flexibility when using mokapot. It also aids in
+making analyses reproducible by easily integrating into Jupyter notebooks and
+Python scripts.
+
+Read PSMs using the :py:func:`~mokapot.read_pin()` or
+:py:func:`~mokapot.read_pepxml()` functions for files in the Percolator
+tab-delimited format or PepXML format, respectively. Once a collection of PSMs
+has been read, the :py:func:`~mokapot.brew()` function will apply the mokapot
+algorithm to learn models from the PSMs and assign confidence estimates based on
+their new scores. Alternatively, the
+:py:meth:`~mokapot.dataset.LinearPsmDataset.assign_confidence()` method will
+assign confidence estimates to PSMs based on the best feature, which is often
+the primary score from the database search engine.
+
+Alternatively, PSMs that are already represented in a
+:py:class:`pandas.DataFrame` can be directly used to create a
+:py:class:`~mokapot.dataset.LinearPsmDataset`.
+
+Finally, custom machine learning models can be created using the
+:py:class:`mokapot.model.Model` class.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :titlesonly:
+
+   Overview <self>
+   functions.rst
+   model.rst
+   dataset.rst
+   confidence.rst
+
+Functions
+---------
+.. currentmodule:: mokapot
+
+Primary Functions
+*****************
+.. autosummary::
+   :nosignatures:
+
+   read_pin
+   read_pepxml
+   brew
+
+Utility Functions
+*****************
+.. autosummary::
+   :nosignatures:
+
+   save_model
+   load_model
+   read_percolator
+   plot_qvalues
+   make_decoys
+   digest
+
+
+Machine Learning Models
+-----------------------
+
+Use a model that emulates the Linear support vector machine used by Percolator
+or create a custom model from anything with a Scikit-Learn interface.
+
+.. currentmodule:: mokapot.model
+.. autosummary::
+   :nosignatures:
+
+   PercolatorModel
+   Model
+
+
+Collections of PSMs
+-------------------
+
+PSMs can be parsed from Percolator tab-delimited files, PepXML files, or
+directly from a :py:class:`pandas.DataFrame`.
+
+.. currentmodule:: mokapot.dataset
+.. autosummary::
+   :nosignatures:
+
+   LinearPsmDataset
+   .. CrossLinkedPsmDataset
+
+
+Confidence Estimates
+--------------------
+
+An analysis with mokapot yields two forms of confidence estimates---q-values and
+posterior error probabilities (PEPs)---at various levels: PSMs, peptides, and
+optionally, proteins.
+
+.. currentmodule:: mokapot.confidence
+.. autosummary::
+   :nosignatures:
+
+   LinearConfidence
+   .. CrossLinkedConfidence
