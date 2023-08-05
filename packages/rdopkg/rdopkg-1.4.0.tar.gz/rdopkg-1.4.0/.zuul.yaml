@@ -1,0 +1,111 @@
+---
+- job:
+    name: rdopkg-base
+    pre-run: playbooks/base.yaml
+    parent: tox
+    abstract: true
+    required-projects:
+      - distroinfo
+
+# NOTE: this test should be running on Centos 7.
+- job:
+    name: rdopkg-base-py2
+    parent: rdopkg-base
+    abstract: true
+    nodeset: centos-7-pod
+
+- job:
+    name: rdopkg-base-coverage-py2
+    parent: rdopkg-base-py2
+    post-run: playbooks/fetch-coverage.yaml
+    success-url: coverage/index.html
+
+- job:
+    name: rdopkg-base-py3
+    parent: rdopkg-base
+    abstract: true
+    nodeset: fedora-latest-pod
+
+- job:
+    name: rdopkg-base-coverage-py3
+    parent: rdopkg-base-py3
+    post-run: playbooks/fetch-coverage.yaml
+    success-url: coverage/index.html
+
+- job:
+    name: rdopkg-py2-tests
+    parent: rdopkg-base-coverage-py2
+    description: rdopkg unit and feature tests on python2
+    vars:
+      tox_envlist: py2-unit,py2-feature,py2-cover
+
+- job:
+    name: rdopkg-py3-tests
+    parent: rdopkg-base-coverage-py3
+    description: rdopkg unit and features tests on python3
+    vars:
+      tox_envlist: py3-unit,py3-feature,py3-cover
+
+- job:
+    name: rdopkg-py2-integration
+    parent: rdopkg-base-py2
+    description: rdopkg integration tests on python2
+    vars:
+      tox_envlist: py2-integration
+
+- job:
+    name: rdopkg-py3-integration
+    parent: rdopkg-base-py3
+    description: rdopkg integration tests on python3
+    vars:
+      tox_envlist: py3-integration
+
+- job:
+    name: rdopkg-lint
+    parent: rdopkg-base-py3
+    description: rdopkg linting
+    vars:
+      tox_envlist: lint
+
+- job:
+    name: rdopkg-install-epel
+    description: install rdopkg with epel
+    run: playbooks/install-test-epel-7.yaml
+    nodeset: centos-latest-cloud
+
+- job:
+    name: rdopkg-dlrn-master
+    parent: dlrn-base
+    description: rdopkg integration tests with DLRN master
+    run: playbooks/dlrn-master.yaml
+    nodeset:
+      nodes:
+        - name: rdo-centos-8
+          label: rdo-centos-8
+    required-projects:
+      - DLRN
+
+- project:
+    name: rdopkg
+    check:
+      jobs:
+        - rdopkg-py2-tests
+        - rdopkg-py3-tests
+        - rdopkg-py2-integration
+        - rdopkg-py3-integration
+        - rdopkg-lint
+        - rdopkg-dlrn-master
+    gate:
+      jobs:
+        - rdopkg-py2-tests
+        - rdopkg-py3-tests
+        - rdopkg-py2-integration
+        - rdopkg-py3-integration
+        - rdopkg-lint
+        - rdopkg-dlrn-master
+    periodic:
+      jobs:
+        - rdopkg-install-epel
+    release:
+      jobs:
+        - upload-pypi
