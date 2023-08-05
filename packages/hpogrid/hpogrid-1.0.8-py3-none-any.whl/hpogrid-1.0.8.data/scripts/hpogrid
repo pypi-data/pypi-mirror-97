@@ -1,0 +1,99 @@
+#!python
+import sys
+import argparse
+
+from hpogrid._version import __version__
+from hpogrid.utils.cli_parser import CLIParser
+  
+class CLI(object):
+    _COMMAND_HELP_MESSAGE_ = {
+        'hpo_config': 'Manage HPO configuration',
+        'grid_config': 'Manage grid configuration',
+        'model_config': 'Manage model configuration',
+        'search_space': 'Manage search space',
+        'project': 'Manage a project',
+        'tasks': 'Monitor grid jobs',
+        'run': 'Run an HPO task',
+        'submit': 'Submit an HPO task to the grid/idds',
+        'sites': 'Show available grid sites',
+        'report': 'Display a report of an HPO task',
+        'generate' :'Generate hyperparameter search points',
+        'idds_log' : 'Download idds log'
+    }
+    @staticmethod
+    def run_parser():
+        parser = CLIParser(description='Tool for Hyperparameter Optimization on the Grid',
+                               version=__version__)
+        parser.set_title('The most commonly used commands are')
+        command_parser = parser.add_subparsers(dest="command", parser_class=argparse.ArgumentParser)
+        for command in CLI._COMMAND_HELP_MESSAGE_:
+            command_parser.add_parser(command, help=CLI._COMMAND_HELP_MESSAGE_[command])
+        args = parser.parse_args(sys.argv[1:2])
+        if (not args.command) or (not hasattr(CLI, args.command)):
+            print('Unrecognized command')
+            parser.print_help()
+            sys.exit(0)
+        getattr(CLI, args.command)(args=sys.argv[2:])
+        
+    @staticmethod    
+    def hpo_config(args=None):
+        from hpogrid.configuration import HPOConfiguration
+        HPOConfiguration().run_parser(args)
+        
+    @staticmethod
+    def grid_config(args=None):
+        from hpogrid.configuration import GridConfiguration
+        GridConfiguration().run_parser(args)
+        
+    @staticmethod
+    def search_space(args=None):
+        from hpogrid.configuration import SearchSpaceConfiguration
+        SearchSpaceConfiguration().run_parser(args)
+
+    @staticmethod
+    def model_config(args=None):
+        from hpogrid.configuration import ModelConfiguration
+        ModelConfiguration().run_parser(args)
+
+    @staticmethod
+    def project(args=None):
+        from hpogrid.configuration import ProjectConfiguration
+        ProjectConfiguration().run_parser(args)
+    
+    @staticmethod
+    def tasks(args=None):
+        from hpogrid.components.panda_task_manager import PandaTaskManager
+        PandaTaskManager().run_parser(args)
+        
+    @staticmethod
+    def submit(args=None):
+        from hpogrid import GridHandler
+        GridHandler().run_parser(args)
+    
+    @staticmethod
+    def run(args=None):
+        from hpogrid import JobBuilder
+        JobBuilder().run_parser(args)
+        
+    @staticmethod
+    def sites(args=None):
+        from hpogrid import GridSiteInfo
+        GridSiteInfo.run_parser(args)
+
+    @staticmethod
+    def report(args=None):
+        from hpogrid.components.reporter import HPOTaskHandle
+        HPOTaskHandle().run_parser(args)
+        
+    @staticmethod
+    def generate(args=None):
+        from hpogrid import SteeringIDDS
+        SteeringIDDS().run_parser(args)
+    
+    @staticmethod
+    def idds_log(args=None):
+        from hpogrid.idds_interface.idds_utils import IDDSInterface
+        IDDSInterface().run_parser(args)     
+    
+if __name__ == '__main__':
+    CLI.run_parser()
