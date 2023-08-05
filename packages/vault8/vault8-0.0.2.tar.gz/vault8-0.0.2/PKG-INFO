@@ -1,0 +1,52 @@
+Metadata-Version: 2.1
+Name: vault8
+Version: 0.0.2
+Summary: Python library for Vault8 service
+Home-page: https://github.com/cimon-io/vault8-python
+Author: Eugene Ignatov
+Author-email: eugene@cimon.io
+Maintainer: Eugene Ignatov
+Maintainer-email: eugene@cimon.io
+License: UNKNOWN
+Description: ### Vault8 Python lib
+        
+        #### Installation
+        
+        ```
+        pip3 install vault8
+        ```
+        
+        #### Example
+        ```python
+        import os
+        import sys
+        import vault8
+        
+        pubkey = os.getenv('VAULT8_PUBLIC_KEY', '')
+        privkey = os.getenv('VAULT8_SECRET_KEY', '')
+        url = os.getenv('VAULT8_URL', 'https://vault8.io')
+        
+        vault = vault8.Vault8(public_key=pubkey, secret_key=privkey, service_url=url)
+        
+        # upload file from localhost
+        image = open('pypi.png', 'rb')
+        # or remote
+        # image = 'https://example.com/pypi.png'
+        
+        uploaded = vault.upload_image(image)
+        
+        if uploaded.get('status') == 'error':
+            print(uploaded.get('response'))
+            sys.exit(0)
+        
+        uid = uploaded.get('image_uid')
+        
+        print(vault.image_url(uid=uid, filters=[('resize_fill',1000,500), ('grayscale',)]))
+        ```
+Keywords: vault8
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
