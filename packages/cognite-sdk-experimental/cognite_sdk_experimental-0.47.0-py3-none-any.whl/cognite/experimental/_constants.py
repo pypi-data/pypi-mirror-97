@@ -1,0 +1,4 @@
+# Functions
+LIST_LIMIT_DEFAULT = 25
+HANDLER_FILE_NAME = "handler.py"
+MAX_RETRIES = 5
