@@ -1,0 +1,107 @@
+Metadata-Version: 2.1
+Name: openscad-docsgen
+Version: 1.1.7
+Summary: A processor to generate Markdown code documentation from OpenSCAD source comments.
+Home-page: https://github.com/revarbat/openscad_docsgen
+Author: Revar Desmera
+Author-email: revarbat@gmail.com
+License: MIT License
+Download-URL: https://github.com/revarbat/openscad_docsgen/archive/openscad_docsgen_v1.1.7.zip
+Keywords: openscad documentation generation docsgen
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Manufacturing
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Artistic Software
+Classifier: Topic :: Multimedia :: Graphics :: 3D Modeling
+Classifier: Topic :: Multimedia :: Graphics :: 3D Rendering
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Description-Content-Type: text/x-rst
+Requires-Dist: setuptools
+Requires-Dist: Pillow (>=7.2.0)
+Requires-Dist: openscad-runner (>=1.0.7)
+
+################################
+OpenSCAD Documentation Generator
+################################
+
+This package generates wiki-ready GitHub flavored markdown documentation pages from in-line source
+code comments.  This is similar to Doxygen or JavaDoc, but designed for use with OpenSCAD code.
+Example images can be generated automatically from short example scripts.
+
+Documentation about how to add documentation comments to OpenSCAD code can be found at
+`https://github.com/revarbat/openscad_docsgen/blob/main/WRITING_DOCS.md`
+
+
+Installing openscad-docsgen
+---------------------------
+
+The easiest way to install this is to use pip::
+
+    % pip3 install openscad-docsgen
+
+To install directly from these sources, you can instead do::
+
+    % python3 setup.py build install
+
+
+Using openscad-docsgen
+----------------------
+
+The simplest way to generate documentation is::
+
+    % openscad-docsgen -m *.scad
+
+Which will read all of .scad files in the current directory, and writes out documentation to
+the ``./docs/`` dir.  To write out to a different directory, use the ``-D`` argument::
+
+    % openscad-docsgen -D wikidir -m *.scad
+
+To write out an alphabetical function/module index markdown file, use the ``-i`` flag::
+
+    % openscad-docsgen -i *.scad
+
+To write out a Table of Contents markdown file, use the ``-t`` flag::
+
+    % openscad-docsgen -t *.scad
+
+To write out a CheatSheet markdown file, use the ``-c`` flag::
+
+    % openscad-docsgen -c *.scad
+
+You can just test for script errors more quickly with the ``-T`` flag (for test-only)::
+
+    % openscad-docsgen -T *.scad
+
+
+Configuration File
+------------------
+You can also make more persistent configurations by putting a `.openscad_docsgen_rc` file in the
+directory you will be running openscad-docsgen from.  It can look something like this::
+
+    DocsDirectory: WikiDir/
+    IgnoreFiles:
+      foo.scad
+      std.scad
+      version.scad
+      tmp_*.scad
+    PrioritizeFiles:
+      First.scad
+      Second.scad
+      Third.scad
+      Fourth.scad
+    DefineHeader(BulletList): Side Effects
+    DefineHeader(Table:Anchor&nbsp;Name|Position): Extra Anchors
+
+For an explanation of the syntax and the specific headers, see:
+`https://github.com/revarbat/openscad_docsgen/blob/main/WRITING_DOCS.md`
+
+
