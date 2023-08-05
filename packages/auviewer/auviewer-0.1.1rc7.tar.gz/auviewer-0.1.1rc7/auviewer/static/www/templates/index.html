@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link rel='stylesheet' href='{{ rootWebPath }}/css/third-party/webix.min.css'/>
+<style>
+	h2 { text-align: center; margin-bottom: 16px; }
+	tbody > tr { cursor: pointer; }
+</style>
+{% endblock %}
+
+{% block js %}
+<script src="{{ rootWebPath }}/js/third-party/webix.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!--<div class="panel" id="projects">-->
+<!--	<h2>Projects</h2>-->
+<!--	<table-->
+<!--</div>-->
+
+<div class="container">
+	<div class="row">
+
+		<div class="col-xl">
+
+			<h2>Projects</h2>
+
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">Project</th>
+						<th scope="col">Files</th>
+						<th scope="col">Patterns</th>
+						<th scope="col">Annotations</th>
+						<th scope="col">Assignments Rem.</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for p in projects %}
+					<tr onclick="window.location='{{rootWebPath}}/project?id={{p.id}}'">
+						<th scope="row">{{p.name}}</th>
+						<td>{{p.files}}</td>
+						<td>{{p.patterns}}</td>
+						<td>{{p.annotations}}</td>
+						<td>{{p.assignments_rem}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		</div>
+
+		<div class="col-xl">
+
+			<h2>My Assignments</h2>
+
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">Assignment</th>
+						<th scope="col">Project</th>
+						<th scope="col">Compl.</th>
+						<th scope="col">Rem.</th>
+						<th scope="col">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for a in assignments %}
+					<tr onclick="window.location='{{rootWebPath}}/project?id={{a.project_id}}'">
+						<th scope="row">{{a.name}}</th>
+						<td>{{a.project_name}}</td>
+						<td>{{a.completed}}</td>
+						<td>{{a.remaining}}</td>
+						<td>{{a.total}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		</div>
+
+	</div>
+</div>
+
+{% endblock %}

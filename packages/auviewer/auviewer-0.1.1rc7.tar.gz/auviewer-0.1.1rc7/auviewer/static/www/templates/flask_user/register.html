@@ -1,0 +1,37 @@
+{% extends 'flask_user/public_base.html' %}
+
+{% block content %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field %}
+<h1>{%trans%}Register{%endtrans%}</h1>
+
+<form action="" method="POST" novalidate formnovalidate class="form" role="form">
+
+    {{ form.hidden_tag() }}
+
+    {# Username or Email #}
+    {% set field = form.username if user_manager.enable_username else form.email %}
+    <div class="form-group">
+        <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+        {{ field(class_='form-control'+(' is-invalid' if field.errors else ''), tabindex=210) }}
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+        {% endif %}
+        <small class="form-text text-muted"><a href="{{ url_for('user.login') }}" tabindex='290'>{%trans%}Already registered? Sign in.{%endtrans%}</a></small>
+    </div>
+
+    {% if user_manager.enable_email and user_manager.enable_username %}
+        {{ render_field(form.email, tabindex=220) }}
+    {% endif %}
+
+    {{ render_field(form.password, tabindex=230) }}
+
+    {% if user_manager.enable_retype_password %}
+        {{ render_field(form.retype_password, tabindex=240) }}
+    {% endif %}
+
+    {{ render_submit_field(form.submit, tabindex=280) }}
+</form>
+
+{% endblock %}
