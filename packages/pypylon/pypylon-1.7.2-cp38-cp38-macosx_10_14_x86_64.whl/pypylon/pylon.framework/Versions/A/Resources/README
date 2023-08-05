@@ -1,0 +1,84 @@
+pylon 5 Camera Software Suite for macOS for use with Basler 
+Gigabit Ethernet(GigE) and Basler USB 3.0 Cameras (U3V)
+================================================================
+
+
+System Requirements
+===================
+
+GigE
+----
+A GigE network adapter that supports jumbo frames is recommended. Concerning 
+performance and reliability we made best experiences with the on-board network 
+adapter. Although the pylon software will work with any GigE network adapter, 
+we recommend to use on-board adapters.
+
+USB
+---
+For U3V devices a USB3-capable USB controller is necessary. For best 
+performance and stability we highly recommend to use the on-board 
+USB adapter.
+
+
+Performance Optimization
+========================
+
+To increase performance and to minimize CPU load when grabbing images, the 
+following settings should be considered:
+
+GigE Devices
+------------
+* Enable jumbo frames.
+  Many GigE network adapters support so-called jumbo frames, i.e., network 
+  packets larger than the usual 1500 bytes. To enable jumbo frames, the maximum 
+  transfer unit (MTU) size of the PC's network adapter must be set to a high 
+  value (see the description in the INSTALL document). We recommend using a 
+  value of 8192.
+
+* Increase the packet size.
+  When jumbo frames are enabled, the camera's packet size must be increased to 
+  benefit from the larger packets. The 'Optimizing Packet Size' section of the 
+  INSTALL document describes how to set the packet size.
+
+U3V Devices
+-----------
+* Increasing Packet Size
+  For faster USB transfers you should increase the packet size. You can do this 
+  by changing the "Stream Parameters" -> "Maximum Transfer Size" value from 
+  inside the pylon Viewer or by setting the corresponding value via the API.
+
+
+Camera Emulator
+===============
+
+In addition to camera transport layers like GigE Vision or USB3 Vision, pylon offers
+a transport layer that can create simple camera emulation devices. This allows you to
+develop applications without the need for a physical camera. It is also useful if you
+want to develop a multi-camera application and don't have enough cameras at hand.
+Besides emulating image acquisition and standard camera features, camera emulation
+devices also offer features that a physical camera does not offer:
+- You can display custom test images, e.g., to optimize your image processing algorithms.
+- You can generate failed buffers, e.g., to test your exception handling routines.
+
+The number of available emulator devices can be controlled by exporting the
+PYLON_CAMEMU environment variable. For example,
+
+   export PYLON_CAMEMU=2
+
+will provide two emulator devices. These devices are accessible both by using
+the pylon API and the pylon Viewer program.
+
+When PYLON_CAMEMU is not set, no emulator devices are provided.
+Note: A maximum of 256 emulator devices are supported.
+
+For more information on the camera emulator refer to the Basler Product Documentation.
+
+ 
+Version Infos
+=============
+
+The pylon libraries have been built using the following tools.
+
+macOS x86 64bit:
+    These binaries are built with Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+    
