@@ -1,0 +1,2 @@
+class BaseConverter:
+    pass
