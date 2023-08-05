@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+	DNs &raquo; {{g_dn.code}} &raquo; LDZs
+{% endblock %}
+
+{% block nav %}
+	<a href="/g_dns/">LDZs</a> &raquo;
+	<a href="/g_dns/{{g_dn.id}}">{{g_dn.code}}</a> &raquo;
+	<a href="/g_dns/{{g_dn.id}}/g_ldzs">LDZs</a>
+{% endblock %}
+
+{% block content %}
+	<div class="layer-section">
+		<div class="section-content">
+			<div class="section-data">
+				<table>
+					<thead>
+						<tr>
+							<th>Code</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for g_ldz in g_ldzs %}
+							<tr>
+								<td><a href="/g_ldzs/{{g_ldz.id}}">{{g_ldz.code}}</a></td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="layer-section">
+		<div class="section-header">
+			<h2>CV Data</h2>	
+		</div>
+		<div class="section-content">
+			<div class="section-data">
+				<p>
+					<a href="/non_core_contracts/4">CV Data</a>
+				</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}
