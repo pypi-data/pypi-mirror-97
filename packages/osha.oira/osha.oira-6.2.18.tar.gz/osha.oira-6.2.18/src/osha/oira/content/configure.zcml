@@ -1,0 +1,60 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:plone="http://namespaces.plone.org/plone"
+  xmlns:browser="http://namespaces.zope.org/browser">
+
+    <include package="plone.behavior" file="meta.zcml" />
+    <include package="plone.directives.form" file="meta.zcml" />
+    <include package="plone.directives.form" />
+
+    <include package=".browser" />
+
+    <plone:behavior
+        title="OSHA extra Sector fields"
+        description="Provide additional OSHA fields"
+        provides=".sector.IOSHASector"
+        factory=".sector.OSHASector"
+        for="plone.dexterity.interfaces.IDexterityContent"
+        />
+
+    <plone:behavior
+        name="osha.country.extrafields"
+        title="OSHA extra Country fields"
+        provides=".country.IOSHACountry"
+        />
+
+    <plone:behavior
+        title="OSHA extra Survey fields"
+        description="Provide additional OSHA fields"
+        provides=".survey.IOSHASurvey"
+        factory=".survey.OSHASurvey"
+        for="plone.dexterity.interfaces.IDexterityContent"
+        />
+
+    <adapter
+        for=".survey.IOSHASurveyMarker zope.schema.interfaces.IField"
+        factory="z3c.form.datamanager.AttributeField"
+        />
+
+    <adapter
+        factory=".statistics.ReportPeriodFactory"
+        name="osha.oira.content.statistics.IReportPeriod"
+        />
+
+  <browser:page
+      name="site-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".controlpanel.SiteControlPanel"
+      permission="cmf.ManagePortal"
+      layer="osha.oira.interfaces.IOSHAContentSkinLayer"
+      />
+
+  <browser:page
+      name="survey-contents-docx"
+      for=".survey.IOSHASurveyMarker"
+      class=".survey.ContentsOfSurvey"
+      permission="zope2.View"
+      layer="osha.oira.interfaces.IOSHAContentSkinLayer"
+      />
+
+</configure>

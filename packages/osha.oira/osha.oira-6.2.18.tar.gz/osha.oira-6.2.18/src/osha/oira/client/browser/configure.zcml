@@ -1,0 +1,133 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    >
+
+  <!-- override some classes, but re-use the template from Euphorie -->
+  <configure package="euphorie.client.browser">
+
+    <browser:page
+        name="login_form"
+        for="*"
+        permission="zope.Public"
+        class="osha.oira.client.browser.login.LoginForm"
+        template="templates/login_form.pt"
+        layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+        />
+
+    <browser:page
+        name="webhelpers"
+        for="*"
+        permission="zope.Public"
+        class="osha.oira.client.browser.webhelpers.OSHAWebHelpers"
+        template="templates/webhelpers.pt"
+        layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+        />
+
+  </configure>
+
+
+  <browser:page
+      name="terms-and-conditions"
+      for="*"
+      permission="zope2.Public"
+      class=".conditions.TermsAndConditions"
+      template="templates/privacy_policy.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="remove-certificate-status-box"
+      for="euphorie.client.adapters.session_traversal.ITraversedSurveySession"
+      permission="zope2.View"
+      class=".certificate.RemoveCertificateBox"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="certificate"
+      for="euphorie.client.adapters.session_traversal.ITraversedSurveySession"
+      permission="zope2.View"
+      class=".certificate.Certificate"
+      template="templates/certificate.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="certificate-print"
+      for="euphorie.client.adapters.session_traversal.ITraversedSurveySession"
+      permission="zope2.View"
+      class=".certificate.Certificate"
+      template="templates/certificate-print.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="certificate_fr_specific"
+      for="*"
+      permission="zope2.View"
+      class=".fr.Certificate"
+      template="templates/certificate_fr_specific.pt"
+      />
+
+  <browser:page
+      name="status"
+      for="euphorie.client.adapters.session_traversal.ITraversedSurveySession"
+      permission="euphorie.client.ViewSurvey"
+      class="euphorie.client.browser.session.Status"
+      template="templates/status.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <!-- Certificates are not protected -->
+  <browser:page
+      name="certificates"
+      for="*"
+      permission="zope.Public"
+      class=".certificate.PublicCertificate"
+      template="templates/public-certificate.pt"
+      />
+
+  <browser:page
+      name="risk_macros"
+      for="*"
+      permission="zope.Public"
+      class=".webhelpers.WebHelpers"
+      template="templates/risk_macros.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="certificate_macros"
+      for="*"
+      permission="euphorie.client.ViewSurvey"
+      template="templates/certificate_macros.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="identification"
+      for="euphorie.client.model.Module"
+      permission="euphorie.client.ViewSurvey"
+      class=".module.OSHAIdentificationView"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="actionplan"
+      for="euphorie.client.model.Module"
+      permission="euphorie.client.ViewSurvey"
+      class=".module.OSHAActionPlanView"
+      template="templates/module_actionplan.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+  <browser:page
+      name="appendix"
+      for="*"
+      permission="zope.Public"
+      template="templates/appendix.pt"
+      layer="osha.oira.client.interfaces.IOSHAClientSkinLayer"
+      />
+
+</configure>
