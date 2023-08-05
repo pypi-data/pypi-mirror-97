@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Malden.MetricsServer.Service.Metric.Data" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Malden.MetricsServer.Service.Metric.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="ConfigurationData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="InUse" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Modified" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Version" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ConfigurationData" nillable="true" type="tns:ConfigurationData" />
+  <xs:complexType name="ArrayOfConfigurationData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ConfigurationData" nillable="true" type="tns:ConfigurationData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfConfigurationData" nillable="true" type="tns:ArrayOfConfigurationData" />
+  <xs:complexType name="ArrayOfMetricGroupData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="MetricGroupData" nillable="true" type="tns:MetricGroupData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfMetricGroupData" nillable="true" type="tns:ArrayOfMetricGroupData" />
+  <xs:complexType name="MetricGroupData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Metrics" nillable="true" type="tns:ArrayOfMetricData" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MetricGroupData" nillable="true" type="tns:MetricGroupData" />
+  <xs:complexType name="ArrayOfMetricData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="MetricData" nillable="true" type="tns:MetricData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfMetricData" nillable="true" type="tns:ArrayOfMetricData" />
+  <xs:complexType name="MetricData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AllowOptionEdit" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Enabled" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAdvancedOptions" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="OptionLabel" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Options" nillable="true" type="q1:ArrayOfstring" />
+      <xs:element minOccurs="0" name="Selected" type="xs:boolean" />
+      <xs:element minOccurs="0" name="SelectedOption" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MetricData" nillable="true" type="tns:MetricData" />
+  <xs:complexType name="ArrayOfAdvancedOptionData">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AdvancedOptionData" nillable="true" type="tns:AdvancedOptionData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAdvancedOptionData" nillable="true" type="tns:ArrayOfAdvancedOptionData" />
+  <xs:complexType name="AdvancedOptionData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AdvancedOptionData" nillable="true" type="tns:AdvancedOptionData" />
+</xs:schema>

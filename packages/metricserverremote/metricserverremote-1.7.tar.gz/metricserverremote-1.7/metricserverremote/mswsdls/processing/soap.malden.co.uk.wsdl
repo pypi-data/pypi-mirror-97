@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://soap.malden.co.uk" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://soap.malden.co.uk" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://soap.malden.co.uk/Imports">
+      <xsd:import namespace="http://soap.malden.co.uk" schemaLocation="soap.malden.co.uk.xsd" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" schemaLocation="service.xsd" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/Malden.MetricsServer.Service.Process.Data" schemaLocation="Malden.MetricsServer.Service.Process.Data.xsd" />
+      <xsd:import namespace="http://schemas.microsoft.com/Message" schemaLocation="Message.xsd" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" schemaLocation="Arrays.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IFilePairProcessing_PrepareUpload_InputMessage">
+    <wsdl:part name="parameters" element="tns:PrepareUpload" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_PrepareUpload_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PrepareUploadResponse" />
+  </wsdl:message>
+  <wsdl:message name="FilePairInfoData">
+    <wsdl:part name="parameters" element="tns:FilePairInfoData" />
+  </wsdl:message>
+  <wsdl:message name="FilePairInfoData_Headers">
+    <wsdl:part name="FileName" element="tns:FileName" />
+    <wsdl:part name="FilePairID" element="tns:FilePairID" />
+    <wsdl:part name="OutputConfiguration" element="tns:OutputConfiguration" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_UploadReference_OutputMessage" />
+  <wsdl:message name="IFilePairProcessing_UploadDegraded_OutputMessage" />
+  <wsdl:message name="IFilePairProcessing_Process_InputMessage">
+    <wsdl:part name="parameters" element="tns:Process" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_Process_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ProcessResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_ConfigureHeaderlessSettings_InputMessage">
+    <wsdl:part name="parameters" element="tns:ConfigureHeaderlessSettings" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_ConfigureHeaderlessSettings_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ConfigureHeaderlessSettingsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_HeaderlessSettings_InputMessage">
+    <wsdl:part name="parameters" element="tns:HeaderlessSettings" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_HeaderlessSettings_OutputMessage">
+    <wsdl:part name="parameters" element="tns:HeaderlessSettingsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_SupportedHeaderlessSampleRates_InputMessage">
+    <wsdl:part name="parameters" element="tns:SupportedHeaderlessSampleRates" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_SupportedHeaderlessSampleRates_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SupportedHeaderlessSampleRatesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_SupportedHeaderlessFormats_InputMessage">
+    <wsdl:part name="parameters" element="tns:SupportedHeaderlessFormats" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_SupportedHeaderlessFormats_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SupportedHeaderlessFormatsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_IsFilePairProcessed_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsFilePairProcessed" />
+  </wsdl:message>
+  <wsdl:message name="IFilePairProcessing_IsFilePairProcessed_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsFilePairProcessedResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IFilePairProcessing">
+    <wsdl:operation name="PrepareUpload">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/PrepareUpload" message="tns:IFilePairProcessing_PrepareUpload_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/PrepareUploadResponse" message="tns:IFilePairProcessing_PrepareUpload_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadReference">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/UploadReference" name="FilePairInfoData" message="tns:FilePairInfoData" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/UploadReferenceResponse" message="tns:IFilePairProcessing_UploadReference_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadDegraded">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/UploadDegraded" name="FilePairInfoData" message="tns:FilePairInfoData" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/UploadDegradedResponse" message="tns:IFilePairProcessing_UploadDegraded_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Process">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/Process" message="tns:IFilePairProcessing_Process_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/ProcessResponse" message="tns:IFilePairProcessing_Process_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ConfigureHeaderlessSettings">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/ConfigureHeaderlessSettings" message="tns:IFilePairProcessing_ConfigureHeaderlessSettings_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/ConfigureHeaderlessSettingsResponse" message="tns:IFilePairProcessing_ConfigureHeaderlessSettings_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="HeaderlessSettings">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/HeaderlessSettings" message="tns:IFilePairProcessing_HeaderlessSettings_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/HeaderlessSettingsResponse" message="tns:IFilePairProcessing_HeaderlessSettings_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SupportedHeaderlessSampleRates">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/SupportedHeaderlessSampleRates" message="tns:IFilePairProcessing_SupportedHeaderlessSampleRates_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/SupportedHeaderlessSampleRatesResponse" message="tns:IFilePairProcessing_SupportedHeaderlessSampleRates_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SupportedHeaderlessFormats">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/SupportedHeaderlessFormats" message="tns:IFilePairProcessing_SupportedHeaderlessFormats_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/SupportedHeaderlessFormatsResponse" message="tns:IFilePairProcessing_SupportedHeaderlessFormats_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsFilePairProcessed">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/IsFilePairProcessed" message="tns:IFilePairProcessing_IsFilePairProcessed_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IFilePairProcessing/IsFilePairProcessedResponse" message="tns:IFilePairProcessing_IsFilePairProcessed_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

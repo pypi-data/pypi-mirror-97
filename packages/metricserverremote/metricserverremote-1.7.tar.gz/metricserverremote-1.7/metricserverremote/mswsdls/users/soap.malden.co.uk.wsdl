@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://soap.malden.co.uk" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://soap.malden.co.uk" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://soap.malden.co.uk/Imports">
+      <xsd:import namespace="http://soap.malden.co.uk" schemaLocation="soap.malden.co.uk.xsd" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" schemaLocation="service.xsd" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" schemaLocation="Arrays.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IUserService_InitiateLogon_InputMessage">
+    <wsdl:part name="parameters" element="tns:InitiateLogon" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_InitiateLogon_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InitiateLogonResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_InitiateLogon_AccountUnknownFaultFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:AccountUnknownFault" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_CompleteLogon_InputMessage">
+    <wsdl:part name="parameters" element="tns:CompleteLogon" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_CompleteLogon_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CompleteLogonResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_LdapAuthenticate_InputMessage">
+    <wsdl:part name="parameters" element="tns:LdapAuthenticate" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_LdapAuthenticate_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LdapAuthenticateResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_Setting_InputMessage">
+    <wsdl:part name="parameters" element="tns:Setting" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_Setting_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SettingResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_SaveSetting_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveSetting" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_SaveSetting_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveSettingResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_Roles_InputMessage">
+    <wsdl:part name="parameters" element="tns:Roles" />
+  </wsdl:message>
+  <wsdl:message name="IUserService_Roles_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RolesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IUserService">
+    <wsdl:operation name="InitiateLogon">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/InitiateLogon" message="tns:IUserService_InitiateLogon_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/InitiateLogonResponse" message="tns:IUserService_InitiateLogon_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://soap.malden.co.uk/IUserService/InitiateLogonAccountUnknownFaultFault" name="AccountUnknownFaultFault" message="tns:IUserService_InitiateLogon_AccountUnknownFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CompleteLogon">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/CompleteLogon" message="tns:IUserService_CompleteLogon_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/CompleteLogonResponse" message="tns:IUserService_CompleteLogon_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="LdapAuthenticate">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/LdapAuthenticate" message="tns:IUserService_LdapAuthenticate_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/LdapAuthenticateResponse" message="tns:IUserService_LdapAuthenticate_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Setting">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/Setting" message="tns:IUserService_Setting_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/SettingResponse" message="tns:IUserService_Setting_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveSetting">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/SaveSetting" message="tns:IUserService_SaveSetting_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/SaveSettingResponse" message="tns:IUserService_SaveSetting_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Roles">
+      <wsdl:input wsaw:Action="http://soap.malden.co.uk/IUserService/Roles" message="tns:IUserService_Roles_InputMessage" />
+      <wsdl:output wsaw:Action="http://soap.malden.co.uk/IUserService/RolesResponse" message="tns:IUserService_Roles_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>
