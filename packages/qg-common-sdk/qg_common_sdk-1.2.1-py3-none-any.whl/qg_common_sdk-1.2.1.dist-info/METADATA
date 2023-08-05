@@ -1,0 +1,69 @@
+Metadata-Version: 2.1
+Name: qg-common-sdk
+Version: 1.2.1
+Summary: 全高python统一处理底层框架封装包
+Home-page: http://192.168.117.144/cetc28/spiderStructFrameWork
+Author: lbb
+Author-email: liubeibei15895926598@gmail.com
+Maintainer: lbb
+Maintainer-email: liubeibei15895926598@gmail.com
+License: GPL3 License
+Platform: all
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: Implementation
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Topic :: Software Development :: Libraries
+Description-Content-Type: text/markdown
+Requires-Dist: python-logstash (>=0.4.6)
+Requires-Dist: redis (>=3.5.3)
+Requires-Dist: termcolor (>=1.1.0)
+Requires-Dist: xlrd (>=1.2.0)
+Requires-Dist: openpyxl (>=3.0.5)
+Requires-Dist: Django (>=3.1.7)
+Requires-Dist: pymongo (>=3.11.3)
+Requires-Dist: pipreqs (>=0.4.10)
+Requires-Dist: colorama (>=0.4.4)
+Requires-Dist: py-bootstrap (>=0.0.12)
+
+# 底层封装工具类
+## 异常处理
+自定义异常信息
+catchException.py
+```
+# 业务异常类封装
+class BusinessException(Exception):
+    def __init__(self, data: str,msg: str):
+        self.data = data
+        self.code = StatusCode.BUSINESSEXEC
+        self.msg = msg
+# 异常封装类
+class SysException(Exception):
+    def __init__(self, data: str,msg: str):
+        self.data = data
+        self.code = StatusCode.SYSEXEC
+        self.msg = msg
+```
+需要异常处理的接口上，添加exec_catch_func装饰器即可。
+## 返回值信息统一封装
+returnInfo.py
+每个需要统一返回值的接口上，添加return_info_func装饰器即可。
+return_info_func 中封装了异常处理，异常日志记录，操作日志记录等
+## 字典统一处理
+dictOpr.py
+字典统一处理类，支持内存缓存，提供字典查询，清除缓存接口，未来可以支持redis缓存。
+## 获取用户信息
+operUserInfo.py
+提供接口从redis中获取当前用户信息
+## 时间转换工具
+dateTool.py 时间转换工具
+## 系统工具
+sysTool.py 操作系统参数的函数封装
+
