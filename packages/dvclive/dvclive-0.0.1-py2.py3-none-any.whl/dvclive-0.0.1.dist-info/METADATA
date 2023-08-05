@@ -1,0 +1,53 @@
+Metadata-Version: 2.1
+Name: dvclive
+Version: 0.0.1
+Summary: Metric logger for ML projects.
+Home-page: http://dvc.org
+Author: Paweł Redzyński
+Author-email: pawel@iterative.ai
+License: UNKNOWN
+Keywords: data-science metrics machine-learning developer-tools ai
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Provides-Extra: all
+Requires-Dist: tensorflow ; extra == 'all'
+Requires-Dist: xgboost ; extra == 'all'
+Provides-Extra: tests
+Requires-Dist: pylint (==2.5.3) ; extra == 'tests'
+Requires-Dist: pytest (>=6.0.1) ; extra == 'tests'
+Requires-Dist: pre-commit ; extra == 'tests'
+Requires-Dist: pylint ; extra == 'tests'
+Requires-Dist: pylint-plugin-utils ; extra == 'tests'
+Requires-Dist: black ; extra == 'tests'
+Requires-Dist: flake8 ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pytest-mock ; extra == 'tests'
+Requires-Dist: pandas ; extra == 'tests'
+Requires-Dist: sklearn ; extra == 'tests'
+Requires-Dist: funcy (>=1.14) ; extra == 'tests'
+Requires-Dist: dvc (>=2.0.0) ; extra == 'tests'
+Requires-Dist: tensorflow ; extra == 'tests'
+Requires-Dist: xgboost ; extra == 'tests'
+Provides-Extra: tf
+Requires-Dist: tensorflow ; extra == 'tf'
+Provides-Extra: xgb
+Requires-Dist: xgboost ; extra == 'xgb'
+
+dvclive
+=======
+
+dvclive is an open-source library for monitoring machine learning model performance.
+
+dvclive aims to provide the user with simple python interface what will allow the
+
+user to log the model metrics as the training progresses.
+
+The interface consists of three main methods:
+
+1. :code:`dvclive.init(path)` - initializes dvclive logger. The metrics will be saved under :code:`path`.
+
+2. :code:`dvclive.log(metric, value, step)` - logs the metric value. The value and step will be appended to :code:`path/{metric}.tsv` file. The step value is optional.
+
+3. :code:`dvclive.next_step()` - signals :code:`dvclive` that current step has ended. Executed automatically if same :code:`metric` is logged again.
+
+
