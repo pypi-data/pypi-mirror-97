@@ -1,0 +1,84 @@
+Metadata-Version: 2.1
+Name: arcor2-build
+Version: 0.12.0
+Summary: ARCOR2 Build
+Home-page: UNKNOWN
+Author: Robo@FIT
+Author-email: imaterna@fit.vut.cz
+License: LGPL
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Natural Language :: English
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: ==3.8.*
+Description-Content-Type: text/markdown
+Requires-Dist: Flask (==1.1.1)
+Requires-Dist: arcor2-build-data (~=0.8.1)
+Requires-Dist: arcor2 (~=0.12.0)
+Requires-Dist: dataclasses-jsonschema-rereleased[fast-validation] (==2.12.2)
+Requires-Dist: pyhumps (==1.6.1)
+Requires-Dist: typed-ast (==1.4.2)
+
+# arcor2_build
+# Changelog
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+
+## [0.12.0] - 2021-03-03
+
+### Changed
+- A new method `PUT /project/import` to import existing execution package.
+  - Import fails if data already exists and there is any difference.
+  - Import can be forced by setting `overwrite` parameter.
+
+### Fixed
+- Build now returns response messages in JSON.
+
+## [0.11.0] - 2021-02-08
+
+### Changed
+- Part of the code refactored into `arcor2/flask.py`.
+- Support for explicit parameters in the main script.
+  - `Actions` class is no longer generated (does not make sense now). 
+  - `Resources` class is no longer generated (used to have actions parameters as properties).
+  - Improved/adapted `ActionPoints` generated class.
+- Support for project constants (parameter type `constant`).
+- An action can now use a previous result as its parameter (parameter type `link`).
+
+## [0.10.0] - 2020-12-14
+
+### Changed
+- Ability to generate branched logic (if/elif block after action).
+
+## [0.9.2] - 2020-10-30
+
+### Changed
+- ARCOR2 dependency updated
+
+## [0.9.1] - 2020-10-19
+
+### Changed
+- ARCOR2 dependency updated
+
+## [0.9.0] - 2020-10-16
+
+### Changed
+- Code generation adapted according to `print_exception` location change.
+
+## [0.8.1] - 2020-10-05
+
+### Added
+- Build now has `--debug` argument ([0e6e418](http://github.com/robofit/arcor2/commit/0e6e418)).
+### Fixed
+- Fixed empty response error ([0edc1a6](http://github.com/robofit/arcor2/commit/0edc1a6)).
+### Changed
+- Build now assembles the execution package in memory ([7ac70d0](http://github.com/robofit/arcor2/commit/7ac70d0)).
+
+## [0.8.0] - 2020-09-24
+### Changed
+- The first release of the separated package.
+
