@@ -1,0 +1,483 @@
+Metadata-Version: 2.1
+Name: phantom-dev
+Version: 0.5.0
+Summary: Utilities to simplify Phantom app development
+Home-page: https://gitlab.com/phantom6/phantom-dev
+Author: David Finn
+Author-email: dfinn@splunk.com
+License: UNKNOWN
+Keywords: splunk,phantom
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.6
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: docstring-parser
+Requires-Dist: paramiko
+Requires-Dist: pyyaml
+Requires-Dist: roboversion (>=2)
+
+# phantom-dev
+
+Utilities for simplifying the development of Phantom apps
+
+## Author
+
+David Finn: dfinn@splunk.com
+
+## Requirements
+
+* Splunk>Phantom
+* Python 3.6 or higher
+
+## Installation
+
+```sh
+pip install phantom-dev
+```
+
+## Description
+
+`phantom-dev` is a command-line utility for creating, building, and deploying
+Phantom apps.
+
+App packages are built from project directories containing a YAML metadata file
+and a connector implemented in Python.
+Any other files in the project directory will be packaged and included with
+the app.
+
+### App Metadata
+
+The `metadata.yaml` file in the project directory will be used to generate the
+app JSON expected by the Phantom platform.
+Minor alterations to the JSON structure have been made to assist with
+readability and maintainability;
+related keys have been grouped under a common prefix key
+(e.g. JSON `project-*` keys are defined under the `project` object in the YAML)
+and lists of uniquely-identifiable objects have been converted to objects
+(e.g. JSON `actions` is now a mapping of action names to action data, rather
+than a list of action objects with unique and potentially conflicting names).
+
+For information on the generated app metadata, see the official Phantom
+documentation.
+
+### Connector Implementation
+
+The `phantom_dev.action_handler` module greatly simplifies the implementation
+of a `phantom.base_connector.BaseConnector` subclass, which is the basis for
+Phantom app development.
+
+Action handler methods defined using the 
+`phantom_dev.action_handler.ActionHandler` decorator will be used to
+dynamically infer action metadata unless overridden in the metadata file.
+Action names, parameter names, and parameter types can all be inferred from
+the implementation assuming parameters are type-annotated in the code.
+
+The `phantom_dev.action_handler` module will be automatically embedded in the
+`dependencies` directory when the app is built, allowing the developer to
+make full use of the module without being concerned with managing it as a
+dependency.
+
+Edge cases and use of more specialised `BaseConnector` methods should be dealt
+with as normal, in accordance with the official Phantom documentation.
+
+## Quickstart
+
+Running `phantom-dev create` will prompt the user for the set of details
+required to define a Phantom app.
+
+```sh
+$ phantom-dev create "My Special App"
+Product Vendor: Special Vendor
+Product Name: Special Product
+Description: My special little app
+Publisher: David Finn
+License: Special license
+```
+
+A new project directory will be created and populated with a `metadata.yaml`
+and a `connector.py`.
+The metadata YAML will contain the details provided by the user, and the
+connector module will define an example connector implementation.
+The metadata will also be populated with action information required by the
+example connector implementation.
+
+
+### Extending the App
+
+The following defines the implementation of a new action called "echo message":
+
+```python
+from phantom_dev.action_handler import ActionHandler, smart_connector
+...
+@smart_connector
+class Connector:
+	...
+	@ActionHandler
+	def echo_message(self, message: str):
+		"""
+		Echo a message
+
+		:param message: The message to be echoed
+		"""
+		yield {'response': message}
+	...
+
+	@echo_message.summary
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+...
+```
+
+If possible, the action description will be inferred from the method docstring-
+in this case, "Echo a message".
+Similarly, parameter descriptions will also be inferred if specified in the
+docstring with appropriate docstring syntax (currently, Sphinx syntax is
+confirmed to work).
+In this case, the description for the paramter `message` will be "The message
+to be echoed".
+
+The action summary data for the `echo message` action is created by decorating
+the summary method with `@echo_message.summary`.
+Action summary methods take the action results as an iterable, and create
+the appropriate summary data.
+
+Thanks to `smart_connector`, all methods of the `BaseConnector` class are
+available for use in the action handler logic implementation.
+
+Although the app will successfully install and run given the above metadata,
+it's still missing output fields and `contains` information.
+Unless specfied in `metadata.yaml`, `phantom-dev` (and therefore Phantom) has
+no way of knowing that the output data should contain a `response` field
+with a `data_type` of `string`.
+If we want to add `contains` information, such as setting a `contains`
+value of `['text']` for the message and response, we also need to specify
+these somewhere.
+
+These *can* be specified as normal using `metadata.yaml`, but this can also
+be done directly using approrpate `ActionHandler` methods:
+
+```python
+from phantom_dev.action_handler import ActionHandler, contains, smart_connector
+...
+
+@contains('text')
+class Text(str):
+	"""A string-based type which contains `['text']`"""
+
+...
+
+@smart_connector
+class Connector:
+	...
+	@ActionHandler.data_contains({'response': Text})
+	def echo_message(self, message: Text):
+		"""
+		Echo a message
+
+		:param message: The message to be echoed
+		"""
+		yield {'response': message}
+
+	@echo_message.summary_contains({'response': Text})
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+	...
+...
+```
+
+Several things are happening here.
+First, a new type called `Text` inherits from `str` and is decorated with the
+`@contains` decorator, mapping it to a `contains` value of `['text']`.
+This type is used instead of `str` to annotate the `message` parameter of the
+action, which allows `phantom-dev` to infer both the `data_type` and the
+`contains` value for the parameter.
+
+Next, the `data_contains` decorator is being used to decorate the action
+method, and a mapping of `'response'` to `Text` is being specified as the
+argument.
+This allows `phantom-dev` to infer that each data result has a field named
+`'response'`, and that its `data_type` and `contains` information should
+be inferred from the `Text` type the same way it was for the `message`
+parameter.
+
+Finally, the same thing is being done with the `echo_message.summary_contains`
+decorator (used instead of `summary`), though in this case it's the action
+summary fields rather than the results data fields that are being described.
+
+Use of these decorators is preferred to `metadata.yaml` specification, as they
+keep metadata definitions colocated with the data they describe.
+They also encourage code reuse though the use of common `contains`-mapped
+type definitions, shareable between both parameters and output fields.
+
+### Dependencies
+
+Any package specified in `requirements.txt` in the app project directory will
+be automatically downloaded and packaged with the app.
+`requirements.txt` should be a normal `pip` requirements file.
+
+For example, if the app requires the `roboversion` package, a
+`requirements.txt` could be created with the following content:
+
+```
+roboversion>=2
+
+```
+
+When the app is built, the `roboversion` wheel will be automatically downloaded
+and included in the package `wheels` directory, and the autogenerated app
+JSON will specify its location for Phantom installation.
+
+
+### Deploying the App
+
+Once the app is ready to install, assuming a Phantom server location of
+`phantom.example.com`:
+
+```sh
+$ phantom-dev push my_special_app/ root@phantom.example.com
+```
+
+Note: The Phantom server must be a known host; SSH to it first to confirm
+credentials and connectivity.
+
+The user will be prompted for the SSH password. Once supplied, the app will be
+automatically packaged, sent to the Phantom server, and installed.
+
+The SSH password can also be provided as part of the command:
+
+```sh
+$ phantom-dev push my_special_app/ root:PASSWORD@phantom.example.com
+```
+
+If certificate authentication is used, an empty password can be also be
+specified:
+
+```sh
+$ phantom-dev push my_special_app/ root:@phantom.example.com
+```
+
+### Other commands
+
+For information on the other `phantom-dev` subcommands including `package` and
+`deploy`, run:
+
+```sh
+$ phantom-dev --help
+$ phantom-dev <subcommand> --help
+```
+
+## Details
+
+In the above example, use of the `ActionHandler`
+(or`ActionHandler.data_contains`) decorator wraps the decorated `echo_message`
+method in the logic required for error handling and results reporting.
+The `param` dictionary is automatically unpacked as keyword arguments to
+handler method, allowing for quick and explicit argument validation and
+intuitive access to action parameters.
+`param` contains the parameters described in the app JSON.
+
+Handler methods such as `echo_message` are expected to return iterables of
+results data.
+The items from this iterable are added as data objects to the `ActionResult`.
+Implementing handler methods as generators is highly convenient, as this allows
+custom logic to be run any time before or after data is yielded, but methods
+can also be implemented as normal functions that return iterable objects.
+
+The `HandlerMixin` superclass provided by `smart_connector` automatically
+delegates incoming actions to the correct method based on the action
+identifier.
+
+`smart_connector` also wraps the functionality of a the `main_connector`
+decorator. `main_connector` simply calls the class's `main` method if
+the class is defined in the `__main__` module, reproducing the testing
+functionality provided by autogenerated app wizard code.
+
+### Signaling Failure
+
+Failure is signaled through raising exceptions.
+If the handler executes without raising an exception, the action is treated as
+a success.
+
+To implement an `echo fail` action that does the same thing as `echo message`,
+but always fails after producing results:
+
+```python
+...
+@contains('text')
+class Text(str):
+	"""A string-based type which contains `['text']`"""
+
+...
+
+@smart_connector
+class Connector:
+	...
+	@ActionHandler.data_contains({'response': Text})
+	def echo_message(self, message: Text):
+		"""
+		Echo a message
+
+		:param message: The message to be echoed
+		"""
+		yield {'response': message}
+
+	@echo_message.summary_contains({'response': Text})
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+	...
+
+	@ActionHandler.data_contains({'response': Text})
+	def echo_fail(self, **param):
+		"""
+		Echo the message as normal, then fail
+		"""
+		# Demonstration of re-packing param; this will be the same as the
+		# original param dictionary, which we can then unpack for the call
+		# to echo_message.
+		# Unfortunately, this will require manual specification of more
+		# parameter metadata.
+		yield from self.echo_message(**param)
+		raise RuntimeError('Failed on purpose')
+
+	# The same summary method can be decorated multiple times for different
+	# handlers to duplicate functionality
+	@echo_fail.summary_contains({'response': Text})
+	@echo_message.summary_contains({'response': Text})
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+
+```
+
+In the example, parameter packing with `**param` was used instead of describing
+and annotating the paramters for `echo fail`.
+This is possible but not recommended, because now the user must manually
+specify more parameter information in `metadata.yaml`:
+
+```yaml
+...
+actions:
+	...
+	echo_fail:
+		parameters:
+			message:
+				data_type: string
+				description: The message to be echoed
+				required: true
+				contains:
+					- text
+	...
+...
+```
+
+### Actions with no results
+
+`test connectivity` is an example of an action which produces no results.
+The handler method needs only to return an empty iterable, which is easily
+accomplished by returning an empty collection rather than implementing a
+generator:
+
+```python
+...
+@contains('text')
+class Text(str):
+	"""A string-based type which contains `['text']`"""
+
+...
+
+@smart_connector
+class Connector:
+	...
+	@ActionHandler.data_contains({'response': Text})
+	def echo_message(self, message: Text):
+		"""
+		Echo a message
+
+		:param message: The message to be echoed
+		"""
+		yield {'response': message}
+
+	@echo_message.summary_contains({'response': Text})
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+	...
+
+	@ActionHandler.data_contains({'response': Text})
+	def echo_fail(self, **param):
+		"""
+		Echo the message as normal, then fail
+		"""
+		# Demonstration of re-packing param; this will be the same as the
+		# original param dictionary, which we can then unpack for the call
+		# to echo_message.
+		# Unfortunately, this will require manual specification of more
+		# parameter metadata.
+		yield from self.echo_message(**param)
+		raise RuntimeError('Failed on purpose')
+
+	# The same summary method can be decorated multiple times for different
+	# handlers to duplicate functionality
+	@echo_fail.summary_contains({'response': Text})
+	@echo_message.summary_contains({'response': Text})
+	def summarise_echo(self, results):
+		result, = results
+		return {'response': result['response']}
+
+	@ActionHandler
+	def test_connectivity(self):
+		"""
+		Check `echo message` and `echo fail`
+		"""
+		# The test connectivity action is a special case that does not
+		# receive a param dictionary at all, so there are no arguments to
+		# unpack
+		test_value = 'SOME TEST MESSAGE'
+		results = []
+		try:
+			for result in self.echo_fail(test_value):
+				results.append(result)
+		except RuntimeError:
+			pass
+		else:
+			raise RuntimeError('echo fail failed to fail')
+
+		message, = results
+		if message != test_value:
+			raise ValueError('echo fail failed to echo')
+
+		return []
+
+```
+
+It would also be possible to achieve this with a `return` statement before a
+`yield` statement in a generator, or by failing before any results are yielded.
+
+
+### Action Context
+
+The hidden phantom action `context` parameter can be accessed as the `context`
+member of the connector object during action execution.
+This data contains entries for `artifact_id`, `guid`, and `parent_action_run`;
+see 'Understanding Datapaths' in the offical phantom documentation for details.
+
+
+### Logging
+
+The `logger` member of the connector object is a standard Python
+`logging.Logger` object that can be used in the normal way.
+
+All log messages of `ERROR` and above will be logged to `/var/log/spawn.log`.
+If the system is configured for `DEBUG` logging, all messages of `DEBUG`
+and above will also be logged.
+Additionally, all log messages of level `INFO` and above will be reported
+using `BaseConnector.save_progress` regardless of Phantom debug configuration.
+
+
+<div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+
+
