@@ -1,0 +1,108 @@
+Metadata-Version: 2.1
+Name: pybtreecore
+Version: 0.0.1
+Summary: pybtreecore - python implementation of core B-Tree methods storage memory management
+Home-page: https://github.com/kr-g/pybtreecore
+Author: k.r. goger
+Author-email: k.r.goger+pybtreecore@gmail.com
+License: UNKNOWN
+Keywords: implementation of core B-Tree methods storage memory management pyheapfile
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pyheapfile (>=0.0.2)
+
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+
+# pybtreecore - B-Tree (core persistence)
+
+`pybtreecore` provides core B-Tree/B+Tree/B*Tree methods for persisting a `BTree Node` in a `heapfile` / `dllfile`.
+this module contains not the logic for searching, inserting, or deleting data in a tree.
+it also provides only a minimal set of integrity checks.
+
+
+# memory / file layout
+
+a list of B-Tree element nodes resides inside a dllfile, and heap node as data part. 
+see also 
+[`pydllfile`](https://github.com/kr-g/pydllfile/), and
+[`pyheapfile`](https://github.com/kr-g/pyheapfile/) 
+for layout.
+
+
+## general node layout
+
+### BTree node 
+
+| name | size (bytes) | description |
+| --- | --- | --- | 
+| flags| 1 | boolean bit flags to indicate which fields to persist (see below) |
+| len_high | 1 | key and data len high nibbles combined, this exists only if key, or data is set |
+| key_len_low | 1 | key len low byte (2 nibbles), this exists only if key is set |
+| data_len_low | 1 | data len low byte (2 nibbles), this exists only if data is set |
+| key | k bytes | key value, this exists only if key is set |
+| data | d bytes | data value, this exists only if data is set |
+| left | xpos bytes | left node pointer, this exists only if flag is set |
+| right | xpos bytes | right node pointer, this exists only if flag is set |
+
+a list of nodes is stored as continuously stream of bytes inside a heap node.
+
+
+### BTree node flags
+
+| name | value | description |
+| --- | --- | --- | 
+| F_LEAF | 1 << 0 | node is leaf |
+| F_KEY | 1 << 1 | node key to persist |
+| F_DATA | 1 << 2 | node data to persist |
+| F_LEFT | 1 << 3 | node left xpos to persist |
+| F_RIGHT | 1 << 4 | node right xpos persist |
+
+
+### BTree node list  
+
+| name | size / value | description |
+| --- | --- | --- | 
+| parent | xpos bytes | parent node pointer |
+| stream| n bytes | stream of btcore nodes |
+
+a node list resides inside a `dllfile` (Double Linked List) as data part.
+refer also for layout [`pydllfile`](https://github.com/kr-g/pydllfile/)
+
+
+## limitation
+
+- see other limits also here [`pydllfile`](https://github.com/kr-g/pydllfile/)
+- see other limits also here [`pyheapfile`](https://github.com/kr-g/pyheapfile/)
+- key and data field len is limited to 12 bits (3 nibbles) 2**12 == 4096 bytes max len
+- 
+
+# Platform
+
+Tested on Python3, and Linux.
+
+
+# development status
+
+alpha state.
+the API or logical call flow might change without prior notice.
+
+read [`CHANGELOG`](https://github.com/kr-g/pybtreecore/blob/main/CHANGELOG.MD)
+for latest, or upcoming news.
+
+
+# installation
+
+available on pypi. install with:
+
+    python3 -m pip install pybtreecore
+
+
+
