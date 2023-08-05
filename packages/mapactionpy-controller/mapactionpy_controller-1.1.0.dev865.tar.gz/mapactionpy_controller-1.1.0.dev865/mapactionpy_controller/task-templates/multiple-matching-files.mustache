@@ -1,0 +1,51 @@
+h1. What is the problem?
+
+There are multiple dataset which fulfil the requirements for this map layer: *<%layer.name%>*. The data files name all match this pattern (as a 'Regular Expression'):
+
+{{<%layer.reg_exp%>}}
+
+<%#search_info.is_parsable%>
+In more human readable terms, this means that these bits of the filename must match exactly these values:
+
+<%#search_info.valid_clause_list%>
+* {{<%&valid_clause%>}}
+<%/search_info.valid_clause_list%>
+
+Whilst _in general_ any valid value is acceptable for these part of the filename:
+
+<%#search_info.invalid_clause_list %>
+* {{<%&invalid_clause%>}}
+<%/search_info.invalid_clause_list %>
+<%/search_info.is_parsable%>
+
+
+Each of these files matched the search requirements:
+
+<%#datasources_list%>
+* {{<%datasources%>}}
+<%/datasources_list%>
+
+h1. What is the likely consequence of this problem?
+
+The layer *<%layer.name%>* will not be added to any of the maps that require it. The maps will be produced with the layer missing. The usefulness of the maps may be greatly reduced.
+
+h1. How can this problem be resolved?
+
+Identify the most appropriate dataset to use for this layer within this map.
+
+* (*_Recommended approach_*); Remove the other datasets from the folder {{<%datasources_dir%>}} by one of these methods:
+** Store them in the relevant location under {{<%cmf.original_data%>}}
+** OR create a subdirectory below {{<%datasources_dir%>}} and store them there. (Subdirectories are not searched when looking for available data)
+** If you are confident that they are not required by any other map, delete the other layers.
+* (_Advanced option_) It is also possible to update the search regex for layer {{<%layer.name%>}} in the {{<%cmf.layer_properties%>}} file, so that it is more specific and only selects a single dataset (for example by explicitly specifying the data source clause).
+
+For information related this specific layer see this page:
+
+[https://wiki.mapaction.org/x/QIDW|https://wiki.mapaction.org/x/QIDW]
+
+h1. Other information
+
+|layer name|{{<%layer.name%>}}|
+|data search regex|{{<%layer.reg_exp%>}}|
+|Full path to layer file|{{<%layer.layer_file_path%>}}|
+|Operation ID|{{<%hum_event.operation_id%>}}|
