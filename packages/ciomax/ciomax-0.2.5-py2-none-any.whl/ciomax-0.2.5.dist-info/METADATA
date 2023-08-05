@@ -1,0 +1,147 @@
+Metadata-Version: 2.1
+Name: ciomax
+Version: 0.2.5
+Summary: Max plugin for Conductor Cloud Rendering Platform.
+Home-page: https://github.com/AtomicConductor/conductor-max
+Author: conductor
+Author-email: info@conductortech.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python
+Classifier: Topic :: Multimedia :: Graphics :: 3D Rendering
+Requires-Python: ~=2.7
+Description-Content-Type: text/markdown
+Requires-Dist: ciocore (<1.0.0,>=0.2.18)
+
+# Conductor for 3DS Max
+
+Max plugin submitter for the Conductor Cloud rendering service.
+
+## Install
+
+**To install the latest version.**
+```bash
+pip install --upgrade ciomax --target=$HOME/Conductor
+```
+
+**To install a specific version, for example 0.1.0.**
+```bash
+pip install --upgrade --force-reinstall ciomax==0.1.0 --target=$HOME/Conductor
+```
+
+**Then setup the Plugin startup file from a windows machine.** 
+
+```bash
+python ~/Conductor/ciomax/post_install.py
+```
+
+## Usage
+
+To set up a render, go to **Rendering** menu in 3ds Max and choose **Render with Conductor**.
+
+For detailed help, checkout the [tutorial](https://docs.conductortech.com/tutorials/max) and [reference](https://docs.conductortech.com/reference/max) documentation.
+
+## License
+[MIT](https://choosealicense.com/licenses/mit)
+
+## Changelog
+
+### Version:0.2.5 -- 03 Mar 2021
+
+* Scenes that used Conductor prior to this release should work fine, however we recommended to delete the ConductorStore object fromthe scene and reopen the dialog to get the latest defaults and to avoid unanticipated conflicts.
+* Remove sampling flags from default kick command. [28857a0]
+* Adds a drop-down menu to choose the render camera. The presubmission scripts then attach this camera to the active view so that the vrscene or ass files use if to render. [f97866c]
+* Changed behaviour of the Presubmission script `Execute` button. It now runs the script, merges the results with the fully resolved submission, and displays the results in the `Preview` tab. In this way, the customer can see exactly what would be submitted. [35f551a]
+* Presubmission scripts have a different return type and is not backwards compatible. They now return an object the same shape as a regular submission, which means any fields can be amended during presubmission. A concrete example is adding the `ARNOLD_PATHMAP` variable to the environment. Extra Assets and Environment work, but several fields are yet to be implemented. [d73690c]
+* Adds two new validations. 1. Ensure either Vray or Artnold are the selected renderer. 2. Ensure Legacy 3d Maps Support is off when Arnold is the renderer.   [dcc77e5]
+* `<timestamp>` token now has 1 second granularity as opposed to 1 minute. This helps to reduce conflicts when 2 jobs are submitted close to each other, especially if using an upload daemoin. [0e90e9a]
+
+### Version:0.2.4 -- 19 Feb 2021
+
+* Disable pathhelper and add a validator (#8). [c637b36]
+* Improves template command and presubmit script. [1ab2650]
+* Vray presubmit now writes out a remapPathFile, used by the task command. [c6e7136]
+* Fix bug in frame section resolve method. [42c2831]
+
+### Version:0.2.3 -- 10 Feb 2021
+
+* Adds validation and confirmation to flow. [4204ed9]
+* Refactor, abstract buttoned panel. [81c0d2a]
+* Displays correctly on high DPI screens such as MBP retina. [c7765b8]
+* Adds icons for validation severity panels. [390aeb8]
+* Reading from saved settings no longer crashes when old scene oppened with missing keys. [74a40ff]
+
+### Version:0.2.2 -- 02 Feb 2021
+
+* Set maximum retries to 5. [96fe970]
+* Remove timestamp from renderoutput path template. [6ea4eec]
+
+### Version:0.2.1 -- 02 Feb 2021
+
+* Fix export ass script. [e9b53e0]
+* Remove autodefault to stop close on enter. [e6f63e8]
+
+### Version:0.2.0 -- 01 Feb 2021
+
+* Bump version file to 0.2.0. [59cd56d]
+* Ct 1568 change software selection to include only Arnold and Vray (#6)
+
+* Adds a close button
+
+* Adds safe store getters, in case old scene is missing some properties. [fe1300e]
+
+### Version:0.1.10 -- 24 Jan 2021
+
+* Save collapsible state of sections between invocations. [2c1b9b3]
+* Adds per-renderer defaults and renderer detection. [0747f07]
+
+### Version:0.1.9 -- 15 Jan 2021
+
+* Ass export support and simplified UI. [b14b6b4]
+
+### Version:0.1.8 -- 07 Jan 2021
+
+* Require 0.2.17 core which has UNC path support. [8c2ca64]
+
+### Version:0.1.7 -- 07 Jan 2021
+
+* Adds presubmit script with test functionality. [1169a6c]
+* Sections namespace and - presubmit script wip. [96ce40f]
+
+### Version:0.1.6 -- 28 Dec 2020
+
+* resolve() function works in all sections.. [fb5a765]
+
+### Version:0.1.5 -- 23 Dec 2020
+
+* Signals and slots in advanced section. [7f1a220]
+* Assets section store signals and slots. [fadce90]
+* Sots and signals for kvpair widgets: env and metadata. [aba9d1a]
+
+### Version:0.1.4 -- 17 Dec 2020
+
+* Frames info calculation working. Remove fixtures directory option (assume ~/Conductor/fixtures). [09236b6]
+### Version:0.1.3 -- 14 Dec 2020
+
+* Post_install to use ~ because env-vars are invalid in companion. [28d02b4]
+
+### Version:0.1.2 -- 14 Dec 2020
+
+### Version:0.1.1 -- 14 Dec 2020
+
+* Fix path variable bug in post_install. [9bc1984]
+* Fix readme. [43a20e8]
+
+### Version:0.1.0 -- 14 Dec 2020
+
+* Post_install and prep for pypi. [fbc9529]
+* Implement software section and provide dialog object to sections. [59ac89f]
+* Populate from store. [e4662c6]
+* Projects and inst types sourced from coredata. [a6197c0]
+* Wip implementing resolve. [18595ce]
+* Consolidate single sections into advanced section. [cd874de]
+* Adds destination path - plus aesthetic improvements. [bcaf90d]
+* Ct 1530 general (#3)
+
