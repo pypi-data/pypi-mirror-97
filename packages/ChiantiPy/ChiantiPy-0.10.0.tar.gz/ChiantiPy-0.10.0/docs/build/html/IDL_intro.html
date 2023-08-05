@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Intro for CHIANTI IDL Users &#8212; ChiantiPy 0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Resources for ChiantiPy Users" href="resources.html" />
+    <link rel="prev" title="Notes" href="notes.html" /> 
+  </head><body>
+<div style="padding: 20px 10px 10px 40px; background-color: #fff8d3; text-align: left;">
+<a href="">
+<img border="0" alt="chiantipy" src="_static/chiantipy_logo.png"/>
+</a>
+</div>
+    
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="resources.html" title="Resources for ChiantiPy Users"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="notes.html" title="Notes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ChiantiPy 0.9.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="notes.html"
+                        title="previous chapter">Notes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="resources.html"
+                        title="next chapter">Resources for ChiantiPy Users</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="intro-for-chianti-idl-users">
+<h1>Intro for CHIANTI IDL Users<a class="headerlink" href="#intro-for-chianti-idl-users" title="Permalink to this headline">¶</a></h1>
+<p>ChiantiPy was not developed to be a clone of the CHIANTI IDL code.  The IDL code largely consists of functions that can be used to calculate or plot a variety of properties.  Structures are often used to carry the results of one function to be used by another.</p>
+<p>ChiantiPy is object oriented.  For example, the building block of ChiantiPy is the <strong>ion</strong> class.  It carries with it all the methods that are needed as well as various calculated properties that are kept as attributes.  By following the Quick Start guide, you will become familiar with how ChiantiPy works.  Because one can always inquire, for example with <cite>dir</cite>, as to the methods and attributes of a an object, such as an ion, it is easy to remember what you might want to calculate next.  For example, you have created an object <em>myion</em>.  It is possible to then invoke</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myion</span><span class="o">.</span><span class="n">popPlot</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>to plot the level populations of <em>myion</em>.  If you have not already calculated the levels populations, the <strong>ion</strong> class knows to calculate the level populations (<em>myion.populate()</em>) and save them for later use as the dictionary attribute <em>myion.Population</em> and then plot the specified level populations.  The level populations are then available as a 2 dimensional <cite>numpy</cite> array</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myion</span><span class="o">.</span><span class="n">Population</span><span class="p">[</span><span class="s1">&#39;population&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Python and IPython provide many tools for examining any give object (everything in Python is an object of some sort)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mg4</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">ion</span><span class="p">(</span><span class="s1">&#39;mg_4&#39;</span><span class="p">,</span><span class="n">setup</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By setting the keyword <em>setup</em> to 0 or <cite>False</cite> the complete setup of the ion is not performed, but a certain amount of information is retrieved.  Since neither a temperature or electron density were specified, none of these attributes know anything related to these two quantitities.  The default value for setup is True so that the setup is performed with the specified temperatures and electron densities.  In general, this is the way you want to construct the mg_4 <em>ion</em>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">mg4</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+<span class="n">IonStr</span>
+<span class="n">FIP</span>
+<span class="n">Z</span>
+<span class="n">AbundanceName</span>
+<span class="n">Ip</span>
+<span class="n">Ion</span>
+<span class="n">IoneqAll</span>
+<span class="n">PDensity</span>
+<span class="n">Abundance</span>
+<span class="n">RadTemperature</span>
+<span class="n">FileName</span>
+<span class="n">RStar</span>
+<span class="n">ProtonDensityRatio</span>
+<span class="n">Dielectronic</span>
+<span class="n">Defaults</span>
+<span class="n">IoneqName</span>
+<span class="n">Spectroscopic</span>
+</pre></div>
+</div>
+<p>The Python function <cite>vars</cite> retrieves the attributes of the mg4 object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">mg4</span><span class="o">.</span><span class="n">IoneqName</span><span class="p">))</span>
+
+<span class="n">chianti</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the abundance file name is </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">mg4</span><span class="o">.</span><span class="n">AbundanceName</span><span class="p">))</span>
+
+<span class="n">the</span> <span class="n">abundance</span> <span class="n">file</span> <span class="n">name</span> <span class="ow">is</span> <span class="n">sun_coronal_1992_feldman_ext</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;the abundance of </span><span class="si">%s</span><span class="s1"> is </span><span class="si">%10.2e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">mg4</span><span class="o">.</span><span class="n">Spectroscopic</span><span class="p">,</span><span class="n">mg4</span><span class="o">.</span><span class="n">Abundance</span><span class="p">))</span>
+
+<span class="n">the</span> <span class="n">abundance</span> <span class="n">of</span> <span class="n">Mg</span> <span class="n">IV</span> <span class="ow">is</span>   <span class="mf">1.41e-04</span>
+</pre></div>
+</div>
+<p>One can get a more complete description of the various attributes and methods of the mg4 object</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">one</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">mg4</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">one</span><span class="p">)</span>
+
+<span class="n">Abundance</span>
+<span class="n">AbundanceName</span>
+<span class="n">Defaults</span>
+<span class="n">Dielectronic</span>
+<span class="n">FIP</span>
+<span class="n">FileName</span>
+<span class="n">Ion</span>
+<span class="n">IonStr</span>
+<span class="n">IoneqAll</span>
+<span class="n">IoneqName</span>
+<span class="n">Ip</span>
+<span class="n">PDensity</span>
+<span class="n">ProtonDensityRatio</span>
+<span class="n">RStar</span>
+<span class="n">RadTemperature</span>
+<span class="n">Spectroscopic</span>
+<span class="n">Z</span>
+<span class="vm">__class__</span>
+<span class="fm">__delattr__</span>
+<span class="vm">__dict__</span>
+<span class="fm">__dir__</span>
+<span class="vm">__doc__</span>
+<span class="fm">__eq__</span>
+<span class="fm">__format__</span>
+<span class="fm">__ge__</span>
+<span class="fm">__getattribute__</span>
+<span class="fm">__gt__</span>
+<span class="fm">__hash__</span>
+<span class="fm">__init__</span>
+<span class="fm">__le__</span>
+<span class="fm">__lt__</span>
+<span class="vm">__module__</span>
+<span class="fm">__ne__</span>
+<span class="fm">__new__</span>
+<span class="n">__reduce__</span>
+<span class="n">__reduce_ex__</span>
+<span class="fm">__repr__</span>
+<span class="fm">__setattr__</span>
+<span class="n">__sizeof__</span>
+<span class="fm">__str__</span>
+<span class="n">__subclasshook__</span>
+<span class="vm">__weakref__</span>
+<span class="n">boundBoundLoss</span>
+<span class="n">cireclvlDescale</span>
+<span class="n">convolve</span>
+<span class="n">diCross</span>
+<span class="n">diRate</span>
+<span class="n">drRate</span>
+<span class="n">drRateLvl</span>
+<span class="n">eaCross</span>
+<span class="n">eaDescale</span>
+<span class="n">eaRate</span>
+<span class="n">emiss</span>
+<span class="n">emissList</span>
+<span class="n">emissPlot</span>
+<span class="n">emissRatio</span>
+<span class="n">gofnt</span>
+<span class="n">intensity</span>
+<span class="n">intensityList</span>
+<span class="n">intensityPlot</span>
+<span class="n">intensityRatio</span>
+<span class="n">intensityRatioInterpolate</span>
+<span class="n">intensityRatioSave</span>
+<span class="n">ionGate</span>
+<span class="n">ioneqOne</span>
+<span class="n">ionizCross</span>
+<span class="n">ionizRate</span>
+<span class="n">lineSpectrumPlot</span>
+<span class="n">p2eRatio</span>
+<span class="n">popPlot</span>
+<span class="n">populate</span>
+<span class="n">recombRate</span>
+<span class="n">rrRate</span>
+<span class="n">setup</span>
+<span class="n">setupIonrec</span>
+<span class="n">spectrum</span>
+<span class="n">spectrumPlot</span>
+<span class="n">twoPhoton</span>
+<span class="n">twoPhotonEmiss</span>
+<span class="n">twoPhotonLoss</span>
+<span class="n">upsilonDescale</span>
+<span class="n">upsilonDescaleSplups</span>
+</pre></div>
+</div>
+<p>First, at the top of the list are the attributes that were listed by the <cite>vars</cite> function.  Then come a number of methods starting with ‘__’.  These are generally not used and called <em>private</em> methods although nothing in Python is really private.  In IDL, just about everything is private.  After the <em>private</em> methods is a list of the methods provided by the mg4 <em>ion</em> class object.  These all start with a lower case letter to separate them from the attributes that start with an upper case letter (this is a ChiantiPy convention).</p>
+<p>In the IPython and jupyter-qtconsole, typing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mg4</span><span class="o">.</span><span class="n">diCross</span><span class="p">(</span>
+</pre></div>
+</div>
+<p>and then hitting the tab key will bring up the doc-string for the diCross method, also found in the API reference in the documentation.  And then</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mg4</span><span class="o">.</span><span class="n">diCross</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>calculates the direct ionization cross section of Mg IV for a set of energies above the ionization potential <em>Ip</em>.  The direct ionization cross sections are then provided in the mg4.DiCross dictionary.</p>
+<p>Experience using the CHIANTI IDL package will provide the user with a background with what ChiantiPy can do.  However, the way to accomplish them are much easier but must be learned.  The best way to start is with the Quick Start guide and a book about Python.  Book suggestions are <em>Learning Python</em> by Mark Lutz and the handy <em>Python Pocket Reference</em>, also by Mark Lutz.  The first one is alway in reach and copies of the latter is on all of my computer desks.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="resources.html" title="Resources for ChiantiPy Users"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="notes.html" title="Notes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ChiantiPy 0.9.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+<div style="padding: 20px 10px 10px 40px; background-color: #fff8d3; text-align: left;">
+
+
+</div>
+    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ken Dere.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+
+  </body>
+</html>
