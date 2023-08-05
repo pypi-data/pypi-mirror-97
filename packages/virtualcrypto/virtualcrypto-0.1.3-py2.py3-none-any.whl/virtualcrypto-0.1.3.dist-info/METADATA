@@ -1,0 +1,107 @@
+Metadata-Version: 2.1
+Name: virtualcrypto
+Version: 0.1.3
+Summary: VirtualCrypto Python SDK
+Home-page: https://github.com/virtualCrypto-discord/virtualcrypto-python
+Author: sizumita
+Author-email: contact@sumidora.com
+License: MIT license
+Keywords: virtualcrypto
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6
+Requires-Dist: requests
+Requires-Dist: aiohttp
+
+================
+VirtualCrypto.py
+================
+
+
+.. image:: https://img.shields.io/pypi/v/virtualcrypto.svg
+        :target: https://pypi.python.org/pypi/virtualcrypto
+
+.. image:: https://img.shields.io/travis/virtualCrypto-discord/virtualcrypto.svg
+        :target: https://travis-ci.com/virtualCrypto-discord/virtualcrypto
+
+.. image:: https://readthedocs.org/projects/virtualcrypto/badge/?version=latest
+        :target: https://virtualcrypto.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+
+
+
+VirtualCrypto Python SDK
+
+
+* Free software: MIT license
+* Documentation: https://virtualcrypto.readthedocs.io.
+
+Usage
+-----
+
+Normal Usage::
+
+    from virtualcrypto import VirtualCryptoClient, Scope
+    client = VirtualCryptoClient(
+        client_id="956fcdd2-84ee-4b02-8766-8aec7dd12b05",
+        client_secret="akOu2Wna3SYkVksVgaQWAEDwLmfHW1-ThIS5WQwDCfU",
+        scopes=[Scope.Pay, Scope.Claim]
+    )
+    print(client.get_currency_by_unit("v"))
+    # Currency(unit='v', guild=754191887203696731, name='vcoin', pool_amount=5000, total_amount=1000000)
+
+For asyncio::
+
+    from virtualcrypto import Scope, AsyncVirtualCryptoClient
+    import asyncio
+    client = AsyncVirtualCryptoClient(
+        client_id="956fcdd2-84ee-4b02-8766-8aec7dd12b05",
+        client_secret="akOu2Wna3SYkVksVgaQWAEDwLmfHW1-ThIS5WQwDCfU",
+        scopes=[Scope.Pay, Scope.Claim]
+    )
+
+    async def main():
+        await client.start()
+        print(await client.get_currency_by_unit("v"))
+        await client.close()
+
+    asyncio.get_event_loop().run_until_complete(main())
+
+
+Features
+--------
+
+* TODO
+
+Credits
+-------
+
+This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+
+=======
+History
+=======
+
+0.0.1 (2021-02-03)
+------------------
+
+* First release on PyPI.
+
+0.1.0 (2021-03-3)
+------------------
+
+* Create VirtualCrypto Client
+
+
