@@ -1,0 +1,66 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module WFNSYMLIB ! in 
+    interface  ! in :WFNSYMLIB
+        subroutine mainlib(AOccup, BOccup, NBas, NMo, Norb, NAt, NCShell, iZAt, AtLab, Alph, COrb, NShell, RAt, n_prim, &
+        shell_type, igroup, ngroup, Ca, Cb, RCread, VAxis, VAxis2, nAOccup, nBOccup, DoOp, &
+        OutDim, OutGrim, OutCMS, OutSymLab, OutSDiagA, OutSDiagB, OutWDiagA, OutWDiagB, OutTbl, OutIRLab, OutgIRA, &
+        OutgIRB, OutgIRwfA, OutgIRwfB, OutgIRwf, OutSymMat) ! in :WFNSYMLIB:lib_main.F
+
+!           Inputs
+            logical :: DoOp
+            integer :: NBas, Norb, NAt, NCShell, igroup, ngroup, NMo
+
+            ! integer, check(len(Ca)/NBas>=NMo),depend(Ca), intent(hide) :: NMo=len(Ca)/NBas
+            ! integer, intent(hide) :: NOrb_w
+
+            real*8 dimension(3),intent(in) :: RCread, VAxis, VAxis2
+            real*8 dimension(NMo*NBas),intent(in),depend(NMo) :: Ca, Cb
+            real*8 dimension(Norb),intent(in),depend(Norb) :: Alph, COrb
+            real*8 dimension(NAt,3),intent(in),depend(NAt) :: RAt
+            integer dimension(NAt),intent(in),depend(NAt) :: iZAt, NShell
+            integer dimension(NCShell),intent(in),depend(NCShell) :: n_prim, shell_type
+            character dimension(NAt),intent(in),depend(NAt) :: AtLab*2
+            real*8 dimension(nAOccup), intent(in) :: AOccup
+            real*8 dimension(nBOccup), intent(in) :: BOccup
+            integer, optional,check(len(AOccup)>=nAOccup),depend(AOccup) :: nAOccup=len(AOccup)
+            integer, optional,check(len(BOccup)>=nBOccup),depend(BOccup) :: nBOccup=len(BOccup)
+
+!           Outputs
+            integer dimension(3),intent(out) :: OutDim
+            real*8 dimension(100),intent(out) :: OutCMS, OutGrim
+            character dimension(100),intent(out) :: OutSymLab*6, OutIRLab*3
+            real*8 dimension(NMo,100),intent(out) :: OutSDiagA, OutSDiagB
+            real*8 dimension(100),intent(out) :: OutWDiagA, OutWDiagB
+            real*8 dimension(100,100),intent(out) :: OutTbl
+            real*8 dimension(NMo,100),intent(out) :: OutgIRA, OutgIRB
+            real*8 dimension(100),intent(out) :: OutgIRwfA, OutgIRwfB, OutgIRwf
+            real*8 dimension(100,3,3),intent(out) :: OutSymMat
+
+        end subroutine mainlib
+
+        subroutine overlap(i_angl, exponent, R, integral)
+            integer dimension(3), intent(in) :: i_angl  ! Cartesian index
+            real*8 dimension(3), intent(in) ::  R  ! Position of the function
+            real*8, intent(in) :: exponent  ! Gaussian exponent
+            real*8, intent(out) :: integral  ! Integral value (scalar)
+        end subroutine overlap
+
+       subroutine overlap_mat(S_AO, AtLab, RAt, NBas, NAt, NOrb, NCShell, NShell, shell_type, n_prim, COrb, Alph)
+           integer :: NBas, NAt, NCShell, NOrb
+
+           real*8 dimension(NBas*NBas),intent(out),depend(NBas) :: S_AO
+           character dimension(NAt),intent(in),depend(NAt) :: AtLab*2
+           real*8 dimension(NAt,3),intent(in),depend(NAt) :: RAt
+           integer dimension(NAt),intent(in),depend(NAt) :: NShell
+           integer dimension(NCShell),intent(in),depend(NCShell) :: n_prim, shell_type
+           real*8 dimension(NOrb),intent(in),depend(NOrb) :: Alph, COrb
+
+       end subroutine get_S_simple
+
+   end interface
+end python module WFNSYMLIB
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
