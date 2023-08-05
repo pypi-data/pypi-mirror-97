@@ -1,0 +1,170 @@
+@trait
+class Fiber:
+
+    def run(self):
+        """The fiber entry point.
+
+        """
+
+    def start(self):
+        """Start the fiber.
+
+        """
+
+        c"mys::start(shared_from_this());"
+
+    def join(self):
+        """Wait for the fiber to stop.
+
+        """
+
+        c"mys::join(shared_from_this());"
+
+def suspend():
+    """Suspend current fiber.
+
+    It's not recommended to use this function, but instead use queues,
+    events and locks.
+
+    """
+
+    c"mys::suspend();"
+
+def resume(fiber: Fiber):
+    """Resume given suspended fiber.
+
+    It's not recommended to use this function, but instead use queues,
+    events and locks.
+
+    """
+
+    c"mys::resume(fiber);"
+
+def sleep(seconds: f64):
+    """Sleep for given number of seconds.
+
+    """
+
+    c"mys::sleep(seconds);"
+
+def current() -> Fiber:
+    """Returns current fiber.
+
+    """
+
+    fiber: Fiber = None
+
+    c"fiber = mys::current();"
+
+    return fiber
+
+class QueueError(Error):
+    message: string
+
+@generic(T)
+class Queue:
+    """Message passing from one fiber to another.
+
+    """
+
+    _values: [T]
+    _reader: Fiber
+
+    def __init__(self):
+        self._values = []
+        self._reader = None
+
+    def put(self, value: T):
+        """Put given value at the end of the queue.
+
+        """
+
+        self._values.append(value)
+
+        if self._reader is not None:
+            resume(self._reader)
+            self._reader = None
+
+    def get(self) -> T:
+        """Get the first value from the queue. Suspends current fiber if the
+        queue is empty.
+
+        """
+
+        if len(self._values) == 0:
+            if self._reader is not None:
+                raise QueueError("only one fiber can get for a queue")
+
+            self._reader = current()
+            suspend()
+
+        return self._values.pop(0)
+
+class Lock:
+    _is_acquired: bool
+    _waiters: [Fiber]
+
+    def __init__(self):
+        self._is_acquired = False
+        self._waiters = []
+
+    def acquire(self):
+        """Acquire the lock. Suspends current fiber is the lock is aleady
+        acquired.
+
+        """
+
+        if self._is_acquired:
+            self._waiters.append(current())
+            suspend()
+        else:
+            self._is_acquired = True
+
+    def release(self):
+        """Release the lock. Resumes the next fiber that is trying to acquire
+        the lock, if any.
+
+        """
+
+        if len(self._waiters) > 0:
+            resume(self._waiters.pop())
+        else:
+            self._is_acquired = False
+
+class EventError(Error):
+    message: string
+
+class Event:
+    _is_set: bool
+    _waiter: Fiber
+
+    def set(self):
+        """Set the event. Resumes any waiting fiber.
+
+        """
+
+        self._is_set = True
+
+        if self._waiter is not None:
+            resume(self._waiter)
+
+    def clear(self):
+        """Clear the event.
+
+        """
+
+        self._is_set = False
+
+    def wait(self):
+        """Wait for the event to be set.
+
+        """
+
+        if self._is_set:
+            return
+
+        if self._waiter is not None:
+            raise EventError("only one fiber can wait for an event")
+
+        self._waiter = current()
+        suspend()
