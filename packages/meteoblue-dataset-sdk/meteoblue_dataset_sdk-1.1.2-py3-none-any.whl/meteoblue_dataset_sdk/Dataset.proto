@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+message DatasetApiProtobuf {
+  // contains one entry per reader
+  repeated Geometry geometries = 1;
+
+  message Geometry {
+    string domain = 1;
+    // The coordinate points (latitudes)
+    repeated float lats = 2;
+    // The coordinate points (longitudes)
+    repeated float lons = 3;
+    // The coordinate points (elevations)
+    repeated float asls = 4;
+    repeated string locationNames = 5;
+    sint64 nx = 6;
+    sint64 ny = 7;
+    string timeResolution = 8;
+    // timeIntervals list multiple time-intervals if requested. In this example
+    // only one time-interval is present stating on 20200101T0000. With an
+    // hourly timeResolution.
+    repeated TimeInterval timeIntervals = 9;
+    // codes will now contain an array of structures for each requested weather
+    // variable code e.g. temperature or precipitation.
+    repeated Code codes = 10;
+  }
+
+  message TimeInterval {
+    repeated string timestrings = 1;
+    // the first timestamp as unix timestamp
+    sint64 start = 2;
+    // the last unix timestamp wich is not included in the sequence (end = last + stide)
+    sint64 end = 3;
+    // the number of secounds to step by in each timestep
+    int64 stride = 4;
+  }
+
+  message Code {
+    // code is the numeric identifier for a weather variable. E.g. 11 for
+    // temperature.
+    int64 code = 1;
+    // level indicates the height or elevation for this variable. 2 m above gnd
+    // is common for temperature.
+    string level = 2;
+    string variable = 3;
+    // unit is the returned unit for this weather variable after unit
+    // conversions or transformations.
+    string unit = 4;
+    // aggregation shows min/max/mean in case of temporal aggregations are used.
+    // The aggregation for spatial transformations is not shown here.
+    string aggregation = 5;
+    // dataPerTimeInterval is now an array with a structure for each
+    // time-interval. Has the same number of elements as timeIntervals above.
+    repeated Time timeIntervals = 6;
+    float gddBase = 7;
+    float gddLimit = 8;
+    float slope = 9;
+    float facing = 10;
+    float kwPeak = 11;
+    int64 startDepth = 12;
+    int64 endDepth = 13;
+    float efficiency = 14;
+    int64 tracker = 15;
+  }
+
+  message Time {
+    // gapFillRatio is the fraction from 0-1 of how much data was gap-filled with
+    // another dataset in case gap-fill is active.
+    float gapFillRatio = 1;
+    // data is a 2 dimensional array. The first dimension is used for the number
+    // of grid-cells (2 in this case). The second dimension is used for the
+    // number of time-steps. The data array can be huge!
+    repeated float data = 2;
+  }
+
+}
