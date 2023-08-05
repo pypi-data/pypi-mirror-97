@@ -1,0 +1,44 @@
+SimpleEmail
+===========
+Simple SMTP wrapper for Python with basic HTML and text support based on MIME types.
+------------------------------------------------------------------------------------
+Quickstart
+----------
+
+Install simpleemail
+
+ ``pip install simpleemail``
+
+Then use it in a project:
+
+ ``from simpleemail import create_email_message, send_email``
+
+To send an email you have to first create an email message to send.
+*Note you can use any combination of plain text or HTML when creating a message.*
+
+ ``message = create_email_message('Hello','email@address.com','foo@bar.it','World!','<html><head></head><body><h1>World!</h1></body></html>')``
+ ``send_email(message,'smtp.server.com', False)``
+
+You can also provide parameters to be replaced when the message is created.::
+
+    params = {'name': 'Rick James'}
+    message = create_email_message('Hello',
+                                    'email@address.com',
+                                    'anyone@foobar.com',
+                                    '[name]!',
+                                    '<html><head></head><body><h1>[name]!</h1></body></html>',
+                                    params)
+
+This will substitute the value of Rick James in for the name.
+
+You can also send a single attachment or multiple attachments by choosing::
+
+    message = create_email_message('Hello',
+                                    'email@address.com',
+                                    'anyone@foobar.com',
+                                    'Test body',
+                                    '<html><head></head><body><h1>Test body</h1></body></html>',
+                                    [],
+                                    "file.txt",
+                                    ['file1.txt','file2.pdf'])
+
