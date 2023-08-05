@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Adam Souzis
+# SPDX-License-Identifier: MIT
+tosca_definitions_version: tosca_simple_unfurl_1_0_0 # unfurl/v1alpha1.ServiceTemplate
+metadata:
+  template_name: Google Cloud Platform implementations
+  template_author: onecommons.org
+  template_version: 1.0.0
+node_types:
+  unfurl.nodes.GenericCompute:
+    derived_from: tosca.nodes.Compute
+    interfaces:
+      Install:
+        check:
+          implementation: gcloud compute instances describe {{ SELF.name }}  --format=json
+          inputs:
+            resultTemplate: &gcloudStatusMap
+              eval:
+                if: $result
+                then:
+                  attributes:
+                    public_ip: "{{ result.networkInterfaces[0].accessConfigs[0].natIP }}"
+                    private_ip: "{{ result.networkInterfaces[0].networkIP }}"
+                    zone: "{{ result.zone | basename }}"
+                    project_id: "{{ result.zone | dirname | dirname | basename }}"
+                    id:  "{{ result.selfLink }}"
+                    name: "{{ result.name }}"
+                  readyState:
+                    state: "{{ {'PROVISIONING': 'creating', 'STAGING': 'starting',
+                              'RUNNING': 'started', 'REPAIRING' 'error,'
+                              'SUSPENDING': 'stopping',  'SUSPENDED': 'stopped',
+                              'STOPPING': 'deleting', 'TERMINATED': 'deleted'}[result.status] }}"
+                    local: "{{ {'PROVISIONING': 'pending', 'STAGING': 'pending',
+                              'RUNNING': 'ok', 'REPAIRING' 'error,'
+                              'SUSPENDING': 'error',  'SUSPENDED': 'error',
+                              'STOPPING': 'absent', 'TERMINATED': 'absent'}[result.status] }}"
+              vars:
+                result: "{%if success %}{{ stdout | from_json }}{% endif %}"
+      Standard:
+        create:
+          implementation: |
+            gcloud compute instances create {{ '.name' | eval | regex_replace("_", '-') }}
+              --boot-disk-size={{ {"get_property": ["SELF", "host", "disk_size"]} | eval | regex_replace(" ") }}
+              --image=$(gcloud compute images list --filter=name:{{ {'get_property': ['SELF', 'os', 'distribution']} | eval }}
+                    --filter=name:focal --limit=1 --uri)
+              --machine-type=e2-medium   > /dev/null
+            && gcloud compute instances describe {{ '.name' | eval | regex_replace("_", '-') }} --format=json
+          inputs:
+            resultTemplate: *gcloudStatusMap
+        delete:
+          implementation: "gcloud compute instances delete {{ SELF.name }} --quiet"
