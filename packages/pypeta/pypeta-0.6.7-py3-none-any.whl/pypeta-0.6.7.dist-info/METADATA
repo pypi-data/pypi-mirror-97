@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: pypeta
+Version: 0.6.7
+Summary: BGI-PETA data APIs
+Home-page: https://github.com/JaylanLiu/pepeta
+Author: JaylanLiu
+Author-email: liujilong@genomics.cn
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: requests
+Requires-Dist: hgvs
+
+# Pypeta
+pypeta is the python code interface for BGI-PETA database. It provides APIs for login, querying and fetching data.
+
+## Installation
+From source code.
+```
+$ git clone https://github.com/JaylanLiu/pypeta
+$ cd pypeta
+$ python setup.py install 
+```
+
+## Example usage
+Import libraies:
+```
+import pypeta
+```
+
+Login to BGI-PETA database via PETA account:
+```
+peta=pypeta.Peta(username='bgi-peta@genomics.cn',password='******')
+```
+Or login via token:
+```
+peta=pypeta.Peta(token = '******')
+```
+
+Get all visable studies info:
+```
+peta.list_visible_studys()
+```
+
+Set target study id and other filters:
+```
+peta.select_studys(["chol_nus_2012"])
+peta.data_restriction["attributesEqualFilters"]=[]
+```
+
+Also studies and filters can be load from a json file, which can be get from the PETA website:
+```
+peta.set_data_restriction_from_json_file('json.txt')
+```
+
+Fetch SNV and InDel data as MAF format:
+```
+peta.fetch_mutation_data()
+```
+
+Fetch clinical info as tsv format:
+```
+peta.fetch_clinical_data()
+```
+
