@@ -1,0 +1,86 @@
+Metadata-Version: 2.1
+Name: altimeter
+Version: 5.0.11
+Summary: Graph AWS resources in Neptune
+Home-page: https://github.com/tableau/altimeter
+Author: Tableau
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8,<4
+Description-Content-Type: text/markdown
+Requires-Dist: aws-requests-auth (<1,>=0.4.3)
+Requires-Dist: rdflib (==4.2.2)
+Requires-Dist: structlog (<21,>=20.1.0)
+Requires-Dist: boto3 (<2,>=1.9.130)
+Requires-Dist: jinja2 (<3,>=2.11.1)
+Requires-Dist: pydantic (<2,>=1.6.1)
+Requires-Dist: toml (<1,>=0.10.0)
+Requires-Dist: gremlinpython (>=3.4.3)
+Provides-Extra: hyper
+Requires-Dist: tableauhyperapi (<1,>=0.0.11355) ; extra == 'hyper'
+Requires-Dist: pydantic (<2,>=1.6.1) ; extra == 'hyper'
+Provides-Extra: qj
+Requires-Dist: alembic (==1.4.2) ; extra == 'qj'
+Requires-Dist: fastapi (<1,>=0.60.1) ; extra == 'qj'
+Requires-Dist: psycopg2-binary (<3,>=2.8.5) ; extra == 'qj'
+Requires-Dist: sqlalchemy (<2,>=1.3.16) ; extra == 'qj'
+Requires-Dist: uvicorn (<2,>=0.11.5) ; extra == 'qj'
+
+# Altimeter
+
+[![Community Supported](https://img.shields.io/badge/Support%20Level-Community%20Supported-457387.svg)](https://www.tableau.com/support-levels-it-and-developer-tools)
+[![GitHub](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/Tableau/altimeter/master/LICENSE)
+
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
+
+Altimeter is a system to graph and scan AWS resources across multiple
+AWS Organizations and Accounts.
+
+Altimeter generates RDF files which can be loaded into a triplestore
+such as AWS Neptune for querying.
+
+# Quickstart
+
+## Installation
+
+    pip install altimeter
+
+## Configuration
+
+Altimeter's behavior is driven by a toml configuration file.  A few sample
+configuration files are included in the `conf/` directory:
+
+* `current_single_account.toml` - scans the current account - this is the account
+  for which the environment's currently configured AWS CLI credentials are.
+* `current_master_multi_account.toml` - scans the current account and attempts to
+  scan all organizational subaccounts - this configuration should be used if you
+  are scanning  all accounts in an organization.  To do this the currently
+  configured AWS CLI credentials should be pointing to an AWS Organizations
+  master account.
+
+To scan a subset of regions, set the region list parameter `regions` in the `scan`
+section to a list of region names.
+
+## Generating the Graph
+
+Assuming you have configured AWS CLI credentials
+(see <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html>),
+run:
+
+    altimeter <path-to-config>
+
+This will scan all resources in regions specified in the config file.
+
+The full path to the generated RDF file will printed, for example:
+
+    Created /tmp/altimeter/20191018/1571425383/graph.rdf
+
+This RDF file can then be loaded into a triplestore such as Neptune or
+Blazegraph for querying.
+
+For more user documentation see <https://tableau.github.io/altimeter/>
+
+
