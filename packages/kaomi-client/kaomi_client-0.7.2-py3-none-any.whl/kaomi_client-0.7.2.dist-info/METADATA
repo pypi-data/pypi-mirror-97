@@ -1,0 +1,78 @@
+Metadata-Version: 2.1
+Name: kaomi-client
+Version: 0.7.2
+Summary: This package contains the client endpoint for the Kaomi deployer. Kaomi client has to be run on the deployer system.
+Home-page: https://gitlab.linkspirit.it/linkspirit/kaomi-deployer.git
+Author: Linkspirit Team
+Author-email: tecnici@linkspirit.it
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: requests-toolbelt
+Requires-Dist: requests-futures
+
+# Kaomi Client
+
+This package is the client for KAOMI Deployer.
+
+
+## Command line parameters
+
+
+~~~
+python -m kaomi_client <ARGS>
+~~~
+
+`ARGS` can be:
+
+
+| id | id extended | arg[s] | mandatory | default |
+|----|-------------|--------|:---------:|:-------:|
+| -k | --key | apikey | yes | - |
+| -s | --server | server with Kaomi deployer | yes | - |
+| -p | --port | port of kaomi service | no | 47000 |
+| | | | | | 
+| -d | --directory | path local dir, path remote dir | - | - |
+| -dr | --directory-regex | path local dir, path remote dir, regex | - | - |
+| -f | --file | path local file, path remote file | - | - | 
+| -a | --action | action name | - | - |
+| -x | --delete | filesystem node (file or dir) | - | - |
+| -xr | --delete-regex | filesystem nodes (file or dir) based on regex match | - | - |
+| | | | | | 
+| -dp | --dir-perms | permissions for directories | no | remote folders' ones | 
+| -fp | --file-perms | permissions for files | no | remote files' ones |
+| -o | --overwrite | overwrite flag for dirs and file | no | no overwrite |
+| | | | | |
+| -nt | --node-type | node types to act upon when using regex operations, can be 'file', 'folder' or 'both' | no | both |
+| -is | --include-subdirs | specifies whether to include subdirectories when using regex deletion, can't be used for regex upload | no | no |
+| -i | --inverted | specifies whether to act upon the not matching files/folders instead of the matching ones when using regex operations | no | no |
+| | | | | |
+| -v | --verbose | verbose output | no | non-verbose output | 
+
+### Output
+
+#### Status codes
+
+* `0` = Success
+* `1` = Local error (eg. local file to be uploaded does not exist, etc.)
+* `2` = Remote error: comunication (eg. server not reachable, connnection refused, timeout, etc.)
+* `3` = Remote error: authorization (eg. remote folder not writable, bad custom action, invalid api key, etc.)
+* `4` = Remote error: application (eg. errors specific to the action that is being executed)
+
+#### Stdout
+Client console output:
+
+* Operations on files/folders 
+    * Success: no output (if `-v` is specified, one line for file uploaded)
+    * Error: error message
+
+* Custom actions execution
+    * Successo: no output (if `-v` is specified, the action output is show)
+    * Error: error message
+
+
+
