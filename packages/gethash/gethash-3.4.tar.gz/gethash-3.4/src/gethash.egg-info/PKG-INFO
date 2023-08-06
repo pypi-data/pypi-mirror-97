@@ -1,0 +1,103 @@
+Metadata-Version: 2.1
+Name: gethash
+Version: 3.4
+Summary: A set of command-line tools that can generate or check various hash values
+Home-page: https://github.com/xymy/gethash
+Author: xymy
+Author-email: thyfan@163.com
+Maintainer: xymy
+Maintainer-email: thyfan@163.com
+License: MIT
+Project-URL: Source Code, https://github.com/xymy/gethash
+Project-URL: Documentation, https://github.com/xymy/gethash
+Description: # gethash
+        
+        A set of command-line tools that can generate or check various hash values.
+        
+        ## Installation
+        
+        Require Python 3.6+.
+        
+        ```shell
+        pip install -U gethash
+        ```
+        
+        or (if you need legacy hash algorithms)
+        
+        ```shell
+        pip install -U gethash[all]
+        ```
+        
+        ## Usage
+        
+        After installation, 8 commands are available:
+        
+        - md5
+        - sha1
+        - sha256
+        - sha512
+        - sha3-256
+        - sha3-512
+        - blake2b
+        - blake2s
+        
+        If you use `[all]`, 3 additional commands are available:
+        
+        - md2
+        - md4
+        - ripemd160
+        
+        ### Generate hash values
+        
+        ```shell
+        $ ls -l
+        total 296
+        -rw-r--r-- 1 User 197610  68074 Jun 27 10:43 001.zip
+        -rw-r--r-- 1 User 197610 126717 Jun 27 10:43 002.zip
+        -rw-r--r-- 1 User 197610 103064 Jun 27 10:44 003.zip
+        
+        $ sha1 -s *.zip
+        7701133eb84b567362fbf1b9e3883d7620ee8ada *001.zip
+        0d6c6cb6908064139f419c1b528f99142a1f2a49 *002.zip
+        10e2c0d8aa85add2ba495393f7f7f0b0baaf34a6 *003.zip
+        
+        $ ls -l
+        total 299
+        -rw-r--r-- 1 User 197610  68074 Jun 27 10:43 001.zip
+        -rw-r--r-- 1 User 197610     51 Jun 27 10:44 001.zip.sha1
+        -rw-r--r-- 1 User 197610 126717 Jun 27 10:43 002.zip
+        -rw-r--r-- 1 User 197610     51 Jun 27 10:44 002.zip.sha1
+        -rw-r--r-- 1 User 197610 103064 Jun 27 10:44 003.zip
+        -rw-r--r-- 1 User 197610     51 Jun 27 10:44 003.zip.sha1
+        ```
+        
+        ### Check hash values
+        
+        ```shell
+        $ cat *.sha1
+        7701133eb84b567362fbf1b9e3883d7620ee8ada *001.zip
+        0d6c6cb6908064139f419c1b528f99142a1f2a49 *002.zip
+        10e2c0d8aa85add2ba495393f7f7f0b0baaf34a6 *003.zip
+        
+        $ sha1 -c *.sha1
+        [SUCCESS] 001.zip
+        [SUCCESS] 002.zip
+        [SUCCESS] 003.zip
+        ```
+        
+Keywords: hash,cryptography
+Platform: UNKNOWN
+Classifier: License :: OSI Approved
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Security
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Provides-Extra: all
