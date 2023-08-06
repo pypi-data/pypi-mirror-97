@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: pysnic
+Version: 1.0.3
+Summary: SNIC superpixels algorithm
+Home-page: https://github.com/MoritzWillig/pysnic
+Author: Moritz Willig
+Author-email: moritz@rise-of-light.de
+License: MIT
+Keywords: image processing,computer vision,image segmentation,superpixels,SNIC
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.5
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Image Recognition
+Requires-Python: >=3.5
+Provides-Extra: examples
+Requires-Dist: scikit-image ; extra == 'examples'
+Requires-Dist: numpy ; extra == 'examples'
+Requires-Dist: matplotlib ; extra == 'examples'
+Requires-Dist: pillow ; extra == 'examples'
+
+
+Python-only implementation of the SNIC superpixels algorithm (https://www.epfl.ch/labs/ivrl/research/snic-superpixels/).
+
+Typical usage example:
+::
+
+    from pysnic.algorithms.snic import snic
+    from pysnic.algorithms.polygonize import polygonize
+    from pysnic.algorithms.ramerDouglasPeucker import RamerDouglasPeucker
+
+    segmentation, distance_map, number_of_segments = snic(
+        lab_image, 500, 0.01,
+        update_func=lambda num_pixels: print("processed %05.2f%%" % (num_pixels * 100 / number_of_pixels)))
+
+    rdp = RamerDouglasPeucker(10)
+    graphs = polygonize(segmentation, seeds, rdp)
+
+This project is maintained under: https://github.com/MoritzWillig/pysnic
+
+
