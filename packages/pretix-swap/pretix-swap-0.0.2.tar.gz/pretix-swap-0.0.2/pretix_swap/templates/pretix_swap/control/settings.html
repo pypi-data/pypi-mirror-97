@@ -1,0 +1,122 @@
+{% extends "pretixcontrol/event/settings_base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+
+{% block title %} {% trans "Swap Configuration" %} {% endblock %}
+
+{% block inside %}
+    <h1>{% trans "Swap Configuration" %}</h1>
+    {% if warn_multiple_items %}
+    <div class="alert alert-danger">
+        {% blocktrans trimmed %}
+        You currently allow more than <b>one item per order</b>.
+        Please note that <b>cancelations will not work</b> correctly with this configuration.
+        You can change this in your cart settings.
+        {% endblocktrans %}
+    </div>
+    {% endif %}
+    {% if warn_no_swap_groups %}
+    <div class="alert alert-warning">
+        {% blocktrans trimmed %}
+        You have set swaps to be allowed, but haven't configured any swap groups.
+        {% endblocktrans %}
+    </div>
+    {% endif %}
+    {% if warn_no_cancel_groups %}
+    <div class="alert alert-warning">
+        {% blocktrans trimmed %}
+        You have set cancelations to be allowed, but haven't configured any cancel groups.
+        {% endblocktrans %}
+    </div>
+    {% endif %}
+    <form action="" method="post" class="form-horizontal">
+        {% csrf_token %}
+        {% bootstrap_form_errors form %}
+        <div class="tabbed-form">
+            <fieldset>
+                <legend>{% trans "Settings" %}</legend>
+                <div class="alert alert-info">
+                {% blocktrans trimmed %}
+                <p>You can allow users two ways of getting rid of a ticket that they don't want anymore:</p>
+                <p>You can allow them to <b>swap</b> the ticket with somebody else. You can configure the products that can be swapped with one another with swap groups.
+                Currently, only products of the same price can be swapped with each other.
+                Swaps will be performed <b>automatically</b> whenever matching swap requests are found.</p>
+                <p>You can also allow them to <b>request to cancel</b> a ticket.
+                You have to <b>trigger</b> pending cancelations manually in the "Swap overview" page.
+                Cancelations only take place when there is an unapproved order that is part of a matching cancelation group.
+                Cancelations are only permitted if the unapproved order has the <b>same price or is more expensive</b> than the order about to be canceled.</p>
+                {% endblocktrans %}
+                </div>
+                {% bootstrap_field form.swap_orderpositions layout="control" %}
+                {% bootstrap_field form.swap_orderpositions_specific layout="control" %}
+                {% bootstrap_field form.cancel_orderpositions layout="control" %}
+                {% bootstrap_field form.cancel_orderpositions_specific layout="control" %}
+                <div class="form-group submit-group">
+                    <button type="submit" class="btn btn-primary btn-save">
+                        {% trans "Save" %}
+                    </button>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>{% trans "Swap Groups" %}</legend>
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th>{% trans "Items" %}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for sg in swap_groups %}
+                    <tr>
+                        <td>
+                            <a href="{% url "plugins:pretix_swap:settings.detail" organizer=request.organizer.slug event=request.event.slug pk=sg.pk %}">
+                                {{ sg.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if sg.swap_type == "s" %}
+                                <i class="fa fa-random"></i>
+                                {% trans "Swap group" %}
+                            {% else %}
+                                <i class="fa fa-times-circle"></i>
+                                {% trans "Cancelation group" %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for item in sg.items.all %}
+                                {{ item.name }}<br>
+                            {% endfor %}
+                        </td>
+                        <td class="text-right">
+                            <a href="{% url "plugins:pretix_swap:settings.detail" organizer=request.organizer.slug event=request.event.slug pk=sg.pk %}"
+                               class="btn btn-default btn-sm">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="{% url "plugins:pretix_swap:settings.delete" organizer=request.event.organizer.slug event=request.event.slug pk=sg.pk %}"
+                               class="btn btn-danger btn-sm">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                        <tr><td>{% trans "No swap groups yet" %}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="form-group submit-group">
+                    <a class="btn btn-primary btn-save" href="{% url "plugins:pretix_swap:settings.new" event=request.event.slug organizer=request.organizer.slug %}">
+                        <i class="fa fa-plus"></i>
+                        {% trans "New Swap Group" %}
+                    </a>
+                </div>
+            </fieldset>
+        </div>
+
+    </form>
+
+    <script src="{% static "pretix_swap/settings.js" %}"></script>
+{% endblock %}
