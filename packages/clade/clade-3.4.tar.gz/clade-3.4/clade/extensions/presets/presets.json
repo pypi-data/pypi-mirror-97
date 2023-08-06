@@ -1,0 +1,195 @@
+{
+    "base": {
+        "log_level": "INFO",
+        "force": false,
+        "cpu_count": null,
+        "indent": 4,
+        "extensions": ["SrcGraph"],
+        "Wrapper.wrap_list": [],
+        "Wrapper.recursive_wrap": false,
+        "CC.ignore_cc1": true,
+        "CC.with_system_header_files": true,
+        "CL.pre_encoding": null,
+        "LD.searchdirs": [],
+        "Compiler.deps_encoding": null,
+        "Compiler.get_deps": true,
+        "Compiler.store_deps": true,
+        "Compiler.preprocess_cmds": false,
+        "Compiler.extra_preprocessor_opts": [],
+        "Storage.convert_to_utf8": false,
+        "Storage.decoding_errors": "strict",
+        "Storage.files_to_add": [],
+        "CmdGraph.requires": [
+            "AR",
+            "AS",
+            "CC",
+            "CXX",
+            "LD",
+            "MV",
+            "Objcopy",
+            "CL",
+            "Link",
+            "Copy"
+        ],
+        "CmdGraph.as_picture": false,
+        "SrcGraph.requires": [
+            "CC",
+            "CL"
+        ],
+        "Common.exclude_list": [],
+        "Common.exclude_list_in": [],
+        "Common.exclude_list_out": [],
+        "Common.include_list": [],
+        "Info.extra_CIF_opts": [],
+        "Info.use_preprocessed_files": false,
+        "Info.cif": "cif",
+        "Info.aspectator": null,
+        "PidGraph.as_picture": false,
+        "PidGraph.filter_cmds_by_pid": true,
+        "CDB.filter_opts": false,
+        "AR.which_list": [
+            "(/|-)ar$"
+        ],
+        "AS.which_list": [
+            "(/|-)as$"
+        ],
+        "CC.which_list": [
+            "cc$",
+            "cc1$",
+            "[mg]cc(-?\\d+(\\.\\d+){0,2})?$",
+            "clang(-?\\d+(\\.\\d+){0,2})?$",
+            "aspectator$"
+        ],
+        "CXX.which_list": [
+            "[mgc]\\+\\+(-?\\d+(\\.\\d+){0,2})?$",
+            "clang\\+\\+(-?\\d+(\\.\\d+){0,2})?$"
+        ],
+        "LD.which_list": [
+            "(/|-)ld$",
+            "ld.lld$"
+        ],
+        "MV.which_list": [
+            "/mv$"
+        ],
+        "Objcopy.which_list": [
+            "objcopy$"
+        ],
+        "CL.which_list": [
+            "(cl|CL)\\.exe$"
+        ],
+        "Link.which_list": [
+            "link\\.exe$"
+        ],
+        "Copy.which_list": [
+            "cmd\\.exe$"
+        ]
+    },
+    "base_print": {
+        "extends": "base",
+        "CmdGraph.as_picture": true,
+        "PidGraph.as_picture": true
+    },
+    "linux_kernel": {
+        "extends": "base",
+        "CmdGraph.requires": [
+            "AR",
+            "CC",
+            "LD",
+            "MV",
+            "Objcopy"
+        ],
+        "Common.exclude_list": [
+            ".*?\\.tmp$"
+        ],
+        "Common.exclude_list_in": [
+            "^-$",
+            "/dev/null",
+            "scripts/(?!mod/empty\\.c)",
+            "kernel/.*?bounds.*?",
+            "arch/x86/tools/relocs",
+            "arch/x86/kernel/asm-offsets.c",
+            "\\.mod\\.c",
+            "\\.tmp\\w+\\.s",
+            "\\.S"
+        ],
+        "Common.exclude_list_out": [
+            "/dev/null",
+            "scripts/(?!mod/.*empty\\.o)",
+            "\\.cmd$"
+        ],
+        "Info.extra_CIF_opts": ["-Dvector_size(x)="]
+    },
+    "busybox_linux": {
+        "extends": "base_print",
+        "Common.exclude_list": [],
+        "Common.exclude_list_in": [
+            "\\.tmp$",
+            "tmp\\.\\w+\\.c$",
+            "tmp.*?\\.c$",
+            "/tmp/\\w+.o",
+            "^-$",
+            "/dev/null",
+            "built-in\\.o$"
+        ],
+        "Common.exclude_list_out": [
+            "/dev/null",
+            "\\.cmd$",
+            "tmp\\.\\w+"
+        ]
+    },
+    "apache_linux": {
+        "extends": "base_print",
+        "Common.exclude_list": [
+            "/tmp/.*"
+        ],
+        "Common.exclude_list_in": [
+            "\\.tmp$",
+            "tmp\\.\\w+\\.c$",
+            "tmp.*?\\.c$",
+            "^-$",
+            "/dev/null",
+            "built-in\\.o$"
+        ],
+        "Common.exclude_list_out": [
+            "/dev/null",
+            "\\.cmd$",
+            "tmp\\.\\w+"
+        ]
+    },
+    "klever_linux_kernel": {
+        "extends": "linux_kernel",
+        "indent": 0,
+        "extensions": [
+            "Callgraph",
+            "Variables",
+            "Typedefs",
+            "Macros",
+            "CrossRef"
+        ]
+    },
+    "klever_linux_kernel_arm": {
+        "extends": "klever_linux_kernel",
+        "Info.cif": "arm-unknown-eabi-cif"
+    },
+    "klever_busybox_linux": {
+        "extends": "busybox_linux",
+        "extensions": [
+            "Callgraph",
+            "Variables",
+            "Typedefs",
+            "Macros",
+            "CrossRef"
+        ]
+    },
+    "klever": {
+        "extends": "base",
+        "indent": 0,
+        "extensions": [
+            "Callgraph",
+            "Variables",
+            "Typedefs",
+            "Macros",
+            "CrossRef"
+        ]
+    }
+}

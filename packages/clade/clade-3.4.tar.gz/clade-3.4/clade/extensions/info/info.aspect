@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2018 ISP RAS (http://www.ispras.ru)
+ * Ivannikov Institute for System Programming of the Russian Academy of Sciences
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * ee the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+around: define(likely(x)) { (x) }
+
+around: define(unlikely(x)) { (x) }
+
+info: execution(static $ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/execution.txt", "%s %d static %s\n", $func_name, $decl_line, $signature>
+}
+
+info: execution($ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/execution.txt", "%s %d extern %s\n", $func_name, $decl_line, $signature>
+}
+
+info: declare_func(static $ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/declare_func.txt", "%s %d static %s\n", $func_name, $decl_line, $signature>
+}
+
+info: declare_func($ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/declare_func.txt", "%s %d extern %s\n", $func_name, $decl_line, $signature>
+}
+
+info: expand(__EXPORT_SYMBOL(sym, sec)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $expansion_path "/exported.txt", "%s\n", $arg_val1>
+}
+
+info: expand(___EXPORT_SYMBOL(sym, sec)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $expansion_path "/exported.txt", "%s\n", $arg_val1>
+}
+
+info: expand($) {
+    $fprintf<"$env<CIF_INFO_DIR>" $expansion_path "/CLADE-EXPAND" $path "/expand.txt", "%s %d %d\n", $macro_name, $expansion_line, $line>
+}
+
+info: expand($(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $expansion_path "/CLADE-EXPAND" $path "/expand.txt", "%s %d %d %s\n", $macro_name, $expansion_line, $line, $actual_args>
+}
+
+info: define($) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/define.txt", "%s %d\n", $macro_name, $line>
+}
+
+info: define($(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/define.txt", "%s %d\n", $macro_name, $line>
+}
+
+info: call(static $ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $func_context_path "/call.txt", "%s %s %d static %s\n", $func_context_name, $func_name, $call_line, $actual_arg_func_names>
+}
+
+info: call($ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $func_context_path "/call.txt", "%s %s %d extern %s\n", $func_context_name, $func_name, $call_line, $actual_arg_func_names>
+}
+
+info: callp($ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $func_context_path "/callp.txt", "%s %s %d\n", $func_context_name, $func_ptr_name, $call_line>
+}
+
+info: use_func($ $(..)) {
+    $fprintf<"$env<CIF_INFO_DIR>" $func_context_path "/use_func.txt", "%s %s %d\n", $func_context_name, $func_name, $use_line>
+}
+
+info: use_var($ $) {
+    $fprintf<"$env<CIF_INFO_DIR>" $func_context_path "/use_var.txt", "%s %s %d\n", $func_context_name, $var_name, $use_line>
+}
+
+info: init_global(static $ $){
+    $fprintf<"$env<CIF_INFO_DIR>/$env<C_FILE>/init_global.txt", "declaration: %s path: %s; type: static\n%s", $signature, $env<C_FILE>, $var_init_list>
+}
+
+info: init_global($ $){
+    $fprintf<"$env<CIF_INFO_DIR>/$env<C_FILE>/init_global.txt", "declaration: %s path: %s; type: global\n%s", $signature, $env<C_FILE>, $var_init_list>
+}
+
+info: introduce($ $) {
+    $fprintf<"$env<CIF_INFO_DIR>" $path "/typedefs.txt", "%s\n", $signature>
+}
