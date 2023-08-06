@@ -1,0 +1,48 @@
+Metadata-Version: 2.1
+Name: mpcontribs-client
+Version: 3.8.4
+Summary: client library for MPContribs API
+Home-page: https://github.com/materialsproject/MPContribs/tree/master/mpcontribs-client
+Author: Patrick Huck
+Author-email: phuck@lbl.gov
+License: MIT
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
+Requires-Dist: boltons
+Requires-Dist: bravado[fido]
+Requires-Dist: cryptography
+Requires-Dist: fido[tls]
+Requires-Dist: ipython
+Requires-Dist: json2html
+Requires-Dist: pandas
+Requires-Dist: plotly
+Requires-Dist: pyIsEmail
+Requires-Dist: pyOpenSSL
+Requires-Dist: pymatgen
+Requires-Dist: ratelimit
+Requires-Dist: requests-futures
+Requires-Dist: service-identity
+Requires-Dist: tqdm
+
+![PyPI](https://img.shields.io/pypi/v/mpcontribs-client?style=flat-square)
+![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/pypi/mpcontribs-client?style=flat-square)
+
+Small, dynamic python client library to connect to [MPContribs](https://docs.mpcontribs.org)
+APIs based on Yelp's [bravado](https://bravado.readthedocs.io).
+
+```python
+from mpcontribs.client import Client
+client = Client()
+dir(client) # show available resources
+```
+
+By default, the client connects to https://contribs-api.materialsproject.org and uses the environment variable
+`MPCONTRIBS_API_KEY` to set the API key. The key can alternatively be set explicitly via the
+`apikey` argument to the constructor. The `host` argument or the `MPCONTRIBS_API_HOST`
+environment variable can be set to connect to other MPContribs-style APIs:
+
+```python
+client = Client(host='ml-api.materialsproject.org')
+```
+
+
