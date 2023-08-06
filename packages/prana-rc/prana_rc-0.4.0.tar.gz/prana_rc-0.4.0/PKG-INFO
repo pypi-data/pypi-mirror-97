@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: prana_rc
+Version: 0.4.0
+Summary: Python library and CLI to control Prana recuperators via BLE connection (https://prana.org.ua/)
+Home-page: https://github.com/corvis/prana_rc
+Author: Dmitry Berezovsky
+License: GPLv3
+Description: 
+        Prana RC
+        ========
+        
+        
+        .. image:: https://github.com/corvis/prana_rc/blob/development/media/cover-picture.jpg?raw=true
+           :target: https://github.com/corvis/prana_rc/blob/development/media/cover-picture.jpg?raw=true
+           :alt: Prana device picture
+        
+        
+        **DISCLAIMER: This library is under active development now. There are no any stable release yet, so please do not 
+        use it in your installation unless you are developer who would like to contribute into module**
+        
+        Python library and CLI to manage Prana recuperators (https://prana.org.ua/) via BLE interface.
+        It provides access to the device API and provides functionality similar to functionality of the official mobile 
+        application with some limitations (see limitation section below).
+        
+        **ATTENTION**\ : Manufacturer doesn't provide any technical documentation describing protocol and also officially doesn't 
+        provide an ability to interact with the devices programmatically. This library is based on reverse engineering of the 
+        closed proprietary protocol. Used it on your own risk.
+        
+        **Features:**
+        
+        
+        * Read current prana state
+        * Control everything which could be managed via official app with a few exceptions (see limitations section)
+        * Discover not connected devices around
+        * Client-server architecture (allows distributed setup)
+        * CLI interface available for quick tinkering
+        
+        Installation
+        ------------
+        
+        Install regular server component with Http API:
+        
+        .. code-block::
+        
+           pip install prana-rc[server-tornado]
+        
+        If you prefer dockerized setup you could run it like this:
+        
+        .. code-block::
+        
+           docker run --rm prana-rc:latest -d  --network=host --restart=unless-stopped
+        
+        For more details `see readme <https://github.com/corvis/prana_rc>`_.
+        
+        Disclaimer
+        ==========
+        
+        This module is licensed under GPL v3. This means you are free to use in non-commercial projects.
+        
+        The GPL license clearly explains that there is no warranty for this free software. Please see the included LICENSE file for details.
+        
+Keywords: python prana recuperators iot automation
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Home Automation
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Python: >3.6
+Provides-Extra: server-tornado
+Provides-Extra: client-aio
