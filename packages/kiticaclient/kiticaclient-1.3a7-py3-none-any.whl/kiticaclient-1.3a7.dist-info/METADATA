@@ -1,0 +1,110 @@
+Metadata-Version: 2.1
+Name: kiticaclient
+Version: 1.3a7
+Summary: Kitica Devicepool Client.
+Home-page: https://github.com/MainSystemDev/kitica
+Author: Joshua Kim Rivera
+Author-email: joshua.rivera@mnltechnology.com
+License: Type license() to see the full license text
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: Testing
+Description-Content-Type: text/markdown
+Requires-Dist: Appium-Python-Client
+Requires-Dist: certifi (==2019.11.28)
+Requires-Dist: chardet (==3.0.4)
+Requires-Dist: idna (==2.8)
+Requires-Dist: pure-python-adb (==0.2.3.dev0)
+Requires-Dist: python-box (==4.0.4)
+Requires-Dist: PyYAML (==5.3)
+Requires-Dist: requests (==2.22.0)
+Requires-Dist: ruamel.yaml (==0.16.7)
+Requires-Dist: ruamel.yaml.clib (==0.2.0)
+Requires-Dist: toml (==0.10.0)
+Requires-Dist: urllib3 (==1.25.8)
+
+Kitica Host Client Listener
+================
+
+Contents:
+ * [Description](#description)
+ * [Installation](#installation)
+ * [Features](#features)
+ * [Usage](#usage)
+
+
+### Description
+Kitica Host Client Listener enables a machine to host devices for the Kitica Devicepool Setup. It supports device status updates.
+
+### Installation
+If you have [pip](http://pip-installer.org/) installed, just run
+```bash
+pip install kiticaclient==1.1b1
+```
+To verify installation, you may run:  
+_for ADB Client._  
+> ``adb-kitica --help`` 
+
+or  
+_for iOS Client._
+> ``ios-kitica --help``
+
+You may refer to the sample execution below.
+```bash
+$ adb-kitica --help
+usage: adb-kitica [-h] [-k KITICASERVER] [-w WEBDRIVERPATH] [-a ADBHOST]
+                  [-p ADBPORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -k KITICASERVER, --kiticaserver KITICASERVER
+                        Kitica API Server URI
+  -w WEBDRIVERPATH, --webdriverpath WEBDRIVERPATH
+                        Web Driver PATH
+  -a ADBHOST, --adbhost ADBHOST
+                        The adb host to connect to. Defaults to localhost.
+  -p ADBPORT, --adbport ADBPORT
+                        The ADB port of the host. Defaults to 5037
+
+$ ios-kitica
+usage: ios-kitica [-h] [-k KITICASERVER] [-w WEBDRIVERPATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -k KITICASERVER, --kiticaserver KITICASERVER
+                        Kitica API Server URI
+  -w WEBDRIVERPATH, --webdriverpath WEBDRIVERPATH
+                        Web Driver PATH
+```
+
+### Features
+Kitica ``adb-client`` supports auto start of the **ADB server** should it detect that the client is not running.
+
+Client also auto creates ``KITICA_CLIENT_WEBDRIVERS`` which differs for every Operating System, but, follows the same format. It targets the home folder for the users.  
+For __linux__ It would be ``/home/<username>/kitica/client/webdrivers``  
+For __Windows__ ``C:\Users\<username>\kitica\client\webdrivers``  
+For __macOS__ ``/Users/<username>/kitica/client/webdrivers``  
+
+
+### Usage
+**ADB Client**  
+To start an Android Debug Bridge kitica client, simply run ``adb-kitica`` on your terminal.
+```bash
+$ adb-kitica -k http://kitica.server
+
+Base Client Instance Started..
+HOST IP :xxx.xxx.xxx.xxx
+KITICA SERVER :http://kitica.server
+Webdriver PATH :/home/<username>/kitica/client/webdrivers
+Starting Android Host Client Listener Service....
+adbhost:localhost
+adbport:5037
+```
+
+**iOS Client**  
+TO DO!
+
+
