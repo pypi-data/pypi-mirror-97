@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "cloudsync"
+author = "Atakama, LLC"
+author-email = "dev-support@atakama.com"
+home-page = "https://github.com/atakamallc/cloudsync"
+description-file="README.md"
+# MUST be from this list: https://pypi.org/pypi?%3Aaction=list_classifiers
+classifiers=["Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires = ["arrow", "dataclasses", "pystrict", "msgpack", "requests_oauthlib", "python-daemon", "xxhash", "urllib3>=1.25.3", "watchdog", "pywin32; sys_platform == 'win32'"]
+requires-python = ">=3.6"
+
+[tool.flit.metadata.requires-extra]
+box = [ "boxsdk>=2.9.0", ]
+dropbox = [ "dropbox>=10.3.0", "six>=1.14.0"]
+boxcom = [ "boxsdk[jwt]", ]
+onedrive = [ "cloudsync-onedrive~=3.0.0a2", ]
+gdrive = [ "cloudsync-gdrive~=2.0.0a2", ]
+all = [ "cloudsync-gdrive~=2.0.0a2", "cloudsync-onedrive~=3.0.0a2", "boxsdk[jwt]", "dropbox>=10.3.0", "six>=1.14.0", "boxsdk>=2.9.0" ]
+
+[tool.flit.scripts]
+cloudsync = "cloudsync.command:main"
