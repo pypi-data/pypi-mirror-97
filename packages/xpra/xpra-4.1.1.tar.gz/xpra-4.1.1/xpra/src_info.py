@@ -1,0 +1,3 @@
+BRANCH='v4.1.x'
+LOCAL_MODIFICATIONS='unknown'
+REVISION='unknown'
