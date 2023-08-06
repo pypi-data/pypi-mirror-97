@@ -1,0 +1,75 @@
+name: Default Codeplugs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [published]
+
+env:
+  OUTPUT: /tmp/default-codeplug
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get current time
+      uses: 1466587594/get-current-time@v2
+      id: current-time
+      with:
+        format: YYYYMMDD
+        utcOffset: "-08:00"
+    - name: Cache .cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache
+        key: dzcb-cache-${{ steps.current-time.outputs.formattedTime }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Build Codeplugs
+      run: tox -e default
+    - name: Archive Codeplugs
+      uses: actions/upload-artifact@v2
+      with:
+        name: default-codeplug
+        path: ${{ env.OUTPUT }}
+  upload:
+    if: ${{ github.event_name == 'release' }}
+    needs: build
+    runs-on: ubuntu-20.04
+    env:
+      ASSET_PATH: /tmp/default-codeplug.zip
+    steps:
+    - name: Download Codeplugs
+      uses: actions/download-artifact@v2
+      with:
+        name: default-codeplug
+        path: ${{ env.OUTPUT }}
+    - name: Create release ZIP
+      run: |
+        cd "${{ env.OUTPUT }}" && zip -r "${{ env.ASSET_PATH }}" .
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact to release
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ${{ env.ASSET_PATH }}
+        asset_name: default-codeplug.zip
+        asset_content_type: application/zip
