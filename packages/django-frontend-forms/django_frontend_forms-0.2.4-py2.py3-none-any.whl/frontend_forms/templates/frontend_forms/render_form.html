@@ -1,0 +1,67 @@
+{% load i18n frontend_forms_tags %}
+
+{% with num_form_errors=form.errors|length num_form_non_field_errors=form.non_field_errors|length %}
+    {% if num_form_errors|add:num_form_non_field_errors == 1 %}
+        <p class="errornote">{% trans 'Please correct the error below.' %}</p>
+    {% elif num_form_errors|add:num_form_non_field_errors > 1 %}
+        <p class="errornote">{% trans 'Please correct the errors below.' %}</p>
+    {% endif %}
+{% endwith %}
+
+{% if FORM_LAYOUT_FLAVOR == "generic" %}
+
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            <ul class="errorlist">
+                {% for error in hidden_field.errors %}
+                    <li>(Hidden field {{ hidden_field.name }}) {{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <fieldset class="module grp-module" style="width: 100%">
+        {% for field in form.visible_fields %}
+            {% render_form_field field=field flavor=FORM_LAYOUT_FLAVOR layout=layout index=forloop.counter %}
+        {% endfor %}
+    </fieldset>
+
+{% elif FORM_LAYOUT_FLAVOR == "bs4" %}
+
+    {% comment %}
+    Adapted from:
+    https://simpleisbetterthancomplex.com/article/2017/08/19/how-to-render-django-form-manually.html#rendering-bootstrap-4-forms
+    {% endcomment %}
+
+    {% if form.non_field_errors %}
+        <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <fieldset>
+        {% for field in form.visible_fields %}
+            {% render_form_field field flavor=FORM_LAYOUT_FLAVOR layout=layout index=forloop.counter %}
+        {% endfor %}
+    </fieldset>
+
+{% else %}
+
+    <h1>Unknow FORM_LAYOUT_FLAVOR: "{{ FORM_LAYOUT_FLAVOR }}"</h1>
+
+{% endif %}
