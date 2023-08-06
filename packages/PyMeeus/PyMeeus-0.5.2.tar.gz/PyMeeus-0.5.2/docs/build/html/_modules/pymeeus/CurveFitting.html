@@ -1,0 +1,918 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymeeus.CurveFitting &mdash; PyMeeus 0.5.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyMeeus
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../core/index.html">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../core/base.html">Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../core/Angle.html">Angle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../core/Coordinates.html">Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../core/CurveFitting.html">Curveffiting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../core/Epoch.html">Epoch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../core/Interpolation.html">Interpolation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../bodies/index.html">Bodies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Earth.html">Earth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/JupiterMoons.html">JupiterMoons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Jupiter.html">Jupiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Mars.html">Mars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Mercury.html">Mercury</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Minor.html">Minor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Moon.html">Moon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Neptune.html">Neptune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Pluto.html">Pluto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Saturn.html">Saturn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Sun.html">Sun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Uranus.html">Uranus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../bodies/Venus.html">Venus</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Usage Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Angle.html">Angle examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-base.html">Base examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Coordinates.html">Coordinates examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-CurveFitting.html">CurveFitting examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Earth.html">Earth examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Epoch.html">Epoch examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Interpolation.html">Interpolation examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Jupiter.html">Jupiter examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-JupiterMoons.html">JupiterMoons examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Mars.html">Mars examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Mercury.html">Mercury examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Minor.html">Minor examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Moon.html">Moon examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Neptune.html">Neptune examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Pluto.html">Pluto examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Saturn.html">Saturn examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Sun.html">Sun examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Uranus.html">Uranus examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/ex-Venus.html">Venus examples</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyMeeus</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymeeus.CurveFitting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymeeus.CurveFitting</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="c1"># PyMeeus: Python module implementing astronomical algorithms.</span>
+<span class="c1"># Copyright (C) 2018  Dagoberto Salazar</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">radians</span><span class="p">,</span> <span class="n">fsum</span><span class="p">,</span> <span class="n">sin</span>
+
+<span class="kn">from</span> <span class="nn">pymeeus.base</span> <span class="k">import</span> <span class="n">TOL</span>
+<span class="kn">from</span> <span class="nn">pymeeus.Angle</span> <span class="k">import</span> <span class="n">Angle</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: CurveFitting</span>
+<span class="sd">   :synopsis: Class to get the best fit of a curve to a set of (x, y) points</span>
+<span class="sd">   :license: GNU Lesser General Public License v3 (LGPLv3)</span>
+
+<span class="sd">.. moduleauthor:: Dagoberto Salazar</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="CurveFitting"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting">[docs]</a><span class="k">class</span> <span class="nc">CurveFitting</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class CurveFitting deals with finding the function (linear, cuadratic, etc)</span>
+<span class="sd">    that best fit a given set of points.</span>
+
+<span class="sd">    The constructor takes pairs of (x, y) values from the table of interest.</span>
+<span class="sd">    These pairs of values can be given as a sequence of int/floats, tuples,</span>
+<span class="sd">    lists or Angles. It is also possible to provide a CurveFitting object to</span>
+<span class="sd">    the constructor in order to get a copy.</span>
+
+<span class="sd">    .. note:: When using Angles, be careful with the 360-to-0 discontinuity.</span>
+
+<span class="sd">    If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">    positions are considered to belong to the &#39;x&#39; set, while the values in the</span>
+<span class="sd">    even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">    provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is build</span>
+<span class="sd">    from 0 onwards with steps of length 1.</span>
+
+<span class="sd">    Please keep in mind that a minimum of two data pairs are needed in order to</span>
+<span class="sd">    carry out any fitting. If only one value pair is provided, a ValueError</span>
+<span class="sd">    exception will be raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CurveFitting.__init__"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;CurveFitting constructor.</span>
+
+<span class="sd">        This takes pairs of (x, y) values from the table of interest. These</span>
+<span class="sd">        pairs of values can be given as a sequence of int/floats, tuples, lists</span>
+<span class="sd">        or Angles. It is also possible to provide a CurveFitting object to the</span>
+<span class="sd">        constructor in order to get a copy.</span>
+
+<span class="sd">        .. note:: When using Angles, be careful with the 360-to-0 discontinuity</span>
+
+<span class="sd">        If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">        positions are considered to belong to the &#39;x&#39; set, while the values in</span>
+<span class="sd">        the even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">        provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is</span>
+<span class="sd">        build from 0 onwards with steps of length 1.</span>
+
+<span class="sd">        Please keep in mind that a minimum of two data pairs are needed in</span>
+<span class="sd">        order to carry out any interpolation. If only one value pair is</span>
+<span class="sd">        provided, a ValueError exception will be raised.</span>
+
+<span class="sd">        :param args: Input tabular values, or another CurveFitting object.</span>
+<span class="sd">        :type args: int, float, list, tuple, :py:class:`Angle`,</span>
+<span class="sd">           :py:class:`CurveFitting`</span>
+
+<span class="sd">        :returns: CurveFitting object.</span>
+<span class="sd">        :rtype: :py:class:`CurveFitting`</span>
+<span class="sd">        :raises: ValueError if not enough input data pairs are provided.</span>
+<span class="sd">        :raises: TypeError if input values are of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; i = CurveFitting([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i._x)</span>
+<span class="sd">        [5, 3, 6, 1, 2, 4]</span>
+<span class="sd">        &gt;&gt;&gt; print(i._y)</span>
+<span class="sd">        [10, 6, 12, 2, 4, 8]</span>
+<span class="sd">        &gt;&gt;&gt; j = CurveFitting([3, -8, 1, 12, 2, 5, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(j._x)</span>
+<span class="sd">        [0, 1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(j._y)</span>
+<span class="sd">        [3, -8, 1, 12, 2, 5, 8]</span>
+<span class="sd">        &gt;&gt;&gt; k = CurveFitting(3, -8, 1, 12, 2, 5, 8)</span>
+<span class="sd">        &gt;&gt;&gt; print(k._x)</span>
+<span class="sd">        [3, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; print(k._y)</span>
+<span class="sd">        [-8, 12, 5]</span>
+<span class="sd">        &gt;&gt;&gt; m = CurveFitting(k)</span>
+<span class="sd">        &gt;&gt;&gt; print(m._x)</span>
+<span class="sd">        [3, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; print(m._y)</span>
+<span class="sd">        [-8, 12, 5]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialize data table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># Let&#39;s use &#39;set()&#39; method to handle the setup</span></div>
+
+<div class="viewcode-block" id="CurveFitting.set"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method used to define the value pairs of CurveFitting object.</span>
+
+<span class="sd">        This takes pairs of (x, y) values from the table of interest. These</span>
+<span class="sd">        pairs of values can be given as a sequence of int/floats, tuples,</span>
+<span class="sd">        lists, or Angles. It is also possible to provide a CurveFitting object</span>
+<span class="sd">        to this method in order to get a copy.</span>
+
+<span class="sd">        .. note:: When using Angles, be careful with the 360-to-0 discontinuity</span>
+
+<span class="sd">        If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">        positions are considered to belong to the &#39;x&#39; set, while the values in</span>
+<span class="sd">        the even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">        provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is</span>
+<span class="sd">        build from 0 onwards with steps of length 1.</span>
+
+<span class="sd">        Please keep in mind that a minimum of two data pairs are needed in</span>
+<span class="sd">        order to carry out any interpolation. If only one value is provided, a</span>
+<span class="sd">        ValueError exception will be raised.</span>
+
+<span class="sd">        :param args: Input tabular values, or another CurveFitting object.</span>
+<span class="sd">        :type args: int, float, list, tuple, :py:class:`Angle`</span>
+
+<span class="sd">        :returns: None.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raises: ValueError if not enough input data pairs are provided.</span>
+<span class="sd">        :raises: TypeError if input values are of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; i = CurveFitting()</span>
+<span class="sd">        &gt;&gt;&gt; i.set([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i._x)</span>
+<span class="sd">        [5, 3, 6, 1, 2, 4]</span>
+<span class="sd">        &gt;&gt;&gt; print(i._y)</span>
+<span class="sd">        [10, 6, 12, 2, 4, 8]</span>
+<span class="sd">        &gt;&gt;&gt; j = CurveFitting()</span>
+<span class="sd">        &gt;&gt;&gt; j.set([3, -8, 1, 12, 2, 5, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(j._x)</span>
+<span class="sd">        [0, 1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(j._y)</span>
+<span class="sd">        [3, -8, 1, 12, 2, 5, 8]</span>
+<span class="sd">        &gt;&gt;&gt; k = CurveFitting(3, -8, 1, 12, 2, 5, 8)</span>
+<span class="sd">        &gt;&gt;&gt; print(k._x)</span>
+<span class="sd">        [3, 1, 2]</span>
+<span class="sd">        &gt;&gt;&gt; print(k._y)</span>
+<span class="sd">        [-8, 12, 5]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Clean up the internal data tables and parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># If no arguments are given, return. Internal data tables are empty</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># If we have only one argument, it can be a single value or tuple/list</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CurveFitting</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_x</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_y</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)):</span>
+                <span class="c1"># Insuficient data for curve fitting. Raise ValueError</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">seq</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Read input values into &#39;y&#39;, and create &#39;x&#39;</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="c1"># Insuficient data for curve fitting. Raise ValueError</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># Check if they have the same length. If not, make them equal</span>
+                <span class="n">length_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="n">length_min</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="n">length_min</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Read input values into &#39;x&#39; and &#39;y&#39;</span>
+                    <span class="k">for</span> <span class="n">xval</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xval</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yval</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># In this case, no combination of input values is valid</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If there is an odd number of arguments, drop the last one</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># Check that all the arguments are ints, floats or Angles</span>
+            <span class="n">all_numbers</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">all_numbers</span> <span class="o">=</span> <span class="p">(</span><span class="n">all_numbers</span>
+                               <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)))</span>
+            <span class="c1"># If any of the values failed the test, raise an exception</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">all_numbers</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+            <span class="c1"># Now, extract the data: Odds are x&#39;s, evens are y&#39;s</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Compute parameters</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_parameters</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to compute the intermediate parameters using for fitting.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_P</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_R</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_U</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_V</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_W</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_P</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_N</span><span class="p">):</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span> <span class="o">+=</span> <span class="n">x2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_R</span> <span class="o">+=</span> <span class="n">x2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">+=</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">x2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_U</span> <span class="o">+=</span> <span class="n">xy</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_V</span> <span class="o">+=</span> <span class="n">xy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_W</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="CurveFitting.__str__"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method used when trying to print the object.</span>
+
+<span class="sd">        :returns: Internal tabular values as strings.</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        &gt;&gt;&gt; i = CurveFitting([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i)</span>
+<span class="sd">        X: [5, 3, 6, 1, 2, 4]</span>
+<span class="sd">        Y: [10, 6, 12, 2, 4, 8]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xstr</span> <span class="o">=</span> <span class="s2">&quot;X: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">ystr</span> <span class="o">=</span> <span class="s2">&quot;Y: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xstr</span> <span class="o">+</span> <span class="n">ystr</span></div>
+
+<div class="viewcode-block" id="CurveFitting.__repr__"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method providing the &#39;official&#39; string representation of the object.</span>
+<span class="sd">        It provides a valid expression that could be used to recreate the</span>
+<span class="sd">        object.</span>
+
+<span class="sd">        :returns: As string with a valid expression to recreate the object</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        &gt;&gt;&gt; i = CurveFitting([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; repr(i)</span>
+<span class="sd">        &#39;CurveFitting([5, 3, 6, 1, 2, 4], [10, 6, 12, 2, 4, 8])&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CurveFitting.__len__"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the number of value pairs internally stored in</span>
+<span class="sd">        this object.</span>
+
+<span class="sd">        :returns: Number of value pairs internally stored</span>
+<span class="sd">        :rtype: int</span>
+
+<span class="sd">        &gt;&gt;&gt; i = CurveFitting([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; len(i)</span>
+<span class="sd">        6</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CurveFitting.correlation_coeff"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.correlation_coeff">[docs]</a>    <span class="k">def</span> <span class="nf">correlation_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the coefficient of correlation, as a float.</span>
+
+<span class="sd">        :returns: Coefficient of correlation.</span>
+<span class="sd">        :rtype: float</span>
+
+<span class="sd">        &gt;&gt;&gt; cf = CurveFitting([73.0, 38.0, 35.0, 42.0, 78.0, 68.0, 74.0, 42.0,</span>
+<span class="sd">        ...                    52.0, 54.0, 39.0, 61.0, 42.0, 49.0, 50.0, 62.0,</span>
+<span class="sd">        ...                    44.0, 39.0, 43.0, 54.0, 44.0, 37.0],</span>
+<span class="sd">        ...                   [90.4, 125.3, 161.8, 143.4, 52.5, 50.8, 71.5,</span>
+<span class="sd">        ...                    152.8, 131.3, 98.5, 144.8, 78.1, 89.5, 63.9,</span>
+<span class="sd">        ...                    112.1, 82.0, 119.8, 161.2, 208.4, 111.6, 167.1,</span>
+<span class="sd">        ...                    162.1])</span>
+<span class="sd">        &gt;&gt;&gt; r = cf.correlation_coeff()</span>
+<span class="sd">        &gt;&gt;&gt; print(round(r, 3))</span>
+<span class="sd">        -0.767</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N</span>
+        <span class="n">sxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_U</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_P</span>
+        <span class="n">sy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T</span>
+        <span class="n">sx2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span>
+        <span class="n">sy2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_W</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">n</span> <span class="o">*</span> <span class="n">sxy</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sy</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">sx2</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sx</span><span class="p">)</span>
+                                       <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">sy2</span> <span class="o">-</span> <span class="n">sy</span> <span class="o">*</span> <span class="n">sy</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="CurveFitting.linear_fitting"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.linear_fitting">[docs]</a>    <span class="k">def</span> <span class="nf">linear_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns a tuple with the &#39;a&#39;, &#39;b&#39; coefficients of the</span>
+<span class="sd">        linear equation *&#39;y = a*x + b&#39;* that best fits the table data, using</span>
+<span class="sd">        the least squares approach.</span>
+
+<span class="sd">        :returns: &#39;a&#39;, &#39;b&#39; coefficients of best linear equation fit.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        :raises: ZeroDivisionError if input data leads to a division by zero</span>
+
+<span class="sd">        &gt;&gt;&gt; cf = CurveFitting([73.0, 38.0, 35.0, 42.0, 78.0, 68.0, 74.0, 42.0,</span>
+<span class="sd">        ...                    52.0, 54.0, 39.0, 61.0, 42.0, 49.0, 50.0, 62.0,</span>
+<span class="sd">        ...                    44.0, 39.0, 43.0, 54.0, 44.0, 37.0],</span>
+<span class="sd">        ...                   [90.4, 125.3, 161.8, 143.4, 52.5, 50.8, 71.5,</span>
+<span class="sd">        ...                    152.8, 131.3, 98.5, 144.8, 78.1, 89.5, 63.9,</span>
+<span class="sd">        ...                    112.1, 82.0, 119.8, 161.2, 208.4, 111.6, 167.1,</span>
+<span class="sd">        ...                    162.1])</span>
+<span class="sd">        &gt;&gt;&gt; a, b = cf.linear_fitting()</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;a = {}\tb = {}&quot;.format(round(a, 2), round(b, 2)))</span>
+<span class="sd">        a = -2.49	b = 244.18</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N</span>
+        <span class="n">sxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_U</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_P</span>
+        <span class="n">sy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T</span>
+        <span class="n">sx2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">sx2</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sx</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ZeroDivisionError</span><span class="p">(</span><span class="s2">&quot;Input data leads to a division by zero&quot;</span><span class="p">)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">sxy</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sy</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">sy</span> <span class="o">*</span> <span class="n">sx2</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sxy</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CurveFitting.quadratic_fitting"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.quadratic_fitting">[docs]</a>    <span class="k">def</span> <span class="nf">quadratic_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns a tuple with the &#39;a&#39;, &#39;b&#39;, &#39;c&#39; coefficients of</span>
+<span class="sd">        the quadratic equation *&#39;y = a*x*x + b*x + c&#39;* that best fits the table</span>
+<span class="sd">        data, using the least squares approach.</span>
+
+<span class="sd">        :returns: &#39;a&#39;, &#39;b&#39;, &#39;c&#39; coefficients of best quadratic equation fit.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        :raises: ZeroDivisionError if input data leads to a division by zero</span>
+
+<span class="sd">        &gt;&gt;&gt; cf2 = CurveFitting([-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5,</span>
+<span class="sd">        ...                     2.0, 2.5,3.0],</span>
+<span class="sd">        ...                    [-9.372, -3.821, 0.291, 3.730, 5.822, 8.324,</span>
+<span class="sd">        ...                     9.083, 6.957, 7.006, 0.365, -1.722])</span>
+<span class="sd">        &gt;&gt;&gt; a, b, c = cf2.quadratic_fitting()</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;a = {}; b = {}; c = {}&quot;.format(round(a, 2), round(b, 2),</span>
+<span class="sd">        ...                                       round(c, 2)))</span>
+<span class="sd">        a = -2.22; b = 3.76; c = 6.64</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_P</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Q</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_R</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_S</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_U</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V</span>
+        <span class="n">q2</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">n</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">r</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ZeroDivisionError</span><span class="p">(</span><span class="s2">&quot;Input data leads to a division by zero&quot;</span><span class="p">)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">u</span>
+             <span class="o">-</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">v</span> <span class="o">-</span> <span class="n">n</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">t</span>
+             <span class="o">-</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">n</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">v</span>
+             <span class="o">-</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CurveFitting.general_fitting"><a class="viewcode-back" href="../../core/CurveFitting.html#pymeeus.CurveFitting.CurveFitting.general_fitting">[docs]</a>    <span class="k">def</span> <span class="nf">general_fitting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">f2</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns a tuple with the &#39;a&#39;, &#39;b&#39;, &#39;c&#39; coefficients of</span>
+<span class="sd">        the general equation *&#39;y = a*f0(x) + b*f1(x) + c*f2(x)&#39;* that best fits</span>
+<span class="sd">        the table data, using the least squares approach.</span>
+
+<span class="sd">        :param f0, f1, f2: Functions used to build the general equation.</span>
+<span class="sd">        :type f0, f1, f2: function</span>
+<span class="sd">        :returns: &#39;a&#39;, &#39;b&#39;, &#39;c&#39; coefficients of best general equation fit.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        :raises: ZeroDivisionError if input functions are null or input data</span>
+<span class="sd">           leads to a division by zero</span>
+
+<span class="sd">        &gt;&gt;&gt; cf4 = CurveFitting([3, 20, 34, 50, 75, 88, 111, 129, 143, 160, 183,</span>
+<span class="sd">        ...                     200, 218, 230, 248, 269, 290, 303, 320, 344],</span>
+<span class="sd">        ...                    [0.0433, 0.2532, 0.3386, 0.3560, 0.4983, 0.7577,</span>
+<span class="sd">        ...                     1.4585, 1.8628, 1.8264, 1.2431, -0.2043,</span>
+<span class="sd">        ...                     -1.2431, -1.8422, -1.8726, -1.4889, -0.8372,</span>
+<span class="sd">        ...                     -0.4377, -0.3640, -0.3508, -0.2126])</span>
+<span class="sd">        &gt;&gt;&gt; def sin1(x): return sin(radians(x))</span>
+<span class="sd">        &gt;&gt;&gt; def sin2(x): return sin(radians(2.0*x))</span>
+<span class="sd">        &gt;&gt;&gt; def sin3(x): return sin(radians(3.0*x))</span>
+<span class="sd">        &gt;&gt;&gt; a, b, c = cf4.general_fitting(sin1, sin2, sin3)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;a = {}; b = {}; c = {}&quot;.format(round(a, 2), round(b, 2),</span>
+<span class="sd">        ...                                       round(c, 2)))</span>
+<span class="sd">        a = 1.2; b = -0.77; c = 0.39</span>
+
+<span class="sd">        &gt;&gt;&gt; cf5 = CurveFitting([0, 1.2, 1.4, 1.7, 2.1, 2.2])</span>
+<span class="sd">        &gt;&gt;&gt; a, b, c = cf5.general_fitting(sqrt)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;a = {}; b = {}; c = {}&quot;.format(round(a, 3), round(b, 3),</span>
+<span class="sd">        ...                                       round(c, 3)))</span>
+<span class="sd">        a = 1.016; b = 0.0; c = 0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="n">yl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xl</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">yl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">m</span> <span class="o">+=</span> <span class="n">f0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="n">f0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">q</span> <span class="o">+=</span> <span class="n">f0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">+=</span> <span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">+=</span> <span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">u</span> <span class="o">+=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">f0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">+=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">+=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">u</span> <span class="o">/</span> <span class="n">m</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ZeroDivisionError</span><span class="p">(</span><span class="s2">&quot;Invalid input functions: They are null&quot;</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">m</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">t</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ZeroDivisionError</span><span class="p">(</span><span class="s2">&quot;Input data leads to a division by zero&quot;</span><span class="p">)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">s</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+             <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r</span><span class="p">))</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span>
+             <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">m</span> <span class="o">*</span> <span class="n">s</span><span class="p">))</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">s</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">m</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>
+             <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span><span class="p">))</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+    <span class="c1"># Let&#39;s define a small helper function</span>
+    <span class="k">def</span> <span class="nf">print_me</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+
+    <span class="c1"># Now let&#39;s work with the CurveFitting class</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="mi">35</span> <span class="o">*</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** Use of CurveFitting class&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mi">35</span> <span class="o">*</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create a CurveFitting object</span>
+    <span class="n">cf1</span> <span class="o">=</span> <span class="n">CurveFitting</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="mf">73.0</span><span class="p">,</span>
+            <span class="mf">38.0</span><span class="p">,</span>
+            <span class="mf">35.0</span><span class="p">,</span>
+            <span class="mf">42.0</span><span class="p">,</span>
+            <span class="mf">78.0</span><span class="p">,</span>
+            <span class="mf">68.0</span><span class="p">,</span>
+            <span class="mf">74.0</span><span class="p">,</span>
+            <span class="mf">42.0</span><span class="p">,</span>
+            <span class="mf">52.0</span><span class="p">,</span>
+            <span class="mf">54.0</span><span class="p">,</span>
+            <span class="mf">39.0</span><span class="p">,</span>
+            <span class="mf">61.0</span><span class="p">,</span>
+            <span class="mf">42.0</span><span class="p">,</span>
+            <span class="mf">49.0</span><span class="p">,</span>
+            <span class="mf">50.0</span><span class="p">,</span>
+            <span class="mf">62.0</span><span class="p">,</span>
+            <span class="mf">44.0</span><span class="p">,</span>
+            <span class="mf">39.0</span><span class="p">,</span>
+            <span class="mf">43.0</span><span class="p">,</span>
+            <span class="mf">54.0</span><span class="p">,</span>
+            <span class="mf">44.0</span><span class="p">,</span>
+            <span class="mf">37.0</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="p">[</span>
+            <span class="mf">90.4</span><span class="p">,</span>
+            <span class="mf">125.3</span><span class="p">,</span>
+            <span class="mf">161.8</span><span class="p">,</span>
+            <span class="mf">143.4</span><span class="p">,</span>
+            <span class="mf">52.5</span><span class="p">,</span>
+            <span class="mf">50.8</span><span class="p">,</span>
+            <span class="mf">71.5</span><span class="p">,</span>
+            <span class="mf">152.8</span><span class="p">,</span>
+            <span class="mf">131.3</span><span class="p">,</span>
+            <span class="mf">98.5</span><span class="p">,</span>
+            <span class="mf">144.8</span><span class="p">,</span>
+            <span class="mf">78.1</span><span class="p">,</span>
+            <span class="mf">89.5</span><span class="p">,</span>
+            <span class="mf">63.9</span><span class="p">,</span>
+            <span class="mf">112.1</span><span class="p">,</span>
+            <span class="mf">82.0</span><span class="p">,</span>
+            <span class="mf">119.8</span><span class="p">,</span>
+            <span class="mf">161.2</span><span class="p">,</span>
+            <span class="mf">208.4</span><span class="p">,</span>
+            <span class="mf">111.6</span><span class="p">,</span>
+            <span class="mf">167.1</span><span class="p">,</span>
+            <span class="mf">162.1</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Let&#39;s use &#39;linear_fitting()&#39;</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">cf1</span><span class="o">.</span><span class="n">linear_fitting</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Linear fitting for cf1:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">b = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Use the copy constructor</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Let&#39;s make a copy:&quot;</span><span class="p">)</span>
+    <span class="n">cf2</span> <span class="o">=</span> <span class="n">CurveFitting</span><span class="p">(</span><span class="n">cf1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   cf2 = CurveFitting(cf1)&quot;</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">cf2</span><span class="o">.</span><span class="n">linear_fitting</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Linear fitting for cf2:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">b = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get the number of value pairs internally stored</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;Number of value pairs inside &#39;cf2&#39;&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cf2</span><span class="p">))</span>  <span class="c1"># 22</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Compute the correlation coefficient</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">cf1</span><span class="o">.</span><span class="n">correlation_coeff</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Correlation coefficient:&quot;</span><span class="p">)</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;   r&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="n">cf2</span> <span class="o">=</span> <span class="n">CurveFitting</span><span class="p">(</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="o">-</span><span class="mf">9.372</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">3.821</span><span class="p">,</span>
+            <span class="mf">0.291</span><span class="p">,</span>
+            <span class="mf">3.730</span><span class="p">,</span>
+            <span class="mf">5.822</span><span class="p">,</span>
+            <span class="mf">8.324</span><span class="p">,</span>
+            <span class="mf">9.083</span><span class="p">,</span>
+            <span class="mf">6.957</span><span class="p">,</span>
+            <span class="mf">7.006</span><span class="p">,</span>
+            <span class="mf">0.365</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">1.722</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Now use &#39;quadratic_fitting()&#39;</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cf2</span><span class="o">.</span><span class="n">quadratic_fitting</span><span class="p">()</span>
+    <span class="c1"># Original curve: y = -2.0*x*x + 3.5*x + 7.0 + noise</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Quadratic fitting:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">b = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">c = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                                             <span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">cf4</span> <span class="o">=</span> <span class="n">CurveFitting</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="mi">3</span><span class="p">,</span>
+            <span class="mi">20</span><span class="p">,</span>
+            <span class="mi">34</span><span class="p">,</span>
+            <span class="mi">50</span><span class="p">,</span>
+            <span class="mi">75</span><span class="p">,</span>
+            <span class="mi">88</span><span class="p">,</span>
+            <span class="mi">111</span><span class="p">,</span>
+            <span class="mi">129</span><span class="p">,</span>
+            <span class="mi">143</span><span class="p">,</span>
+            <span class="mi">160</span><span class="p">,</span>
+            <span class="mi">183</span><span class="p">,</span>
+            <span class="mi">200</span><span class="p">,</span>
+            <span class="mi">218</span><span class="p">,</span>
+            <span class="mi">230</span><span class="p">,</span>
+            <span class="mi">248</span><span class="p">,</span>
+            <span class="mi">269</span><span class="p">,</span>
+            <span class="mi">290</span><span class="p">,</span>
+            <span class="mi">303</span><span class="p">,</span>
+            <span class="mi">320</span><span class="p">,</span>
+            <span class="mi">344</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="p">[</span>
+            <span class="mf">0.0433</span><span class="p">,</span>
+            <span class="mf">0.2532</span><span class="p">,</span>
+            <span class="mf">0.3386</span><span class="p">,</span>
+            <span class="mf">0.3560</span><span class="p">,</span>
+            <span class="mf">0.4983</span><span class="p">,</span>
+            <span class="mf">0.7577</span><span class="p">,</span>
+            <span class="mf">1.4585</span><span class="p">,</span>
+            <span class="mf">1.8628</span><span class="p">,</span>
+            <span class="mf">1.8264</span><span class="p">,</span>
+            <span class="mf">1.2431</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.2043</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">1.2431</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">1.8422</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">1.8726</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">1.4889</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.8372</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.4377</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.3640</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.3508</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">0.2126</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Let&#39;s define the three functions to be used for fitting</span>
+    <span class="k">def</span> <span class="nf">sin1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">sin2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">sin3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span>
+
+    <span class="c1"># Use &#39;general_fitting()&#39; here</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cf4</span><span class="o">.</span><span class="n">general_fitting</span><span class="p">(</span><span class="n">sin1</span><span class="p">,</span> <span class="n">sin2</span><span class="p">,</span> <span class="n">sin3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;General fitting with f0 = sin(x), f1 = sin(2*x), f2 = sin(3*x):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">b = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">c = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                                             <span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">cf5</span> <span class="o">=</span> <span class="n">CurveFitting</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">])</span>
+
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cf5</span><span class="o">.</span><span class="n">general_fitting</span><span class="p">(</span><span class="n">sqrt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;General fitting with f0 = sqrt(x), f1 = 0.0 and f2 = 0.0:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a = </span><span class="si">{}</span><span class="se">\t</span><span class="s2">b = </span><span class="si">{}</span><span class="se">\t\t</span><span class="s2">c = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                                               <span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Dagoberto Salazar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
