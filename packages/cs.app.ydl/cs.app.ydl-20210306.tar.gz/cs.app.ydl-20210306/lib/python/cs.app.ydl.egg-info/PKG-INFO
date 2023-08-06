@@ -1,0 +1,147 @@
+Metadata-Version: 2.1
+Name: cs.app.ydl
+Version: 20210306
+Summary: Convenient command line and library wrapper for youtube-dl.
+Home-page: https://bitbucket.org/cameron_simpson/css/commits/all
+Author: Cameron Simpson
+Author-email: cs@cskk.id.au
+License: GNU General Public License v3 or later (GPLv3+)
+Description: Convenient command line and library wrapper for youtube-dl.
+        
+        *Latest release 20210306*:
+        Assorted internal updates.
+        
+        The `youtube-dl` tool and associated `youtube_dl` Python module
+        are very useful for downloading media from various websites.
+        However, as an end user who almost never streams because of my
+        soggy internet link, I find fetching several items is quite serial and
+        visually noisy.
+        
+        This module provides a command line tool `ydl` which:
+        - runs multiple downloads in parallel with progress bars
+        - prints the downloaded filename as each completes
+        
+        Interactively, I keep this shell function:
+        
+            ydl(){
+              ( set -ue
+                dldir=${DL:-$HOME/dl}/v
+                [ -d "$dldir" ] || set-x mkdir "$dldir"
+                cd "$dldir"
+                command ydl ${1+"$@"}
+              )
+            }
+        
+        which runs the downloader in my preferred download area
+        without tedious manual `cd`ing.
+        
+        ## Function `main(argv=None, cmd=None)`
+        
+        Main command line.
+        
+        ## Class `OverYDL`
+        
+        A manager for multiple `YDL` instances.
+        
+        ### Method `OverYDL.queue(self, *a, **kw)`
+        
+        Queue a fetch of `url` and return a `Result`.
+        
+        ### Method `OverYDL.queue_iter(self, urls)`
+        
+        Queue the URLs of the iterable `urls`,
+        essentially a convenience wrapper for the `queue` method.
+        Returns a list of the `Result`s for each queued URL.
+        
+        ### Method `OverYDL.report(self, Rs=None)`
+        
+        Wrapper returning `cs.result.report(.Rs)`.
+        `Rs` defaults to `list(self.Rs`, the accumulated `Result`s.
+        
+        ## Class `YDL`
+        
+        Manager for a download process.
+        
+        ### Method `YDL.__init__(self, url, *, fstags, upd=None, tick=None, over_progress=None, **kw_opts)`
+        
+        Initialise the manager.
+        
+        Parameters:
+        * `url`: the URL to download
+        * `fstags`: mandatory keyword argument, a `cs.fstags.FSTags` instance
+        * `upd`: optional `cs.upd.Upd` instance for progress reporting
+        * `tick`: optional callback to indicate state change
+        * `over_progress`: an `OverProgress` to which to add each new `Progress` instance
+        * `kw_opts`: other keyword arguments are used to initialise
+          the options for the underlying `YoutubeDL` instance
+        
+        ### Method `YDL.bg(self)`
+        
+        Return the `Result` for this download,
+        starting the download if necessary.
+        
+        ### Property `YDL.output_filename`
+        
+        The target output filename.
+        
+        ### Method `YDL.process_info(ie_result)`
+        
+        Process info hook called by youtube_dl, seems uncalled :-(
+        
+        ## Class `YDLCommand(cs.cmdutils.BaseCommand)`
+        
+        `ydl` command line implementation.
+        
+        
+        Command line usage:
+        
+            Usage: YDLCommand [-f] {URLs|-}...
+                -f  Force download - do not use the cache.
+        
+        ### Method `YDLCommand.apply_defaults(self)`
+        
+        Initial defaults options.
+        
+        ### Method `YDLCommand.apply_opts(self, opts)`
+        
+        Command line main switches.
+        
+        ### Method `YDLCommand.main(self, argv)`
+        
+        Command line main programme.
+        
+        # Release Log
+        
+        
+        
+        *Release 20210306*:
+        Assorted internal updates.
+        
+        *Release 20200621*:
+        * YDL.run: just catch the youtube_dl DownloadError.
+        * Changes to the default output filename template.
+        * Other minor internal changes.
+        
+        *Release 20200615.1*:
+        Add usage message to docstring.
+        
+        *Release 20200615*:
+        * Initial "daemon" mode, suitable for "tail -f .ydld-queue | ydl -", handy for keeping around in a tmux session.
+        * Assorted small bugfixes.
+        
+        *Release 20200521*:
+        Initial PyPI release.
+Keywords: python3
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Internet
+Classifier: Topic :: System :: Networking
+Classifier: Topic :: Utilities
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Description-Content-Type: text/markdown
