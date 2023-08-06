@@ -1,0 +1,54 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load xchk_instructions %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-Yo76L9sFM0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+
+<h4>Git is zoals een logboek</h4>
+<p>Data in een Git repository kan zich in drie fasen bevinden. Om je deze drie fasen voor te stellen, kan je een Git repository zien als een project met een logboek. In dat logboek wordt bijgehouden wanneer bepaalde data is toegevoegd, aangepast of verwijderd. Om alles overzichtelijk te houden, wordt niet elke wijziging zomaar genoteerd, maar worden wijzigingen in betekenisvolle groepjes bijgehouden.</p>
+<p>Stel je voor dat je een nieuwe knop toevoegt aan een applicatie, bijvoorbeeld om je wachtwoord te resetten. Die knop moet zichtbaar zijn voor de gebruiker, dus er zal een wijziging moeten plaatsvinden in de user interface. Code om een wachtwoord te resetten staat normaal echter niet op dezelfde plaats als code voor de user interface. Als je in je logboek wil noteren dat je een nieuwe knop hebt toegevoegd om het wachtwoord te resetten, kan je de wijziging in de user interface best groeperen met de wijziging achter de schermen. Soms moet je even zoeken naar welke wijzigingen je samen wil noteren in het logboek, dus het is een goed idee de wijzigingen eerst in potlood te noteren en ze pas definitief in pen te noteren wanneer je tevreden bent.</p>
+
+<h4>De technische uitleg</h4>
+<p>Het verschil tussen "niet genoteerd in het logboek", "genoteerd in potlood" en "genoteerd in pen" bestaat ook in Git, maar wordt wat anders uitgedrukt. In Git bevindt data zich op één van volgende drie "plaatsen":
+<ul>
+	<li>working directory</li>
+	<li>staging area</li>
+	<li>project history</li>
+</ul>
+</p>
+
+<h5>Working directory</h5>
+<p>Data in de working directory is data waar Git eigenlijk niets vanaf weet. Ze staat wel in de <strong>map</strong> waar je een Git repository van hebt gemaakt, maar er is geen metadata over. Met andere woorden, het is alsof je er nog <strong>niets</strong> over hebt genoteerd in je logboek, zelfs niet in potlood.</p>
+
+<p class="alert alert-warning">We spreken hier heel bewust over "data". Het hoeft niet over volledige bestanden te gaan. Het kan bijvoorbeeld dat er al iets over A.txt in je logboek staat, maar niet over de recentste wijzigingen. De recentste wijzigingen staan in dat geval nog in de working directory, maar een vorige versie van de file staat op een van de andere twee "plaatsen".</p>
+
+<h5>Staging area</h5>
+<p>"To stage" betekent "klaarzetten". De "staging area" is dus waar je bepaalde data "klaar zet" om in het logboek te noteren. Met andere woorden: wat in de staging area staat, is zoals de tekst die je in potlood in je logboek hebt gezet.</p>
+
+<h5>Project history</h5>
+<p>De project history is alle data die definitief in je logboek is opgenomen. In een goed beheerd project is deze data in overzichtelijke groepjes genoteerd en staat er bij elk groepje ook een beschrijving van wat dat groepje precies verandert aan de code. De project history is dus zoals wat in pen staat.</p>
+
+<p class="alert alert-info">Je kan data niet rechtstreeks in de project history plaatsen. Je moet je wijzigingen altijd eerst "in potlood" noteren voor je ze "in pen" kan noteren.</p>
+{% endblock %}
+
+{% block assignment %}
+<p>Maak een bestand met de naam die vermeld wordt onder "Technische vereisten". Let erop dat je exact dezelfde naam en bestandsextensie gebruikt. Beantwoord in dat bestand volgende vragen met één antwoord per regel.</p>
+
+<ol>
+  <li>Hoe heet de "plaats" die overeenstemt met nota's in potlood? (twee woorden)</li>
+  <li>Staat er in de verborgen map .git iets over wijzigingen in de working directory? (ja/nee)</li>
+</ol>
+
+<p>
+Voer vervolgens uit in je shell (dus via Powershell of Terminal), in je Git repository:
+</p>
+
+<ol>
+	<li><code>git add &lt;naam-van-het-bestand-vermeld-in-de-technische-vereisten&gt;</code> (vul niet letterlijk in, kijk naar de gevraagde bestandsnaam onder "Technische vereisten")</li>
+	<li><code>git commit -m "Antwoorden fasen data"</code></li>
+	<li><code>git push</code></li>
+	<li>Ga tenslotte naar "Deze oefening controleren" onderaan de pagina, de repository waarin je het gevraagde bestand hebt geplaatst en klik op de knop.</li>
+</ol>
+
+{% endblock assignment %}
