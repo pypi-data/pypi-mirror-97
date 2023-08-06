@@ -1,0 +1,41 @@
+protocol = "seabreeze"
+doc = "Sensor daemon for Ocean Optics SeaBreeze spectrometers."
+traits = ["has-mapping", "has-measure-trigger", "is-sensor", "is-daemon"]
+hardware = ["ocean-insight:usb2000", "ocean-insight:usb4000"]
+
+[links]
+source = "https://gitlab.com/yaq/yaqd-seabreeze"
+bugtracker = "https://gitlab.com/yaq/yaqd-seabreeze/-/issues"
+manufacturer = "https://www.oceaninsight.com/products/spectrometers/"
+
+[installation]
+PyPI = "https://pypi.org/project/yaqd-seabreeze"
+conda-forge = "https://anaconda.org/conda-forge/yaqd-seabreeze"
+
+[config]
+correct_dark_counts.type = "boolean"
+correct_dark_counts.default = false
+correct_nonlinearity.type = "boolean"
+correct_nonlinearity.default = false
+
+[state]
+integration_time_micros.type = "int"
+integration_time_micros.default = 3000
+integration_time_micros.doc = "Integration time for collecting pixels"
+
+[messages]
+
+[messages.set_integration_time_micros]
+request = [{"name"="set_integration_time_micros", "type"="int"}]
+doc = "Set the integration time in microseconds."
+
+[messages.get_integration_time_micros]
+response = "int"
+doc = "Get the integration time in microseconds."
+
+[fields]
+
+[fields.integration_time_micros]
+type = "record"
+name = "field"
+fields = {"getter"="get_integration_time_micros", "setter"="set_integration_time_micros", "dyanmic"=true, "kind"="normal", "type"="int"}
