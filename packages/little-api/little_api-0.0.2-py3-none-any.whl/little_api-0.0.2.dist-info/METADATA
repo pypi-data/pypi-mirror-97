@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: little-api
+Version: 0.0.2
+Summary: Little API the web framework that could
+Home-page: UNKNOWN
+Author: j dunham
+Author-email: 
+License: MIT
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.6
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+Requires-Dist: Jinja2 (==2.10.3)
+Requires-Dist: parse (==1.12.1)
+Requires-Dist: requests (==2.22.0)
+Requires-Dist: requests-wsgi-adapter (==0.4.1)
+Requires-Dist: WebOb (==1.8.5)
+Requires-Dist: whitenoise (==4.1.4)
+Requires-Dist: pyjwt (==2.0.1)
+Requires-Dist: gunicorn (==20.0.4)
+
+
+# Little-API: The little web framework that could
+
+![PyPI](https://img.shields.io/pypi/v/little-api.svg)
+
+It's a WSGI framework and can be used with any WSGI application server such as Gunicorn.
+
+## Installation
+
+```shell
+pip install little-api
+```
+
+## Usage
+
+``` python
+from little_api.api import API
+
+app = API()
+
+# Json Response Example
+@app.route("/home")
+def home(request, response):
+    response.json = {"name": "little-api"}
+
+# Class Base Route Example
+@app.route("/book")
+class BookResource:
+    def get(self, req: Request, resp: Response):
+        resp.text = "Get Books Page"
+
+    def post(self, req: Request, resp: Response):
+        resp.text = "Create Books Page"
+
+
+# Rendering Template Example
+@app.route("/template")
+def template_render(req: Request, resp: Response):
+    resp.body = app.template(
+        "index.html", context={"name": "Little-Api", "title": "Best Framework"}
+    )
+
+```
+
+## Running with DebugServer
+little-api has a wrapper around the gunicorn server to allow for easier debugging
+
+```python
+if __name__ == "__main__":
+    from little_api.debug_server import DebugServer
+    DebugServer(application=app, port=8080).run()
+```
+
