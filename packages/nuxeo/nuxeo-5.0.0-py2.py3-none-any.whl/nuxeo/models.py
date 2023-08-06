@@ -1,0 +1,813 @@
+# coding: utf-8
+from __future__ import unicode_literals
+
+import os
+from io import StringIO
+
+from .compat import text
+from .constants import UP_AMAZON_S3
+from .exceptions import InvalidBatch
+from .utils import guess_mimetype
+
+try:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Any, BinaryIO, Dict, List, Optional, Text, Union
+        from .endpoint import APIEndpoint
+except ImportError:
+    pass
+
+
+# Base classes
+
+
+class Model(object):
+    """ Base class for all entities. """
+
+    __slots__ = {"service": None}  # type: Dict[Text, Any]
+
+    def __init__(self, service=None, **kwargs):
+        # type: (Optional[APIEndpoint], Any) -> None
+        self.service = service  # type: APIEndpoint
+
+        # Declare attributes
+        for key, default in type(self).__slots__.copy().items():
+            # Reset mutable objects to prevent data leaks
+            if isinstance(default, dict):
+                default = {}
+            elif isinstance(default, list):
+                default = []
+            key = key.replace("-", "_")
+            setattr(self, key, kwargs.get(key, default))
+
+    def __repr__(self):
+        # type: () -> Text
+        attrs = ", ".join(
+            "{}={!r}".format(attr.replace("_", "-"), getattr(self, attr, None))
+            for attr in sorted(self.__slots__)
+        )
+        return "<{} {}>".format(self.__class__.__name__, attrs)
+
+    def as_dict(self):
+        # type: () -> Dict[Text, Any]
+        """ Returns a dict representation of the resource. """
+        result = {}
+        for key in self.__slots__:
+            val = getattr(self, key)
+            if val is None:
+                continue
+            # Parse lists of objects
+            elif isinstance(val, list) and len(val) > 0 and isinstance(val[0], Model):
+                val = [item.as_dict() for item in val]
+
+            result[key.replace("_", "-")] = val
+        return result
+
+    @classmethod
+    def parse(cls, json, service=None):
+        # type: (Dict[Text, Any], Optional[APIEndpoint]) -> Model
+        """ Parse a JSON object into a model instance. """
+        kwargs = {k: v for k, v in json.items()}
+        return cls(service=service, **kwargs)
+
+    def save(self):
+        # type: () -> None
+        """ Save the resource. """
+        self.service.put(self)
+
+
+class RefreshableModel(Model):
+
+    __slots__ = ()
+
+    def load(self, model=None):
+        # type: (Optional[Union[Model, Dict[Text, Any]]]) -> None
+        """
+        Reload the Model.
+
+        If model is not None, copy from its attributes,
+        otherwise query the server for the entity with its uid.
+
+        :param model: the entity to copy
+        :return: the refreshed model
+        """
+        if not model:
+            model = self.service.get(self.uid)
+
+        if isinstance(model, dict):
+
+            def get_prop(obj, key):
+                return obj.get(key)
+
+        else:
+
+            def get_prop(obj, key):
+                return getattr(obj, key)
+
+        for key in self.__slots__.keys():
+            setattr(self, key, get_prop(model, key))
+
+
+# Entities
+
+
+class Batch(Model):
+    """ Upload batch. """
+
+    __slots__ = {
+        "batchId": None,
+        "blobs": {},
+        "dropped": None,
+        "extraInfo": None,
+        "etag": None,
+        "key": "",
+        "multiPartUploadId": None,
+        "provider": None,
+        "upload_idx": 0,
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.batchId
+
+    @uid.setter
+    def uid(self, value):
+        # type: (Text) -> None
+        self.batchId = value
+
+    def cancel(self):
+        # type: () -> None
+        """ Cancel an upload batch. """
+        if not self.batchId:
+            return
+        self.service.delete(self.uid)
+        self.batchId = None
+
+    def delete(self, file_idx):
+        """ Delete a blob from the batch. """
+        if self.batchId:
+            self.service.delete(self.uid, file_idx=file_idx)
+            self.blobs[file_idx] = None
+
+    def get(self, file_idx):
+        # type: (int) -> Blob
+        """
+        Get the blob info.
+
+        :param file_idx: the index of the blob in the batch
+        :return: the corresponding blob
+        """
+        if self.batchId is None:
+            raise InvalidBatch("Cannot fetch blob for inexistant/deleted batch.")
+        blob = self.service.get(self.uid, file_idx=file_idx)
+        self.blobs[file_idx] = blob
+        return blob
+
+    def get_uploader(self, blob, **kwargs):
+        # type: (Blob, Any) -> Blob
+        """
+        Get an uploader for blob.
+
+        :param blob: the blob to upload
+        :param kwargs: the upload settings
+        :return: the uploader
+        """
+        return self.service.get_uploader(self, blob, **kwargs)
+
+    def is_s3(self):
+        # type: () -> bool
+        """Return True if the upload provider is Amazon S3."""
+        return self.provider == UP_AMAZON_S3
+
+    def upload(self, blob, **kwargs):
+        # type: (Blob, Any) -> Blob
+        """
+        Upload a blob.
+
+        :param blob: the blob to upload
+        :param kwargs: the upload settings
+        :return: the blob info
+        """
+        return self.service.upload(self, blob, **kwargs)
+
+    def execute(self, operation, file_idx=None, params=None):
+        # type: (Text, int, Dict[Text, Any]) -> Any
+        """
+        Execute an operation on this batch.
+
+        :param operation: operation to execute
+        :param file_idx: target file of the operation
+        :param params: parameters of the operation
+        :return: the output of the operation
+        """
+        return self.service.execute(self, operation, file_idx, params)
+
+    def attach(self, doc, file_idx=None):
+        # type: (Text, Optional[int]) -> Any
+        """
+        Attach one or all files of this batch to a document.
+
+        :param doc: document to attach
+        :param file_idx: target file
+        :return: the output of the attach operation
+        """
+        return self.service.attach(self, doc, file_idx)
+
+    def complete(self, **kwargs):
+        # type: (Any) -> Any
+        """
+        Complete a S3 Direct Upload.
+
+        :param kwargs: additional arguments fowarded at the underlying level
+        :return: the output of the complete operation
+        """
+        return self.service.complete(self, **kwargs)
+
+
+class Blob(Model):
+    """ Blob superclass used for metadata. """
+
+    __slots__ = {
+        "batchId": "",
+        "chunkCount": 0,
+        "fileIdx": None,
+        "mimetype": None,
+        "name": None,
+        "size": 0,
+        "uploadType": None,
+        "uploaded": "true",
+        "uploadedChunkIds": [],
+        "uploadedSize": 0,
+    }
+
+    @classmethod
+    def parse(cls, json, service=None):
+        # type: (Dict[Text, Any], Optional[APIEndpoint]) -> Blob
+        """ Parse a JSON object into a blob instance. """
+        kwargs = {k: v for k, v in json.items()}
+        model = cls(service=service, **kwargs)
+
+        if model.uploaded and model.uploadedSize == 0:
+            model.uploadedSize = model.size
+        return model
+
+    def to_json(self):
+        # type: () -> Dict[Text, Text]
+        """ Return a JSON object used during the upload. """
+        return {"upload-batch": self.batchId, "upload-fileId": text(self.fileIdx)}
+
+
+class BufferBlob(Blob):
+    """
+    InMemory content to upload to Nuxeo.
+
+    Acts as a context manager so its data can be read
+    with the `with` statement.
+    """
+
+    def __init__(self, data, **kwargs):
+        # type: (Text, Any) -> None
+        """
+        :param data: content to upload to Nuxeo
+        :param **kwargs: named attributes
+        """
+        super(BufferBlob, self).__init__(**kwargs)
+        self.stringio = None  # type: Optional[StringIO]
+        self.buffer = data
+        self.size = len(self.buffer)
+        self.mimetype = "application/octet-stream"
+
+    @property
+    def data(self):
+        # type: () -> StringIO
+        """ Request data. """
+        return self.stringio
+
+    def __enter__(self):
+        if not self.buffer:
+            return None
+        self.stringio = StringIO(self.buffer)
+        return self.stringio
+
+    def __exit__(self, *args):
+        if self.stringio:
+            self.stringio.close()
+
+
+class Comment(Model):
+    """ Comment. """
+
+    __slots__ = {
+        "ancestorIds": [],
+        "author": None,
+        "creationDate": None,
+        "entity": None,
+        "entity_type": "comment",
+        "entityId": None,
+        "id": None,
+        "lastReplyDate": None,
+        "modificationDate": None,
+        "numberOfReplies": 0,
+        "origin": None,
+        "parentId": None,
+        "text": None,
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.id
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the comment. """
+        self.service.delete(self.uid)
+
+    def has_replies(self):
+        # type: () -> bool
+        """ Return True is the comment has at least one reply. """
+        return self.numberOfReplies > 0
+
+    def replies(self, **params):
+        # type: (Text, Any) -> List[Comment]
+        """
+        Get the replies of the comment.
+
+        Any additionnal arguments will be passed to the *params* parent's call.
+
+        :param uid: the ID of the comment
+        :return: the list of replies
+        """
+        return self.service.replies(self.uid, params=params)
+
+    def reply(self, text):
+        # type: (Text) -> Comment
+        """ Add a reply to the comment. """
+        # Add the reply
+        reply_comment = self.service.post(self.uid, text)
+
+        # Update comment attributes
+        self.numberOfReplies += 1
+        self.lastReplyDate = reply_comment.creationDate
+
+        # And return the reply
+        return reply_comment
+
+
+class FileBlob(Blob):
+    """
+    File to upload to Nuxeo.
+
+    Acts as a context manager so its data can be read
+    with the `with` statement.
+    """
+
+    def __init__(self, path, **kwargs):
+        # type: (Text, Any) -> None
+        """
+        :param path: file path
+        :param **kwargs: named attributes
+        """
+        super(FileBlob, self).__init__(**kwargs)
+        self.fd = None  # type: Optional[BinaryIO]
+        self.path = path
+        self.name = os.path.basename(self.path)
+        self.size = os.path.getsize(self.path)
+        self.mimetype = self.mimetype or guess_mimetype(self.path)  # type: Text
+
+    @property
+    def data(self):
+        # type: () -> BinaryIO
+        """
+        Request data.
+
+        The caller has to close the file descriptor
+        himself if he doesn't open it with the
+        context manager.
+        """
+        return self.fd
+
+    def __enter__(self):
+        self.fd = open(self.path, "rb")
+        return self.fd
+
+    def __exit__(self, *args):
+        if self.fd:
+            self.fd.close()
+
+
+class Directory(Model):
+    """ Directory. """
+
+    __slots__ = {
+        "directoryName": None,
+        "entries": [],
+        "entity_type": "directory",
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.directoryName
+
+    def get(self, entry):
+        # type: (Text) -> DirectoryEntry
+        """
+        Get an entry of the directory.
+
+        :param entry: the name of the entry
+        :return: the corresponding directory entry
+        """
+        return self.service.get(self.uid, dir_entry=entry)
+
+    def create(self, entry):
+        # type: (DirectoryEntry) -> DirectoryEntry
+        """ Create an entry in the directory. """
+        return self.service.post(entry, dir_name=self.uid)
+
+    def save(self, entry):
+        # type: (DirectoryEntry) -> DirectoryEntry
+        """ Save a modified entry of the directory. """
+        return self.service.put(entry, dir_name=self.uid)
+
+    def delete(self, entry):
+        # type: (Text) -> None
+        """
+        Delete one of the directory's entries.
+
+        :param entry: the entry to delete
+        """
+        self.service.delete(self.uid, entry)
+
+    def exists(self, entry):
+        # type: (Text) -> bool
+        """
+        Check if an entry is in the directory.
+
+        :param entry: the entry name
+        :return: True if it exists, else False
+        """
+        return self.service.exists(self.uid, dir_entry=entry)
+
+
+class DirectoryEntry(Model):
+    """ Directory entry. """
+
+    __slots__ = {
+        "directoryName": None,
+        "entity_type": "directoryEntry",
+        "properties": {},
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.properties["id"]
+
+    def save(self):
+        # type: () -> DirectoryEntry
+        """ Save the entry. """
+        return self.service.put(self, self.directoryName)
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the entry. """
+        self.service.delete(self.directoryName, self.uid)
+
+
+class Document(RefreshableModel):
+    """ Document. """
+
+    __slots__ = {
+        "changeToken": None,
+        "contextParameters": {},
+        "entity_type": "document",
+        "facets": [],
+        "isCheckedOut": False,
+        "isProxy": False,
+        "isTrashed": False,
+        "isVersion": False,
+        "lastModified": None,
+        "name": None,
+        "parentRef": None,
+        "path": None,
+        "properties": {},
+        "repository": "default",
+        "state": None,
+        "title": None,
+        "type": None,
+        "uid": None,
+        "versionLabel": None,
+    }
+
+    @property
+    def workflows(self):
+        # type: () -> List[Workflow]
+        """ Return the workflows associated with the document. """
+        return self.service.workflows(self)
+
+    def add_permission(self, params):
+        # type: (Dict[Text, Any]) -> None
+        """
+        Add a permission to a document.
+
+        :param params: permission to add
+        """
+        return self.service.add_permission(self.uid, params)
+
+    def comment(self, text):
+        # type: (Text) -> Comment
+        """
+        Add a comment to the document.
+
+        :param text: the comment message
+        :return: a comment object
+        """
+        return self.service.comment(self.uid, text)
+
+    def comments(self, **params):
+        # type: (Any) -> List[Comment]
+        """Return the comments associated with the document.
+        Any additionnal arguments will be passed to the *params* parent's call.
+        """
+        return self.service.comments(self.uid, params=params)
+
+    def convert(self, params):
+        # type: (Dict[Text, Any]) -> Union[Dict[Text, Any], Text]
+        """
+        Convert the document to another format.
+
+        :param params: Converter permission
+        :return: the converter result
+        """
+        return self.service.convert(self.uid, params)
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the document. """
+        self.service.delete(self.uid)
+
+    def fetch_acls(self):
+        # type: () -> Dict[Text, Any]
+        """ Fetch document ACLs. """
+        return self.service.fetch_acls(self.uid)
+
+    def fetch_audit(self):
+        # type: () -> Dict[Text, Any]
+        """ Fetch audit for current document. """
+        return self.service.fetch_audit(self.uid)
+
+    def fetch_blob(self, xpath="blobholder:0"):
+        # type: (Text) -> Blob
+        """
+        Retrieve one of the blobs attached to the document.
+
+        :param xpath: the xpath to the blob
+        :return: the blob
+        """
+        return self.service.fetch_blob(uid=self.uid, xpath=xpath)
+
+    def fetch_lock_status(self):
+        # type: () -> Dict[Text, Any]
+        """ Get lock informations. """
+        return self.service.fetch_lock_status(self.uid)
+
+    def fetch_rendition(self, name):
+        # type: (Text) -> Union[Text, bytes]
+        """
+        :param name: Rendition name to use
+        :return: The rendition content
+        """
+        return self.service.fetch_rendition(self.uid, name)
+
+    def fetch_renditions(self):
+        # type: () -> List[Union[Text, bytes]]
+        """
+        :return: Available renditions for this document
+        """
+        return self.service.fetch_renditions(self.uid)
+
+    def follow_transition(self, name):
+        # type: (Text) -> None
+        """
+        Follow a lifecycle transition on this document.
+
+        :param name: transition name
+        """
+        doc = self.service.follow_transition(self.uid, name)
+        self.load(doc)
+
+    def get(self, prop):
+        # type: (Text) -> Any
+        """ Get a property of the document by its name. """
+        return self.properties[prop]
+
+    def has_permission(self, permission):
+        # type: (Text) -> bool
+        """ Verify if a document has the permission. """
+        return self.service.has_permission(self.uid, permission)
+
+    def is_locked(self):
+        # type: () -> bool
+        """ Get the lock status. """
+        return not not self.fetch_lock_status()
+
+    def lock(self):
+        # type: () -> Dict[Text, Any]
+        """ Lock the document. """
+        return self.service.lock(self.uid)
+
+    def move(self, dst, name=None):
+        # type: (Text, Optional[Text]) -> None
+        """
+        Move a document into another parent.
+
+        :param dst: The new parent path
+        :param name: Rename the document if specified
+        """
+        doc = self.service.move(self.uid, dst, name)
+        self.load(doc)
+
+    def remove_permission(self, params):
+        # type: (Dict[Text, Any]) -> None
+        """ Remove a permission to a document. """
+        return self.service.remove_permission(self.uid, params)
+
+    def set(self, properties):
+        # type: (Dict[Text, Any]) -> None
+        """ Add/update the properties of the document. """
+        self.properties.update(properties)
+
+    def trash(self):
+        # type: () -> None
+        doc = self.service.trash(self.uid)
+        self.load(doc)
+
+    def unlock(self):
+        # type: () -> Dict[Text, Any]
+        """ Unlock the document. """
+        return self.service.unlock(self.uid)
+
+    def untrash(self):
+        # type: () -> None
+        doc = self.service.untrash(self.uid)
+        self.load(doc)
+
+
+class Group(Model):
+    """ User group. """
+
+    __slots__ = {
+        "entity_type": "group",
+        "grouplabel": None,
+        "groupname": None,
+        "memberGroups": [],
+        "memberUsers": [],
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.groupname
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the group. """
+        self.service.delete(self.uid)
+
+
+class Operation(Model):
+    """ Automation operation. """
+
+    __slots__ = {
+        "command": None,
+        "context": None,
+        "input_obj": None,
+        "params": {},
+        "progress": 0,
+    }
+
+    def execute(self, **kwargs):
+        # type: (Any) -> Any
+        """ Execute the operation. """
+        return self.service.execute(self, **kwargs)
+
+
+class Task(RefreshableModel):
+    """ Workflow task. """
+
+    __slots__ = {
+        "actors": [],
+        "comments": [],
+        "created": None,
+        "directive": None,
+        "dueDate": None,
+        "entity_type": "task",
+        "id": None,
+        "name": None,
+        "nodeName": None,
+        "state": None,
+        "targetDocumentIds": [],
+        "taskInfo": {},
+        "variables": {},
+        "workflowInstanceId": None,
+        "workflowModelName": None,
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.id
+
+    def complete(self, action, variables=None, comment=None):
+        # type: (Text, Optional[Dict[Text, Any]], Optional[Text]) -> None
+        """ Complete the action of a task. """
+        updated_task = self.service.complete(
+            self, action, variables=variables, comment=comment
+        )
+        self.load(updated_task)
+
+    def delegate(self, actors, comment=None):
+        # type: (Text, Optional[Text]) -> None
+        """ Delegate the task to someone else. """
+        self.service.transfer(self, "delegate", actors, comment=comment)
+        self.load()
+
+    def reassign(self, actors, comment=None):
+        # type: (Text, Optional[Text]) -> None
+        """ Reassign the task to someone else. """
+        self.service.transfer(self, "reassign", actors, comment=comment)
+        self.load()
+
+
+class User(RefreshableModel):
+    """ User. """
+
+    __slots__ = {
+        "entity_type": "user",
+        "extendedGroups": [],
+        "id": None,
+        "isAdministrator": False,
+        "isAnonymous": False,
+        "properties": {},
+    }
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.id
+
+    def change_password(self, password):
+        # type: (Text) -> None
+        """
+        Change user password.
+
+        :param password: New password to set
+        """
+        self.properties["password"] = password
+        self.save()
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the user. """
+        self.service.delete(self.uid)
+
+
+class Workflow(Model):
+    """ Workflow. """
+
+    __slots__ = {
+        "attachedDocumentIds": [],
+        "entity_type": "workflow",
+        "graphResource": None,
+        "id": None,
+        "initiator": None,
+        "name": None,
+        "state": None,
+        "title": None,
+        "variables": {},
+        "workflowModelName": None,
+    }
+
+    @property
+    def tasks(self):
+        # type: () -> List[Task]
+        """ Return the tasks associated with the workflow. """
+        return self.service.tasks(self)
+
+    @property
+    def uid(self):
+        # type: () -> Text
+        return self.id
+
+    def delete(self):
+        # type: () -> None
+        """ Delete the workflow. """
+        self.service.delete(self.uid)
+
+    def graph(self):
+        # type: () -> Dict[Text, Any]
+        """ Return a JSON representation of the workflow graph. """
+        return self.service.graph(self)
