@@ -1,0 +1,59 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+{% block pagecontent %}
+    <h1>Export Status</h1>
+
+    {%if access_key%}
+        {%fa fa-key text-success%} Access Key is defined
+    {%else%}
+        {%fa fa-exclamation-triangle text-danger%} Missing setting: <span class="code">BI_EXPORT_ACCESS_KEY</span>
+    {%endif%}<br />
+    {%if secret_key%}
+        {%fa fa-key text-success%} Secret Key is defined
+    {%else%}
+        {%fa fa-exclamation-triangle text-danger%} Missing setting: <span class="code">BI_EXPORT_SECRET_KEY</span>
+    {%endif%}<br />
+    <br />
+
+
+    The following models would be exported to S3 for BI/Cognos reporting:<br />
+
+    {%for app, models in exportable_models.items%}
+        <br />
+        <h2>{{app}}</h2>
+
+
+        {%if models.items%}
+            <table class="table" style="margin-left: 50px;width:auto;">
+            {%for mm, ss in models.items%}
+                <tr>
+                    <td>
+                        {%if 'Export Enabled' in ss%}
+                            {%fa fa-check text-success%}
+                        {%else%}
+                            {%fa fa-minus-circle text-danger%}
+                        {%endif%}
+                    </td>
+                    <th>{{mm}}</th>
+                    <td>{{ss}}</td>
+                </tr>
+            {%endfor%}
+            </table>
+            <div class="console" style="margin-left: 50px;">
+                <div style="font-size:.8em"><em># settings.py</em></div><br />
+                <b>{{export_settings|get:app|get:'name'}}</b> = {{export_settings|get:app|get:'value'}}<br />
+            </div>
+        {%else%}
+            <em class="text-muted" style="margin-left: 50px;">No models to export</em>
+        {%endif%}
+        <br />
+    {%endfor%}
+    <br />
+
+    <a href="{%url 'export:models'%}" class="btn btn-danger" target="_blank" style="text-decoration: none;">
+        {%fa fa-database fa-fw%}
+        Run Export Now <sup>{%fa fa-external-link fa-fw%}</sup>
+    </a>
+
+{% endblock %}
