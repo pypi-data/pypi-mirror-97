@@ -1,0 +1,13 @@
+{% load crispy_forms_field common_forms_tags %}
+
+<label for="{{ field.id_for_label }}"
+       class="{% if not forloop.first %}sr-only {% endif %}control-label{% if field.field.required %} requiredField{% endif %}">
+  {{ field.label|safe }}
+</label>
+<div id="div_{{ field.auto_id }}" class="form-group">
+  {% if acao in '4,x' %}
+    {% crispy_field field 'disabled' 'disabled' 'class' 'checkbox' %}
+  {% else %}
+    {% crispy_field field 'class' 'checkbox' %}
+  {% endif %}
+</div>

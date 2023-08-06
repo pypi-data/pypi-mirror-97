@@ -1,0 +1,59 @@
+{% load staticfiles i18n crispy_forms_tags common_forms_tags common_polymorphic_formset_tags %}
+
+<div id="detail-items-{{ formset.prefix }}" class="inline-group js-django-inlines"
+     data-options="{{ formset|as_script_options }}">
+  <!-- management_form -->
+  {#  {{ formset.management_form|crispy }}#}
+  {{ formset.management_form }}
+
+  <!-- formset id -->
+  {#  {{ formset|polymorphic_formset_id:formset }}#}
+  {{ formset|formset_id }}
+
+  <!-- formset -->
+  <div class="js-django-inlines-forms row">
+    {% for form in formset|include_empty_form %}
+      <div id="{{ form.prefix }}" data-inline-type="{{ form|as_form_type|lower }}"
+           class="inline-related col-sm-12{% if '__prefix__' in form.prefix %} empty-form{% endif %}">
+
+        {# form.non_field_errors #}
+        {{ form|as_non_field_errors }}
+
+        {# Add the 'pk' field that is not mentioned in crispy #}
+        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+        {% crispy form %}
+      </div>
+    {% endfor %}
+  </div>
+  {# show_add_button é usada no lugar de can_add pois um determinado campo pode não ser passível de adição, #}
+  {# apesar do form master ter permissão de adição #}
+  {% if show_add_button|default_if_none:None %}
+    <div class="row">
+      {# empty_forms é do polymorphic, são os forms das várias classes #}
+      {% if formset.empty_forms %}
+        {# django-polymorphic formset (e.g. PolymorphicInlineFormSetView) #}
+        <div class="btn-group" role="group">
+          <div class="row">
+            <div class="col-md-12"><label class="control-label">Incluir</label></div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 js-django-inlines-add">
+              {% for model in formset.child_forms %}
+                <a type="button" data-type="{{ model|as_model_name }}" style="margin-right: 10px;"
+                   class="js-django-inlines-add-form-{{ formset.prefix }} btn btn-success btn-xs"> {{ model|as_verbose_name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+          <div class="col-md-10 text-right js-django-inlines-add">
+            <a class="js-django-inlines-add-form-{{ formset.prefix }} btn btn-success btn-xs">Adicionar {{ formset|verbose_name_formset }}</a>
+          </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% if can_add|default_if_none:True %}
+<div class="row">&nbsp;</div>
+{% endif %}

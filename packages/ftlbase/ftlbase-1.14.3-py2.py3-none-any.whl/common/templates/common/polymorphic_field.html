@@ -1,0 +1,78 @@
+{# extends ajax|yesno:"base-frame.html,base.html" #}
+
+{% load staticfiles i18n crispy_forms_tags common_forms_tags common_polymorphic_formset_tags %}
+
+<div class="container-fluid" id="{{ formset.prefix }}-container">
+  <div class="row">
+    <div id="{{ formset.prefix }}-group" class="inline-group js-django-inlines"
+         data-options="{{ formset|as_script_options }}">
+      <!-- management_form -->
+      {{ formset.management_form }}
+
+      <!-- formset id -->
+      {{ form|polymorphic_formset_id:formset }}
+
+      <div class="js-django-inlines-forms row">
+        {% for form in formset|include_empty_form %}
+          {% block formset_form_wrapper %}
+            <div id="{{ form.prefix }}" data-inline-type="{{ form|as_form_type|lower }}"
+                 class="inline-related col-sm-12{% if '__prefix__' in form.prefix %} empty-form{% endif %}">
+              <div class="row">
+                <div class="col-md-11">
+                  <h2>
+                    <small>{{ form.instance|as_verbose_name }}</small>
+                  </h2>
+                </div>
+              </div>
+
+              {# form.non_field_errors #}
+              {{ form|as_non_field_errors }}
+
+              {# Add the 'pk' field that is not mentioned in crispy #}
+              {% for field in form.hidden_fields %}
+                {{ field }}
+              {% endfor %}
+
+              {% block formset_form %}
+                {% crispy form %}
+              {% endblock %}
+
+              {# Desabilitado porque é preferível usar o checkbox de delete e não um botão que remove da tela o form  #}
+              {# {% if formset.can_delete %}<div class="row text-right"><span class="glyphicon glyphicon-trash remove-button js-django-inlines-remove-form" title="{% trans 'Remove' %}"></span></div>{% endif %} #}
+            </div>
+          {% endblock %}
+        {% endfor %}
+      </div>
+
+      {# show_add_button não foi eliminada e usada can_add pois um determinado campo pode não ser passível de adição, #}
+      {# apesar do form master ter permissão de adição #}
+      {% if show_add_button|default_if_none:None %}
+        {% if formset.empty_forms %}
+          {# django-polymorphic formset (e.g. PolymorphicInlineFormSetView) #}
+          <div class="btn-group" role="group">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="control-label">
+                  Incluir
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 js-django-inlines-add">
+                {% for model in formset.child_forms %}
+                  <a type="button" data-type="{{ model|as_model_name }}" style="margin-right: 10px;"
+                     class="js-django-inlines-add-form-{{ formset.prefix }} btn btn-success btn-xs"> {{ model|as_verbose_name }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="col-md-10 text-right js-django-inlines-add">
+            <a class="js-django-inlines-add-form-{{ formset.prefix }} btn btn-success btn-xs">{% trans "Add" %}</a>
+          </div>
+        {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>

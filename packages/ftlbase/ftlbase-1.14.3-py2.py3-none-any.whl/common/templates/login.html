@@ -1,0 +1,217 @@
+{% load i18n staticfiles %}{% load crispy_forms_tags %}{% load common_forms_tags %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:"pt-br" }}">
+<head>
+<title role="title">FTL Informática - {% block title_html %}Início{% endblock %}</title>
+{# Bootstrap 3.3.7 #}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha256-ZT4HPpdCOt2lvDkXokHuhJfdOKSPFLzeAJik5U/Q+l4=" crossorigin="anonymous" />
+<link href="{% static 'css/fontawesome.css' %}" rel="stylesheet">
+{% block extrastyle %}{% endblock %}
+<link href="{% static 'css/ftl.css' %}" rel="stylesheet">{# Deve ser a última a carregar pois altera css anterior #}
+{% block extrahead %}{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+</head>
+
+<body role="document" class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"data-admin-utc-offset="{% now "Z" %}">
+<!-- Container -->
+<div id="container">
+  {% if not is_popup %}
+    <!--div id="background" ></div-->
+
+    <!-- Header -->
+    <div id="header">
+        {% if user.is_active %}
+        {% block menu %}
+        <div id="menu">
+            {% include "menu.html" %}
+        </div>
+        {% endblock %}
+        {% endif %}
+        <div id="branding">{% block branding %}{% endblock %}</div>
+        {% block nav-global %}{% endblock %}
+    </div>
+    <!-- END Header -->
+    {% comment Analisar como usar mais tarde %}
+    {% if user.is_active %}
+     {% block breadcrumbs %}
+     <ol class="breadcrumb">
+      <!--li><a href="{{ site_url }}">{% trans 'Home' %}</a></li-->
+      {% if title %}{{ title }}{% endif %}
+      <!--li><a href="#">&rsaquo; Library</a></li>
+      <li class="active">Data</li-->
+     </ol>
+     {% endblock %}
+    {% endif %}
+  {% endcomment %}
+  {% endif %}
+
+    <!-- Content -->
+    <div id="content">
+        {% block pretitle %}{% endblock %}
+        {% block content_h1 %}{% if h1 %}<h1 role="h1">{{ h1 }}</h1>{% endif %}{% endblock %}
+        {% if not user.is_active %}
+        {% block login %}
+        <div id="login">
+         <form class="form-horizontal" name="LoginForm" action="/common/login/" method="post">
+          {% csrf_token %}
+          {% if request.GET.next %}
+           <input type="hidden" id="next" name="next" value="{{ request.GET.next }}" />
+          {% else %}
+          {% if next %}
+           <input type="hidden" id="next" name="next" value="{{ next }}" />
+          {% endif %}
+          {% endif %}
+          <div class="col-md-12 bg-primary text-center" style="font-size:24px;padding:10px;">FTL Informática</div>
+          <div class="col-md-12">
+           <label class="control-label requiredField">Username</label>
+           <input class="textinput textInput form-control" id="username" maxlength="60" name="username" placeholder="Username" type="text" />
+          </div>
+          <div class="col-md-12">
+           <label class="control-label requiredField" for="password">Password</label>
+           <input class="textinput textInput form-control" id="username" maxlength="60" name="password" placeholder="Password" type="password" />
+          </div>
+          <div class="col-md-12 text-center" style="vertical-align:middle;padding:10px;">
+           <input type="submit" name="save" value="Login" class="btn btn-primary btn-sm"/>
+          </div>
+         </form>
+        </div>
+        {% endblock %}
+        {% endif %}
+        {% block content %}
+         {% block object-tools %}{% endblock %}
+         {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+    </div>
+    <!-- END Content -->
+
+    {% block footer %}<div id="footer"></div>{% endblock %}
+    <!-- Errors -->
+    {% block messages %}
+    {% if messages %}
+    <div id="erros" class="container" style="margin-top:20px">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}info{% endif %} col-md-8 col-md-offset-2"  style="margin-top:20px" role="alert">{{ message|capfirst }}</div>
+    </div>
+    {% endfor %}
+    </div>
+    {% endif %}
+    {% endblock messages %}
+{% comment "Teoricamente os campos com erros são mostrados no form master, mas não no formset detail " %}
+{% endcomment %}
+  <!--div id='form-errors'>{{ form_errors }} {{ form.non_field_errors }} {{ form.errors }} </div-->
+  <div id='form-errors' class="container" style="margin-top: 20px;">
+    {% with form|nice_errors as qq %}
+     {% for error_name,desc in qq.items %}
+      <div  class="row">&nbsp;</div><div  class="row"><div class="alert alert-danger col-md-10" role="alert">{% if master %}Aba de {{ master }}<br><br>{% endif %}{{ error_name }}: {{ desc }}</div></div>
+     {% endfor %}
+    {% endwith %}
+    {% for f,msg in form.non_field_errors.items %}
+     {% if f %}
+      <div  class="row">&nbsp;</div><div  class="row"><div class="alert alert-danger col-md-10" role="alert">{% if master %}Aba de {{ master }}<br><br>{% endif %}{{ f }}</div></div>
+     {% endif %}
+    {% endfor %}
+  </div>
+  <!--div id='formset-errors'>{{ formset_errors }} {{ formset.non_field_errors }} {{ formset.errors }} </div-->
+  <div id='formset-errors' class="container" style="margin-top: 20px;">
+    {% with formset|nice_errors as qq %}
+     {% for error_name,desc in qq.items %}
+      <div  class="row col-md-11">&nbsp;</div><div  class="row col-md-11"><div class="alert alert-danger col-md-10" role="alert">{% if detail %}Aba de {{ detail }}<br><br>{% endif %}{{ f }}{{ msg }}{{ error_name }}: {{ desc }}</div></div>
+     {% endfor %}
+    {% endwith %}
+    {% for f,msg in formset.non_field_errors.items %}
+     {% if f %}
+      <div  class="row">&nbsp;</div><div  class="row"><div class="alert alert-danger col-md-10" role="alert">{% if detail %}Aba de {{ detail }}<br><br>{% endif %}{{ f }}{{ msg }}{{ f }}{{ msg }}{{ f }}</div></div>
+     {% endif %}
+    {% endfor %}
+  </div>
+  <!-- END Errors -->
+  <div id="commonLoad" class="commonLoad" ><i class="fa fa-spinner fa-pulse fa-3x" aria-hidden="true"style="color:#09568d"></i></div>
+</div>
+<!-- END Container -->
+
+</body>
+<script>
+(function(funcName, baseObj) {
+    // The public function name defaults to window.docReady
+    // but you can pass in your own object and own function name and those will be used
+    // if you want to put them in a different namespace
+    funcName = funcName || "docReady";
+    baseObj = baseObj || window;
+    var readyList = [];
+    var readyFired = false;
+    var readyEventHandlersInstalled = false;
+
+    // call this when the document is ready
+    // this function protects itself against being called more than once
+    function ready() {
+        if (!readyFired) {
+            // this must be set to true before we start calling callbacks
+            readyFired = true;
+            for (var i = 0; i < readyList.length; i++) {
+                // if a callback here happens to add new ready handlers,
+                // the docReady() function will see that it already fired
+                // and will schedule the callback to run right after
+                // this event loop finishes so all handlers will still execute
+                // in order and no new ones will be added to the readyList
+                // while we are processing the list
+                readyList[i].fn.call(window, readyList[i].ctx);
+            }
+            // allow any closures held by these functions to free
+            readyList = [];
+        }
+    }
+
+    function readyStateChange() {
+        if ( document.readyState === "complete" ) {
+            ready();
+        }
+    }
+
+    // This is the one public interface
+    // docReady(fn, context);
+    // the context argument is optional - if present, it will be passed
+    // as an argument to the callback
+    baseObj[funcName] = function(callback, context) {
+        // if ready has already fired, then just schedule the callback
+        // to fire asynchronously, but right away
+        if (readyFired) {
+            setTimeout(function() {callback(context);}, 1);
+            return;
+        } else {
+            // add the function and context to the list
+            readyList.push({fn: callback, ctx: context});
+        }
+        // if document already ready to go, schedule the ready function to run
+        if (document.readyState === "complete") {
+            setTimeout(ready, 1);
+        } else if (!readyEventHandlersInstalled) {
+            // otherwise if we don't have event handlers installed, install them
+            if (document.addEventListener) {
+                // first choice is DOMContentLoaded event
+                document.addEventListener("DOMContentLoaded", ready, false);
+                // backup is window load event
+                window.addEventListener("load", ready, false);
+            } else {
+                // must be IE
+                document.attachEvent("onreadystatechange", readyStateChange);
+                window.attachEvent("onload", ready);
+            }
+            readyEventHandlersInstalled = true;
+        }
+    }
+})("docReady", window);
+
+{# docReady(fn) é equivalente a $(document).ready(fn) #}
+docReady(function() {
+  if (document.URL.indexOf('#')>=0) {
+    document.getElementById("next").setAttribute('value', document.URL.slice(document.URL.indexOf('#')+1));
+  }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+
+</html>

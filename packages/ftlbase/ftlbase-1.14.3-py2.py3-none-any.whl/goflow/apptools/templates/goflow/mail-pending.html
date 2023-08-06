@@ -1,0 +1,27 @@
+<html>
+  <head>Pendências</head>
+  <body>
+{% comment %}
+You can use these variables:
+- workitems
+- user
+- url_prefix (like "http://myhost.com/", with myhost.com defined in the user profile field [web_host])
+
+The "subject" parameter (urls.py) is a template string too, with these variables
+availables:
+-workitems
+-user
+{% endcomment %}
+Olá {{ user.name }},<br>
+<br>
+O item abaixo está pendente e sua atenção é necessária:<br>
+<br>
+{% for wi in workitems %}
+- {{ wi.instance.pk }} - {{ wi.instance.content_object }}<br>
+{% endfor %}
+<br>
+<br>
+Por favor, acesse o sistema e dê andamento nas suas pendências: <a href="{{ site }}{% url 'workflow_pending' %}">{{ site }}{% url 'workflow_pending' %}</a>.<br>
+<br>
+</body>
+</html>

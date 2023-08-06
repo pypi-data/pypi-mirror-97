@@ -1,0 +1,30 @@
+<html>
+  <head>Pendências</head>
+  <body>
+{% comment %}
+You can use these variables:
+- workitems
+- user
+- url_prefix (like "http://myhost.com/", with myhost.com defined in the user profile field [web_host])
+
+The "subject" parameter (urls.py) is a template string too, with these variables
+availables:
+-workitems
+-user
+{% endcomment %}
+Olá {{ user.name }},<br>
+<br>
+{% if workitems.count > 1 %}
+Os itens abaixo falharam, favor revisar os Workflows.
+{% else %}
+O item abaixo falhou, favor revisar Workflow.
+{% endif %}<br>
+<br>
+{% for wi in workitems %}
+Workflow:  {{wi.instance.process}}<br>
+Atividade: {{wi.activity}}<br>
+Instância: {{wi.instance}}<br>
+<br>
+{% endfor %}
+</body>
+</html>

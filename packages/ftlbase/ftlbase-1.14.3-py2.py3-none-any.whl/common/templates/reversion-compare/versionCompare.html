@@ -1,0 +1,133 @@
+{% extends ajax|yesno:"base-frame.html,base.html" %}
+{% spaceless %}
+
+{% load staticfiles i18n crispy_forms_tags common_forms_tags common_polymorphic_formset_tags %}
+
+{% block title_html %}{{ title }}{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <style type="text/css">
+        /* minimal style for the diffs */
+        del, ins {color: #000;text-decoration: none;}
+        del { background-color: #ffe6e6; }
+        ins { background-color: #e6ffe6; }
+        sup.follow { color: #5555ff; }
+    </style>
+    <div class="row">
+      <fieldset class="col-md-11 ">
+        <legend>{{ title }}</legend>
+        <div class="row">
+          <div class="col-xs-11">
+    <!--        <h3><p>{{ title }}</p><p></p></h3>-->
+            <h4><p>{{ name }} de {{ v_new.revision.date_created }}</p></h4>
+            <h4><p>{% if v_old %}Versão anterior de {{ v_old.revision.date_created }}{% else %}Não há versão anterior para comparar.{% endif %}</p></h4>
+          </div>
+          <div class="col-xs-11">
+
+{% for field_diff in compare_data %}
+  {# Só mostra campos que não são FKs ou não há follow, porque esses são tratados depois #}
+  {% if not field_diff.is_related or not field_diff.follow %}
+            <label class="control-label">
+              {% firstof field_diff.field.verbose_name field_diff.field.related_name %}{% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}
+              {% if field_diff.field.help_text %}
+                <div class="help-block">
+                {{ field_diff.field.help_text }}
+                </div>
+              {% endif %}
+            </label>
+            <div class="module">
+                <p>{{ field_diff.diff }}</p>
+            </div>
+  {% endif %}
+{% empty %}
+  {% if v_old %}
+            <div class="module">
+              <p><strong>Não há diferenças.</strong></p>
+            </div>
+  {% endif %}
+{% endfor %}
+          </div>
+        </div>
+      </fieldset>
+    </div>
+{# List followed FKs #}
+{% if compare_data_fk %}
+    <div class="row">
+      <fieldset class="col-md-11 ">
+        <legend>Dados relacionados</legend>
+      </fieldset>
+    </div>
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  {% for fk in compare_data_fk %}
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading{{ forloop.counter0 }}">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter0 }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter0 }}">
+          <h4><p>{{ fk.v_new.object }}</p></h4>
+          <p style="font-size: 14px">{{ fk.v_new.object|verbose_name }} de {{ fk.v_new.revision.date_created }}</p>
+          <p style="font-size: 14px">{% if fk.v_old %}Versão anterior de {{ fk.v_old.revision.date_created }}{% else %}Não há versão anterior para comparar.{% endif %}</p>
+          {% if not fk.compare_data %}
+            <div class="module">
+              <p style="font-size: 14px"><strong>Não há diferença.</strong></p>
+            </div>
+          {% endif %}
+        </a>
+      </h4>
+    </div>
+    <div id="collapse{{ forloop.counter0 }}" class="panel-collapse collapse {% if fk.compare_data %}in{% endif %}" role="tabpanel" aria-labelledby="heading{{ forloop.counter0 }}">
+      <div class="panel-body">
+    {% for field_diff in fk.compare_data %}
+            <label class="control-label">
+              {% firstof field_diff.field.verbose_name field_diff.field.related_name %}{% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}
+              {% if field_diff.field.help_text %}
+                <div class="help-block">
+                {{ field_diff.field.help_text }}
+                </div>
+              {% endif %}
+            </label>
+            <div class="module">
+                <p>{{ field_diff.diff }}</p>
+            </div>
+{#    {% empty %} #}
+{#      {% if v_old %} #}
+{#            <div class="module"> #}
+{#              <p><strong>Não há diferenças.</strong></p> #}
+{#            </div> #}
+{#      {% endif %} #}
+    {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{# END List followed FKs #}
+
+{% if v_old %}
+    <div class="row">
+      <div class="col-xs-12">
+        <p class="follow">
+          * Textos marcado com <del>vermelho</del> foram removidos, textos marcados com <ins>verde</ins> foram inseridos
+        </p>
+      </div>
+    </div>
+{% endif %}
+
+{% if linkCancel %}
+    <div class="col-xs-11 text-right buttons-do-form">
+      <div class="controls ">
+        <input type="button" name="cancel" value="Retornar" class="btn btn-cancel btn-sm" id="button-id-cancel" onclick="{{linkCancel}}">
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+  {% if objetos.opts.footerForm %}
+  <div class="">
+    {% crispy objetos.opts.footerForm %}
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% endspaceless %}

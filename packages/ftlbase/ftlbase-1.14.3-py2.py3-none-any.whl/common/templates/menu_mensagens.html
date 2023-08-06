@@ -1,0 +1,34 @@
+{% load static %}
+<li class="dropdown messages-menu">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-envelope-o"></i>
+    <span class="label label-success">{{ menu_mensagens.count }}</span>
+  </a>
+  <ul class="dropdown-menu">
+  {% if menu_mensagens.count > 0 %}
+    <li class="header">Você {% if menu_mensagens.count > 1 %}têm {{ menu_mensagens.count }} mensagens{% else %}tem 1 mensagem{% endif %}.</li>
+    <li>
+      <ul class="menu">
+  {% for row in menu_mensagens|slice:":3" %}
+        <li>
+          <a href="#">
+            <div class="pull-left">
+              {% if user.get_username %}<img src="{% static 'img/' %}{% firstof user.get_username %}.jpg" class="img-circle" alt="User Image">{% endif %}
+            </div>
+            <h4>
+              Support Team
+              <small><i class="fa fa-clock-o"></i> 5 mins</small>
+            </h4>
+            <!-- The message -->
+            <p>Why not buy a new awesome theme?</p>
+          </a>
+        </li>
+  {% endfor %}
+      </ul>
+    </li>
+    <li class="footer"><a href="#">Ver todas as mensagens.</a></li>
+  {% else %}
+    <li class="header">Não há novas mensagens.</li>
+  {% endif %}
+  </ul>
+</li>

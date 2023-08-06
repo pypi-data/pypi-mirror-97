@@ -1,0 +1,110 @@
+{% extends ajax|yesno:"base-frame.html,base.html" %}
+{% spaceless %}
+
+{% load staticfiles i18n crispy_forms_tags common_forms_tags common_polymorphic_formset_tags %}
+
+{% block title_html %}{{ title }}{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <form method="post">
+      <div class="row">
+        {% csrf_token %}
+        {% if form.helper %}
+          {% crispy form form.helper %}
+        {% else %}
+          {% crispy form %}
+        {% endif %}
+      </div>
+
+      {% for formset in detail %}
+        <div id="detail{{ forloop.counter0 }}" class="row">
+          {% if formset.isTree %}
+            <div id="{{ idTree }}" data-url="{{ dataUrl }}"></div>
+            <div id="ftl-form-modal"></div>
+          {% else %}
+            <div id="detail-items-{{ formset.formset.prefix }}" class="inline-group js-django-inlines"
+                 data-options="{{ formset|as_script_options }}">
+              {# {{ formset.formset.management_form|crispy }} #}
+              {{ formset.formset.management_form }}
+
+              <!-- formset id -->
+              {{ form|polymorphic_formset_id:formset }}
+
+              <div class="js-django-inlines-forms row">
+                {% for form in formset.formset|include_empty_form %}
+                  <div id="{{ form.prefix }}" data-inline-type="{{ form|as_form_type|lower }}"
+                       class="inline-related col-sm-12{% if '__prefix__' in form.prefix %} empty-form{% endif %}">
+
+                    {# form.non_field_errors #}
+                    {{ form|as_non_field_errors }}
+
+                    {# Add the 'pk' field that is not mentioned in crispy #}
+                    {% for field in form.hidden_fields %}
+                      {{ field }}
+                    {% endfor %}
+
+                    {% if form.helper %}
+                      {% crispy form form.helper %}
+                    {% else %}
+                      {% crispy form %}
+                    {% endif %}
+                    {#                  {% crispy form %}#}
+                  </div>
+                {% endfor %}
+              </div>
+              {# show_add_button é usada no lugar de can_add pois um determinado campo pode não ser passível de adição, #}
+              {# apesar do form master ter permissão de adição #}
+              {% if show_add_button|default_if_none:None %}
+                {% if formset.formset.empty_forms %} {# empty_forms é do polymorphic, são os forms das várias classes #}
+                  {# django-polymorphic formset (e.g. PolymorphicInlineFormSetView) #}
+                  <div class="btn-group" role="group">
+                    <div class="row">
+                      <div class="col-md-12"><label class="control-label">Incluir</label></div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12 js-django-inlines-add">
+                        {% for model in formset.child_forms %}
+                          <a type="button" data-type="{{ model|as_model_name }}" style="margin-right: 10px;"
+                             class="js-django-inlines-add-form-{{ formset.formset.prefix }} btn btn-success btn-xs"> {{ model|as_verbose_name }}</a>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="col-md-10 text-right js-django-inlines-add">
+                    <a class="js-django-inlines-add-form-{{ formset.formset.prefix }} btn btn-success btn-xs">Adicionar {{ formset.formset|verbose_name_formset }}</a>
+                  </div>
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {# Erros gerados no formset - datail #}
+      <div id='formset-errors' class="" style="margin-top: 20px;">
+        {% with formset|nice_errors as qq %}
+          {% for error_name,desc in qq.items %}
+            <div class="row ">&nbsp;</div>
+            <div class="row">
+              <div class="alert alert-danger col-md-10" role="alert">{% if detail %}Aba de {{ detail }}<br>
+                <br>{% endif %}{{ f }}{{ msg }}{{ error_name }}: {{ desc }}</div>
+            </div>
+          {% endfor %}
+        {% endwith %}
+        {% for f,msg in formset.non_field_errors.items %}
+          {% if f %}
+            <div class="row">&nbsp;</div>
+            <div class="row">
+              <div class="alert alert-danger col-md-10" role="alert">{% if detail %}Aba de {{ detail }}<br>
+                <br>{% endif %}{{ f }}{{ msg }}{{ f }}{{ msg }}{{ f }}</div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% endspaceless %}

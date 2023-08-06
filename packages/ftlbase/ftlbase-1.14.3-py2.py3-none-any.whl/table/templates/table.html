@@ -1,0 +1,292 @@
+{% spaceless %}
+{% load staticfiles %}
+{% load l10n %}
+{% load table_tags %}
+{% load crispy_forms_tags %}
+
+{% block title_html %} {{ title }} {% endblock %}
+
+{% block content %}
+  <div class="">
+    {% render_table objetos %}
+  </div>
+  {% if objetos.opts.footerForm %}
+  <div class="">
+    {% crispy objetos.opts.footerForm %}
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block extrajavascript %}
+{# DAL - Django Autocomplete Light coloca em media do Widget o css usado e os js #}
+{{ form.media.js }}
+
+{% if not ajax %}
+<script>
+{% endif %}
+function stopPropagation(evt) {
+    if (evt.stopPropagation !== undefined) {
+        evt.stopPropagation();
+    } else {
+        evt.cancelBubble = true;
+    }
+}
+
+$(document).ready(function() {
+
+    var filterFunc = function (sData) {
+        return sData.replace(/\n/g," ").replace( /<.*?>/g, "" );
+    };
+
+    // Configuração global do Dataables para reconhecer data automaticamente usando moments.js
+    $.fn.dataTable.moment( 'DD/MM/YYYY' );
+
+    // Cria botão de refresh para Datatables
+    $.fn.dataTable.ext.buttons.refresh = {
+      text: 'Refresh',
+      action: function (e, dt, node, config) {
+        {#dt.clear().draw();#}
+        dt.ajax.reload();
+      }
+    };
+
+    var table = $('#{{ objetos.opts.id }}').dataTable({
+        "destroy": true,
+        "dom": "{{ objetos.addons.render_dom }}",
+        "preDrawCallback":function() {
+            document.getElementById('ftl-page-load').value='loading';
+        },
+        "drawCallback":function() {
+            $("#{{ objetos.opts.id }}_wrapper").show();
+                this.api().columns.adjust();
+            document.getElementById('ftl-page-load').value='loaded';
+        },
+        {% if objetos.opts.ajax %}
+        "processing": true,
+        "serverSide": true,
+        // Responsive não funciona muito bem pois muitas vezes mesmo tendo espaço suficiente gera o detalhe sem necessidade
+        "responsive": true,
+        "ajaxSource": {% if objetos.opts.ajax_source %}"{{ objetos.opts.ajax_source }}"{% else %}"{% url 'feed_data' objetos.token %}"{% endif %},
+        {% endif %}
+        "paging": {% if objetos.opts.pagination %}true{% else %}false{% endif %},
+        "pageLength": {{ objetos.addons.pagination.length }},
+        "lengthMenu": [[10, 25, 50, 100, 200, -1], [10, 25, 50, 100, 200, "Todos"]],
+        "buttons": {
+            dom: {
+                button: {
+                    className: 'btn btn-sm btn-space'
+                },
+                container: {
+                    "className": ''
+                }
+            },
+            buttons: [
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.print %}{extend: 'print', text: '<i class="far fa-print"></i>', titleAttr: 'Imprimir', className: 'btn btn-primary btn-sm'},{% endif %}
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.pdf %}{extend: 'pdf', text: '<i class="far fa-file-pdf"></i>', titleAttr: 'Gerar PDF', className: 'btn btn-primary btn-sm'},{% endif %}
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.copy %}{extend: 'copy', text: '<i class="far fa-copy"></i>', titleAttr: 'Copiar', className: 'btn btn-primary btn-sm'},{% endif %}
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.excel %}{extend: 'excel', text: '<i class="far fa-file-spreadsheet"></i>', titleAttr: 'Exportar para Excel', className: 'btn btn-primary btn-sm'},{% endif %}
+{% if objetos.opts.ajax and objetos.addons.std_button.visible and objetos.addons.std_button.refresh %}{extend: 'refresh', text: '<i class="far fa-sync-alt"></i> Atualizar', titleAttr: 'Atualizar', className: 'btn btn-primary'},{% endif %}
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.create %}
+{
+    "text": '{% if objetos.addons.std_button.create.icon != '' %}<i class="{{ objetos.addons.std_button.create.icon }}" style="color:#ffffff;"></i> {% endif %}{{ objetos.addons.std_button.create.text|safe }}',
+    "className": '{% if objetos.addons.std_button.create.className %}{{ objetos.addons.std_button.create.className }}{% else %}btn btn-primary btn-sm{% endif %}',
+    "action": function ( e, dt, node, conf ) {
+        window.location.href = window.location.href+"{{ objetos.addons.std_button.create.href|safe }}";
+    }
+},{% endif %}
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.ret.text %}
+{
+    "text": '{{ objetos.addons.std_button.ret.text|safe }}',
+    "className": '{% if objetos.addons.std_button.ret.className %}{{ objetos.addons.std_button.ret.className }}{% else %}btn btn-primary btn-sm{% endif %}',
+    "action": function ( e, dt, node, conf ) {
+        window.location.href = "{% if objetos.addons.std_button.ret.action %}{{ objetos.addons.std_button.ret.action|safe }}{% else %}{{linkCancel}}{% endif %}";
+    }
+},{% endif %}
+{% if objetos.opts.ext_button %}
+    {% for button in objetos.opts.ext_button %}
+        {
+            "text": '{% if button.icon != '' %}<i class="{{ button.icon }}" style="color:#ffffff;"></i> {% endif %}{{ button.text|safe }}',
+            "className": '{% if button.className %}{{ button.className }}{% else %}btn btn-primary btn-sm{% endif %}',
+            "action": {% if button.action %} {{ button.action|safe }} {% else %} function ( e, dt, node, conf ) {
+                    window.location.href = "{{ button.href|safe }}";
+                }{% endif %}
+        },
+    {% endfor %}
+{% endif %}
+            ]
+        },
+        "stateSave": {% if objetos.opts.stateSave %}true{% else %}false{% endif %},
+        "sScrollX": "100%",
+        {#"sScrollXInner": "100%",#}
+        "sScrollXInner": "{{ objetos.opts.scrollinner }}",
+        "bScrollCollapse": true,
+        {% if objetos.opts.scrollable %}
+        "orderCellsTop": true,
+        "scrollCollapse": true,
+        {% endif %}
+        "searchDelay": 650,
+        "searchHighlight": true,
+        "order": [
+            {% for index, order in objetos.opts.sort %}
+            [ {{ index }}, "{{ order }}" ],
+            {% endfor %}
+         ],
+        "columns": [
+            {% for column in objetos.columns %}
+            {% if column.space %}
+            {
+                {% if column.attrs %}
+                {% for key, value in column.attrs.items %}
+                "{{ key|safe }}": "{{ value|safe }}",
+                {% endfor %}
+                {% endif %}
+                {% if not column.searchable %}"searchable": false,{% endif %}
+                {% if not column.sortable %}"orderable": false,{% endif %}
+                "visible": {% if column.visible %} true, "className": "{{ column.className }}" {% else %} false, "className": "never {{ column.className }}" {% endif %},
+                {% if column.renderFormat %}
+                "render": {{ column.renderFormat|safe }},
+                {% elif column.links %}
+                "render": function(data, type, full) {
+                    return type === 'filter' ? $(data).text() : data;
+                },
+                {% endif %}
+            },
+            {% endif %}
+            {% endfor %}
+
+        ],
+        "language": {
+            "info": "{{ objetos.addons.info_label.format }}",
+            "infoEmpty": "{{ objetos.addons.info_label.format }}",
+            "zeroRecords": "{{ objetos.opts.zero_records }}",
+            "paginate": {
+                "first": "{{ objetos.addons.pagination.first }}",
+                "last": "{{ objetos.addons.pagination.last }}",
+                "next": "{{ objetos.addons.pagination.next }}",
+                "previous": "{{ objetos.addons.pagination.prev }}"
+            },
+            "lengthMenu": "_MENU_ resultados por página",
+            "loadingRecords": "Espere por favor, carregando dados...",
+            "decimal": ",",
+            "thousands": ".",
+            "processing": "Processando...",
+            "search": "",
+            "sInfoFiltered": "(filtrados de _MAX_ registros)",
+        },
+        {% if tableScript %}{{ tableScript }}{% endif %}
+        "initComplete": function(oSettings, json) {
+            var api = this.api();
+            {% if objetos.opts.ext_button %}
+            // $("#{{ objetos.opts.id }}_wrapper .ext-btn").append('{{ objetos.addons.ext_button.html }}');
+            // api.buttons().container()
+            //    .appendTo( '#{{ objetos.opts.id }}_wrapper .col-sm-6:eq(0)' );
+            {% endif %}
+            {% if objetos.opts.search %}
+            $("#{{ objetos.opts.id }}_wrapper .dataTables_filter input").wrap('<div class="input-group"></div>');
+            $("#{{ objetos.opts.id }}_wrapper .dataTables_filter input").before('<span class="input-group-addon filter_icon"><i class="glyphicon glyphicon-search"></i></span>');
+            $("#{{ objetos.opts.id }}_wrapper .dataTables_filter input").attr("placeholder", "{{objetos.opts.std_button_cancel}} {{ objetos.addons.search_box.placeholder }}");
+            {% endif %}
+            {% for column in objetos.columns %}{% if column.footer %}$(api.column({{ forloop.counter0 }}).footer()).html("{{column.footer}}");
+            {% endif %}{% endfor %}
+        }{% if objetos.opts.totals %},
+        "footerCallback": function ( row, data, start, end, display ) {
+            {#var api = this.api(), data;#}
+            var api = this.api();
+            {# Remove the formatting to get integer data for summation #}
+            var intVal = function ( i ) {
+              var a = i;
+              {# Se tem ponto na posição length-3, então é padrão en, se tem vírgula, então padrão pt-BR #}
+              if (typeof a === 'string') {
+                a = a.trim();
+                {#if (a.indexOf('.') === (a.length-3)) {#}
+                if ([(a.length-2), (a.length-3)].includes(a.indexOf('.')) ) {
+                    return parseFloat(a);
+                } else {
+                    return i.replace(/[\$.]/g, '').replace(/[\$,]/g, '.')*1
+                }
+              }
+              return typeof i === 'number' ? i : 0;
+            };
+
+            var haTotal = false;
+            {% for column in objetos.columns %}{% if column.totals %}
+            haTotal = true;
+            {# Total over all pages #}
+            var totalFinal{{ forloop.counter0 }} = 0;{% endif %}{% endfor %}
+
+            if (haTotal) {
+              api.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                var data = this.data();
+                //console.log('row: ', rowIdx);
+            {% for column in objetos.columns %}{% if column.totals %}
+                totalFinal{{ forloop.counter0 }} += intVal(data[{{ forloop.counter0 }}]);{% endif %}{% endfor %}
+              } );
+            }
+
+            {% for column in objetos.columns %}
+            {% if column.totals %}
+            if (api.column({{ forloop.counter0 }}).data().length > 0){
+              var total{{ forloop.counter0 }} = api
+                  .column( {{ forloop.counter0 }} )
+                  .data()
+                  .reduce( function (a, b) {
+                      return intVal(a) + intVal(b);
+                  }, 0 );
+              total{{ forloop.counter0 }} = typeof total{{ forloop.counter0 }} === 'number' ? total{{ forloop.counter0 }} : 0;
+
+              {# Total over this page #}
+              var pageTotal{{ forloop.counter0 }} = api
+                  .column( {{ forloop.counter0 }}, { page: 'current'} )
+                  .data()
+                  .reduce( function (a, b) {
+                      return intVal(a) + intVal(b);
+                  }, 0 );
+              pageTotal{{ forloop.counter0 }} = typeof pageTotal{{ forloop.counter0 }} === 'number' ? pageTotal{{ forloop.counter0 }} : 0;
+
+              {# Update footer $( api.column( 8 ).footer() ).html( numFormat( askingTotal ) ); #}
+              $( api.column( {{ forloop.counter0 }} ).footer() ).html(
+                accounting.formatMoney(pageTotal{{ forloop.counter0 }}, {symbol: "", precision: {{ column.decimal_places }}, decimal : ",", thousand: ".", format: {pos : "%v", neg : "\(%v\)", zero: "--"} } )
+              );
+            }
+            else {
+              var total = 0;
+              var pageTotal = 0;
+            }
+            {% endif %}
+            {% endfor %}
+        }
+        {% endif %}
+    });
+
+{% if objetos.addons.std_button.visible and objetos.addons.std_button.create and 1 == 0 %}
+    riot.mount('li#ftl-menu-button', 'ftl-menu-button', {
+        text: '{{ objetos.addons.std_button.create.text|safe }}',
+        classList: '{% if objetos.addons.std_button.create.className != '' %}{{ objetos.addons.std_button.create.className }}{% else %}btn btn-primary btn-sm{% endif %}',
+        href: '{{ objetos.addons.std_button.create.action|safe }}',
+        icon: '{{ objetos.addons.std_button.create.icon|safe }}'
+    });
+{% endif %}
+
+{% if objetos.opts.scrollable %}
+{% if objetos.opts.fixed_columns or objetos.opts.fixed_columns_width %}
+    new $.fn.dataTable.FixedColumns(table, {
+ 		{% if objetos.opts.fixed_columns %}"iLeftColumns": {{ objetos.opts.fixed_columns }},{% endif %}
+		{% if objetos.opts.fixed_columns_width %}"iLeftWidth": {{ objetos.opts.fixed_columns_width }}{% endif %}
+ 	});
+    {% endif %}
+{% endif %}
+
+  {# Tratamento do título no form do header da table e dos campos a serem desabilitados #}
+  var titleForm = $('#titleForm .disableMe');
+  titleForm.attr('disabled', 'disabled');
+
+{% if extrajavascript %}{{ extrajavascript|safe }}{% endif %}
+
+});
+
+{% if not ajax %}
+</script>
+{% endif %}
+{% endblock %}
+
+{% endspaceless %}

@@ -1,0 +1,29 @@
+{% extends ajax|yesno:"base-frame.html,base.html" %}
+{% spaceless %}
+{% load staticfiles %}
+{% load l10n %}
+{% load goflow %}
+
+{% block title_html %} {{ process.title }} {% endblock %}
+
+{% block content %}
+<div class="modal-body text-center">
+<div class="chart">
+{% graph %}
+</div>
+</div>
+{% endblock %}
+
+{% block extrajavascript %}
+{% if not ajax %}
+<script>
+{% endif %}
+
+{% if extrajavascript %}{{ extrajavascript|safe }}{% endif %}
+
+{% if not ajax %}
+</script>
+{% endif %}
+{% endblock %}
+
+{% endspaceless %}

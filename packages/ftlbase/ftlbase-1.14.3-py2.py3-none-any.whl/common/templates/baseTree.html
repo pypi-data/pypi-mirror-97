@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load common_forms_tags %}
+
+<div class="modal" id="editModal" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+     <form id="modalForm" class="form-group" method="POST">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        {# crispy form  #}
+      </div>
+      <div class="modal-footer">
+        <input id="contextMenuID" type="hidden" value="">
+        <input id="contextMenuParent" type="hidden" value="">
+        <input id="pk" type="hidden" value="{{ pk }}">
+        <button type="submit" name="DELETE" id="modal-button-delete" class="btn btn-danger btn-sm">Confirmar exclusão do registro</button>
+        <button type="submit" name="save" id="modal-button-save" class="btn btn-primary btn-sm">Salvar</button>
+        <button type="button" name="cancel" id="modal-button-cancel" class="btn btn-default btn-sm" data-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none">
+  <li><a tabindex="-1">Conta Contábil</a></li>
+  <li class="divider"></li>
+  <li><a id="contextCreate" tabindex="-1" href="#">Criar uma nova</a></li>
+  <li><a id="contextAlter"  tabindex="-1" href="#">Alterar</a></li>
+  <li><a id="contextDelete" tabindex="-1" href="#">Excluir</a></li>
+</ul>
+

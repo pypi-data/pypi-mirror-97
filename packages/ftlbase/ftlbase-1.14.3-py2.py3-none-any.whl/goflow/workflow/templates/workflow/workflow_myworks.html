@@ -1,0 +1,39 @@
+{% spaceless %}
+{% load static %}
+{% block title_html %} {{ title }} {% endblock %}
+
+{% block content %}
+<!-- <li id='workflow_myworks' class="dropdown tasks-menu"> -->
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="far fa-flag"></i>
+    <span class="label label-danger">{{ workitems|length }}</span>
+  </a>
+  <ul class="dropdown-menu">
+  {% if workitems|length > 0 %}
+    <li class="header">Há {% if workitems|length > 1 %}{{ workitems|length }} processos pendentes{% else %}um processo pendente{% endif %}.</li>
+    <li>
+      <ul class="menu">
+  {% for row in workitems|slice:":4" %}
+        <li>
+          <a href="/#{% url 'workflow_action' row.id %}">
+            <h3>
+              {{ row.instance }}
+              <small class="pull-right">{{ row.process.id }}</small>
+            </h3>
+          </a>
+        </li>
+  {% endfor %}
+      </ul>
+    </li>
+    <li class="footer">
+      <a href="/#{% url 'workflow_pending' %}">Ver todos os processos</a>
+    </li>
+  {% else %}
+    <li class="header">Não há processos pendentes.</li>
+  {% endif %}
+  </ul>
+<!-- </li> -->
+{% endblock %}
+
+{% block extrajavascript %}{% endblock %}
+{% endspaceless %}
