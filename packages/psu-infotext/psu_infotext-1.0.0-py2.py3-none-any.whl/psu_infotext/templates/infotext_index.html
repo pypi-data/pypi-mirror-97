@@ -1,0 +1,141 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+{% load infotext_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% block scripts %}
+    <!-- Summernote requirements -->
+    <link href="{%static_content_url%}/wdt/summernote/summernote-0.8.18/summernote-lite.min.css" rel="stylesheet" type="text/css">
+    <script src="{%static_content_url%}/wdt/summernote/summernote-0.8.18/summernote-lite.min.js"></script>
+    <!-- End of Summernote requirements -->
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Infotext for {%app_name%}</h1>
+
+    <table class="table table-condensed table-striped">
+        <tr>
+            <th scope="col" class="hidden">ID</th>
+            <th scope="col">Identifier</th>
+            <th scope="col">Content</th>
+        </tr>
+        {% for it in text_instances %}
+        <tr class="it-row">
+            <td class="it-id hidden">{{it.id}}</td>
+            <td class="it-code">{{it.text_code}}</td>
+            <td class="it-content">
+                <!-- <textarea onchange="update_infotext($(this));">{{it.content}}</textarea> -->
+                <div class="summernote">{{it.content|safe}}</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script type="text/javascript">
+
+        var SaveButton = function(context) {
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents: '<i class="fa fa-floppy-o"/> Save',
+            tooltip: 'Save text changes',
+            click: function() {
+
+                editable = context.$note.closest('tr').find('.note-editable');
+                content = editable.html();
+                update_infotext(content, editable)
+
+            }
+          });
+
+          return button.render();
+        }
+
+        $(document).ready(function() {
+            $('.summernote').summernote({
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['insert', ['link', 'picture', 'table']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['view', ['fullscreen', 'codeview', 'help']],
+                    ['height', ['height']],
+                    ['save', ['save']]
+                ],
+                buttons: {
+                  save: SaveButton
+                },
+                codeviewIframeFilter: true,
+                width: '100%',
+                theme: 'lite',
+                // airMode: true,
+                callbacks: {
+                    onChange: function(content, $editable) {
+                        let row = $editable.closest('.it-row');
+                        let original_text = row.find('.summernote').html();
+                        let editable_text_container = row.find('.note-editable');
+                        let save_button = row.find('.fa-floppy-o').parent();
+
+                        if(content === original_text){
+                            save_button.css('border', '1px solid #dae0e5');
+                            editable_text_container.css('background-color', 'inherit');
+                        }
+                        else{
+                            save_button.css('border', '3px solid orange');
+                            editable_text_container.css('background-color', '#EBE3C6');
+                        }
+                    }
+                }
+            });
+        });
+
+
+        function update_infotext(content, element){
+            let row = element.closest('.it-row');
+            let saveButton = row.find('.fa-floppy-o').parent();
+            let originalTextContainer = row.find('.summernote');
+            let editableTextContainer = row.find('.note-editable');
+            let id = row.find('.it-id').html();
+            $.ajax({
+                type:   "POST",
+                url:    "{% url 'infotext:update' %}",
+                data:   { id: id, content: content, csrfmiddlewaretoken: '{{ csrf_token }}' },
+                beforeSend:function(){
+                    saveButton.after(getAjaxLoadImage());
+                    editableTextContainer.css('background-color', '#EBE3C6');
+                },
+                success:function(data){
+                    //Update original text (not displayed)
+                    originalTextContainer.html(data);
+                    //Ensure editable content matches (if modified server-side)
+                    editableTextContainer.html(data);
+                    saveButton.css('border', '1px solid green');
+                    flash_success(editableTextContainer)
+
+                },
+                error:function(){
+                    saveButton.css('border', '1px solid red');
+                    editableTextContainer.css('background-color', '#F3DDDF');
+                },
+                complete:function(){
+                    clearAjaxLoadImage(saveButton.parent());
+                }
+            });
+        }
+    </script>
+    <style>
+        .note-save{
+            float: right;
+        }
+    </style>
+    {% endblock %}
+</body>
+</html>

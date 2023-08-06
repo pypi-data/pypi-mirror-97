@@ -1,0 +1,96 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+{% load infotext_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% block scripts %}
+    <!-- Summernote requirements -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-lite.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-lite.js"></script>
+    <!-- End of Summernote requirements -->
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Infotext for {%app_name%}</h1>
+
+    <table class="table table-condensed table-striped">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Identifier</th>
+            <th scope="col">Content</th>
+        </tr>
+        {% for it in text_instances %}
+        <tr class="it-row">
+            <td class="it-id">{{it.id}}</td>
+            <td class="it-code">{{it.text_code}}</td>
+            <td class="it-content">
+                <!-- <textarea onchange="update_infotext($(this));">{{it.content}}</textarea> -->
+                <div class="summernote">{{it.content|safe}}</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.summernote').summernote({
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['view', ['fullscreen', 'codeview', 'help']],
+                    ['height', ['height']],
+                ],
+                codeviewIframeFilter: true,
+                width: '100%',
+                theme: 'lite',
+                // airMode: true,
+                callbacks: {
+                    onChange: function(content, $editable) {
+                        console.log(content);
+                        // console.log($editable);
+                        var row = $editable.closest('.it-row');
+                        var id = row.find('.it-id').html();
+                        console.log(id);
+
+                        //ToDo: Don't save on every keypress
+                        update_infotext(content, $editable);
+                    }
+                }
+            });
+        });
+
+        function update_infotext(content, element){
+            var row = element.closest('.it-row');
+            var id = row.find('.it-id').html();
+            // var content = element.val();
+            $.ajax({
+                type:   "POST",
+                url:    "{% url 'infotext:update' %}",
+                data:   { id: id, content: content, csrfmiddlewaretoken: '{{ csrf_token }}' },
+                beforeSend:function(){
+                    element.css('border-color', 'orange');
+                },
+                success:function(data){
+                    element.css('border-color', 'green');
+                    element.val(data)
+                },
+                error:function(){
+                    element.css('border-color', 'red');
+                },
+                complete:function(){}
+            });
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>
