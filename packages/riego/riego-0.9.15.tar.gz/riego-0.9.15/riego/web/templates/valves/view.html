@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% set title = "Riego - Bewässerungskreise" %}
+{% set active_menu = "valves" %}
+
+{% block content %}
+<h1>{{ item['name'] }}</h1>
+<ul>
+    <li>id: {{item['id']}}</li>
+	<li>remark: {{item['remark']}}</li>
+    <li>channel_nr: {{item['channel_nr']}}</li>
+	<li>duration: {{item['duration']}}</li>
+	<li>interval: {{item['interval']}}</li>
+	<li>last_shedule: {{item['last_shedule']}}</li>
+	<li>is_running: {{item['is_running']}}</li>
+	<li>is_enabled: {{item['is_enabled']}}</li>
+    <li>is_hidden: {{item['is_hidden']}}</li>
+    <li>prio: {{item['prio']}}</li>
+	<li>box_id: {{item['box_id']}}</li>
+    <li>created_at: {{item['created_at']}}</li>
+
+    <li>box_topic (from JOIN): {{item['box_topic']}}</li>
+    <li>box_name (from JOIN): {{item['box_name']}}</li>
+</ul>
+
+<p>
+    <a href="{{url('valves')}}">list</a> 
+    <a href="{{url('valves_item_edit',item_id=item['id'])}}">edit</a>
+</p>
+{% endblock %}
