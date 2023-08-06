@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>dweet2ser status</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css')}}" />
+    </head>
+    <body>
+        <div class="menu_bar" id="config_menu">
+            <button onclick="openForm('addRemote')">Add Remote Device</button>
+            <div class="form-popup" id="addRemote">
+                <form action="/add_remote" method="POST" class="form-container">
+                    <h1>Add Remote</h1>
+    
+                    <input type="text" placeholder="Enter Name" name="name" required>
+    
+                    <input type="text" placeholder="Enter Dweet ID" name="thing_id" required>
+                    
+                    <label for="type">Type: 
+                    <select id="mode" name="mode">
+                        <option value="DCE">DCE</option>
+                        <option value="DTE">DTE</option>
+                    </select>
+                    </label>
+
+                    <label>
+                        Mute? <input type="checkbox" name="mute"/>
+                    </label>
+    
+                    <button type="submit" class="btn">Add</button>
+                    
+                </form>
+            </div>
+            <button onclick="openForm('addLocal')">Add Local Device</button>
+            <div class="form-popup" id="addLocal">
+                <form action="/add_local" method="POST" class="form-container">
+                    <h1>Add Local</h1>
+    
+                    <input type="text" placeholder="Enter Name" name="name" required>
+
+                    <label for="type">Type: 
+                    <select id="mode" name="mode">
+                        <option value="DCE">DCE</option>
+                        <option value="DTE">DTE</option>
+                    </select>
+                    </label>
+
+                    <label for="port">Port: 
+                    <select id="port" name="port">
+                    {% for port in ports %}
+                        <option value="{{ port }}">{{ port }}</option>
+                    {% endfor %}
+                    </select>
+                    </label>
+                                        
+                    <label for="baud">Baud:
+                    <select id="baud" name="baud">
+                        <option value="9600">9600</option>
+                        <option value="1200">1200</option>
+                        <option value="2400">2400</option>
+                        <option value="4800">4800</option>
+                    </select>
+                    </label>
+
+                    <label>
+                        Mute? <input type="checkbox" name="mute"/>
+                    </label>
+    
+                    <button type="submit" class="btn local">Add</button>
+                    
+                </form>
+            </div>
+            <form action="/get_log" metod="POST" style="margin-bottom: auto;"><button>Get Log File</button></form>
+            <button onclick="saveConfig()">Save Configuration</button>
+            <button onclick="closeMenuBar()">Close Menu</button>
+        </div>
+        <div class="main_window">
+            <div class="status">
+                <div class="title"><h1>dweet2ser</h1></div><h3>v{{ version }}</h3>
+                <div class="subtitle">Running on: {{ hostname }}({{ host_ip }})</div>
+                <button onclick="openMenuBar()" id="config_button">Configure</button>
+
+            </div>
+            <div class="device_window">
+                <div class="tabs">
+                    <button class="tablinks active" onclick="openTab(event, 'dce')">Devices</button>
+                    <button class="tablinks" onclick="openTab(event, 'dte')">Computers</button>
+                </div>
+                
+                <div class="device" id="dce">
+                    {% for d in session.bus.dce_devices %}
+                    
+                        {% if d.type == "serial" %}
+                            <table class="serial_device">
+                                <tr><td class="timing_tape" colspan="3"><div  id= {{ d.sku }}></div></td></tr>
+                                <tr><th colspan="3">{{ d.name }}</th></tr>
+                                <tr><th>Port:</th><td colspan="2">{{ d.port_name }}</td></tr>
+                                <tr><th>Baud:</th><td colspan="2">{{ d.baudrate }}</td></tr>
+                                <tr><th>Muted?</th><td>{{ d.mute }}</td>
+                                    <td><form action="/remove/{{ d.name }}" method="POST"><button type="submit" onclick="return confirm('Remove {{ d.name }}?')">X</button></form></td></tr>
+                            </table>
+                        {% endif %}
+                        {% if d.type == "dweet" %}
+                            <table class="dweet_device">
+                                <tr><td class="timing_tape" colspan="3"><div  id= {{ d.sku }}></div></td></tr>
+                                <tr><th colspan="3">{{ d.name }}</th></tr>
+                                <tr><th>Dweet ID:</th><td colspan="2">{{ d.thing_id }}</td></tr>
+                                <tr><th>Locked?</th><td colspan="2">{{ d.locked }}</td></tr>
+                                <tr><th>Muted?</th><td>{{ d.mute }}</td>
+                                    <td><form action="/remove/{{ d.name }}" method="POST"><button type="submit" onclick="return confirm('Remove {{ d.name }}?')">X</button></form></td></tr>
+                            </table>
+                        {% endif %}
+                    
+                    {% endfor %}
+                </div>
+                <div class="device" id="dte" style="display: none;">
+                    {% for d in session.bus.dte_devices %}
+                    
+                        {% if d.type == "serial" %}
+                            <table class="serial_device">
+                                <tr><td class="timing_tape" colspan="3"><div  id= {{ d.sku }}></div></td></tr>
+                                <tr><th colspan="3">{{ d.name }}</th></tr>
+                                <tr><th>Port:</th><td colspan="2">{{ d.port_name }}</td></tr>
+                                <tr><th>Baud:</th><td colspan="2">{{ d.baudrate }}</td></tr>
+                                <tr><th>Muted?</th><td>{{ d.mute }}</td>
+                                    <td><form action="/remove/{{ d.name }}" method="POST"><button type="submit" onclick="return confirm('Remove {{ d.name }}?')">X</button></form></td></tr>
+                            </table>
+                        {% endif %}
+                        {% if d.type == "dweet" %}
+                            <table class="dweet_device">
+                                <tr><td class="timing_tape" colspan="3"><div  id= {{ d.sku }}></div></td></tr>
+                                <tr><th colspan="3">{{ d.name }}</th></tr>
+                                <tr><th>Dweet ID:</th><td colspan="2">{{ d.thing_id }}</td></tr>
+                                <tr><th>Locked?</th><td colspan="2">{{ d.locked }}</td></tr>
+                                <tr><th>Muted?</th><td>{{ d.mute }}</td>
+                                    <td><form action="/remove/{{ d.name }}" method="POST"><button type="submit" onclick="return confirm('Remove {{ d.name }}?')">X</button></form></td></tr>
+                            </table>
+                        {% endif %}
+                    
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="console">
+                <span id="console_tab">^ Console ^</span>
+                <pre id="console"></pre>
+            </div>
+        </div>
+        
+        <script>
+            var config_file =  "{{ config_file }}";
+            var version = "{{ version }}";
+            var hostname = "{{ hostname }}";       
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!--<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery-3.6.0.min.js') }}">\x3C/script>')</script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js" 
+            integrity="sha512-oFOCo2/3DtjrJG4N27BjSLQWoiBv171sK6a+JiWjp/7agxC2nCUP358AqzxkBUb5jX8g6CYLPdSKQTbC0weCwA==" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='site.js') }}"></script>
+    </body>
+</html>
