@@ -1,0 +1,304 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "DEBOPS.MAILMAN" "5" "Mar 03, 2021" "v2.0.8" "DebOps"
+.SH NAME
+debops.mailman \- Manage Mailman installation using Ansible
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.sp
+The \fI\%debops.mailman\fP Ansible role can be used to create and manage mailing
+lists using \fI\%GNU Mailman\fP <\fBhttp://list.org/\fP> package.
+.sp
+By default the role provides configuration for debops.postfix role to
+configure the SMTP server integration, as well as debops.nginx role to
+configure access to the web control panel.
+.SH GETTING STARTED
+.SS SMTP service integration
+.sp
+The debops.mailman role provides configuration variable for
+debops.postfix Ansible role which are used in the example playbook. The
+role supports two modes of integration:
+.INDENT 0.0
+.IP \(bu 2
+\fBvirtual\fP: messages to Mailman are passed using a Postfix transport, entire
+installation uses virtual mail.
+.IP \(bu 2
+\fBlocal\fP: messages to Mailman are passed using local mail aliases.
+.UNINDENT
+.sp
+The \fBvirtual\fP mode is used by default. Role does not support changing the
+mode after a deployment.
+.sp
+Refer to debops.postfix documentation for more details.
+.SS HTTP service integration
+.sp
+The role provides configuration for debops.nginx role which will configure
+the Mailman web interface using \fBnginx\fP and \fBfcgiwrap\fP instance (using
+debops.fcgiwrap Ansible role). The webserver will be configured with
+a restricted list of allowed referers, to prevent hijacking of the web
+interface forms by other sites.
+.SS Backscatter prevention
+.sp
+The default Mailman installation is very prone to \fI\%backscatter\fP <\fBhttps://en.wikipedia.org/wiki/Backscatter_(email)\fP>
+attacks. Therefore, debops.mailman will try to reduce this possibility by
+taking a few measures:
+.INDENT 0.0
+.IP \(bu 2
+some of the mailing list aliases will be disabled by a patch, only
+\fB\-bounces\fP, \fB\-confirm\fP, \fB\-owner\fP and \fB\-request\fP aliases will be
+present.
+.IP \(bu 2
+commands from somebody not on the list sent by e\-mail will be silently
+discarded using a patch. Unfortunately, this prevents registration via e\-mail
+subscribe message, but it was determined that the benefits outweigh the lost
+functionality. Please, use the webinterface for subscription.
+.IP \(bu 2
+monthly reminders about the mailing list membership are disabled.
+.UNINDENT
+.SS Mailman source code modifications
+.sp
+This role will configure GNU Mailman on the host using the APT \fBmailman\fP
+package. The version provided in Debian Wheezy and Debian Jessie packages
+requires some additional modifications that are provided as source code
+patches. They will be applied automatically in the source code located in
+\fB/usr/lib/mailman/\fP directory (this can be disabled by setting the
+\fBmailman__patch\fP variable to \fBFalse\fP).
+.sp
+Modification of the package source code might cause issues during updates,
+therefore automatic upgrades of the \fBmailman\fP package will be disabled in the
+\fBunattended\-upgrades\fP package using debops.unattended_upgrades Ansible
+role, if patching is enabled.
+.sp
+To apply the patches manually after an upgrade, you can use the provided
+Ansible tags, for example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+user@controller:~$ debops service/mailman \-\-tags role::mailman:patch
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The above command will check the status of the patches in Mailman source code
+and apply them if necessary.
+.SS Language pack support
+.sp
+The role contains a Bash language pack conversion script which will be executed
+on changes in language pack configuration. Some of the language packs provided
+by Debian are stored in wrong encoding (on Debian Wheezy) or contain incorrect
+encoding information. The script will try to fix that in the enabled languages
+after language packs are generated; however subsequent \fBmailman\fP package
+updates will most likely override these changes. To apply them again you can
+use the provided Ansible tags:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+user@controller:~$ debops service/mailman \-\-tags role::mailman:lang
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This will re\-configure the language pack support in \fBmailman\fP package and
+apply the conversion script changes if necessary.
+.SS Example inventory
+.sp
+To configure Mailman on a host, you need to add it to
+\fB[debops_service_mailman]\fP Ansible inventory group. Example inventory:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# inventory/hosts
+[debops_service_mailman]
+hostname
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Example playbook
+.sp
+The debops.mailman uses a set of other roles to configure additional
+services like HTTP and SMTP server. Here\(aqs an example playbook with all of the
+required DebOps services:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-\-\-
+
+\- name: Manage Mailman service
+  collections: [ \(aqdebops.debops\(aq, \(aqdebops.roles01\(aq,
+                 \(aqdebops.roles02\(aq, \(aqdebops.roles03\(aq ]
+  hosts: [ \(aqdebops_service_mailman\(aq ]
+  become: True
+
+  environment: \(aq{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}\(aq
+
+  pre_tasks:
+
+    \- import_role:
+        name: \(aqpostfix\(aq
+        tasks_from: \(aqmain_env\(aq
+      tags: [ \(aqrole::postfix\(aq, \(aqrole::secret\(aq, \(aqrole::ferm\(aq ]
+
+  roles:
+
+    \- role: keyring
+      tags: [ \(aqrole::keyring\(aq, \(aqskip::keyring\(aq, \(aqrole::nginx\(aq ]
+      keyring__dependent_apt_keys:
+        \- \(aq{{ nginx__keyring__dependent_apt_keys }}\(aq
+
+    \- role: secret
+      tags: [ \(aqrole::secret\(aq, \(aqrole::postfix\(aq ]
+      secret__directories:
+        \- \(aq{{ postfix__secret__directories }}\(aq
+
+    \- role: fcgiwrap
+      tags: [ \(aqrole::fcgiwrap\(aq, \(aqskip::fcgiwrap\(aq ]
+      fcgiwrap__instances:
+        \- \(aq{{ mailman__fcgiwrap__instance }}\(aq
+
+    \- role: unattended_upgrades
+      tags: [ \(aqrole::unattended_upgrades\(aq, \(aqskip::unattended_upgrades\(aq ]
+      unattended_upgrades__dependent_blacklist: \(aq{{ mailman__unattended_upgrades__dependent_blacklist }}\(aq
+
+    \- role: apt_preferences
+      tags: [ \(aqrole::apt_preferences\(aq, \(aqskip::apt_preferences\(aq ]
+      apt_preferences__dependent_list:
+        \- \(aq{{ mailman__apt_preferences__dependent_list }}\(aq
+        \- \(aq{{ nginx__apt_preferences__dependent_list }}\(aq
+
+    \- role: ferm
+      tags: [ \(aqrole::ferm\(aq, \(aqskip::ferm\(aq ]
+      ferm__dependent_rules:
+        \- \(aq{{ postfix__ferm__dependent_rules }}\(aq
+        \- \(aq{{ nginx__ferm__dependent_rules }}\(aq
+
+    \- role: python
+      tags: [ \(aqrole::python\(aq, \(aqskip::python\(aq ]
+      python__dependent_packages3:
+        \- \(aq{{ nginx__python__dependent_packages3 }}\(aq
+      python__dependent_packages2:
+        \- \(aq{{ nginx__python__dependent_packages2 }}\(aq
+
+    \- role: postfix
+      tags: [ \(aqrole::postfix\(aq, \(aqskip::postfix\(aq ]
+      postfix__dependent_maincf:
+        \- role: \(aqmailman\(aq
+          config: \(aq{{ mailman__postfix__dependent_maincf }}\(aq
+
+    \- role: nginx
+      tags: [ \(aqrole::nginx\(aq, \(aqskip::nginx\(aq ]
+      nginx__servers: \(aq{{ mailman__nginx__servers }}\(aq
+
+    \- role: mailman
+      tags: [ \(aqrole::mailman\(aq, \(aqskip::mailman\(aq ]
+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH DEFAULT VARIABLE DETAILS
+.sp
+Some of \fBdebops.mailman\fP default variables have more extensive configuration
+than simple strings or lists, here you can find documentation and examples for
+them.
+.SS mailman__lists
+.sp
+Create or remove mailing lists. This is a simple interface to \fBnewlist\fP and
+\fBrmlist\fP Mailman commands, not really intended for proper list management,
+which should be performed through the web interface.
+.sp
+Each list is defined as a dictionary with following keys:
+.INDENT 0.0
+.TP
+.B \fBname\fP
+Required. Name of the mailing list.
+.TP
+.B \fBdomain\fP
+Optional. If specified, sets the domain of the mailing list. The domain
+should be configured as one of Mailman virtual domains.
+.TP
+.B \fBowner\fP
+Optional. Specify e\-mail address of the mailing list owner. If not specified,
+site admin will be the owner of this mailing list.
+.TP
+.B \fBlanguage\fP
+Optional. Specify the mailing list default language as two\-letter name. The
+language pack should be enabled on the server. If not specified, the default
+site language will be used.
+.TP
+.B \fBpassword\fP
+Optional. Specify the mailing list owner password. If not specified, a random
+password will be generated automatically and stored in the \fBsecret/\fP
+directory (highly recommended). See the debops.secret role documentation
+for more details.
+.TP
+.B \fBstate\fP
+Optional. If not specified, or specified and set to \fBpresent\fP, the mailing
+list will be created. If set to \fBabsent\fP, it will be removed.
+.TP
+.B \fBpurge\fP
+Optional, boolean. If specified and set to \fBTrue\fP, the mailing list
+archives will be purged when the mailing list is removed.
+.UNINDENT
+.SS Examples
+.sp
+Create a new mailing lists:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+mailman__lists:
+
+  \- name: \(aqproject\-users\(aq
+
+  \- name: \(aqproject\-devel\(aq
+    language: \(aqen\(aq
+    owner: \(aqproject\-devel@example.org\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Maciej Delmanowski
+.SH COPYRIGHT
+2014-2021, Maciej Delmanowski, Nick Janetakis, Robin Schneider and others
+.\" Generated by docutils manpage writer.
+.

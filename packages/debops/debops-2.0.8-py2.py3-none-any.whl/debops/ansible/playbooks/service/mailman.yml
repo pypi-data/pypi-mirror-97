@@ -1,0 +1,71 @@
+---
+
+- name: Manage Mailman service
+  collections: [ 'debops.debops', 'debops.roles01',
+                 'debops.roles02', 'debops.roles03' ]
+  hosts: [ 'debops_service_mailman' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  pre_tasks:
+
+    - import_role:
+        name: 'postfix'
+        tasks_from: 'main_env'
+      tags: [ 'role::postfix', 'role::secret', 'role::ferm' ]
+
+  roles:
+
+    - role: keyring
+      tags: [ 'role::keyring', 'skip::keyring', 'role::nginx' ]
+      keyring__dependent_apt_keys:
+        - '{{ nginx__keyring__dependent_apt_keys }}'
+
+    - role: secret
+      tags: [ 'role::secret', 'role::postfix' ]
+      secret__directories:
+        - '{{ postfix__secret__directories }}'
+
+    - role: fcgiwrap
+      tags: [ 'role::fcgiwrap', 'skip::fcgiwrap' ]
+      fcgiwrap__instances:
+        - '{{ mailman__fcgiwrap__instance }}'
+
+    - role: unattended_upgrades
+      tags: [ 'role::unattended_upgrades', 'skip::unattended_upgrades' ]
+      unattended_upgrades__dependent_blacklist: '{{ mailman__unattended_upgrades__dependent_blacklist }}'
+
+    - role: apt_preferences
+      tags: [ 'role::apt_preferences', 'skip::apt_preferences' ]
+      apt_preferences__dependent_list:
+        - '{{ mailman__apt_preferences__dependent_list }}'
+        - '{{ nginx__apt_preferences__dependent_list }}'
+
+    - role: ferm
+      tags: [ 'role::ferm', 'skip::ferm' ]
+      ferm__dependent_rules:
+        - '{{ postfix__ferm__dependent_rules }}'
+        - '{{ nginx__ferm__dependent_rules }}'
+
+    - role: python
+      tags: [ 'role::python', 'skip::python' ]
+      python__dependent_packages3:
+        - '{{ nginx__python__dependent_packages3 }}'
+      python__dependent_packages2:
+        - '{{ nginx__python__dependent_packages2 }}'
+
+    - role: postfix
+      tags: [ 'role::postfix', 'skip::postfix' ]
+      postfix__dependent_maincf:
+        - role: 'mailman'
+          config: '{{ mailman__postfix__dependent_maincf }}'
+
+    - role: nginx
+      tags: [ 'role::nginx', 'skip::nginx' ]
+      nginx__servers: '{{ mailman__nginx__servers }}'
+
+    - role: mailman
+      tags: [ 'role::mailman', 'skip::mailman' ]

@@ -1,0 +1,623 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "DEBOPS.DOVECOT" "5" "Mar 03, 2021" "v2.0.8" "DebOps"
+.SH NAME
+debops.dovecot \- Manage Dovecot IMAP/POP3 server using Ansible
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.sp
+This \fI\%Ansible\fP <\fBhttp://ansible.com/\fP> role allows you to install and manage the \fI\%Dovecot\fP <\fBhttp://dovecot.org/\fP>
+IMAP/POP3 server to allow remote access to your mail boxes. It integrates
+with the \fI\%ansible\-pki\fP <\fBhttps://github.com/debops/ansible-pki/\fP> role, so you can easily protect your access via
+secure TLS connection.
+.sp
+Additionally it allows you to configure a \fI\%sieve\fP <\fBhttp://sieve.info/\fP> service which allows you
+to store server\-side rules for mail filtering.
+.SH GETTING STARTED
+.SS Default setup
+.sp
+If you don\(aqt specify any configuration values, the role will setup an IMAP and IMAPS
+service using the certificates provided by \fI\%ansible\-pki\fP <\fBhttps://github.com/debops/ansible-pki\fP>\&. It will further use the
+\fI\%ansible\-ferm\fP <\fBhttps://github.com/debops/ansible-ferm\fP> role to open the required network ports with iptables: 143 (IMAP+STARTTLS)
+and 993 (IMAPS). Every user account which is able to login via PAM, can then also
+login via IMAP and access its mails stored as an mbox file in \fB/var/mail/<username>\fP\&.
+.SS LDAP support
+.sp
+When the LDAP environment is configured on a host, the
+\fBdebops.dovecot\fP role will automatically switch from system account
+authentication to LDAP\-based accounts.
+.SS Example inventory
+.sp
+You can install Dovecot on a host by adding it to the \fB[debops_service_dovecot]\fP group
+in your Ansible inventory:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+[debops_service_dovecot]
+hostname
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Example playbook
+.sp
+Here\(aqs an example playbook which uses \fBdebops.dovecot\fP role to install Dovecot:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-\-\-
+
+\- name: Manage Dovecot service
+  collections: [ \(aqdebops.debops\(aq, \(aqdebops.roles01\(aq,
+                 \(aqdebops.roles02\(aq, \(aqdebops.roles03\(aq ]
+  hosts: [ \(aqdebops_service_dovecot\(aq ]
+  become: True
+
+  environment: \(aq{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}\(aq
+
+  pre_tasks:
+
+    \- import_role:
+        name: \(aqdovecot\(aq
+        tasks_from: \(aqmain_env\(aq
+      tags: [ \(aqrole::dovecot\(aq, \(aqrole::secret\(aq, \(aqrole::ferm\(aq ]
+
+    \- import_role:
+        name: \(aqpostfix\(aq
+        tasks_from: \(aqmain_env\(aq
+      tags: [ \(aqrole::postfix\(aq, \(aqrole::secret\(aq, \(aqrole::ferm\(aq ]
+
+  roles:
+
+    \- role: secret
+      tags: [ \(aqrole::secret\(aq, \(aqrole::postfix\(aq ]
+      secret__directories:
+        \- \(aq{{ postfix__secret__directories }}\(aq
+
+    \- role: ferm
+      tags: [ \(aqrole::ferm\(aq, \(aqskip::ferm\(aq ]
+      ferm__dependent_rules:
+        \- \(aq{{ dovecot__ferm__dependent_rules }}\(aq
+
+    \- role: postfix
+      tags: [ \(aqrole::postfix\(aq, \(aqskip::postfix\(aq ]
+      postfix__dependent_maincf:
+        \- role: \(aqdovecot\(aq
+          config: \(aq{{ dovecot__postfix__dependent_maincf }}\(aq
+      postfix__dependent_mastercf:
+        \- role: \(aqdovecot\(aq
+          config: \(aq{{ dovecot__postfix__dependent_mastercf }}\(aq
+
+    \- role: python
+      tags: [ \(aqrole::python\(aq, \(aqskip::python\(aq, \(aqrole::ldap\(aq ]
+      python__dependent_packages3:
+        \- \(aq{{ ldap__python__dependent_packages3 }}\(aq
+      python__dependent_packages2:
+        \- \(aq{{ ldap__python__dependent_packages2 }}\(aq
+
+    \- role: ldap
+      tags: [ \(aqrole::ldap\(aq, \(aqskip::ldap\(aq ]
+      ldap__dependent_tasks:
+        \- \(aq{{ dovecot__ldap__dependent_tasks }}\(aq
+
+    \- role: dovecot
+      tags: [ \(aqrole::dovecot\(aq, \(aqskip::dovecot\(aq ]
+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Ansible tags
+.sp
+You can use Ansible \fB\-\-tags\fP or \fB\-\-skip\-tags\fP parameters to limit what
+tasks are performed during Ansible run. This can be used after a host was first
+configured to speed up playbook execution, when you are sure that most of the
+configuration is already in the desired state.
+.sp
+Available role tags:
+.INDENT 0.0
+.TP
+.B \fBrole::dovecot\fP
+Main role tag, should be used in the playbook to execute all of the role
+tasks as well as role dependencies.
+.UNINDENT
+.SH DEFAULT VARIABLES: CONFIGURATION
+.sp
+Some of \fBdebops.dovecot\fP default variables have more extensive configuration
+than simple strings or lists, here you can find documentation and examples for
+them.
+.SS dovecot_imap_config_map
+.sp
+Configuration dictionary related to the IMAP protocol configuration. Every
+configuration key is optional and overwrites the default values implicitly
+used by Dovecot. Each section \fBservice imap\-login\fP, \fBservice imap\fP and
+\fBprotocol imap\fP is defined as a YAML dict with the corresponding key:
+.INDENT 0.0
+.TP
+.B \fBlogin\-service\fP
+Configuration settings under this key will go into the \fBservice imap\-login {}\fP
+section which defines the pre\-login process handling. Possible keys are
+\fBinet_listener\fP and upstream Dovecot options such as \fBservice_count\fP or
+\fBprocess_min_avail\fP\&. More information about the login setup can be found at
+the \fI\%Dovecot Login Process\fP <\fBhttp://wiki2.dovecot.org/LoginProcess\fP> page.
+.INDENT 7.0
+.TP
+.B \fBinet_listener\fP
+Will create a network listener definition. Accepts further YAML dicts with
+the listener name as key.
+.sp
+The listener name itself must reference a dict defining listener properties
+such as \fBport\fP (network port), \fBallow\fP (address/subnet restrictions) or
+\fBaddress\fP (listen address). More information about the \fBinet_listener\fP
+setup can be found at the \fI\%Dovecot inet_listeners\fP <\fBhttp://wiki2.dovecot.org/Services#inet_listeners\fP> page.
+.TP
+.B \fBunix_listener\fP
+Will create a Unix socket definition. The key name of the listeners corresponds
+to the socket path.
+.sp
+The listener name itself must reference a dict defining socket properties such
+as \fBowner\fP (socket owner), \fBgroup\fP (socket group) or \fBmode\fP (access mode).
+More information about the \fBunix_listener\fP setup can be found at the
+\fI\%Dovecot unix_listeners\fP <\fBhttp://wiki2.dovecot.org/Services#unix_listeners_and_fifo_listeners\fP> page.
+.UNINDENT
+.TP
+.B \fBservice\fP
+Configuration settings under this key will go into the \fBservice imap {}\fP
+section which defines the post\-login process handling. Possible keys are the
+upstream Dovecot options such as \fBprocess_limit\fP or \fBvsz_limit\fP\&. More
+information about the IMAP service options can be found at the \fI\%Dovecot IMAP Service\fP <\fBhttps://wiki2.dovecot.org/Services#imap.2C_pop3.2C_submission.2C_managesieve\fP>
+page.
+.TP
+.B \fBprotocol\fP
+Configuration settings under this key will go into the \fBprotocol imap {}\fP
+section which defines general protocol behaviour. Possible keys are the
+upstream Dovecot options such as \fBmail_max_userip_connections\fP or
+\fBmail_plugins\fP\&.
+.UNINDENT
+.SS Example
+.sp
+Restrict access to the IMAP service to 192.168.1.0/24. Always keep a process
+waiting for more connections, restrict maximal number of IMAP processes to
+512 and allow 15 IMAP connections for each user:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_imap_config_map:
+
+  login\-service:
+    inet_listener:
+      imap:
+        access: [ \(aq192.168.1.0/24\(aq ]
+
+    process_min_avail: 1
+
+  service:
+    process_limit: 512
+
+  protocol:
+    mail_max_userip_connections: 15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dovecot_imap_listeners
+.sp
+List of IMAP network listener names which will be used to decide which
+default listeners to create. Their configuration can be customized via
+\fI\%dovecot_imap_config_map\fP\&.
+.SS Examples
+.sp
+Possible configuration options for enabling IMAP:
+.TS
+center;
+|l|l|l|l|.
+_
+T{
+Service
+T}	T{
+\fBdovecot_protocols\fP
+T}	T{
+\fBdovecot_imap_listeners\fP
+T}	T{
+\fBdovecot_pki\fP
+T}
+_
+T{
+Port 143 (plain)
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fBFalse\fP
+T}
+_
+T{
+Port 143 (StartTLS)
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fBTrue\fP
+T}
+_
+T{
+Port 143 (StartTLS) + 995 (SSL)
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fB[ \(aqimap\(aq, \(aqimaps\(aq ]\fP
+T}	T{
+\fBTrue\fP
+T}
+_
+T{
+Port 995 (SSL)
+T}	T{
+\fB[ \(aqimap\(aq ]\fP
+T}	T{
+\fB[ \(aqimaps\(aq ]\fP
+T}	T{
+\fBTrue\fP
+T}
+_
+.TE
+.SS dovecot_pop3_config_map
+.sp
+Configuration dictionary related to the POP3 protocol configuration. Please
+to the \fI\%dovecot_imap_config_map\fP for a description of the dict layout.
+.SS dovecot_pop3_listeners
+.sp
+List of POP3 network listener names which will be used to decide which
+default listeners to create. Their configuration can be customized via
+\fI\%dovecot_pop3_config_map\fP\&.
+.SS dovecot_lmtp_config_map
+.sp
+Configuration dictionary related to the LMTP protocol configuration. Please
+refer to the \fI\%dovecot_imap_config_map\fP for a description of the dict
+layout.
+.sp
+In contrast to the other protocol maps, LMTP \fBinet_listeners\fP must always
+be listed in \fBdovecot_lmtp_config_map\fP and define the \fBport\fP property,
+as Dovecot doesn\(aqt define a default port for LMTP network listeners.
+.SS dovecot_lmtp_listeners
+.sp
+List of LMTP network and unix listener names which will be created. The LMTP
+listeners configuration works a bit different from other network protocols.
+Each listeners mentioned in \fBdovecot_lmtp_listeners\fP must also be defined
+in \fI\%dovecot_lmtp_config_map\fP\&.
+.SS dovecot_lda_config_map
+.sp
+Configuration dictionary related to the Dovecot LDA protocol configuration.
+The only valid key is \fBprotocol\fP which references a YAML dict defining the
+\fBprotocol lda {}\fP section. The \fBprotocol\fP dict then accepts the upstream
+Dovecot configuration options such as \fBmail_plugins\fP\&.
+.SS dovecot_auth_config_map
+.sp
+Configuration dictionary related to user authentication when sending emails over
+the SMTP protocol configuration. Postfix uses the \fI/var/spool/postfix/private/auth\fP
+UNIX socket to communicate with Dovecot in order to authenticate an user, while
+sending emails. See also \fIsmtpd_sasl_type\fP and \fIsmtpd_sasl_path\fP values in
+\fBpostconf__postfix__dependent_maincf\fP\&.
+.sp
+Please refer to the \fI\%dovecot_imap_config_map\fP for a description of the dict
+layout.
+.SS dovecot_auth_listeners
+.sp
+List of AUTH unix listener names which will be created. The AUTH
+listeners configuration works like the \fI\%dovecot_lmtp_listeners\fP\&.
+Each listeners mentioned in \fBdovecot_auth_listeners\fP must also be defined
+in \fI\%dovecot_auth_config_map\fP\&.
+.SS Example
+.sp
+Enable \fBsieve\fP mail plugin with local mail delivery:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_lda_config_map:
+
+  protocol:
+    mail_plugins: \(aq$mail_plugins sieve\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dovecot_managesieve_config_map
+.sp
+Configuration dictionary related to the ManageSieve protocol configuration.
+Please refer to the \fI\%dovecot_imap_config_map\fP for a description of the
+dict layout.
+.SS dovecot_managesieve_listeners
+.sp
+List of ManageSieve network listener names which will be used to decide
+which default listeners to create when \fBmanagesieve\fP is enabled in
+\fBdovecot_protocols\fP\&. Their configuration can be customized via
+\fI\%dovecot_managesieve_config_map\fP\&.
+.SS Example
+.sp
+If you want to enable a second ManageSieve listener, you need to add
+its name to the \fBdovecot_managesieve_listeners\fP list and define its
+properties in the \fBdovecot_managesieve_config_map\fP\&. For example to
+bind a second listener to a specific address on port 2000:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_managesieve_listeners: [ \(aqsieve\(aq, \(aqsieve_deprecated\(aq ]
+
+dovecot_managesieve_config_map:
+
+  login\-service:
+    inet_listeners:
+      sieve_deprecated:
+        address: 192.168.1.42
+        port: 2000
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dovecot_postfix_transport
+.sp
+LMTP socket name which will be configured in Postfix to send mails for
+delivery. The value is a file system path relative to \fI/var/spool/postfix\fP
+Make sure there is a corresponding LMTP \fBunix_listener\fP defined in
+\fI\%dovecot_lmtp_config_map\fP and enabled via \fI\%dovecot_lmtp_listeners\fP\&.
+The LMTP transport target will only be configured in Postfix when \(aqlmtp\(aq
+is enabled in \fBdovecot_protocols\fP\&.
+.sp
+For most people the default configuration will be sufficient.
+.SH GUIDES AND EXAMPLES
+.SS Check Dovecot IMAP config is running
+.sp
+Take a look at the official Dovecot documentation on how to test an IMAP connection, Auth and Inbox listing.
+See \fI\%Test Dovecot Installation\fP <\fBhttps://wiki2.dovecot.org/TestInstallation\fP>\&.
+.SS Using maildir mail storage format
+.sp
+If you want to use maildir instead of mbox you first have to make sure,
+that your mail delivery agent is storing the incoming mails in the maildir
+format. If you are using the \fI\%ansible\-postfix\fP <\fBhttps://github.com/debops/ansible-postfix\fP> role, this can be achieved
+by setting the following configuration:
+.INDENT 0.0
+.IP \(bu 2
+Make sure \fBlocal\fP is in your \fBpostfix\fP capabilities list
+.IP \(bu 2
+Set the postfix \fBhome_mailbox\fP configuration value to the desired path.
+It must end with a slash \fB/\fP to indicate the maildir format:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+postfix_local_maincf: |
+  home_mailbox = Maildir/
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+This example will store the mails in the \fBMaildir/\fP folder within the user\(aqs
+home directory. You can make dovecot looking for this maildir by setting:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_mail_location: \(aqmaildir:~/Maildir\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The \fBdovecot_mail_location\fP variable corresponds to the \fBmail_location\fP
+statement in the dovecot configuration file, so you can also set much more
+advanced values. Check the dovecot \fI\%mail_location\fP <\fBhttp://wiki2.dovecot.org/MailLocation/\fP> documentation for more
+examples.
+.SS Enable server\-side mail filtering with sieve
+.sp
+\fI\%Sieve\fP <\fBhttp://wiki2.dovecot.org/Pigeonhole/Sieve/\fP> is a programming language to define mail filtering rules. The
+rules are stored as text files on the mail server and can be managed by
+a client via \fI\%ManageSieve\fP <\fBhttp://wiki2.dovecot.org/Pigeonhole/ManageSieve/\fP> network protocol. Dovecot provides sieve support
+via Pigeonhole sieve interpreter.
+.sp
+To enable the ManageSieve protocol in your Dovecot role you have to add
+it to the \fBdovecot_protocols\fP list:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_protocols: [ \(aqimap\(aq, \(aqmanagesieve\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+It will create a network listener on port 4190 which requires STARTTLS for
+authentication. You can restrict access to this port by explicitly listing
+the networks or hosts which are allowed to connect:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_managesieve_config_map:
+  login\-service:
+    inet_listener:
+      sieve:
+        allow: [ \(aq192.168.1.0/24\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+By default every host can connect.
+.sp
+The sieve filter rules are applied before delivering the mail to the user\(aqs
+mailbox. There are various ways for mail delivery but only a few of them
+respect the sieve filters. By default DebOps would simply use Postfix to
+write the mail. However, Postfix doesn\(aqt know about sieve. Therefore you
+have to manually add the following configuration to each user\(aqs \fB~/.forward\fP
+file, to hook\-in the Dovecot LDA (local delivery agent):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+| "/usr/lib/dovecot/dovecot\-lda"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+To enable the sieve filter with the Dovecot LDA you further have to enable
+the plugin for the corresponding protocol:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_lda_config_map:
+  protocol:
+    mail_plugins: \(aq$mail_plugins sieve\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The Dovecot LDA would then deliver the mail after enquiring the sieve
+files. Alternatively mail can be delivered via LMTP protocol, which also
+supports sieve filtering (see section below).
+.sp
+By default the Dovecot sieve plugin will store the user defined rules as
+plain text files in the \fB~/sieve/\fP folder. They can be managed directly
+via file system, by a mail client which supports the ManageSieve protocol
+or alternatively by a tool like \fI\%sieve\-connect\fP <\fBhttps://github.com/philpennock/sieve-connect/\fP>\&.
+.SS Enable LMTP to deliver mails from Postfix
+.sp
+\fI\%LMTP\fP <\fBhttp://wiki2.dovecot.org/LMTP\fP> is a reliable, scalable and secure protocol to deliver mails
+into virtual mail boxes. It is implemented by Dovecot as an alternative
+to the Dovecot LDA and also supports most mail plugins, such as
+sieve filtering.
+.sp
+It can be enabled by adding it to the \fBdovecot_protocols\fP list. E.g.:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_protocols: [ \(aqimap\(aq, \(aqlmtp\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Without further configuration, this will instruct DebOps to setup a LMTP
+unix socket, which is then used by Postfix for mail delivery. In this
+case Postfix will be automatically added as a dependency and configured
+accordingly.
+.sp
+To enable mail plugins specifically to LMTP only, they can be added to
+the \fBmail_plugins\fP parameter in dovecot_lmtp_config_map:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_lmtp_config_map:
+  protocol:
+    mail_plugins: \(aq$mail_plugins sieve\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In case your Postfix is not running on the same machine, you can enable
+a network socket where the LMTP service is listening on. E.g.:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_lmtp_listeners: [ \(aqlmtp\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Then define its properties:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dovecot_lmtp_config_map:
+  service:
+    inet_listener:
+      lmtp:
+        port: 24
+        allow: [ \(aq192.168.1.0/24\(aq ]
+        address: 192.168.1.123
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This would bind LMTP to the local address 192.168.1.123 on port 24.
+Additionally, access is restricted by \fI\%ansible\-ferm\fP <\fBhttps://github.com/debops/ansible-ferm\fP> to the given
+network. When using the LMTP network socket, you have to configure
+Postfix independently by setting e.g.:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+postfix_local_maincf: |
+  virtual_transport = lmtp:inet:192.168.1.123:24
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Reto Gantenbein
+.SH COPYRIGHT
+2014-2021, Maciej Delmanowski, Nick Janetakis, Robin Schneider and others
+.\" Generated by docutils manpage writer.
+.
