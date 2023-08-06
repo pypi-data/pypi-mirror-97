@@ -1,0 +1,37 @@
+from jax.scipy.special import ndtri
+
+from jaxns.prior_transforms.common import ContinuousPrior
+from jaxns.prior_transforms.discrete import GumbelCategoricalPrior
+from jaxns.prior_transforms.prior_utils import get_shape, prior_docstring
+from jaxns.utils import broadcast_shapes
+
+class GMMDiagPrior(ContinuousPrior):
+    """
+    More efficient version of a mixture of diagonal Gaussians because it avoids computing and stacking
+    all components before selecting.
+    """
+    @prior_docstring
+    def __init__(self, name, logits, mu, sigma, tracked=True):
+        """
+        Mixture of diagonal Gaussians.
+
+        Args:
+            logits: log-weights of the mixture components
+            mu: mean of components, should have first dim like pi
+            sigma: std-dev of components, should have first dim like pi
+        """
+        logits = self._prepare_parameter(name, 'logits', logits)
+        select_component = GumbelCategoricalPrior('_{}_select'.format(name),logits,False)
+        mu = self._prepare_parameter(name, 'mu', mu)
+        sigma = self._prepare_parameter(name, 'sigma', sigma)
+        assert (get_shape(logits)[0] == get_shape(mu)[0]) and (get_shape(logits)[0] == get_shape(sigma)[0]) \
+               and (get_shape(mu) == get_shape(sigma))
+        # replaces f and gamma when parents injected
+        shape = broadcast_shapes(get_shape(mu), get_shape(sigma))[1:]
+        super(GMMDiagPrior, self).__init__(name, shape, [select_component, mu, sigma], tracked)
+
+
+    def transform_U(self, U, select, mu, sigma, **kwargs):
+        sigma = sigma[select, ...]
+        mu = mu[select, ...]
+        return sigma * ndtri(U) + mu
