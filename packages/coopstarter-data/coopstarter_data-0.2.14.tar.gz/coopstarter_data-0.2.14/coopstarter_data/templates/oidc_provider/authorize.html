@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+
+<p class="title_lead">
+    {% trans "Authorization request" %}
+</p>
+
+<div>
+    
+    <p class="flex">
+        {% trans "In order to use Coopedia on" %}&nbsp;
+        <strong>{{settings.SITE_NAME}}</strong>&nbsp;
+        {% trans "the current client needs access to your account, please authorize it." %}
+    </p>
+    
+    <div class="flex">
+        <form method="post" class="block_log" action="{% url 'oidc_provider:authorize' %}">
+
+            {% csrf_token %}
+
+            {{ hidden_inputs }}
+
+            <input class="button_base" type="submit" value="Decline"/>
+            <input class="button_base" name="allow" type="submit" value="Authorize" />
+        </form>
+    </div>
+</div>
+
+{% endblock %}

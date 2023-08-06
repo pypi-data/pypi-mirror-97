@@ -1,0 +1,36 @@
+{% load staticfiles %}
+{% load i18n %}
+<h2 class="title_lead">
+    {% trans  "Notification from your collaborative Coopedia Knowledge Base" %}
+</h2>
+
+<p>
+    {% trans  "Hello" %} {{resource.submitter.name}} !
+</p>
+
+<p>
+    {{review.reviewer.name|safe}} ({{review.reviewer.email}}) {% trans  "proposed an improvement to the following resource you submitted:" %}
+    <ul>
+        <li>
+            {% trans  "Title:" %} {{resource.name}}
+        </li>
+        <li>
+            {% trans  "Description:" %} {{resource.description}}
+        </li>
+        <li>
+            {% trans  "URI:" %} {{resource.uri}}
+        </li>
+    </ul>
+</p>
+
+<p>
+    {% trans  "Improvement proposal detail:" %}<br>
+    <q><strong>{{review.comment}}</strong></q>
+</p>
+
+<footer style="margin-top:10px;font-size:small;color:#777">
+    {% blocktrans %}
+    Connect to the Knowledge Base now to edit this resource.<br>
+    The Coopedia Knowledge Base Team.
+    {% endblocktrans %}
+</footer>
