@@ -1,0 +1,52 @@
+Metadata-Version: 2.1
+Name: plugp100
+Version: 2.1.2.dev1
+Summary: Controller for TP-Link Tapo P100 and other devices
+Home-page: https://github.com/petretiandrea/plugp100
+Author: @petretiandrea
+Author-email: petretiandrea@gmail.com
+License: GPL3
+Download-URL: https://github.com/petretiandrea/plugp100
+Keywords: Tapo,P100
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Description-Content-Type: text/markdown
+Requires-Dist: certifi (==2020.6.20)
+Requires-Dist: chardet (==3.0.4)
+Requires-Dist: idna (==2.10)
+Requires-Dist: jsons (==1.3.0)
+Requires-Dist: pkcs7 (==0.1.2)
+Requires-Dist: pycryptodome (==3.9.8)
+Requires-Dist: requests (==2.24.0)
+Requires-Dist: typish (==1.9.1)
+Requires-Dist: urllib3 (==1.25.10)
+
+# Plug P100
+This is a fork of original work of [@K4CZP3R](https://github.com/K4CZP3R/tapo-p100-python)
+
+The purpose of this fork is to provide the library as PyPi package. 
+
+# How to install
+```pip install plugp100```
+
+# Code example
+```python
+from plugp100 import TapoApi, TapoSwitch, TapoLight
+from plugp100.core.params import SwitchParams, LightParams
+
+sw = TapoApi("<ip>")
+sw.login("<email>", "<passwd>")
+sw.set_device_info(SwitchParams(True))
+sw.set_device_info(LightParams(None, 100))
+print(sw.get_state())
+
+# create specific switch or light
+# sw = TapoSwitch("<ip>", "<email>", "<passwd>")
+# sw.on()
+# lg = TapoLight("<ip>", "<email>", "<passwd>")
+# lg.set_brightness(100)
+
+```
+
+
+
