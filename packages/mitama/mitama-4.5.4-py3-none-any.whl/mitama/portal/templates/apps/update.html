@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}
+{% block content %}
+{% if error==None %}
+{% set post = request.post() %}
+{% else %}
+{% set post = {} %}
+{% endif%}
+<div id='content' class='container mt-4 mb-3'>
+    <h2 class='mb-3'>アプリ設定</h2>
+    <form method='POST' action='' class="inner tight">
+        <div class="app-list">
+        {% for app in apps %}
+            {% call lists.appItemEx(app) %}
+                <div>
+                    <label class="form-label">プリフィクス</label>
+                    <input class='form-control' type="text" name="prefix.{{app.screen_name}}" value="{{app.path}}" placeholder="プリフィクス">
+                </div>
+            {% endcall %}
+        {% endfor %}
+        </div>
+        {{ forms.csrf(request) }}
+        <button type='submit' class='btn btn-primary'>設定を変更</button>
+        {% if error %}
+            <p class='error'>{{ error }}</p>
+        {% endif %}
+        {% if message %}
+            <p class='message'>{{ message}}</p>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
