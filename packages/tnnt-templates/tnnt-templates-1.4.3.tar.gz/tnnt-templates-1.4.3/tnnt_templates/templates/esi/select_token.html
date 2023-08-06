@@ -1,0 +1,117 @@
+{% load static %}
+{% load i18n %}
+{% load evelinks %}
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{% translate 'Character Selection' %}</title>
+
+        <link rel="stylesheet" id="select-esi-token" href="{% static 'tnnt_templates/css/select-esi-token.min.css' %}" type="text/css" media="all">
+    </head>
+
+    <body class="bg-dark">
+        <!-- Requested Scopes -->
+        <div class="container">
+            <div class="container-inner">
+                <div class="card">
+                    <div class="card-header text-center">{% translate 'Scopes Requested' %}</div>
+                    <div class="card-body text-center">
+                        <p>
+                            {% for scope in scopes %}<span class="label-requested-esi-scope">{{ scope|scope_friendly_name }}</span> {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character Selection -->
+        <div class="container">
+            <div class="container-inner">
+                <ul class="cards_container">
+                    {% if tokens|length > 10 %}
+                        <!-- Add New Character -->
+                        <li class="cards_item">
+                            <form method="post">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="_add" value="True">
+
+                                <div class="card">
+                                    <div class="card-header">{% translate 'Add Character' %}</div>
+
+                                    <div class="card-body card__content">
+                                        <button class="btn btn-new-character-sso" type="submit" name="go">
+                                            <img class="img-rounded" src="{{ 1|character_portrait_url:256 }}" title="{% translate 'Add new character by logging in with EVE Online' %}" alt="{% translate 'Add Character' %}">
+                                        </button>
+                                    </div>
+
+                                    <div class="card-footer">
+                                        <button class="btn btn-new-character-sso" type="submit" name="go">
+                                            <img class="img-rounded" src="{% static 'tnnt_templates/images/eve-sso-login-black-small.png' %}" title="{% translate 'Add new character by logging in with EVE Online' %}" alt="{% translate 'Add Character' %}">
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    {% endif %}
+
+                    {% for token in tokens|dictsort:"character_name" %}
+                        {% ifchanged token.character_name %}
+                            <!-- Use {{ token.character_name }} -->
+                            <li class="cards_item">
+                                <form method="post">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="_token" value="{{ token.pk }}">
+
+                                    <div class="card">
+                                        <div class="card-header">{{ token.character_name }}</div>
+
+                                        <div class="card-body card__content">
+                                            <button class="btn btn-select-character btn-character-image" type="submit" title="{% translate 'Select Character' %} {{ token.character_name }}" formmethod="post">
+                                                <img class="img-rounded" src="{{ token.character_id|character_portrait_url:256 }}" alt="{{ token.character_name }}">
+                                            </button>
+                                        </div>
+
+                                        <div class="card-footer">
+                                            <button class="btn btn-select-character" type="submit" title="{% translate 'Select Character' %} {{ token.character_name }}" formmethod="post">{% translate 'Select' %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </li>
+                        {% endifchanged %}
+                    {% endfor %}
+
+                    <!-- Add New Character -->
+                    <li class="cards_item">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="_add" value="True">
+
+                            <div class="card">
+                                <div class="card-header">{% translate 'Add Character' %}</div>
+
+                                <div class="card-body card__content">
+                                    <button class="btn btn-new-character-sso" type="submit" name="go">
+                                        <img class="img-rounded" src="{{ 1|character_portrait_url:256 }}" title="{% translate 'Add new character by logging in with EVE Online' %}" alt="{% translate 'Add Character' %}">
+                                    </button>
+                                </div>
+
+                                <div class="card-footer">
+                                    <button class="btn btn-new-character-sso" type="submit" name="go">
+                                        <img class="img-rounded" src="{% static 'tnnt_templates/images/eve-sso-login-black-small.png' %}" title="{% translate 'Add new character by logging in with EVE Online' %}" alt="{% translate 'Add Character' %}">
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

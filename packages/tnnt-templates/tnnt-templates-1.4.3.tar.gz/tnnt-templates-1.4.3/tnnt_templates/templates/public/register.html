@@ -1,0 +1,34 @@
+{% extends 'public/middle_box.html' %}
+
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block title %}Register{% endblock %}
+
+{% block middle_box_content %}
+    <p style="text-align: center">
+        {% if TNNT_TEMPLATE_ENTITY_ID == 1 %}
+            <img class="login-image img-rounded" src="{{ TNNT_TEMPLATE_AA_LOGO }}" style="display: inline-block;" height="256" width="256" alt="{{ TNNT_TEMPLATE_ENTITY_NAME }}">
+        {% else %}
+            {% if TNNT_TEMPLATE_ENTITY_TYPE == 'alliance' %}
+                <img class="login-image img-rounded" src="{{ TNNT_TEMPLATE_ENTITY_ID|alliance_logo_url:256 }}" style="display: inline-block;" height="256" width="256" alt="{{ TNNT_TEMPLATE_ENTITY_NAME }}">
+            {% elif TNNT_TEMPLATE_ENTITY_TYPE == 'corporation' %}
+                <img class="login-image img-rounded" src="{{ TNNT_TEMPLATE_ENTITY_ID|corporation_logo_url:256 }}" style="display: inline-block;" height="256" width="256" alt="{{ TNNT_TEMPLATE_ENTITY_NAME }}">
+            {% endif %}
+        {% endif %}
+    </p>
+
+    <p style="text-align: center; font-size: 150%;">
+        {{ TNNT_TEMPLATE_ENTITY_NAME }}<br>
+        Authentication System
+    </p>
+
+    <p>{% translate "Please provide your email address for registration confirmation." %}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form|bootstrap }}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">{% translate "Register" %}</button>
+    </form>
+{% endblock %}
