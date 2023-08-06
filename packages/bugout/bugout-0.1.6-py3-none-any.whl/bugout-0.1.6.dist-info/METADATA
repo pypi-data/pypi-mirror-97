@@ -1,0 +1,56 @@
+Metadata-Version: 2.1
+Name: bugout
+Version: 0.1.6
+Summary: Python client library for Bugout API
+Home-page: https://github.com/bugout-dev/bugout-python
+Author: Bugout
+Author-email: engineering@bugout.dev
+License: MIT
+Platform: all
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic (>=1.6)
+Requires-Dist: requests
+Provides-Extra: dev
+Requires-Dist: black ; extra == 'dev'
+Requires-Dist: mypy ; extra == 'dev'
+
+# bugout-python
+Python client library for Bugout API
+
+## Setup
+- Add variables from `sample.env` in you development environment
+```bash
+export BUGOUT_TIMEOUT_SECONDS=5
+```
+
+```python
+from bugout.app import Bugout
+
+def main():
+    bugout = Bugout(brood_api_url="http://localhost:9001", spire_api_url="http://localhost:9002")
+
+    user = bugout.get_user(<user token ID>)
+    print(f"User name is {user.username}")
+
+    group = bugout.get_group(<user token ID>, <group ID>)
+
+    journal = bugout.get_journal(<user token ID>, <journal ID>)
+    entry = bugout.get_entry(<user token ID>, <journal ID>, <entry ID>)
+
+    search_res = bugout.search(<user token ID>, <journal ID>, query="your query", content=False)
+
+if __name__ == "__main__":
+    main()
+```
+
+
