@@ -1,0 +1,45 @@
+kind: Service
+metadata:
+  name: bbc-web-app-template-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: bbc-web-app-template
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: webapp
+---
+kind: StatefulSet
+metadata:
+  name: bbc-web-app-template
+  labels:
+    app: bbc-web-app-template
+spec:
+  selector:
+    matchLabels:
+      app: bbc-web-app-template
+  securityContext:
+    runAsUser: kortical
+  replicas: 1
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: bbc-web-app-template
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: bbc-web-app-template
+          image: eu.gcr.io/cloud_container_repo_placeholder/web_app:v0
+          imagePullPolicy: Always
+          command: ['run-cmd.sh']
+          args: ['flask', 'run', '-h', '0.0.0.0', '-p', '5000']
+          ports:
+            - containerPort: 5000
+              name: webapp
+              protocol: TCP
+          env:
+            - name: FLASK_APP
+              value: /data/bbc_web_app_template/src/main.py
