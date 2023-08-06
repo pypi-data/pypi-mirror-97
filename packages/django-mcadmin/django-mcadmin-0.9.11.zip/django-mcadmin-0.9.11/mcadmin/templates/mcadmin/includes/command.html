@@ -1,0 +1,19 @@
+{# django-mcadmin #}
+{# mcadmin/templates/mcadmin/includes/command.html #}
+
+
+{% load i18n %}
+
+
+<form action="{% url "mcadmin-index" %}" method="post" name="{{ name }}" id="id-{{ name }}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <fieldset class="module aligned extrapretty wide">
+            <h2>{{ command.name }}</h2>
+            {% include "mcadmin/includes/form.html" %}
+        </fieldset>
+        <div class="submit-row">
+            <p class="deletelink-box"><input name="{{ name }}" type="submit" value="{{ command.name }}" class="default"/></p>
+        </div>
+    </div>
+</form>
