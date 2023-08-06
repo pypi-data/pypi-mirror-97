@@ -1,0 +1,64 @@
+{#
+  Copyright (C) 2020 CERN.
+  Copyright (C) 2020 Northwestern University.
+  Copyright (C) 2021 TU Wien.
+
+  Invenio RDM Records is free software; you can redistribute it and/or modify
+  it under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{%- from "invenio_app_rdm/records/macros/version.html" import show_version %}
+
+
+{#
+<!-- TODO add again once the metrics are working -->
+<div class="ui segment rdm-sidebar">
+  <dt><b>{{ _('Metrics')}}</b></dt>
+  <hr class="thin-line">
+  </hr>
+  <dd>
+    <!-- Stats -->
+    {%- include "invenio_app_rdm/landing_page/details/stats.html" %}
+  </dd>
+</div>
+#}
+
+{#
+<!-- TODO add again once versioning is working -->
+<div class="ui segment rdm-sidebar">
+  <dt><b>{{ _('Versions')}}</b></dt>
+  <hr class="thin-line">
+  </hr>
+  <dd class="versions">
+    {{ show_version(metadata.version, record.ui.publication_date_l10n_medium, None) }}
+    <div class="ui container">
+      <div class="ui padded grid">
+      <div class="one column row">
+        <p class="font-small">
+          <strong>Cite all versions?</strong> You can cite all versions by using the DOI <a
+            href="https://doi.org/{{ metadata.identifiers|doi_identifier }}">{{ metadata.identifiers|doi_identifier }}</a>. This
+          DOI represents all versions, and will always resolve to the latest one. <a href="/coming-soon">Read more</a>.
+        </p>
+      </div>
+      </div>
+    </div>
+  </dd>
+</div>
+#}
+
+{%- if config.get("APP_RDM_RECORD_EXPORTERS") -%}
+{# if no export formats are specified, don't bother showing the box #}
+<div class="ui segment rdm-sidebar">
+  <dt><b>{{ _('Export')}}</b></dt>
+  <hr class="thin-line">
+  </hr>
+  <dd class="top-bottom-padded">
+    {# dynamically create the list of export formats #}
+    {%- for fmt, val in config.get("APP_RDM_RECORD_EXPORTERS", {}).items() -%}
+      {%- set name = val.get("name", fmt) -%}
+      {%- set export_url = url_for('invenio_app_rdm_records.record_export', pid_value=record.id, export_format=fmt) -%}
+      <a class="export-format" href="{{ export_url }}">{{ name }}</a>
+    {%- endfor -%}
+  </dd>
+</div>
+{%- endif -%}
