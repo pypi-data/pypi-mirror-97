@@ -1,0 +1,2 @@
+class MoreThanOneResult(ValueError):
+    pass
