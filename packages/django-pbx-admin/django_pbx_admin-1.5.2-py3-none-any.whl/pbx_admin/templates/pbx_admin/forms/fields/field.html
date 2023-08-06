@@ -1,0 +1,61 @@
+{% load pbx_tags %}
+{% load admin_tags %}
+
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+{% with label_class='col-lg-3' field_class=field_class|default:'col-lg-5' %}
+    {% if field|is_checkbox %}
+        <div class="form-group{% if field.field.multiplicable %} multiplicable{% endif %}" title="{% tooltip field %}" data-div-id="div_{{ field.auto_id }}">
+        {% if label_class %}
+            <div class="controls col-lg-offset-3">
+        {% endif %}
+    {% endif %}
+    <div id="div_{{ field.auto_id }}" {% if not field|is_checkbox %}class="form-group{% if field.field.multiplicable %} multiplicable{% endif %}{% else %}class="checkbox{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if not field|is_shinar %}{% if field.errors %} has-error{% endif %}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
+        {% if field.label and not field|is_checkbox and not field|is_shinar %}
+            {% if field.field.multiplicable %}
+              <hr>
+            {% endif %}
+            <label for="{{ field.id_for_label }}" class="control-label {{ label_class }}{% if field.field.required or field.field.silent_required %} requiredField{% endif %}">
+                <span class="label-tooltip" data-toggle="tooltip" title="{% tooltip field %}" data-original-title="">
+                    {{ field.label|safe }}
+                </span>
+                {% if field.field.required or field.field.silent_required %}<span class="asteriskField">*</span>{% endif %}
+            </label>
+        {% endif %}
+
+        {% if field|is_checkboxselectmultiple %}
+            {% include 'pbx_admin/forms/fields/checkboxselectmultiple.html' %}
+        {% endif %}
+
+        {% if field|is_radioselect %}
+            {% include 'pbx_admin/forms/fields/radioselect.html' %}
+        {% endif %}
+
+        {% if field|is_shinar %}
+            {% include 'pbx_admin/forms/fields/shinar.html' %}
+        {% endif %}
+
+        {% if not field|is_checkboxselectmultiple and not field|is_radioselect and not field|is_shinar %}
+            {% if field|is_checkbox %}
+                <label for="{{ field.id_for_label }}" class="{% if field.field.required %} requiredField{% endif %}">
+                    {{ field }}
+                    {{ field.label|safe }}
+                    {% include 'pbx_admin/forms/fields/help_text_and_errors.html' %}
+                </label>
+            {% else %}
+                <div class="controls {{ field_class }}">
+                    {{ field }}
+                    {% include 'pbx_admin/forms/fields/help_text_and_errors.html' %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </{% if tag %}{{ tag }}{% else %}div{% endif %}>
+    {% if field|is_checkbox %}
+        {% if label_class %}
+            </div>
+        {% endif %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endif %}
