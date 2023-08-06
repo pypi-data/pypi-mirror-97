@@ -1,0 +1,61 @@
+Metadata-Version: 2.1
+Name: cdk-stack-resource-rename
+Version: 0.0.5
+Summary: cdk-stack-resource-rename
+Home-page: https://github.com/yglcode/cdk-stack-resource-rename.git
+Author: Yigong Liu<ygl.code@gmail.com>
+License: Apache-2.0
+Project-URL: Source, https://github.com/yglcode/cdk-stack-resource-rename.git
+Description: ## StackResourceRenamer
+        
+        #### A CDK aspect, StackResourceRenamer renames CDK stack name and stack's subordinate resources' custom physical names, so that a CDK stack can be used to create multiple stacks in same AWS environment without confliction.
+        
+        ### Sample
+        
+        ```python
+        # Example automatically generated without compilation. See https://github.com/aws/jsii/issues/826
+        app = core.App()
+        
+        stack = core.Stack(app, "my-stack")
+        
+        alias = stack.node.try_get_context("alias")
+        if alias !== undefined:
+            # if alias is defined, rename stack and resources' custom names
+            # with the "rename" function/method.
+            StackResourceRenamer.rename(stack,
+                rename=(origName, _)=>{
+                                return origName+'-'+alias;
+                            }
+            )
+        
+        # resources in stack
+        bucket = s3.Bucket(stack, "bucket",
+            bucket_name="my-bucket"
+        )
+        ```
+        
+        To create multiple stacks:
+        
+        `cdk -c alias=a1 deploy  `
+        will create a stack: my-stack-a1 with my-bucket-a1.
+        
+        To create more stacks: my-stack-a2 / my-bucket-a2, my-stack-a3 / my-bucket-a3:
+        
+        `cdk -c alias=a2 deploy`
+        
+        `cdk -c alias=a3 deploy`
+        
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: JavaScript
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Typing :: Typed
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
