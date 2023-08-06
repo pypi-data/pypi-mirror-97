@@ -1,0 +1,1 @@
+(self.webpackChunkailab_lite=self.webpackChunkailab_lite||[]).push([[261],{690:(e,i,t)=>{var a=t(568),r=t(337);e.exports={id:"ailab-lite:plugin",requires:[r.IJupyterWidgetRegistry],activate:function(e,i){i.registerWidget({name:"ailab-lite",version:a.version,exports:a})},autoStart:!0}}}]);
