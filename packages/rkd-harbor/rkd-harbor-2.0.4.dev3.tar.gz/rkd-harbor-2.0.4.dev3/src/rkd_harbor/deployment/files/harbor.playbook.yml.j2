@@ -1,0 +1,21 @@
+- hosts: production
+  roles:
+      - name: blackandred.server_docker_project
+        vars:
+            deploy_user: "{{ deploy_user }}"
+            deploy_group: "{{ deploy_group }}"
+            project_dir: "{{ remote_dir }}"
+            git_deploy_url: "{{ git_secret_url }}"
+            git_regular_deploy_url: "{{ git_url }}"
+            compose_env_name: "{{ COMPOSE_PROJECT_NAME }}"
+            configure_sudoers: {{ configure_sudoers | default('false') }}
+
+            # will be active, when deploying to *.localhost (inventory)
+            test_specific_env:
+                - { line: "DOMAIN_SUFFIX=.localhost", regexp: '^DOMAIN_SUFFIX', title: 'env: Add domain suffix - .localhost' }
+
+            # will be active only on non-localhost hosts in the inventory
+            production_specific_env:
+                - { line: "DOMAIN_SUFFIX=", regexp: '^DOMAIN_SUFFIX', title: 'env: Remove domain suffix' }
+                - { line: "APP_USER={{ deploy_user }}", regexp: '^APP_USER', title: 'env: User' }
+                - { line: "APP_GROUP_ID=", regexp: '^APP_GROUP_ID', title: 'env: Group' }
