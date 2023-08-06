@@ -1,0 +1,288 @@
+Metadata-Version: 2.1
+Name: sap-audit-logging
+Version: 1.2.2
+Summary: SAP Python audit log service client
+Home-page: https://www.sap.com/
+Author: SAP SE
+License: SAP DEVELOPER LICENSE AGREEMENT
+Keywords: SAP audit auditlog
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: Microsoft
+Classifier: Operating System :: Other OS
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.0
+Description-Content-Type: text/markdown
+Requires-Dist: requests (==2.25.1)
+Requires-Dist: cfenv (==0.5.3)
+
+sap\_audit\_logging
+===================
+
+Provides audit logging functionalities for Python applications.
+
+Overview
+--------
+
+Audit logging is about writing entries in a specific format to a log
+storage. Subject to audit logging are events of significant importance.
+For example, security events which may impact the confidentiality, the
+integrity or the availability of a system. Another example of such an
+event would be access to personal data (both reading and altering) like
+bank accounts, political opinion, health status, etc.
+
+While the consumer of ordinary logs is a system administrator who would
+like to keep track of the state of a system, audit logs are read by an
+auditor. There are legal requirements regarding audit logging.
+
+In general, the events that are supposed to be audit logged can be
+grouped in 3 main categories:
+
+- changes to system configurations (which may have significant effect on the system itself)
+- access to personal data (related to data privacy)
+- general security events (like starting/stopping a system, failed authorization checks, etc.)
+
+General audit logging principles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  All attempts to perform an action in a system should be audit logged,
+   no matter if they have been successful or not.
+-  Audit log entries should be consistent with the state of the system.
+   If, for example, the writing of the audit log entry fails, but the
+   changes to system critical parameters have been applied, then those
+   changes should be reverted. Best practice is to wait for the callback
+   of the logger before continuing with the execution of other code.
+-  Especially important is which user (or other agent) has triggered the
+   corresponding event that is being audit logged. For most of the cases
+   the library will validate that such a field is provided in the
+   message.
+-  All audit log entries should be in English. Numbers should be
+   converted to strings with English locale. All time fields should be
+   in UTC time in order to avoid timezone and day light saving time
+   issues.
+-  Passwords should never be audit logged.
+
+Prerequisites
+~~~~~~~~~~~~~
+
+An application using the audit log library needs to be bound to an
+instance of the audit log service.
+
+API
+---
+
+The library provides an API for writing audit messages of type
+configuration changes, data modifications, data accesses and security
+events.
+
+Importing the library
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sap.audit_logging import AuditLogger
+
+Create message factory
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    audit_logger = AuditLogger()
+
+This will create an audit log message factory which will use the audit
+log service binding from the *VCAP\_SERVICES* environment variable. If more
+than one audit log service bindings are available, you can specify the
+service instance name in the *AuditLogger* constructor. For example:
+
+.. code:: python
+
+    audit_logger = AuditLogger('<service_instance_name>')
+
+**Note**: If no service instance is available in the environment then
+messages will be logged to the standard output.
+
+**Note**: The library takes *application\_name*, *organization\_name* and *space\_name* from
+the environment variable *VCAP\_APPLICATION* and sends them to the audit
+log service.
+
+**Note**: When a message is logged, the library checks for missing mandatory properties, and will throw an error if some of them are
+not provided.
+
+**Note**: In case a request to audit log service fails, the library will retry sending it.
+By default the number of attempts is 5, can be configured via the *AUDITLOG_CONNECTION_RETRY_COUNT* environment variable.
+
+Data access messages
+~~~~~~~~~~~~~~~~~~~~
+
+If you need to create an entry for a data access operation
+over personal data, you can achieve that with the following code:
+
+.. code:: python
+
+      data_access_message = audit_logger.create_data_access_msg()
+      data_access_message\
+          .set_user('user123')\
+          .set_tenant('tenant')\
+          .set_channel('RFC')\
+          .set_object({
+            'type': '<string>',
+            'id': {
+              '<string>': '<string>'
+            }
+          })\
+          .set_data_subject({
+            'type': '<string>',
+            'role': '<string>',
+            'id': {
+              '<string>': '<string>'
+            }
+          })\
+          .add_attribute('news', True)\
+          .add_attachment('attachment_id', 'attachment_name')\
+          .log()
+
+-  ``set_user(user)`` - takes a string which identifies the *user*
+   performing the action. This is **mandatory**.
+-  ``set_tenant(tenant)`` - takes a string which specifies the tenant
+   id. The provided value is ignored by older versions of the audit log
+   service that do not support setting a tenant.
+-  ``set_channel(channel)`` - takes a string which specifies *channel*
+   of access.
+-  ``set_object(object_attributes)`` - takes a *dict* which specifies the object which is being *accessed*. The *dict* must have two properties: 'type' - *string* and 'id' - *dict*. This is **mandatory**.
+-  ``set_data_subject(data_subject)`` - takes a *dict* which specifies the data subject. The *dict* must have two properties: 'type' - *string* and 'id' - *dict*. It can also have an optional property 'role' - *string*. This is **mandatory**.
+-  ``add_attribute(name, is_successful)`` - sets object attributes. It
+   is **mandatory** to provide at least one attribute.
+    -  ``name`` - is the name of the attribute being accessed.
+    -  ``is_successful`` - specifies whether the access was successful or not.
+-  ``add_attachment(attachment_id, name)`` - if attachments or files are
+   downloaded or displayed, information identifying the attachment shall
+   be logged.
+    -  ``attachment_id`` - attachment id
+    -  ``name`` - attachment name
+-  ``log()`` - sends the message to the audit log service.
+
+Data modification messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is how to create an entry for a data modification operation:
+
+.. code:: python
+
+      data_modification_message = audit_logger.create_data_modification_msg()
+      data_modification_message\
+          .set_user('user123')\
+          .set_tenant('tenant')\
+          .set_object({
+            'type': '<string>',
+            'id': {
+              '<string>': '<string>'
+            }
+          })\
+          .set_data_subject({
+            'type': '<string>',
+            'role': '<string>',
+            'id': {
+              '<string>': '<string>'
+            }
+          })\
+          .add_attribute('news', 'old news', 'new news')\
+          .log_prepare()
+      # make modification ...
+      # set modification as successful
+      data_modification_message.log_success()
+
+-  ``set_user(user)`` - takes a string which identifies the *user*
+   performing the action. This is **mandatory**.
+-  ``set_tenant(tenant)`` - takes a string which specifies the tenant
+   id. The provided value is ignored by older versions of the audit log
+   service that do not support setting a tenant.
+-  ``set_object(object_attributes)`` - takes a *dict* which specifies the object which is being *accessed*. The *dict* must have two properties: 'type' - *string* and 'id' - *dict*. This is **mandatory**.
+-  ``set_data_subject(data_subject)`` - takes a *dict* which specifies the data subject. The *dict* must have two properties: 'type' - *string* and 'id' - *dict*. It can also have an optional property 'role' - *string*. This is **mandatory**.
+-  ``add_attribute(name, old_value, new_value)`` - sets object
+   attributes. It is **mandatory** to provide at least one attribute.
+    -  ``name`` - is the name of the attribute being modified.
+    -  ``old_value`` - is the current value of the attribute.
+    -  ``new_value`` - is the value of the attribute after the change.
+-  ``log_prepare()`` - sends the message to the audit log service with
+   status *pending*.
+-  ``log_success()`` - updates the message status to *successful*.
+-  ``log_failure()`` - updates the message status to *failed*.
+
+**Note**: If *log\_success* or *log\_failure* are called without
+*log\_prepare*, the message will be sent to the audit log service with
+the corresponding status.
+
+Configuration change messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is how to create an entry for a configuration change operation:
+
+.. code:: python
+
+      configuration_change_message = audit_logger.create_configuration_change_msg()
+      configuration_change_message\
+          .set_user('user123')\
+          .set_tenant('tenant')\
+          .set_object({
+            'type': '<string>',
+            'id': {
+              '<string>': '<string>'
+            }
+          })\
+          .add_attribute('news', 'old news', 'new news')\
+          .log_prepare()
+      # make configuration change ...
+      # set configuration change as successful
+      configuration_change_message.log_success()
+
+-  ``set_user(user)`` - takes a string which identifies the *user*
+   performing the action. This is **mandatory**.
+-  ``set_tenant(tenant)`` - takes a string which specifies the tenant
+   id. The provided value is ignored by older versions of the audit log
+   service that do not support setting a tenant.
+-  ``set_object(object_attributes)`` - takes a *dict* which specifies the object which is being *accessed*. The *dict* must have two properties: 'type' - *string* and 'id' - *dict*. This is **mandatory**.
+-  ``add_attribute(name, old_value, new_value)`` - sets object
+   attributes. It is **mandatory** to provide at least one attribute.
+      -  ``name`` - is the name of the attribute being modified.
+      -  ``old_value`` - is the current value of the attribute.
+      -  ``new_value`` - is the value of the attribute after the change.
+-  ``log_prepare()`` - sends the message to the audit log service with
+   status *pending*.
+-  ``log_success()`` - updates the message status to *successful*.
+-  ``log_failure()`` - updates the message status to *failed*.
+
+General security messages
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is how to create a general security audit log message:
+
+.. code:: python
+
+    security_event_message = audit_logger.create_security_event_msg()
+    security_event_message\
+        .set_user('user123')\
+        .set_tenant('tenant')\
+        .set_data('unsuccessful login attempt')\
+        .set_ip('1.1.1.1')\
+        .log()
+
+-  ``set_user(user)`` - takes a string which identifies the *user*
+   performing the action. This is **mandatory**.
+-  ``set_tenant(tenant)`` - takes a string which specifies the tenant
+   id. The provided value is ignored by older versions of the audit log
+   service that do not support setting a tenant.
+-  ``set_data(data)`` - takes a string representing the security event
+   description. This is **mandatory**.
+-  ``set_ip(source_ip)`` - states the IP of the machine that contacts
+   the system. It is not mandatory, but it should be either IPv4 or
+   IPv6.
+-  ``log()`` - sends the message to the audit log service.
+
+
