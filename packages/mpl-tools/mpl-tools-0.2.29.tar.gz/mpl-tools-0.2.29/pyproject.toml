@@ -1,0 +1,151 @@
+# Ref dev_guide.py for some comments on this config.
+
+[tool.poetry]
+name = "mpl-tools"
+version = "0.2.29"
+description = "Tools for working with matplotlib" # Set == Github descript.
+authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
+license = "MIT"
+readme = "README.md" # puts the README on PyPI
+keywords = ["matplotlib", "plotting"]
+repository = "https://github.com/patricknraanes/mpl-tools"
+documentation = "https://patricknraanes.github.io/mpl-tools"
+#homepage = "https://python-poetry.org/"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+##################
+#  Dependencies  #
+##################
+
+[tool.poetry.dependencies]
+python = "^3.7"
+matplotlib = ">=3.0"
+importlib-metadata = {version = "^1.0", python = "<3.8"}
+
+[tool.poetry.dev-dependencies]
+#patlib = {path = "../patlib"} # Provides ipython, debuggers, etc
+
+pyqt5 = "*" # GUI-backend for mpl
+pdoc3 = "^0.9.2" # Doc generation
+
+# Note: Poetry/tox integration is subject to rapid change, ref dev_guide.py
+tox = "^3.20.1"
+tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
+
+pre-commit = "*"
+
+# Test
+pytest = ">=6" # >6 to enable config in pyproject.toml
+pytest-cov = "*"
+coverage = {extras = ["toml"], version = ">=5.1"}
+# "toml" and ">5.0b1" to enable config in pyproject.toml
+pytest-sugar = "*"
+# pytest-benchmark pytest-clarity pytest-xdist
+
+# Lint
+flakehell = "*"
+# NB: plugins must also be ENABLED in [tool.flakehell.plugins]
+# NB: plugins should also be listed in .pre-commit-config.yaml
+flake8-commas = "*"
+flake8-docstrings = "*"
+flake8-bugbear = "*"
+flake8-comprehensions = "*"
+flake8-isort = "*"
+flake8-builtins = "*"
+pep8-naming = "*"
+
+
+##################
+#  Config tests  #
+##################
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py3{7,8,9}
+toxworkdir={homedir}/.tox
+isolated_build = True
+
+[testenv]
+platform = linux|darwindeps
+install_dev_deps = true
+commands =
+    pytest {posargs}
+"""
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov --cov-report term-missing --doctest-modules"
+#testpaths = ["tests", "integration"] # norecursedirs suffices
+norecursedirs = """.* build dist CVS _darcs {arch} *.egg venv \
+tmp*""" # add tmp to the above (defaults)
+
+[tool.coverage.run]
+branch = true # stricter
+source = ["mpl_tools"]
+#omit = ["bad_file.py"]
+
+[tool.coverage.report]
+ignore_errors = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
+
+####################
+#  Config linting  #
+####################
+
+[tool.autopep8]
+max_line_length = 88
+ignore = "W6"
+
+[tool.flakehell]
+exclude = [".*", "README.*", "example*.py"]
+max_line_length = 88
+format = "grouped" # also try "stat"
+show_source = false
+#whitelist = "../../allowlist.txt" # Used by flake8-spellcheck.
+
+[tool.flakehell.plugins]
+pyflakes = ["+*"]
+pycodestyle = ["+*",
+    # flake8 defaults:
+    "-E24", "-W503", "-E123", "-E226", "-E704", "-E121", "-W504", "-E126",
+    #"-E711", "-E712", # "Comparison to True/None should be with 'is'"
+    "-E221", # Allow operator alignment
+    "-E251", # Allow operator alignment for dicts
+    #"-E266", # Allow ## block comments
+    "-C408", # Prefer {} to dict()
+    # "E271", "E701", and more... # if-list alignment
+    # "-E201", "-E202", "-E203", "-E241", "E231", # leave arrays as printed
+    #"-E202", "-E203",
+    # "E301", "E302", # dont put spaces between functions
+]
+#mccabe = ["+*"]
+#pylint = ["+*"]
+pep8-naming = ["+*",
+    # ignore lowercase demands:
+    "-N802", "-N803", "-N806"]
+#flake8-bandit = ["-*"]
+flake8-bugbear = ["+*"]
+flake8-builtins = ["+*"]
+flake8-comprehensions = ["+*", "-C408"]
+#flake8-darglint = ["+*"]
+flake8-commas = ["+*"]
+flake8-docstrings = ["+*", "-D105"]
+#flake8-eradicate = ["+*"]
+#flake8-isort = ["+*"]
+#flake8-pytest-style = ["+*"]
+#flake8-spellcheck = ["+*"]
+
+[tool.flakehell.exceptions."tests/*.py"]
+flake8-docstrings = ["-D*"]
