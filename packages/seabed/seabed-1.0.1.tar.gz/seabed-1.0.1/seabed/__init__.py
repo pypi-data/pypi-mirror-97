@@ -1,0 +1,1 @@
+from .ngdc import NGDCSeabedDescriptions
