@@ -1,0 +1,85 @@
+# gitlab CI config for uvm-python.
+# Official language image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/python/tags/
+image: python:3.7.6
+#image: python:3.8
+#image: gcc:10.2.0
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+    - iverilog/
+    - iverilog/*.o
+    - .pytype/
+    - verilator/
+
+before_script:
+  - uname -a
+  - gcc --version
+  - dpkg --list | grep compiler
+  - python -V  # Print out python version for debugging
+  - python -m venv venv
+  - source venv/bin/activate
+  - python -m pip freeze
+  - python -m pip install -r ci/requirements.txt
+  - apt-get update -qq
+  - apt-cache madison gcc
+  - apt-get install -y -qq flex bison gperf
+  - bash ci/install_iverilog.sh
+  # - bash ci/install_ghdl.sh
+  # - bash ci/install_verilator.sh
+  - ln -s src/uvm ./uvm
+  - ls -la
+
+pytype:
+  script:
+    - pip install pytype
+    - make pytype
+
+lint:
+  script:
+    - pip install flake8
+    - make lint
+
+test_icarus:
+  script:
+    - SIM=icarus make test || exit 1
+
+#test_ghdl:
+#  script:
+#    - SIM=ghdl make test TOPLEVEL_LANG=vhdl || exit 1
+
+#test_verilator:
+#  script:
+#    - SIM=verilator make test || exit 1
+
+#coverage:
+#  script:
+#    - pip install coverage coveralls
+#    - make cov-all
+#    - coveralls
+#  artifacts:
+#    paths:
+#      - htmlcov/
+
+#docs:
+#  script:
+#    - pip install sphinx sphinx-rtd-theme
+#    - cd docs ; make html
+#    - mv build/html/ ../public/
+#  artifacts:
+#    paths:
+#      - public
+#  only:
+#    - master
