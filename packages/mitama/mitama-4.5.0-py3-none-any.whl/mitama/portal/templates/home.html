@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}
+{% block content %}
+<div id='content' class='container'>
+    <ul class='nav nav-tabs mt-2'>
+        <li class='nav-item'>
+            <a class='nav-link active' href='{{ url('/') }}'>ホーム</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/groups') }}'>グループ</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/users') }}'>ユーザー</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/apps') }}'>アプリ</a>
+        </li>
+    </ul>
+    <div class='container pt-3 pb-3'>
+        {{ welcome_message | markdown }}
+    </div>
+</div>
+<script>
+window.addEventListener("load", () => {
+    if ("serviceWorker" in navigator){
+        navigator.serviceWorker.register("{{ url('/sw.js') }}", { scope: "/" }).then(reg => {
+            console.log(reg)
+        }).catch(e => {
+            console.error(e)
+        })
+    }
+});
+</script>
+{% endblock %}
