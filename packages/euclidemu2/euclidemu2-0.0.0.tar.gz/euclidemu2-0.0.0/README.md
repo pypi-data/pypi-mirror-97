@@ -1,0 +1,80 @@
+# EuclidEmulator2 (version 1.0.1)
+This package includes a python wrapper of EuclidEmulator2, a fast and accurate tool to estimate the non-linear correction to the matter power spectrum developed by M. Knabenhans. 
+EuclidEmulator2 allows for 8-parameter cosmological models including massive neutrinos (assuming a degenerate hierarchy) and dynamical dark energy. The source for EuclidEmulator2 is written in C++, with most main functions accessed through the python wrapper.
+
+Authors:  M. Knabenhans (emulator), Pedro Carrilho (python wrapper) <br/>
+Date of last update:      March 2021<br/>
+Reference: Euclid Consortium: Knabenhans et al. (submitted), <a>https://arxiv.org/abs/2010.11288</a><br/>
+
+If you use EuclidEmulator2 in any way (for a publication or otherwise), please cite this paper.
+
+<b>Contact information:</b> If you have any questions and/or remarks related to this work, please do not hesitate to send an email to (p.gregoriocarrilho@qmul.ac.uk) 
+
+## Currently implemented features in this python wrapper:
+* emulation of the non-linear correction factor <i>B(k,z)</i>
+* large allowed redshift interval: <i>z</i> in the interval [0.0,10.0] 
+* spatial scales spanning more than three orders of magnitude: 8.73 x 10<sup>-3</sup> <i>h</i> / Mpc ≤ <i>k</i> ≤ 9.41 <i>h</i> / Mpc.
+
+* Cosmology defined via parameter dictionary
+* Outputs numpy arrays
+* Can output in custom k-range with extrapolation outside default range
+
+See below for a tutorial on usage explaining these functionalities
+
+## Quick start
+### Prerequisites
+In any case you need:
+ * C++11 or later
+ * GNU Scientific Library version 2.5 or higher (GSL; see https://www.gnu.org/software/gsl/)
+ * g++ version 4.9.1 or higher
+ 
+#### GSL install
+On most machines, building GSL is relatively simple. To install it locally, e.g. in `~/local/gsl`, use
+```
+mkdir -p $HOME/local/gsl && cd $HOME/local
+wget -c ftp://ftp.gnu.org/gnu/gsl/gsl-latest.tar.gz -O - | tar zxv
+```
+The install procedure follows standard steps, but each one might take several minutes. Execute each command separately and only continue if there are no errors.
+```
+./configure --prefix=$HOME/local/gsl
+make
+make check
+make install
+```
+ Once done, make sure to add the GSL library to your library path with
+ ```
+ export LD_LIBRARY_PATH=$HOME/local/gsl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+ ```
+ 
+### Usage
+
+To load the package in python use
+
+```
+import euclidemu2
+```
+
+The main function is `get_boost(cosmo_par, redshifts, k_custom=None)` that takes a dictionary of cosmological parameters, an array with the requested redshifts and an optional array with a custom range of wave numbers. It outputs an array with the k values used and a dictionary with the boosts, indexed in the same order as the chosen redshifts. An example run looks like
+
+```
+import euclidemu2 as ee2
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy, scipy.interpolate
+
+cosmo_par={'As':2.1e-09, 'ns':0.966, 'Omb':0.04,'Omm':0.3,'h':0.68,'mnu':0.15,'w':-1.0,'wa':0.0}
+redshifts=[0,2,4,6,8,10]
+k, b = ee2.get_boost(cosmo_par,redshifts)
+
+for i in range(len(redshifts)):
+    plt.loglog(k,b[i],label="z="+str(redshifts[i]))
+
+plt.legend()
+plt.show()
+```
+
+If everything is correctly installed, this should produce a plot of the boosts for the chosen redshifts.
+
+## License
+EuclidEmulator2 is free software, distributed under the GNU General Public License. This implies that you may freely distribute and copy the software. You may also modify it as you wish, and distribute these modified versions. You must always indicate prominently any changes you made in the original code and leave the copyright notices, and the no-warranty notice intact. Please read the General Public License for more details. 
+
