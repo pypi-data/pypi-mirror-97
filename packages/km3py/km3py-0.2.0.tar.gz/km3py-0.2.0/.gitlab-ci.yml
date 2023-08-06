@@ -1,0 +1,53 @@
+image: docker.km3net.de/base/python:3
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+stages:
+  - install
+  - release
+
+.virtualenv_template: &virtualenv_definition |
+  python -V
+  pip install virtualenv
+  virtualenv venv
+  source venv/bin/activate
+  make install
+
+test-py3.6:
+    image: docker.km3net.de/base/python:3.6
+    stage: install
+    script:
+        - *virtualenv_definition
+
+test-py3.7:
+    image: docker.km3net.de/base/python:3.7
+    stage: install
+    script:
+        - *virtualenv_definition
+
+test-py3.8:
+    image: docker.km3net.de/base/python:3.8
+    stage: install
+    script:
+        - *virtualenv_definition
+
+pypi:
+    image: docker.km3net.de/base/python:3.8
+    stage: release
+    cache: {}
+    script:
+        - pip install -U twine wheel
+        - python setup.py sdist
+        - python setup.py bdist_wheel
+        - twine upload dist/*
+    only:
+        - tags
+    allow_failure: true
