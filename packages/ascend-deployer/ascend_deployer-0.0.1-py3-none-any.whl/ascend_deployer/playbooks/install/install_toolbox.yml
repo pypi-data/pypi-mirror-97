@@ -1,0 +1,26 @@
+- hosts: '{{ hosts_name }}'
+  tasks:
+    - name: find toolbox package
+      find:
+        paths: "{{ resources_dir }}"
+        recurse: no
+        file_type: file
+        use_regex: yes
+        patterns: ".*toolbox.*{{ ansible_architecture }}.run"
+      register: toolbox
+
+    - name: install toolbox
+      shell: "bash {{ toolbox.files[0].path }} --install --quiet --install-username={{ user }} --install-usergroup={{ group }}"
+      become: yes
+      register: toolbox_result
+      when: toolbox.matched > 0
+
+    - name: message
+      debug:
+        msg:
+          - "can not find toolbox package, toolbox install skipped"
+      when: "'skipped' in toolbox_result and toolbox_result.skipped and toolbox.matched == 0"
+
+    - name: message
+      debug: var=toolbox_result
+      when: toolbox_result.changed

@@ -1,0 +1,32 @@
+- hosts: '{{ hosts_name }}'
+  tasks:
+
+    - name: find nnrt package
+      find:
+        paths: "{{ resources_dir }}"
+        recurse: no
+        file_type: file
+        use_regex: yes
+        patterns: ".*nnrt.*{{ ansible_architecture }}.run"
+      register: nnrt
+      when: nnrt_from_zip.matched == 0
+
+    - name: install nnrt
+      shell: "bash {{ nnrt.files[0].path }} --install --quiet --install-username={{ user }} --install-usergroup={{ group }}"
+      become: yes
+      register: nnrt_result
+      when: nnrt_from_zip.matched == 0 and nnrt.matched > 0
+      failed_when: "nnrt_result.rc != 0 and ('install success' not in nnrt_result.stdout and 'already installed' not in nnrt_result.stdout)"
+
+    - name: message
+      debug:
+        msg:
+          - "can not find nnrt package, nnrt install skipped"
+      when: nnrt_from_zip.matched == 0 and nnrt.matched == 0
+
+    - name: message
+      debug:
+        msg:
+          - "{{ nnrt_from_zip_result | default('NOT DEFINED') }}"
+          - "{{ nnrt_result | default('NOT DEFINED') }}"
+      when: nnrt_from_zip_result.changed or nnrt_result.changed

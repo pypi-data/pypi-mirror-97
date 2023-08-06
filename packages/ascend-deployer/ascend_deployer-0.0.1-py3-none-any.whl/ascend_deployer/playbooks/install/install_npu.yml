@@ -1,0 +1,27 @@
+- hosts: '{{ hosts_name }}'
+  tasks:
+    # check the driver, always success
+    # set changed when npu-smi info not work
+    - name: check if driver is already installed
+      shell: npu-smi info
+      register: smi_info
+      failed_when: false
+      changed_when: smi_info.rc != 0
+
+    - debug:
+        var: smi_info
+        verbosity: 1
+
+    - name: create user if not exist
+      import_tasks: ../create_user.yml
+
+    - name: install firmware
+      import_tasks: task_firmware.yml
+      when: smi_info.rc == 0
+
+    - name: install driver
+      import_tasks: task_driver.yml
+
+    - name: install firmware
+      import_tasks: task_firmware.yml
+      when: smi_info.rc != 0

@@ -1,0 +1,13 @@
+- name: check driver task for os
+  local_action: stat path=task_driver_{{os_and_arch}}.yml
+  register: special_driver_task
+
+# if have dirver task for specific os, use the driver task for specific os
+- name: process driver for specific os
+  include_tasks: "task_driver_{{os_and_arch}}.yml"
+  when: special_driver_task.stat.exists
+
+# if not dirver task for specific os, use the driver task for common
+- name: process driver for common
+  include_tasks: task_driver_common.yml
+  when: not special_driver_task.stat.exists
