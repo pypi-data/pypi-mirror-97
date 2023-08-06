@@ -1,0 +1,52 @@
+{#
+Copyright 2018 Etsy Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+#}
+{% set iterable_builder = (node.name + '_iterable_builder') | sanitize_operator_name %}
+{% set builder_args = node.config.parameters_jsonschema.properties.keys() %}
+def {{ iterable_builder }}({{ ', '.join(builder_args) }}):
+{{ node.config.iterator_builder_method_code | add_leading_spaces(1) }}
+
+{% set blocklist = (node.name + '_blocklist') | sanitize_operator_name %}
+{{ blocklist }} = {{ node.regex_blocklist }}
+
+{% set item_name_builder = (node.name + '_item_name_builder') | sanitize_operator_name %}
+def {{ item_name_builder }}(index, item):
+{{ node.config.item_name_builder_code | add_leading_spaces(1) }}
+
+{# Note: we use resolved_properties rather than operator_args, because the
+ latter would discard any default task args, expecting them to be filled-in
+ by airflow, while in fact airflow would not fill them in at all. #}
+{% set properties = node.resolved_properties.values %}
+for (index, item) in enumerate({{ iterable_builder }}(
+{% for arg in builder_args %}
+{% if arg in properties %}
+            {{ arg }} = {{ properties[arg] | format_value }},
+{% endif %}
+{% endfor %}
+        )):
+
+    item_name = {{ item_name_builder }}(index, item)
+    blocklist_match = any(re.match(i, item_name) for i in {{ blocklist }})
+    if blocklist_match:
+        continue
+
+    {{ node.target | sanitize_operator_name }}_builder(
+        index = index,
+        item = item,
+        item_name = item_name,
+        dag = dag,
+        upstream_dependencies = {{ upstream_dependencies | sanitize_operator_name | verbatim | format_value }},
+        downstream_dependencies = {{ downstream_dependencies | sanitize_operator_name | verbatim | format_value }})
+
