@@ -1,0 +1,5 @@
+"""HTTP specific constants."""
+KEY_AUTHENTICATED = "ha_authenticated"
+KEY_HASS = "hass"
+KEY_HASS_USER = "hass_user"
+KEY_HASS_REFRESH_TOKEN_ID = "hass_refresh_token_id"
