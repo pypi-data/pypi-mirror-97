@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository
+contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- Views -->
+        <record model="ir.ui.view" id="party_view_tree">
+            <field name="model">party.party</field>
+            <field name="inherit" ref="party.party_view_tree"/>
+            <field name="name">party_tree</field>
+        </record>
+        <record model="ir.ui.view" id="party_view_tree_person">
+            <field name="model">party.party</field>
+            <field name="priority" eval="20"/>
+            <field name="type">tree</field>
+            <field name="name">party_tree_person</field>
+        </record>
+        <record model="ir.ui.view" id="party_view_tree_organization">
+            <field name="model">party.party</field>
+            <field name="priority" eval="20"/>
+            <field name="type">tree</field>
+            <field name="name">party_tree_organization</field>
+        </record>
+        <record model="ir.ui.view" id="party_view_form">
+            <field name="model">party.party</field>
+            <field name="inherit" ref="party.party_view_form"/>
+            <field name="name">party_form</field>
+        </record>
+        <!-- Menu actions and Menu entrys -->
+        <record model="ir.action.act_window" id="act_organization_form">
+            <field name="name">Organizations</field>
+            <field name="res_model">party.party</field>
+            <field name="domain" eval="[('party_type', '=', 'organization')]" pyson="1"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_organization_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="party_view_tree_organization"/>
+            <field name="act_window" ref="act_organization_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_organization_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="party_view_form"/>
+            <field name="act_window" ref="act_organization_form"/>
+        </record>
+        <menuitem name="Organizations"
+            parent="party.menu_party_form" sequence="5"
+            action="act_organization_form" id="menu_organization_form"/>
+        <record model="ir.action.act_window" id="act_person_form">
+            <field name="name">Persons</field>
+            <field name="res_model">party.party</field>
+            <field name="domain" eval="[('party_type', '=', 'person')]" pyson="1"/>
+            <field name="context" eval="{'party_type': 'person'}" pyson="1"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_person_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="party_view_tree_person"/>
+            <field name="act_window" ref="act_person_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_person_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="party_view_form"/>
+            <field name="act_window" ref="act_person_form"/>
+        </record>
+        <menuitem name="Persons" parent="party.menu_party_form"
+            sequence="5" action="act_person_form" id="menu_person_form"/>
+    </data>
+</tryton>
