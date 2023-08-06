@@ -1,0 +1,62 @@
+dist: bionic
+language: python
+sudo: required
+cache:
+  directories:
+    - ~/.cache/pip
+
+env:
+  global:
+    - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
+    - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
+    - TESTDATA_DIR=$HOME/testdata
+    - PGUSER=postgres
+    - PGPORT=5432
+    - PGPASSWORD=
+
+addons:
+  postgresql: 9.6
+  apt:
+    sources:
+      - sourceline: 'ppa:ubuntugis/ppa'
+    packages:
+      - libgdal-dev
+      - gdal-bin
+      - libsqlite3-mod-spatialite
+      - libproj-dev
+      - python3-dev
+      - postgresql-9.6-postgis-2.4
+
+services:
+  - postgresql
+
+python:
+  - '3.7'
+
+before_install:
+  - wget -O esa-snap_sentinel_unix_8_0.sh https://step.esa.int/downloads/8.0/installers/esa-snap_sentinel_unix_8_0.sh
+  - bash esa-snap_sentinel_unix_8_0.sh -q
+  - export PATH=$PATH:/opt/snap/bin
+
+install:
+  - pip install --ignore-installed six certifi # install packages inside the venv if the system version is too old
+  - pip install numpy
+  - pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="$(gdal-config --cflags)"
+  - pip install -r requirements-dev.txt
+  - pip install coveralls coverage
+  - python setup.py install
+
+#before_script:
+#  - travis_wait 40 . ./pyroSAR/install/download_testdata.sh
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+
+script:
+  - coverage run --source pyroSAR/ -m pytest
+
+after_success:
+  - coveralls
+
+notifications:
+  slack: pyrosar:bs03zodEkRSYr8MN5HrgfSeB
