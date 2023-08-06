@@ -1,0 +1,20 @@
+$def with (resources, files)
+$var title: Publication
+
+<h2>Resources</h2>
+<ul>
+$for resource in resources:
+    <li>
+    $ r = resource
+    <p><a href=$r["url"]>$r["url"]</a><br>
+    <small><strong>$"/".join(r["resource"]["type"])</strong>
+    last modified $r["modified"].diff_for_humans()</small></p>
+    <pre>$pformat(r["resource"])</pre>
+    </li>
+</ul>
+
+<h2>Files</h2>
+<ul>
+$for file in files:
+    <li><a href=/pub/media/$file.name>$file.name</a></li>
+</ul>
