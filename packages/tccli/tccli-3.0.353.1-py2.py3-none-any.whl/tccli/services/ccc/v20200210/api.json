@@ -1,0 +1,1715 @@
+{
+  "actions": {
+    "CreateSDKLoginToken": {
+      "document": "创建 SDK 登录 Token。",
+      "input": "CreateSDKLoginTokenRequest",
+      "name": "创建 SDK 登录 Token",
+      "output": "CreateSDKLoginTokenResponse"
+    },
+    "CreateStaff": {
+      "document": "创建客服账号。",
+      "input": "CreateStaffRequest",
+      "name": "创建客服账号",
+      "output": "CreateStaffResponse"
+    },
+    "DescribeChatMessages": {
+      "document": "包括具体聊天内容",
+      "input": "DescribeChatMessagesRequest",
+      "name": "查询服务的聊天记录",
+      "output": "DescribeChatMessagesResponse"
+    },
+    "DescribeIMCdrs": {
+      "document": "包括全媒体和文本两种类型",
+      "input": "DescribeIMCdrsRequest",
+      "name": "查询在线客服记录",
+      "output": "DescribeIMCdrsResponse"
+    },
+    "DescribePSTNActiveSessionList": {
+      "document": "获取 PSTN 活动会话列表。",
+      "input": "DescribePSTNActiveSessionListRequest",
+      "name": "获取 PSTN 活动会话列表",
+      "output": "DescribePSTNActiveSessionListResponse"
+    },
+    "DescribeSeatUserList": {
+      "document": "获取坐席用户列表（废弃）",
+      "input": "DescribeSeatUserListRequest",
+      "name": "获取坐席用户列表（废弃）",
+      "output": "DescribeSeatUserListResponse"
+    },
+    "DescribeSkillGroupInfoList": {
+      "document": "获取技能组信息列表",
+      "input": "DescribeSkillGroupInfoListRequest",
+      "name": "获取技能组信息列表",
+      "output": "DescribeSkillGroupInfoListResponse"
+    },
+    "DescribeStaffInfoList": {
+      "document": "获取坐席信息列表",
+      "input": "DescribeStaffInfoListRequest",
+      "name": "获取坐席信息列表",
+      "output": "DescribeStaffInfoListResponse"
+    },
+    "DescribeTelCallInfo": {
+      "document": "按实例获取电话消耗统计",
+      "input": "DescribeTelCallInfoRequest",
+      "name": "按实例获取电话消耗统计",
+      "output": "DescribeTelCallInfoResponse"
+    },
+    "DescribeTelCdr": {
+      "document": "获取电话服务记录与录音",
+      "input": "DescribeTelCdrRequest",
+      "name": "获取电话服务记录与录音",
+      "output": "DescribeTelCdrResponse"
+    }
+  },
+  "metadata": {
+    "apiVersion": "2020-02-10",
+    "api_brief": "介绍如何使用API对腾讯云呼叫中心进行操作，包括拉取会话记录、管理坐席信息和管理呼叫中心参数等。",
+    "serviceNameCN": "云呼叫中心",
+    "serviceShortName": "ccc"
+  },
+  "objects": {
+    "CreateSDKLoginTokenRequest": {
+      "document": "CreateSDKLoginToken请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "应用ID。",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "坐席账号。",
+          "member": "string",
+          "name": "SeatUserId",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "CreateSDKLoginTokenResponse": {
+      "document": "CreateSDKLoginToken返回参数结构体",
+      "members": [
+        {
+          "document": "SDK 登录 Token。",
+          "member": "string",
+          "name": "Token",
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "document": "过期时间戳，Unix 时间戳。",
+          "member": "int64",
+          "name": "ExpiredTime",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "SDK 加载路径会随着 SDK 的发布而变动。",
+          "member": "string",
+          "name": "SdkURL",
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "CreateStaffRequest": {
+      "document": "CreateStaff请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "应用ID",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "客服信息，个数不超过 10",
+          "member": "SeatUserInfo",
+          "name": "Staffs",
+          "required": true,
+          "type": "list"
+        }
+      ],
+      "type": "object"
+    },
+    "CreateStaffResponse": {
+      "document": "CreateStaff返回参数结构体",
+      "members": [
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeChatMessagesRequest": {
+      "document": "DescribeChatMessages请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "服务记录ID",
+          "member": "string",
+          "name": "CdrId",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "",
+          "document": "实例ID",
+          "member": "int64",
+          "name": "InstanceId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "应用ID",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回记录条数 最大为100默认20",
+          "member": "int64",
+          "name": "Limit",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回记录偏移 默认为0",
+          "member": "int64",
+          "name": "Offset",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "1为从早到晚，2为从晚到早，默认为2",
+          "member": "int64",
+          "name": "Order",
+          "required": false,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeChatMessagesResponse": {
+      "document": "DescribeChatMessages返回参数结构体",
+      "members": [
+        {
+          "document": "总记录数",
+          "member": "int64",
+          "name": "TotalCount",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "消息列表",
+          "member": "MessageBody",
+          "name": "Messages",
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeIMCdrsRequest": {
+      "document": "DescribeIMCdrs请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "起始时间",
+          "member": "int64",
+          "name": "StartTimestamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "结束时间",
+          "member": "int64",
+          "name": "EndTimestamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "实例ID",
+          "member": "int64",
+          "name": "InstanceId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "应用ID",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回记录条数 最大为100默认20",
+          "member": "int64",
+          "name": "Limit",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回记录偏移 默认为0",
+          "member": "int64",
+          "name": "Offset",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "1为全媒体，2为文本客服，不填则查询全部",
+          "member": "int64",
+          "name": "Type",
+          "required": false,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeIMCdrsResponse": {
+      "document": "DescribeIMCdrs返回参数结构体",
+      "members": [
+        {
+          "document": "总记录数",
+          "member": "int64",
+          "name": "TotalCount",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "服务记录列表",
+          "member": "IMCdrInfo",
+          "name": "IMCdrs",
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribePSTNActiveSessionListRequest": {
+      "document": "DescribePSTNActiveSessionList请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "应用 ID",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "数据偏移",
+          "member": "int64",
+          "name": "Offset",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回的数据条数，最大 25",
+          "member": "int64",
+          "name": "Limit",
+          "required": true,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribePSTNActiveSessionListResponse": {
+      "document": "DescribePSTNActiveSessionList返回参数结构体",
+      "members": [
+        {
+          "document": "列表总条数",
+          "member": "int64",
+          "name": "Total",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "列表内容",
+          "member": "PSTNSessionInfo",
+          "name": "Sessions",
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeSeatUserListRequest": {
+      "document": "DescribeSeatUserList请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "实例ID",
+          "example": "12",
+          "member": "int64",
+          "name": "InstanceId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "偏移量",
+          "example": "0",
+          "member": "int64",
+          "name": "Offset",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回数量",
+          "example": "10",
+          "member": "int64",
+          "name": "Limit",
+          "required": true,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeSeatUserListResponse": {
+      "document": "DescribeSeatUserList返回参数结构体",
+      "members": [
+        {
+          "document": "此实例的坐席用户总数",
+          "example": "10",
+          "member": "int64",
+          "name": "TotalCount",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "坐席用户信息列表",
+          "example": "无",
+          "member": "SeatUserInfo",
+          "name": "SeatUsers",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeSkillGroupInfoListRequest": {
+      "document": "DescribeSkillGroupInfoList请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "应用ID",
+          "example": "1400000000",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页尺寸，上限 100",
+          "example": "100",
+          "member": "int64",
+          "name": "PageSize",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页页码，从 0 开始",
+          "example": "0",
+          "member": "int64",
+          "name": "PageNumber",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "技能组ID，查询单个技能组时使用",
+          "example": "12",
+          "member": "int64",
+          "name": "SkillGroupId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "查询修改时间大于等于ModifiedTime的技能组时使用",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "ModifiedTime",
+          "required": false,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeSkillGroupInfoListResponse": {
+      "document": "DescribeSkillGroupInfoList返回参数结构体",
+      "members": [
+        {
+          "document": "技能组总数",
+          "example": "10",
+          "member": "int64",
+          "name": "TotalCount",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "技能组信息列表",
+          "example": "无",
+          "member": "SkillGroupInfoItem",
+          "name": "SkillGroupList",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeStaffInfoListRequest": {
+      "document": "DescribeStaffInfoList请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "应用ID",
+          "example": "1400000000",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页尺寸，上限 100",
+          "example": "100",
+          "member": "int64",
+          "name": "PageSize",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页页码，从 0 开始",
+          "example": "0",
+          "member": "int64",
+          "name": "PageNumber",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "坐席账号，查询单个坐席时使用",
+          "example": "102992@qq.com",
+          "member": "string",
+          "name": "StaffMail",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "",
+          "document": "查询修改时间大于等于ModifiedTime的坐席时使用",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "ModifiedTime",
+          "required": false,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeStaffInfoListResponse": {
+      "document": "DescribeStaffInfoList返回参数结构体",
+      "members": [
+        {
+          "document": "坐席用户总数",
+          "example": "10",
+          "member": "int64",
+          "name": "TotalCount",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "坐席用户信息列表",
+          "example": "无",
+          "member": "StaffInfo",
+          "name": "StaffList",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeTelCallInfoRequest": {
+      "document": "DescribeTelCallInfo请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "起始时间戳，Unix 时间戳",
+          "member": "int64",
+          "name": "StartTimeStamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "结束时间戳，Unix 时间戳，查询时间范围最大为90天",
+          "member": "int64",
+          "name": "EndTimeStamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "应用ID列表，多个ID时，返回值为多个ID使用总和",
+          "member": "int64",
+          "name": "SdkAppIdList",
+          "required": true,
+          "type": "list"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeTelCallInfoResponse": {
+      "document": "DescribeTelCallInfo返回参数结构体",
+      "members": [
+        {
+          "document": "电话呼出统计分钟数",
+          "member": "int64",
+          "name": "TelCallOutCount",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "电话呼入统计分钟数",
+          "member": "int64",
+          "name": "TelCallInCount",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "坐席使用统计个数",
+          "member": "int64",
+          "name": "SeatUsedCount",
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeTelCdrRequest": {
+      "document": "DescribeTelCdr请求参数结构体",
+      "members": [
+        {
+          "default": "",
+          "document": "起始时间戳，Unix 时间戳",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "StartTimeStamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "结束时间戳，Unix 时间戳",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "EndTimeStamp",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "返回数据条数，上限（deprecated）",
+          "example": "0",
+          "member": "int64",
+          "name": "Limit",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "偏移（deprecated）",
+          "example": "0",
+          "member": "int64",
+          "name": "Offset",
+          "required": true,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "实例 ID（deprecated）",
+          "example": "11",
+          "member": "int64",
+          "name": "InstanceId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "应用 ID",
+          "example": "1400000000",
+          "member": "int64",
+          "name": "SdkAppId",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页尺寸，上限 100",
+          "example": "100",
+          "member": "int64",
+          "name": "PageSize",
+          "required": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "document": "分页页码，从 0 开始",
+          "example": "0",
+          "member": "int64",
+          "name": "PageNumber",
+          "required": false,
+          "type": "int"
+        }
+      ],
+      "type": "object"
+    },
+    "DescribeTelCdrResponse": {
+      "document": "DescribeTelCdr返回参数结构体",
+      "members": [
+        {
+          "document": "话单记录总数",
+          "example": "2",
+          "member": "int64",
+          "name": "TotalCount",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "document": "话单记录",
+          "example": "0",
+          "member": "TelCdrInfo",
+          "name": "TelCdrs",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": false
+        },
+        {
+          "document": "唯一请求 ID，每次请求都会返回。定位问题时需要提供该次请求的 RequestId。",
+          "member": "string",
+          "name": "RequestId",
+          "type": "string"
+        }
+      ],
+      "type": "object"
+    },
+    "IMCdrInfo": {
+      "document": "全媒体服务记录信息",
+      "members": [
+        {
+          "default": "",
+          "document": "服务记录ID",
+          "member": "string",
+          "name": "Id",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "服务时长秒数",
+          "member": "int64",
+          "name": "Duration",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "结束状态",
+          "member": "int64",
+          "name": "EndStatus",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "用户昵称",
+          "member": "string",
+          "name": "Nickname",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "服务类型 1为全媒体，2为文本客服",
+          "member": "int64",
+          "name": "Type",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "客服ID",
+          "member": "string",
+          "name": "StaffId",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "服务时间戳",
+          "member": "int64",
+          "name": "Timestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        }
+      ],
+      "usage": "out"
+    },
+    "IVRKeyPressedElement": {
+      "document": "ivr 按键信息",
+      "members": [
+        {
+          "default": "",
+          "document": "按键\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1",
+          "member": "string",
+          "name": "Key",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "按键关联的标签\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "非常满意",
+          "member": "string",
+          "name": "Label",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "out"
+    },
+    "Message": {
+      "document": "单条消息",
+      "members": [
+        {
+          "default": "",
+          "document": "消息类型",
+          "member": "string",
+          "name": "Type",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "消息内容",
+          "member": "string",
+          "name": "Content",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        }
+      ],
+      "usage": "out"
+    },
+    "MessageBody": {
+      "document": "聊天消息",
+      "members": [
+        {
+          "default": "",
+          "document": "消息时间戳",
+          "member": "int64",
+          "name": "Timestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "发消息的用户ID",
+          "member": "string",
+          "name": "From",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "消息列表",
+          "member": "Message",
+          "name": "Messages",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": false
+        }
+      ],
+      "usage": "out"
+    },
+    "PSTNSessionInfo": {
+      "document": "PSTN 会话信息",
+      "members": [
+        {
+          "default": "",
+          "document": "会话 ID",
+          "member": "string",
+          "name": "SessionID",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "会话临时房间 ID",
+          "member": "string",
+          "name": "RoomID",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "主叫",
+          "member": "string",
+          "name": "Caller",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "被叫",
+          "member": "string",
+          "name": "Callee",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "开始时间，Unix 时间戳",
+          "member": "string",
+          "name": "StartTimestamp",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "接听时间，Unix 时间戳",
+          "member": "string",
+          "name": "AcceptTimestamp",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席邮箱",
+          "member": "string",
+          "name": "StaffEmail",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席工号",
+          "member": "string",
+          "name": "StaffNumber",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席状态 inProgress 进行中",
+          "member": "string",
+          "name": "SessionStatus",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "会话呼叫方向， 0 呼入 | 1 - 呼出",
+          "member": "int64",
+          "name": "Direction",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "振铃时间，Unix 时间戳",
+          "member": "int64",
+          "name": "RingTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        }
+      ],
+      "usage": "out"
+    },
+    "SeatUserInfo": {
+      "document": "坐席用户信息",
+      "members": [
+        {
+          "default": "",
+          "document": "坐席名称",
+          "example": "张三",
+          "member": "string",
+          "name": "Name",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席邮箱",
+          "example": "foo@tencent.com",
+          "member": "string",
+          "name": "Mail",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席电话号码（带0086前缀）",
+          "example": "008613012345678",
+          "member": "string",
+          "name": "Phone",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席昵称",
+          "example": "三三",
+          "member": "string",
+          "name": "Nick",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "用户ID",
+          "example": "foo@tencent.com",
+          "member": "string",
+          "name": "UserId",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席关联的技能组列表\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "\"\"",
+          "member": "string",
+          "name": "SkillGroupNameList",
+          "required": false,
+          "type": "list",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "工号\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "007",
+          "member": "string",
+          "name": "StaffNumber",
+          "required": false,
+          "type": "string",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "both"
+    },
+    "ServeParticipant": {
+      "document": "参与者信息",
+      "members": [
+        {
+          "default": "",
+          "document": "坐席邮箱\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "foo@tencent.com",
+          "member": "string",
+          "name": "Mail",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "坐席电话\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "008613012345678",
+          "member": "string",
+          "name": "Phone",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "振铃时间戳，Unix 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "RingTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "接听时间戳，Unix 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "AcceptTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "结束时间戳，Unix 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631891",
+          "member": "int64",
+          "name": "EndedTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "录音 ID，能够索引到坐席侧的录音\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "string",
+          "name": "RecordId",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "参与者类型，\"staffSeat\", \"outboundSeat\", \"staffPhoneSeat\"\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "staffSeat",
+          "member": "string",
+          "name": "Type",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "转接来源坐席信息\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "bar@tencent.com",
+          "member": "string",
+          "name": "TransferFrom",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "转接去向坐席信息\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "san@tencent.com",
+          "member": "string",
+          "name": "TransferTo",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "转接去向参与者类型，取值与 Type 一致\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "staffSeat",
+          "member": "string",
+          "name": "TransferToType",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "技能组 ID\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1101",
+          "member": "int64",
+          "name": "SkillGroupId",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "结束状态\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "ok unconnected seatGiveUp seatForward outboundForward ivrGiveUp ",
+          "member": "string",
+          "name": "EndStatusString",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "录音 URL\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "https://xxxxxxx",
+          "member": "string",
+          "name": "RecordURL",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "参与者序号，从 0 开始\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "0",
+          "member": "int64",
+          "name": "Sequence",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "开始时间戳，Unix 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "StartTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "技能组名称\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "tel",
+          "member": "string",
+          "name": "SkillGroupName",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "out"
+    },
+    "SkillGroupInfoItem": {
+      "document": "技能组信息",
+      "members": [
+        {
+          "default": "",
+          "document": "技能组ID",
+          "example": "1400000000",
+          "member": "int64",
+          "name": "SkillGroupId",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "技能组名称",
+          "example": "Test",
+          "member": "string",
+          "name": "SkillGroupName",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "类型：IM、TEL、ALL（全媒体）",
+          "example": "IM",
+          "member": "string",
+          "name": "Type",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "会话分配策略\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "fifo",
+          "member": "string",
+          "name": "RoutePolicy",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "会话分配是否优先上次服务坐席\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "0",
+          "member": "int64",
+          "name": "UsingLastSeat",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "单客服最大并发数（电话类型默认1）\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1",
+          "member": "int64",
+          "name": "MaxConcurrency",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "最后修改时间\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "LastModifyTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "out"
+    },
+    "SkillGroupItem": {
+      "document": "技能组信息",
+      "members": [
+        {
+          "default": "",
+          "document": "技能组ID",
+          "example": "101",
+          "member": "int64",
+          "name": "SkillGroupId",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "技能组名称",
+          "example": "Test",
+          "member": "string",
+          "name": "SkillGroupName",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "优先级",
+          "example": "1",
+          "member": "int64",
+          "name": "Priority",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "类型：IM、TEL、ALL（全媒体）",
+          "example": "IM",
+          "member": "string",
+          "name": "Type",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        }
+      ],
+      "usage": "out"
+    },
+    "StaffInfo": {
+      "document": "带有技能组优先级的坐席信息",
+      "members": [
+        {
+          "default": "",
+          "document": "坐席名称\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "xiaowang",
+          "member": "string",
+          "name": "Name",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "坐席邮箱",
+          "example": "10982291@qq.com",
+          "member": "string",
+          "name": "Mail",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席电话号码\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "18092226822",
+          "member": "string",
+          "name": "Phone",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "坐席昵称\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "xiaohong",
+          "member": "string",
+          "name": "Nick",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "坐席工号\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "101",
+          "member": "string",
+          "name": "StaffNumber",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "所属技能组列表\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "0",
+          "member": "SkillGroupItem",
+          "name": "SkillGroupList",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "最后修改时间\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1614149408",
+          "member": "int64",
+          "name": "LastModifyTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "out"
+    },
+    "TelCdrInfo": {
+      "document": "电话话单信息",
+      "members": [
+        {
+          "default": "",
+          "document": "主叫号码",
+          "example": "008613012345678",
+          "member": "string",
+          "name": "Caller",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "被叫号码",
+          "example": "008613012345670",
+          "member": "string",
+          "name": "Callee",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "呼叫发起时间戳，Unix 时间戳",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "Time",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "呼入呼出方向 0 呼入 1 呼出",
+          "example": "0",
+          "member": "int64",
+          "name": "Direction",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "通话时长",
+          "example": "120",
+          "member": "int64",
+          "name": "Duration",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "录音信息",
+          "example": "https://xxxxx",
+          "member": "string",
+          "name": "RecordURL",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "坐席信息",
+          "example": "0",
+          "member": "SeatUserInfo",
+          "name": "SeatUser",
+          "required": true,
+          "type": "object",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "结束状态\n0\t错误\n1\t正常结束\n2\t未接通\n17\t坐席未接\n100\t黑名单\n101\t坐席转接\n102\tIVR 期间用户放弃\n103\t会话排队期间用户放弃\n104\t会话振铃期间用户放弃\n105\t无坐席在线\n106\t非工作时间\n107\tIVR后直接结束\n201\t未知状态\n202\t未接听\n203\t拒接挂断\n204\t关机\n205\t空号\n206\t通话中\n207\t欠费\n208\t运营商线路异常\n209\t主叫取消\n210\t不在服务区",
+          "example": "1",
+          "member": "int64",
+          "name": "EndStatus",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "技能组名称",
+          "example": "tel",
+          "member": "string",
+          "name": "SkillGroup",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "主叫归属地",
+          "example": "广东深圳",
+          "member": "string",
+          "name": "CallerLocation",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": false
+        },
+        {
+          "default": "",
+          "document": "IVR 阶段耗时\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "5",
+          "member": "int64",
+          "name": "IVRDuration",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "振铃时间戳，UNIX 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "RingTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "接听时间戳，UNIX 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "AcceptTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "结束时间戳，UNIX 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631881",
+          "member": "int64",
+          "name": "EndedTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "IVR 按键信息 ，e.g. [\"1\",\"2\",\"3\"]\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "[\"1\",\"2\",\"3\"]",
+          "member": "string",
+          "name": "IVRKeyPressed",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "挂机方 seat 坐席 user 用户\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "user",
+          "member": "string",
+          "name": "HungUpSide",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "服务参与者列表\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "0",
+          "member": "ServeParticipant",
+          "name": "ServeParticipants",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "技能组ID\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "110",
+          "member": "int64",
+          "name": "SkillGroupId",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "error                   错误\nok                       正常结束\nunconnected      未接通\nseatGiveUp         坐席未接\nblackList             黑名单\nseatForward       坐席转接\nivrGiveUp           IVR 期间用户放弃\nwaitingGiveUp   会话排队期间用户放弃\nringingGiveUp   会话振铃期间用户放弃\nnoSeatOnline     无坐席在线\nnotWorkTime     非工作时间\nivrEnd                 IVR后直接结束\nunknown            未知状态\nnotAnswer          未接听\nuserReject          拒接挂断\npowerOff            关机\nnumberNotExist  空号\nbusy                    通话中\noutOfCredit        欠费\noperatorError     运营商线路异常\ncallerCancel        主叫取消\nnotInService       不在服务区\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "ok",
+          "member": "string",
+          "name": "EndStatusString",
+          "required": true,
+          "type": "string",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "会话开始时间戳，UNIX 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631891",
+          "member": "int64",
+          "name": "StartTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "进入排队时间，Unix 秒级时间戳\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "1611631891",
+          "member": "int64",
+          "name": "QueuedTimestamp",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "后置IVR按键信息（e.g. [{\"Key\":\"1\",\"Label\":\"非常满意\"}]）\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "0",
+          "member": "IVRKeyPressedElement",
+          "name": "PostIVRKeyPressed",
+          "required": true,
+          "type": "list",
+          "value_allowed_null": true
+        },
+        {
+          "default": "",
+          "document": "排队技能组Id\n注意：此字段可能返回 null，表示取不到有效值。",
+          "example": "110",
+          "member": "int64",
+          "name": "QueuedSkillGroupId",
+          "required": true,
+          "type": "int",
+          "value_allowed_null": true
+        }
+      ],
+      "usage": "out"
+    }
+  },
+  "version": "1.0"
+}
