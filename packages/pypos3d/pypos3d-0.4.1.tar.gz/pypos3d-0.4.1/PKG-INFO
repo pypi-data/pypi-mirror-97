@@ -1,0 +1,164 @@
+Metadata-Version: 2.1
+Name: pypos3d
+Version: 0.4.1
+Summary: Wavefront files and Poser files manipulation library
+Home-page: https://sourceforge.net/projects/pojamas
+Author: Olivier Dufailly
+Author-email: dufgrinder@laposte.net
+License: UNKNOWN
+Description: This file is the README of the library pypos3d.
+        
+        1) INTRODUCTION:
+        ================
+        This library is a port of the old DATA3D library of the OpenSource Pojamas project.
+        I own both of them.
+        
+        pypos3d aims to replace Pojamas.DATA3D library with a very close interface.
+        Application ePOSER (in Eclipse RCP) is replaced by a new MMI concept based on 
+        LibreOffice/Python.
+        
+        This Python library intends to give high level operations for some 3D files:
+        - WaveFront Files (.OBJ and compressed .obz [gziped]): 
+          * Read / Write
+          * Groups manupilation : add, remove, optimization, fusion
+          * High level method:
+            Plane Split, Plane Slice, Remesh, Hole filling
+        
+          All Wavefront functions (classes) are in the pypos3d.wftk package
+        
+        - Poser Files (.PZ3, .CR2, .PZZ, .CRZ, .PP2, .PPZ):
+          * Read / Write
+          * Actors, Props, Cameras, ... manipulations: add, remove, rename
+          * Morph report and morph report on alternate geometries
+          * Cleaning
+          
+          All Poser functions (classes) are in the pypos3d.pftk packages
+        
+        Initialy, Pojamas project was a Eclipse RCP application based on a SWT/Java3D MMI. 
+        For maintenance reason, this RCP application will be discontinued and shall be replaced
+        by another one (cf. chapter 4 'GUI').
+        
+        2) INSTALLATION:
+        ================
+        
+        2.1) Library Installation:
+        -------------------------
+        The library shall be installed with pip:
+        > python3 -m pip pypos3d
+        
+        2.2) GUI Install:
+        ----------------
+        
+          First, download the relevant GUI distribution package from Source Forge: https://sourceforge.net/projects/pojamas/files/
+             Filename : PyPos3DLO-X.Y.Z.zip
+          Unzip it in your usual work directory (anywhere, in fact)
+        
+          1. On _Linux_ (and probably Mac - To Be Confirmed):
+             Install first the library and its dependencies
+             Launch the GUI installer : PyPos3D-App-Installer.ods
+             Clic on **Check** install first and then on **Install**
+             Close LibreOffice
+        
+             The installation is finished, you can use the PyPos3DLO.ods sheet
+        
+          2. On _Windows_ (and for pure LibreOffice Installation on Linux)
+             You will need to extend the internal Python installation with the dependencies.
+             The PyPos3dLO installer will help you.
+        
+             Launch the GUI installer : PyPos3D-App-Installer.ods
+             Clic on **Check** install first and then on **Install**
+             Close LibreOffice
+        
+             The installation is finished, you can use the PyPos3DLO.ods sheet as an algorithm launcher.
+        
+        
+        2.3) 3D OpenGL Viewer Install:
+        -----------------------------
+        The Viewer shall be installed with pip:
+        > python3 -m pip pypos3dv
+        
+        
+        According to your system install, you may have to install some libraries:
+        Pillow (>= 6.2)
+        glfw (>=3)
+        
+        On CentOS 7: 
+        > yum install python36.pillow glfw
+        
+        On Debian 10 (i386)
+          glfw can't find the glfw3 library, because of the installation path
+          apt-get install libglfw3
+          export PYGLFW_LIBRARY=/lib/i386-linux-gnu/libglfw.so.3
+        
+        
+        
+        3) DESIGN:
+        ==========
+        The pypos3d Library has the following structure:
+          * langutil : A personal generic package for some utilities
+        
+          * pypos3d.wftk : WaveFront manipulation package
+            The main classes are pypos3d.wftk.WaveGeom and pypos3d.wftk.GeomGroup.
+            Refer to WaveGeom documention for information
+        
+          * pypos3d.pftk : Poser files manipulation package
+        
+          * pypos3d.propslim : Decimation function (port of Michael Garland "SlimKit Surface Modeling Tools")
+        
+          * Dependencies :
+            - numpy
+            - scipy
+            - xlrd
+        
+        The pypod3dv Viewer package has a flat structure:
+          * Modules: Window.py and Renderable.py
+          * Launcher: pypos3dv (executes __main__.py)
+        
+          * Dependencies :
+            - pypos3d
+            - PyOpenGL
+            - PyGLM
+            - GLFW
+        
+        
+        4) TESTS:
+        =========
+        This library is tested with unitest with a target coverage rate over 85%.
+        Unit tests are delivered in another package: pypos3dtu
+        Coding rules are based on CNES (RNC-CNES-Q-HB-80-535) - CNES is the French National Space Agency https://www.cnes.fr -
+        
+        Installation and commissionning tests are performed on:
+        - CentOS 8, 7
+        - Fedora >30
+        - Microsoft Windows 10 
+        
+        5) GUI:
+        =======
+        As mentioned previously, the former Pojamas application was an Eclipse RCP (obsolete RCP3).
+        In the future, a WxPython application is forseen.
+        For tests purpose, a LibreOffice calc based GUI is proposed.
+        Refer to: Pojamas for download
+        The GUI requires LibreOffice >= 6.4 on Windows and LibreOffice >= 6.3 on Linux (CentOS > 7)
+        
+        This new version of the library (>0.4) provides a simple 3d Viewer.
+        
+        LICENCE:
+        This library is delivered under the BSD license.
+        
+        
+        KR, Olivier
+        
+        --------------------------------------------------------------------------
+        Dev Notes
+        --------------------------------------------------------------------------
+        
+        
+        
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
