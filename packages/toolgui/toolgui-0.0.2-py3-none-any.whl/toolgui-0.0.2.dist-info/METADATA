@@ -1,0 +1,54 @@
+Metadata-Version: 2.1
+Name: toolgui
+Version: 0.0.2
+Summary: toolgui
+Home-page: https://github.com/rempelj/toolgui
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 1 - Planning
+Description-Content-Type: text/markdown
+Requires-Dist: imgui[glfw]
+Provides-Extra: dev
+Requires-Dist: twine ; extra == 'dev'
+Requires-Dist: wheel ; extra == 'dev'
+
+# toolgui
+
+Simple app to manage imgui windows for development tools written in python. 
+
+## Installation
+
+```
+pip install toolgui
+```
+
+## Usage
+
+```python
+import imgui
+import toolgui
+
+
+class State:
+    window_enabled = False
+
+
+@toolgui.menu_item("Example/Hello World")
+def show_window():
+    State.window_enabled = True
+
+
+@toolgui.on_update()
+def update_window():
+    if State.window_enabled:
+        expanded, opened = imgui.begin("Hello World", True)
+        State.window_enabled = opened
+        imgui.text("Hello world")
+        imgui.end()
+
+
+toolgui.start_toolgui_app()
+```
+
+
+
