@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link
+      href="{{swagger_ui_url}}swagger-ui.css"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('sermos.static', filename='swagger/theme-material.css') }}" />
+    <link
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('sermos.static', filename='swagger/sermos-swagger.css') }}" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('sermos.static', filename='logos/sermos-favicon-32x32.png') }}"
+      sizes="32x32" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('sermos.static', filename='logos/sermos-favicon-16x16.png') }}"
+      sizes="16x16" />
+</head>
+
+<body>
+    <img
+      class="sermos_logo"
+      src="{{ url_for('sermos.static', filename='logos/sermos_white_RGB.png') }}"
+      alt="Sermos" />
+
+    <div id="swagger-ui-container"></div>
+
+    <script src="{{swagger_ui_url}}swagger-ui-standalone-preset.js"></script>
+    <script src="{{swagger_ui_url}}swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = function () {
+            const ui = SwaggerUIBundle({
+                url: "{{ url_for('api-docs.openapi_json') }}",
+                dom_id: '#swagger-ui-container',
+                deepLinking: true,
+                layout: "BaseLayout",
+                supportedSubmitMethods: [{% for meth in swagger_ui_supported_submit_methods %}"{{meth.lower()}}", {% endfor %}],
+       })
+        window.ui = ui
+     }
+    </script>
+
+</body>
+
+</html>
