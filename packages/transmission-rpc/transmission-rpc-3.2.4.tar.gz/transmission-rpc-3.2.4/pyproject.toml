@@ -1,0 +1,67 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "transmission-rpc"
+version = "3.2.4"
+description = "Python module that implements the Transmission bittorent client RPC protocol"
+authors = ["Trim21 <i@trim21.me>"]
+readme = 'README.md'
+repository = 'https://github.com/Trim21/transmission-rpc'
+license = 'MIT'
+packages = [{ include = 'transmission_rpc' }]
+classifiers = [
+  'Intended Audience :: Developers',
+  'Development Status :: 4 - Beta',
+  'License :: OSI Approved :: MIT License',
+  'Topic :: Internet',
+  'Topic :: Software Development :: Version Control :: Git',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3.6',
+  'Programming Language :: Python :: 3.7',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Programming Language :: Python :: Implementation :: PyPy',
+]
+
+[tool.poetry.dependencies]
+python = "^3.6.1"
+# dependencies
+requests = "^2.23.0"
+typing_extensions = ">=3.7.4.2,<4.0.0.0"
+# build document
+sphinx = { version = "==3.5.2", optional = true }
+sphinx-rtd-theme = { version = "==0.5.1", optional = true }
+
+[tool.poetry.extras]
+docs = ['sphinx', 'sphinx-rtd-theme']
+
+[tool.poetry.dev-dependencies]
+yarl = "1.6.3"
+# tests
+pytest = "==6.2.2"
+coverage = "==5.5"
+# linter and formatter
+pre-commit = { version = "==2.11.0", markers = "implementation_name != 'pypy'" }
+mypy = { version = "0.812", markers = "implementation_name != 'pypy'" }
+flake8 = "==3.8.4"
+flake8-comprehensions = "==3.3.1"
+flake8-bugbear = "==21.3.2"
+flake8-mutable = "1.2.0"
+pytest-github-actions-annotate-failures = "==0.1.1"
+
+[tool.isort]
+default_section = 'THIRDPARTY'
+indent = '    '
+known_first_party = 'transmission_rpc'
+length_sort = true
+line_length = 88
+multi_line_output = 3
+no_lines_before = 'LOCALFOLDER'
+use_parentheses = true
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+addopts = '-rav'
