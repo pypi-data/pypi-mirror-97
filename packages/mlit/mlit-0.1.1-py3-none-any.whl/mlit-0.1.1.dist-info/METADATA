@@ -1,0 +1,55 @@
+Metadata-Version: 2.1
+Name: mlit
+Version: 0.1.1
+Summary: ML inference tools
+Home-page: UNKNOWN
+Author: roman@kalyakin.com
+License: UNKNOWN
+Keywords: ML,hugginface,onnx
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: transformers[torch] (>=4.3.3)
+Requires-Dist: onnxruntime (>=1.7.0)
+
+# ML inference tools
+
+## Requirements
+
+For model export `onnx` package is required.
+
+## Convert to ONNX
+
+Below are some examples:
+
+Convert `t5-small`:
+
+```
+PYTHONPATH=. python mlit to-onnx --model-type t5 --model-name t5-small --export-dir tmp
+```
+
+Check that it is working:
+
+```
+PYTHONPATH=. python mlit inference --model-name t5-small --base-dir tmp --model-input "translate English to French: How does this model work?" --model-type t5
+```
+
+Convert custom checkpoint:
+
+```
+PYTHONPATH=. python mlit to-onnx --model-type t5 --model-name "../my_custom_model" --export-dir tmp
+```
+
+Check that it is working:
+
+```
+PYTHONPATH=. python mlit inference --model-name my_custom_model --base-dir tmp --model-input "translate English to French: How does this model work?" --model-type t5 --tokenizer-name "t5-small"
+```
+
+
