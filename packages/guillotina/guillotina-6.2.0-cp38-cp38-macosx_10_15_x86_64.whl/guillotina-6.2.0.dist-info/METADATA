@@ -1,0 +1,504 @@
+Metadata-Version: 2.1
+Name: guillotina
+Version: 6.2.0
+Summary: asyncio REST API Resource database
+Home-page: https://github.com/plone/guillotina
+Author: Ramon Navarro Bosch & Nathan Van Gheem
+Author-email: ramon@plone.org
+License: BSD
+Keywords: asyncio,REST,Framework,transactional,asgi
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7.0
+Requires-Dist: uvicorn
+Requires-Dist: websockets
+Requires-Dist: jsonschema (==2.6.0)
+Requires-Dist: python-dateutil
+Requires-Dist: pycryptodome
+Requires-Dist: jwcrypto
+Requires-Dist: setuptools
+Requires-Dist: orjson (<4,>=3)
+Requires-Dist: zope.interface
+Requires-Dist: pyjwt (<2.0.0)
+Requires-Dist: asyncpg
+Requires-Dist: cffi
+Requires-Dist: PyYAML (>=5.1)
+Requires-Dist: lru-dict
+Requires-Dist: mypy-extensions
+Requires-Dist: argon2-cffi
+Requires-Dist: backoff
+Requires-Dist: multidict
+Requires-Dist: typing-extensions
+Provides-Extra: docs
+Requires-Dist: async-asgi-testclient (<2.0.0) ; extra == 'docs'
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: recommonmark ; extra == 'docs'
+Requires-Dist: sphinxcontrib-httpdomain ; extra == 'docs'
+Requires-Dist: sphinxcontrib-httpexample ; extra == 'docs'
+Requires-Dist: sphinx-guillotina-theme ; extra == 'docs'
+Requires-Dist: sphinx-autodoc-typehints ; extra == 'docs'
+Provides-Extra: mailer
+Requires-Dist: html2text (>=2018.1.9) ; extra == 'mailer'
+Requires-Dist: aiosmtplib (>=1.0.6) ; extra == 'mailer'
+Provides-Extra: memcached
+Requires-Dist: emcache ; extra == 'memcached'
+Provides-Extra: recaptcha
+Requires-Dist: aiohttp (<4) ; extra == 'recaptcha'
+Provides-Extra: redis
+Requires-Dist: aioredis (>=1.2.0) ; (python_version < "3.8") and extra == 'redis'
+Requires-Dist: aioredis (>=1.3.0) ; (python_version >= "3.8") and extra == 'redis'
+Provides-Extra: test
+Requires-Dist: pytest (<6.1.0,>=3.8.0) ; extra == 'test'
+Requires-Dist: docker ; extra == 'test'
+Requires-Dist: backoff ; extra == 'test'
+Requires-Dist: psycopg2-binary ; extra == 'test'
+Requires-Dist: pytest-asyncio (<=0.13.0) ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: coverage (>=4.0.3) ; extra == 'test'
+Requires-Dist: pytest-docker-fixtures ; extra == 'test'
+Requires-Dist: pytest-rerunfailures (<=9.0) ; extra == 'test'
+Requires-Dist: async-asgi-testclient (<2.0.0) ; extra == 'test'
+Requires-Dist: openapi-spec-validator (==0.2.9) ; extra == 'test'
+Requires-Dist: aiohttp (<4.0.0,>=3.0.0) ; extra == 'test'
+Requires-Dist: asyncmock ; extra == 'test'
+Requires-Dist: prometheus-client ; extra == 'test'
+Provides-Extra: testdata
+Requires-Dist: aiohttp (<3.6.0,>=3.0.0) ; (python_version < "3.8") and extra == 'testdata'
+Requires-Dist: aiohttp (<4.0.0,>=3.6.0) ; (python_version >= "3.8") and extra == 'testdata'
+Provides-Extra: validation
+Requires-Dist: pytz (==2020.1) ; extra == 'validation'
+
+Introduction
+============
+
+.. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
+   :target: http://guillotina.readthedocs.io/en/latest/
+
+.. image:: https://travis-ci.org/plone/guillotina.svg?branch=master
+   :target: https://travis-ci.org/plone/guillotina
+
+.. image:: https://codecov.io/gh/plone/guillotina/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/plone/guillotina/branch/master
+   :alt: Test Coverage
+
+.. image:: https://img.shields.io/pypi/pyversions/guillotina.svg
+   :target: https://pypi.python.org/pypi/guillotina/
+   :alt: Python Versions
+
+.. image:: https://img.shields.io/pypi/v/guillotina.svg
+   :target: https://pypi.python.org/pypi/guillotina
+
+.. image:: https://img.shields.io/pypi/l/guillotina.svg
+   :target: https://pypi.python.org/pypi/guillotina/
+   :alt: License
+
+.. image:: https://badges.gitter.im/plone/guillotina.png
+   :target: https://gitter.im/plone/guillotina
+   :alt: Chat
+
+.. image:: https://img.shields.io/docker/cloud/build/plone/guillotina
+   :target: https://hub.docker.com/r/guillotina/guillotina
+   :alt: Docker Cloud Build Status
+
+Please `read the detailed docs <http://guillotina.readthedocs.io/en/latest/>`_
+
+
+This is the working project of the next generation Guillotina server based on asyncio.
+
+
+Dependencies
+------------
+
+* Python >= 3.7
+* PostgreSQL >= 9.6
+
+
+Quickstart
+----------
+
+We use pip
+
+.. code-block:: shell
+
+    pip install guillotina
+
+
+Run PostgreSQL
+--------------
+
+If you don't have a PostgreSQL server to play with, you can run one with Docker.
+
+Download and start the Docker container by running
+
+.. code-block:: shell
+
+    make run-postgres
+
+
+
+Run the server
+--------------
+
+To run the server
+
+.. code-block:: shell
+
+    g
+
+
+Then...
+
+.. code-block:: shell
+
+    curl http://localhost:8080
+
+
+Or, better yet, use `Postman <https://www.getpostman.com/>`_ to start playing with API.
+
+You can also navigate in your Guillotina server with its built-in web admin interface by visiting http://localhost:8080/+admin/.
+
+Deploy on Heroku
+----------------
+
+Read more `Guillotina-Heroku <https://github.com/guillotinaweb/guillotina-heroku>`_.
+
+.. image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://www.heroku.com/deploy?template=https://github.com/guillotinaweb/guillotina-heroku
+
+Getting started with development
+--------------------------------
+
+Using pip (requires Python > 3.7)
+
+.. code-block:: shell
+
+    git clone git@github.com:plone/guillotina.git
+    cd guillotina
+    python3.7 -m venv .
+    ./bin/pip install -r requirements.txt
+    ./bin/pip install -r contrib-requirements.txt
+    ./bin/pip install -e '.[test]'
+    ./bin/pre-commit install
+
+
+Run tests
+---------
+
+We're using `pytest <https://docs.pytest.org/en/latest/>`_
+
+.. code-block:: shell
+
+    ./bin/pytest guillotina
+
+and for test coverage
+
+.. code-block:: shell
+
+    ./bin/pytest --cov=guillotina guillotina/
+
+With file watcher...
+
+.. code-block:: shell
+
+    ./bin/ptw guillotina --runner=./bin/py.test
+
+
+To run tests with cockroach db
+
+.. code-block:: shell
+
+    USE_COCKROACH=true ./bin/pytest guillotina
+
+Default
+-------
+
+Default root access can be done with AUTHORIZATION header : Basic root:root
+
+
+Docker
+------
+
+You can also run Guillotina with Docker!
+
+
+First, run PostgreSQL
+
+.. code-block:: shell
+
+    docker run --rm \
+        -e POSTGRES_DB=guillotina \
+        -e POSTGRES_USER=guillotina \
+        -p 127.0.0.1:5432:5432 \
+        --name postgres \
+        postgres:9.6
+
+Then, run Guillotina
+
+.. code-block:: shell
+
+    docker run --rm -it \
+        --link=postgres -p 127.0.0.1:8080:8080 \
+        plone/guillotina:latest \
+        g -c '{"databases": [{"db": {"storage": "postgresql", "dsn": "postgres://guillotina:@postgres/guillotina"}}], "root_user": {"password": "root"}}'
+
+
+This assumes you have a config.yaml in your current working directory
+
+
+Chat
+----
+
+Join us to talk about Guillotina at https://gitter.im/plone/guillotina
+
+
+CHANGELOG
+=========
+
+6.2.0 (2021-03-04)
+------------------
+
+- Write missing_value to object on deserialization
+  [masipcat]
+
+- BREAKING CHANGE: PG Catalog implementation splitted on multiple fields
+  if you are import PGSearchUtility you need to change the import line from:
+  `from guillotina.contrib.catalog.pg import PGSearchUtility` to `from guillotina.contrib.catalog.pg.utility import PGSearchUtility`
+  [bloodbare]
+
+
+6.1.7 (2021-03-03)
+------------------
+
+- ISecurityInfo: field 'id' was missing
+  [masipcat]
+
+
+6.1.6 (2021-02-25)
+------------------
+
+- Reuse modified objects on same transactions on traversal/async_get navigation
+  [bloodbare]
+
+- Improve memcached metrics probe [lferran]
+
+
+6.1.5 (2021-02-09)
+------------------
+
+- Cleaner memcached_container pytest fixture [lferran]
+
+- Fixing checking field permission on content creation
+  [bloodbare]
+
+- Fix memcached tests not able to start docker image [lferran]
+
+- Fixing 6.1.4 release (anonymous users not working on search)
+  [bloodbare]
+
+
+6.1.4 (2021-01-31)
+------------------
+
+- Apply local roles on @search with pgcatalog
+  [bloodbare]
+
+
+6.1.3 (2021-01-18)
+------------------
+
+- Fix: patch a role on dbusers:groups don't remove users from them
+  [jordic]
+
+- Fix: patching password on a user hash it
+  [jordic]
+
+- Fix: only allow lowercase usernames on dbusers creation
+  [jordic]
+
+- Feat: db_users, being able to login by email
+  [jordic]
+
+
+6.1.2 (2021-01-18)
+------------------
+
+- Fix filter and sort by date field on pgcatalog
+  [bloodbare]
+
+- Add memcached support as cache driver
+  [lferran]
+
+- Fix: prevent caching large objects on fill_cache
+  [lferran]
+
+- Fix: dyncontent vocabularies json serialization
+  [bloodbare]
+
+- Fix: prevent caching large objects on fill_cache
+  [lferran]
+
+6.1.1 (2021-01-15)
+------------------
+
+- Support other languages on FTS at pgcatalog
+  [bloodbare]
+
+- DB Users storing group on DB due to pickling groups_cache leads to wrong objects
+  [bloodbare]
+
+- Improve markup (docs/index.md)
+  [svx]
+
+- Various documentation improvements
+  [svx]
+
+- Unify wording in dev docs
+  [svx]
+
+
+6.1.0 (2021-01-11)
+------------------
+
+- (Breaking change) Fixing TLS and STARTTLS
+  At configuration starttls was used in case of tls: true. Its needed to change it to starttls: true
+  Now you can configura tls with tls: true or starttls with starttls: true on the server configuration
+  [bloodbare]
+
+- Better exception on worflow
+  [bloodbare]
+
+
+6.0.26 (2021-01-10)
+-------------------
+
+- Bug on Tus Upload with dict fieldname, location is wrong on POST request
+  [bloodbare]
+
+
+6.0.25 (2021-01-09)
+-------------------
+
+- Adding config option for max result search value
+  [bloodbare]
+
+
+6.0.24 (2021-01-07)
+-------------------
+
+- (Breaking change) Fix download file name to query parameter so dictionary file field downloads with filename.
+  API with filename on query path needs to change to filename query param
+  [bloodbare]
+
+
+6.0.23 (2021-01-05)
+-------------------
+
+- Dynamic content via config.yaml
+  [bloodbare]
+
+- Fix file not deleted in IMultiAttachments dict
+  [masipcat]
+
+- Keyword not pg catalog search and aggregation endpoint
+  [bloodbare]
+
+
+6.0.22 (2020-12-23)
+-------------------
+
+- Fixing addable-types, filtering not global addable types.
+  [bloodbare]
+
+- PyJwt > 2.0 breaks contract on decoding a JWT. Pinning to 1.6.0
+  [bloodbare]
+
+
+6.0.21 (2020-12-22)
+-------------------
+
+- Adding typing_extensions as dependency
+  [bloodbare]
+
+
+6.0.20 (2020-12-17)
+-------------------
+
+- Update uvicorn to 0.13.1
+  [bloodbare]
+
+- Adding widget field on json schema
+  [bloodbare]
+
+- Update orjson to 3.x
+  [waghanza]
+
+
+6.0.19 (2020-12-15)
+-------------------
+
+- Update gmi
+  [jordic]
+
+- Search by text by rank if its on search paramaters otherwise by alpha order
+  [bloodbare]
+
+
+6.0.18 (2020-12-05)
+-------------------
+
+- doc: training: fix websockets in G6
+  [masipcat]
+
+- doc: training: revert a change in api.md
+  [masipcat]
+
+- Fix watch/watch_lock when prometheus is not installed
+  [masipcat]
+
+
+6.0.17 (2020-12-04)
+-------------------
+
+- Adding timezone on email validation link expiration
+  [bloodbare]
+
+- Adding metadata endpoint to inspect query parameters for the search endpoint
+  [bloodbare]
+
+- Adding workflow/email_validation/vocabularies documentation
+  [bloodbare]
+
+- Bytes serializer
+  [bloodbare]
+
+- doc: improve training
+  [masipcat]
+
+- Record metrics on cache hit/misses
+  [vangheem]
+
+- Record metrics on time waiting for pg locks
+  [vangheem]
+
+- Record redis cache misses
+  [vangheem]
+
+- Add metrics to pg and redis operations
+  [vangheem]
+
+
+
+...
+
+You are seeing a truncated changelog.
+
+You can read the `changelog file <https://github.com/plone/guillotina/blob/master/CHANGELOG.rst>`_
+for a complete list.
+
+
+
