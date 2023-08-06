@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Runtime Image",
+  "name": "runtime-image",
+  "display_name": "Runtime Image",
+  "namespace": "runtime-images",
+  "uihints": {
+    "icon": "elyra:container",
+    "title": "Runtime Images"
+  },
+  "properties": {
+    "schema_name": {
+      "title": "Schema Name",
+      "description": "The schema associated with this instance",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-_]*[a-z0-9]$",
+      "minLength": 1
+    },
+    "display_name": {
+      "title": "Display Name",
+      "description": "The display name of the Runtime Image",
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "description": "Additional data specific to this Runtime Image",
+      "type": "object",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "description": "The description of this Runtime Image instance",
+          "type": "string"
+        },
+        "tags": {
+          "title": "Tags",
+          "description": "Tags for categorizing runtime images",
+          "type": "array",
+          "uihints": {
+            "field_type": "tags"
+          }
+        },
+        "image_name": {
+          "title": "Image Name",
+          "description": "The image name (including optional tag)",
+          "type": "string",
+          "minLength": 1,
+          "uihints": {
+            "placeholder": "registry/owner/image:tag",
+            "category": "Source"
+          }
+        },
+        "pull_policy": {
+          "title": "Image Pull Policy",
+          "description": "The pull policy to use when selecting this image",
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "uihints": {
+            "field_type": "dropdown",
+            "category": "Source"
+          }
+        }
+      },
+      "required": ["image_name"]
+    }
+  },
+  "required": ["schema_name", "display_name", "metadata"]
+}
