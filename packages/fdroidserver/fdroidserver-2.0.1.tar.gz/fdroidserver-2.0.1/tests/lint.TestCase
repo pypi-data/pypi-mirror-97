@@ -1,0 +1,332 @@
+#!/usr/bin/env python3
+
+# http://www.drdobbs.com/testing/unit-testing-with-python/240165163
+
+import inspect
+import logging
+import optparse
+import os
+import shutil
+import sys
+import tempfile
+import unittest
+
+localmodule = os.path.realpath(
+    os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), '..'))
+print('localmodule: ' + localmodule)
+if localmodule not in sys.path:
+    sys.path.insert(0, localmodule)
+
+import fdroidserver.common
+import fdroidserver.lint
+import fdroidserver.metadata
+
+
+class LintTest(unittest.TestCase):
+    '''fdroidserver/lint.py'''
+
+    def setUp(self):
+        logging.basicConfig(level=logging.INFO)
+        self.basedir = os.path.join(localmodule, 'tests')
+        self.tmpdir = os.path.abspath(os.path.join(self.basedir, '..', '.testfiles'))
+        if not os.path.exists(self.tmpdir):
+            os.makedirs(self.tmpdir)
+        os.chdir(self.basedir)
+
+    def test_check_for_unsupported_metadata_files(self):
+        self.assertTrue(fdroidserver.lint.check_for_unsupported_metadata_files())
+
+        tmptestsdir = tempfile.mkdtemp(prefix=inspect.currentframe().f_code.co_name,
+                                       dir=self.tmpdir)
+        self.assertFalse(fdroidserver.lint.check_for_unsupported_metadata_files(tmptestsdir + '/'))
+        shutil.copytree(os.path.join(localmodule, 'tests', 'metadata'),
+                        os.path.join(tmptestsdir, 'metadata'),
+                        ignore=shutil.ignore_patterns('apk', 'dump', '*.json'))
+        self.assertFalse(fdroidserver.lint.check_for_unsupported_metadata_files(tmptestsdir + '/'))
+        with open(os.path.join(tmptestsdir, 'metadata', 'org.adaway.json'), 'w') as fp:
+            fp.write('placeholder')
+        self.assertTrue(fdroidserver.lint.check_for_unsupported_metadata_files(tmptestsdir + '/'))
+
+    def test_forbidden_html_tags(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = {
+            'Name': 'Bad App',
+            'Summary': 'We pwn you',
+            'Description': 'This way: <style><img src="</style><img src=x onerror=alert(1)//">',
+        }
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_regexes(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertTrue(anywarns)
+
+    def test_source_urls(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = {
+            'Name': 'My App',
+            'Summary': 'just a placeholder',
+            'Description': 'This app does all sorts of useful stuff',
+        }
+        good_urls = [
+            'https://github.com/Matteljay/mastermindy-android',
+            'https://gitlab.com/origin/master',
+            'https://gitlab.com/group/subgroup/masterthing',
+            'https://raw.githubusercontent.com/Seva-coder/Finder/HEAD/ChangeLog.txt',
+            'https://github.com/scoutant/blokish/blob/HEAD/README.md#changelog',
+            'https://git.ieval.ro/?p=fonbot.git;a=blob;f=Changes;hb=HEAD',
+            'https://htmlpreview.github.io/?https://github.com/YasuakiHonda/Maxima-on-Android-AS/blob/HEAD/app/src/main/assets/About_MoA/index.html',
+            '',
+        ]
+
+        anywarns = False
+        for url in good_urls:
+            app['SourceCode'] = url
+            for warn in fdroidserver.lint.check_regexes(app):
+                anywarns = True
+                logging.debug(warn)
+        self.assertFalse(anywarns)
+
+        bad_urls = [
+            'github.com/my/proj',
+            'http://github.com/not/secure',
+            'https://github.com/foo/bar.git',
+            'https://gitlab.com/group/subgroup/project.git',
+            'https://raw.githubusercontent.com/Seva-coder/Finder/master/ChangeLog.txt',
+            'https://github.com/scoutant/blokish/blob/master/README.md#changelog',
+            'http://htmlpreview.github.io/?https://github.com/my/project/blob/HEAD/index.html',
+            'http://fdroid.gitlab.io/fdroid-website',
+        ]
+        logging.debug('bad urls:')
+        for url in bad_urls:
+            anywarns = False
+            app['SourceCode'] = url
+            for warn in fdroidserver.lint.check_regexes(app):
+                anywarns = True
+                logging.debug(warn)
+            self.assertTrue(anywarns, url + " does not fail lint!")
+
+    def test_check_app_field_types(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = fdroidserver.metadata.App()
+        app.id = 'fake.app'
+        app.Name = 'Bad App'
+        app.Summary = 'We pwn you'
+        app.Description = 'These are some back'
+
+        fields = {
+            'AntiFeatures': {
+                'good': [
+                    ['KnownVuln', ],
+                    ['NonFreeNet', 'KnownVuln'],
+                ],
+                'bad': [
+                    'KnownVuln',
+                    'NonFreeNet,KnownVuln',
+                ],
+            },
+            'Categories': {
+                'good': [
+                    ['Sports & Health', ],
+                    ['Multimedia', 'Graphics'],
+                ],
+                'bad': [
+                    'Science & Education',
+                    'Multimedia,Graphics',
+                ],
+            },
+            'WebSite': {
+                'good': [
+                    'https://homepage.com',
+                ],
+                'bad': [
+                    [],
+                    ['nope', ],
+                    29,
+                ],
+            },
+        }
+
+        for field, values in fields.items():
+
+            for bad in values['bad']:
+                anywarns = False
+                app[field] = bad
+                for warn in fdroidserver.lint.check_app_field_types(app):
+                    anywarns = True
+                    logging.debug(warn)
+                self.assertTrue(anywarns)
+
+            for good in values['good']:
+                anywarns = False
+                app[field] = good
+                for warn in fdroidserver.lint.check_app_field_types(app):
+                    anywarns = True
+                    logging.debug(warn)
+                self.assertFalse(anywarns)
+
+    def test_check_vercode_operation(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = fdroidserver.metadata.App()
+        app.Name = 'Bad App'
+        app.Summary = 'We pwn you'
+        app.Description = 'These are some back'
+
+        good_fields = [
+            '6%c',
+            '%c - 1',
+            '%c + 10',
+            '%c*10',
+            '%c*10 + 3',
+            '%c*10 + 8',
+            '%c + 2 ',
+            '%c + 3',
+            '%c + 7',
+        ]
+        bad_fields = [
+            'open("/etc/passwd")',
+            '%C + 1',
+            '%%c * 123',
+            '123 + %%',
+            '%c % 7',
+        ]
+
+        anywarns = False
+        for good in good_fields:
+            app.VercodeOperation = good
+            for warn in fdroidserver.lint.check_vercode_operation(app):
+                anywarns = True
+                logging.debug(warn)
+            self.assertFalse(anywarns)
+
+        for bad in bad_fields:
+            anywarns = False
+            app.VercodeOperation = bad
+            for warn in fdroidserver.lint.check_vercode_operation(app):
+                anywarns = True
+                logging.debug(warn)
+            self.assertTrue(anywarns)
+
+    def test_check_license_tag_no_custom_pass(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = fdroidserver.metadata.App()
+        app.License = "GPL-3.0-or-later"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertFalse(anywarns)
+
+    def test_check_license_tag_no_custom_fail(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+
+        app = fdroidserver.metadata.App()
+        app.License = "Adobe-2006"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertTrue(anywarns)
+
+    def test_check_license_tag_with_custom_pass(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+        config['lint_licenses'] = ['fancy-license', 'GPL-3.0-or-later']
+
+        app = fdroidserver.metadata.App()
+        app.License = "fancy-license"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertFalse(anywarns)
+
+    def test_check_license_tag_with_custom_fail(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+        config['lint_licenses'] = ['fancy-license', 'GPL-3.0-or-later']
+
+        app = fdroidserver.metadata.App()
+        app.License = "Apache-2.0"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertTrue(anywarns)
+
+    def test_check_license_tag_with_custom_empty(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+        config['lint_licenses'] = []
+
+        app = fdroidserver.metadata.App()
+        app.License = "Apache-2.0"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertTrue(anywarns)
+
+    def test_check_license_tag_disabled(self):
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.lint.config = config
+        config['lint_licenses'] = None
+
+        app = fdroidserver.metadata.App()
+        app.License = "Apache-2.0"
+
+        anywarns = False
+        for warn in fdroidserver.lint.check_license_tag(app):
+            anywarns = True
+            logging.debug(warn)
+        self.assertFalse(anywarns)
+
+
+if __name__ == "__main__":
+    os.chdir(os.path.dirname(__file__))
+
+    parser = optparse.OptionParser()
+    parser.add_option("-v", "--verbose", action="store_true", default=False,
+                      help="Spew out even more information than normal")
+    (fdroidserver.lint.options, args) = parser.parse_args(['--verbose'])
+    fdroidserver.common.options = fdroidserver.lint.options
+
+    newSuite = unittest.TestSuite()
+    newSuite.addTest(unittest.makeSuite(LintTest))
+    unittest.main(failfast=False)

@@ -1,0 +1,305 @@
+#!/usr/bin/env python3
+
+import glob
+import inspect
+import logging
+import optparse
+import os
+import shutil
+import sys
+import tempfile
+import textwrap
+import unittest
+import uuid
+import yaml
+from unittest import mock
+
+localmodule = os.path.realpath(
+    os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), '..'))
+print('localmodule: ' + localmodule)
+if localmodule not in sys.path:
+    sys.path.insert(0, localmodule)
+
+import fdroidserver.build
+import fdroidserver.common
+import fdroidserver.metadata
+import fdroidserver.scanner
+
+
+class ScannerTest(unittest.TestCase):
+
+    def setUp(self):
+        logging.basicConfig(level=logging.INFO)
+        self.basedir = os.path.join(localmodule, 'tests')
+        self.tmpdir = os.path.abspath(os.path.join(self.basedir, '..', '.testfiles'))
+        if not os.path.exists(self.tmpdir):
+            os.makedirs(self.tmpdir)
+        os.chdir(self.basedir)
+
+    def test_scan_source_files(self):
+        fdroidserver.scanner.options = mock.Mock()
+        fdroidserver.scanner.options.json = False
+        source_files = os.path.join(self.basedir, 'source-files')
+        projects = {
+            'cn.wildfirechat.chat': 4,
+            'com.integreight.onesheeld': 11,
+            'Zillode': 1,
+            'firebase-suspect': 1,
+            'org.mozilla.rocket': 3,
+            'realm': 1,
+            'se.manyver': 2,
+        }
+        for d in glob.glob(os.path.join(source_files, '*')):
+            build = fdroidserver.metadata.Build()
+            fatal_problems = fdroidserver.scanner.scan_source(d, build)
+            should = projects.get(os.path.basename(d), 0)
+            self.assertEqual(should, fatal_problems,
+                             "%s should have %d errors!" % (d, should))
+
+    def test_get_gradle_compile_commands(self):
+        test_files = [
+            ('source-files/fdroid/fdroidclient/build.gradle', 'yes', 17),
+            ('source-files/com.nextcloud.client/build.gradle', 'generic', 24),
+            ('source-files/com.kunzisoft.testcase/build.gradle', 'libre', 4),
+            ('source-files/cn.wildfirechat.chat/chat/build.gradle', 'yes', 33),
+            ('source-files/org.tasks/app/build.gradle.kts', 'generic', 39),
+            ('source-files/at.bitfire.davdroid/build.gradle', 'standard', 16),
+            ('source-files/se.manyver/android/app/build.gradle', 'indie', 29),
+            ('source-files/osmandapp/osmand/build.gradle', 'free', 5),
+            ('source-files/eu.siacs.conversations/build.gradle', 'free', 23),
+            ('source-files/org.mozilla.rocket/app/build.gradle', 'focus', 42),
+        ]
+
+        for f, flavor, count in test_files:
+            i = 0
+            build = fdroidserver.metadata.Build()
+            build.gradle = [flavor]
+            regexs = fdroidserver.scanner.get_gradle_compile_commands(build)
+            with open(f) as fp:
+                for line in fp.readlines():
+                    for regex in regexs:
+                        m = regex.match(line)
+                        if m:
+                            i += 1
+            self.assertEqual(count, i)
+
+    def test_scan_source_files_sneaky_maven(self):
+        """Check for sneaking in banned maven repos"""
+        testdir = tempfile.mkdtemp(prefix=inspect.currentframe().f_code.co_name, dir=self.tmpdir)
+        os.chdir(testdir)
+        fdroidserver.scanner.config = None
+        fdroidserver.scanner.options = mock.Mock()
+        fdroidserver.scanner.options.json = True
+        with open('build.gradle', 'w') as fp:
+            fp.write(textwrap.dedent("""
+                 maven {
+                    "https://jitpack.io"
+                    url 'https://maven.fabric.io/public'
+                 }
+                 maven {
+                    "https://maven.google.com"
+                    setUrl('https://evilcorp.com/maven')
+                 }
+            """))
+        count = fdroidserver.scanner.scan_source(testdir)
+        self.assertEqual(2, count, 'there should be this many errors')
+
+    def test_scan_source_file_types(self):
+        """Build product files are not allowed, test they are detected
+
+        This test runs as if `fdroid build` running to test the
+        difference between absolute and relative paths.
+
+        """
+        testdir = tempfile.mkdtemp(prefix=inspect.currentframe().f_code.co_name, dir=self.tmpdir)
+        build_dir = os.path.join('build', 'fake.app')
+        abs_build_dir = os.path.join(testdir, build_dir)
+        os.makedirs(abs_build_dir, exist_ok=True)
+        os.chdir(abs_build_dir)
+
+        fdroidserver.scanner.config = None
+        fdroidserver.scanner.options = mock.Mock()
+        fdroidserver.scanner.options.json = True
+
+        keep = [
+            'arg.jar',
+            'ascii.out',
+            'baz.so',
+            'classes.dex',
+            'sqlcipher.aar',
+            'static.a',
+            'src/test/resources/classes.dex',
+        ]
+        remove = [
+            'gradle-wrapper.jar',
+            'gradlew',
+            'gradlew.bat',
+        ]
+        os.makedirs('src/test/resources', exist_ok=True)
+        for f in keep + remove:
+            with open(f, 'w') as fp:
+                fp.write('placeholder')
+            self.assertTrue(os.path.exists(f))
+        binaries = [
+            'binary.out',
+            'fake.png',
+            'snippet.png',
+        ]
+        with open('binary.out', 'wb') as fp:
+            fp.write(b'\x00\x00')
+            fp.write(uuid.uuid4().bytes)
+        shutil.copyfile('binary.out', 'fake.png')
+        os.chmod('fake.png', 0o755)
+        os.system('ls -l binary.out')
+        with open('snippet.png', 'wb') as fp:
+            fp.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x000\x00\x00'
+                     b'\x000\x08\x06\x00\x00\x00W\x02\xf9\x87\x00\x00\x00\x04sB'
+                     b'IT\x08\x08\x08\x08|\x08d\x88\x00\x00\x00\tpHYs\x00\x00\n'
+                     b'a\x00\x00\na\x01\xfc\xccJ%\x00\x00\x00\x19tEXtSoftware')
+        os.chmod('snippet.png', 0o755)
+        os.system('ls -l fake.png')
+
+        # run scanner as if from `fdroid build`
+        os.chdir(testdir)
+        count = fdroidserver.scanner.scan_source(build_dir)
+        self.assertEqual(6, count, 'there should be this many errors')
+        os.chdir(build_dir)
+
+        for f in keep + binaries:
+            self.assertTrue(os.path.exists(f), f + ' should still be there')
+        for f in remove:
+            self.assertFalse(os.path.exists(f), f + ' should have been removed')
+
+        files = dict()
+        for section in ('errors', 'infos', 'warnings'):
+            files[section] = []
+            for msg, f in fdroidserver.scanner.json_per_build[section]:
+                files[section].append(f)
+
+        self.assertFalse('ascii.out' in files['errors'],
+                         'an ASCII .out file is not an error')
+        self.assertFalse('snippet.png' in files['errors'],
+                         'an executable valid image is not an error')
+
+        self.assertTrue('arg.jar' in files['errors'], 'all JAR files are errors')
+        self.assertTrue('baz.so' in files['errors'], 'all .so files are errors')
+        self.assertTrue('binary.out' in files['errors'], 'a binary .out file is an error')
+        self.assertTrue('classes.dex' in files['errors'], 'all classes.dex files are errors')
+        self.assertTrue('sqlcipher.aar' in files['errors'], 'all AAR files are errors')
+        self.assertTrue('static.a' in files['errors'], 'all .a files are errors')
+
+        self.assertTrue('fake.png' in files['warnings'],
+                        'a random binary that is executable that is not an image is a warning')
+        self.assertTrue('src/test/resources/classes.dex' in files['warnings'],
+                        'suspicious file but in a test dir is a warning')
+
+        for f in remove:
+            self.assertTrue(f in files['infos'],
+                            f + ' should be removed with an info message')
+
+    def test_build_local_scanner(self):
+        """`fdroid build` calls scanner functions, test them here"""
+        testdir = tempfile.mkdtemp(prefix=inspect.currentframe().f_code.co_name, dir=self.tmpdir)
+        os.chdir(testdir)
+
+        config = dict()
+        fdroidserver.common.fill_config_defaults(config)
+        fdroidserver.common.config = config
+        fdroidserver.build.config = config
+        fdroidserver.build.options = mock.Mock()
+        fdroidserver.build.options.json = False
+        fdroidserver.build.options.scan_binary = False
+        fdroidserver.build.options.notarball = True
+        fdroidserver.build.options.skipscan = False
+        fdroidserver.scanner.options = fdroidserver.build.options
+
+        app = fdroidserver.metadata.App()
+        app.id = 'mocked.app.id'
+        build = fdroidserver.metadata.Build()
+        build.commit = '1.0'
+        build.output = app.id + '.apk'
+        build.scanignore = ['baz.so', 'foo.aar']
+        build.versionCode = '1'
+        build.versionName = '1.0'
+        vcs = mock.Mock()
+
+        for f in ('baz.so', 'foo.aar', 'gradle-wrapper.jar'):
+            with open(f, 'w') as fp:
+                fp.write('placeholder')
+            self.assertTrue(os.path.exists(f))
+
+        with open('build.xml', 'w') as fp:
+            fp.write(textwrap.dedent(
+                """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <project basedir="." default="clean" name="mockapp">
+                <target name="release"/>
+                <target name="clean"/>
+                </project>"""))
+
+        def make_fake_apk(output, build):
+            with open(build.output, 'w') as fp:
+                fp.write('APK PLACEHOLDER')
+            return output
+
+        with mock.patch('fdroidserver.common.replace_build_vars', wraps=make_fake_apk):
+            with mock.patch('fdroidserver.common.get_native_code', return_value='x86'):
+                with mock.patch('fdroidserver.common.get_apk_id',
+                                return_value=(app.id, build.versionCode, build.versionName)):
+                    with mock.patch('fdroidserver.common.is_apk_and_debuggable', return_value=False):
+                        fdroidserver.build.build_local(
+                            app, build, vcs,
+                            build_dir=testdir, output_dir=testdir,
+                            log_dir=None, srclib_dir=None, extlib_dir=None, tmp_dir=None,
+                            force=False, onserver=False, refresh=False
+                        )
+        self.assertTrue(os.path.exists('baz.so'))
+        self.assertTrue(os.path.exists('foo.aar'))
+        self.assertFalse(os.path.exists('gradle-wrapper.jar'))
+
+    def test_gradle_maven_url_regex(self):
+        """Check the regex can find all the cases"""
+        with open(os.path.join(self.basedir, 'gradle-maven-blocks.yaml')) as fp:
+            data = yaml.safe_load(fp)
+
+        urls = []
+        for entry in data:
+            found = False
+            for m in fdroidserver.scanner.MAVEN_URL_REGEX.findall(entry):
+                urls.append(m)
+                found = True
+            self.assertTrue(found, 'this block should produce a URL:\n' + entry)
+        self.assertEqual(len(data), len(urls), 'each data example should produce a URL')
+
+    def test_scan_gradle_file_with_multiple_problems(self):
+        """Check that the scanner can handle scandelete with gradle files with multiple problems"""
+        testdir = tempfile.mkdtemp(prefix=inspect.currentframe().f_code.co_name, dir=self.tmpdir)
+        os.chdir(testdir)
+        fdroidserver.scanner.config = None
+        fdroidserver.scanner.options = mock.Mock()
+        build = fdroidserver.metadata.Build()
+        build.scandelete = ['build.gradle']
+        with open('build.gradle', 'w') as fp:
+            fp.write(textwrap.dedent("""
+                 maven {
+                    url 'https://maven.fabric.io/public'
+                 }
+                 maven {
+                    url 'https://evilcorp.com/maven'
+                 }
+            """))
+        count = fdroidserver.scanner.scan_source(testdir, build)
+        self.assertFalse(os.path.exists("build.gradle"))
+        self.assertEqual(0, count, 'there should be this many errors')
+
+
+if __name__ == "__main__":
+    os.chdir(os.path.dirname(__file__))
+
+    parser = optparse.OptionParser()
+    parser.add_option("-v", "--verbose", action="store_true", default=False,
+                      help="Spew out even more information than normal")
+    (fdroidserver.common.options, args) = parser.parse_args(['--verbose'])
+
+    newSuite = unittest.TestSuite()
+    newSuite.addTest(unittest.makeSuite(ScannerTest))
+    unittest.main(failfast=False)

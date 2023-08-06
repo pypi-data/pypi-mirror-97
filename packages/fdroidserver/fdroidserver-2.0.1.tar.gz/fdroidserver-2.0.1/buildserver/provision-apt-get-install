@@ -1,0 +1,141 @@
+#!/bin/bash
+
+echo $0
+set -e
+set -x
+
+debian_mirror=$1
+export DEBIAN_FRONTEND=noninteractive
+
+printf 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";\n' \
+       > /etc/apt/apt.conf.d/99no-install-recommends
+
+printf 'APT::Acquire::Retries "20";\n' \
+       > /etc/apt/apt.conf.d/99acquire-retries
+
+cat <<EOF > /etc/apt/apt.conf.d/99no-auto-updates
+APT::Periodic::Enable "0";
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Unattended-Upgrade "0";
+EOF
+
+printf 'APT::Get::Assume-Yes "true";\n' \
+       > /etc/apt/apt.conf.d/99assumeyes
+
+cat <<EOF > /etc/apt/apt.conf.d/99quiet
+Dpkg::Use-Pty "0";
+quiet "1";
+EOF
+
+if echo $debian_mirror | grep '^https' 2>&1 > /dev/null; then
+    apt-get update || apt-get update
+    apt-get install apt-transport-https ca-certificates
+fi
+
+cat << EOF > /etc/apt/sources.list
+deb ${debian_mirror} stretch main
+deb http://security.debian.org/debian-security stretch/updates main
+deb ${debian_mirror} stretch-updates main
+EOF
+echo "deb ${debian_mirror} stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list
+echo "deb ${debian_mirror} stretch-backports-sloppy main" > /etc/apt/sources.list.d/stretch-backports-sloppy.list
+echo "deb ${debian_mirror} testing main"           > /etc/apt/sources.list.d/testing.list
+printf "Package: *\nPin: release o=Debian,a=testing\nPin-Priority: -300\n" > /etc/apt/preferences.d/debian-testing
+
+dpkg --add-architecture i386
+
+apt-get update || apt-get update
+apt-get upgrade --download-only
+apt-get upgrade
+
+packages="
+ androguard/stretch-backports
+ ant
+ asn1c
+ ant-contrib
+ autoconf
+ autoconf2.13
+ automake
+ automake1.11
+ autopoint
+ bison
+ bzr
+ ca-certificates-java
+ cmake
+ curl
+ disorderfs
+ expect
+ faketime
+ flex
+ gettext
+ gettext-base
+ git-core
+ git-svn
+ gperf
+ gpg/stretch-backports-sloppy
+ gpgconf/stretch-backports-sloppy
+ libassuan0/stretch-backports
+ libgpg-error0/stretch-backports
+ javacc
+ libarchive-zip-perl
+ libexpat1-dev
+ libgcc1:i386
+ libglib2.0-dev
+ liblzma-dev
+ libncurses5:i386
+ librsvg2-bin
+ libsaxonb-java
+ libssl-dev
+ libstdc++6:i386
+ libtool
+ libtool-bin
+ make
+ maven
+ mercurial
+ nasm
+ openjdk-8-jre-headless
+ openjdk-8-jdk-headless
+ optipng
+ p7zip
+ pkg-config
+ python-gnupg
+ python-lxml
+ python-magic
+ python-pip
+ python-setuptools
+ python3-asn1crypto/stretch-backports
+ python3-defusedxml
+ python3-git
+ python3-gitdb
+ python3-gnupg
+ python3-pip
+ python3-pyasn1
+ python3-pyasn1-modules
+ python3-requests
+ python3-setuptools
+ python3-smmap
+ python3-yaml
+ python3-ruamel.yaml
+ python3-pil
+ python3-paramiko
+ quilt
+ rsync
+ scons
+ sqlite3
+ subversion
+ sudo
+ swig
+ unzip
+ xsltproc
+ yasm
+ zip
+ zlib1g:i386
+"
+apt-get install $packages --download-only
+apt-get install $packages
+
+highestjava=`update-java-alternatives --list | sort -n | tail -1 | cut -d ' ' -f 1`
+update-java-alternatives --set $highestjava
+
+# configure headless openjdk to work without gtk accessability dependencies
+sed -i -e 's@\(assistive_technologies=org.GNOME.Accessibility.AtkWrapper\)@#\1@' /etc/java-8-openjdk/accessibility.properties
