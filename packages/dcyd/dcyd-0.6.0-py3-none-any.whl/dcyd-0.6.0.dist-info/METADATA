@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: dcyd
+Version: 0.6.0
+Summary: dcyd model performance monitoring client
+Home-page: https://github.com/dcyd-inc/dcyd-mpm-client-python
+Author: dcyd, inc.
+Author-email: info@dcyd.io
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown
+Requires-Dist: google-cloud-logging (==2.2.0)
+Requires-Dist: requests
+
+
+# DCYD Model Performance Monitoring Client
+
+Visit https://www.dcyd.io/ for more details.
+
+## Install
+
+Requires Python 3 before start
+
+### Using pip
+
+```
+pip3 install dcyd -U
+```
+
+### Using pipenv
+
+```
+pipenv install dcyd
+```
+
+
+## Configure
+
+Generate the **dcyd.json** configuration file
+
+```bash
+dcyd-config $DCYD_PROJECT_ID $DCYD_PROJECT_ACCESS_TOKEN
+```
+
+Point the **DCYD_CONFIG_FILE** environment variable to the above file location
+
+```bash
+export DCYD_CONFIG_FILE=/path/to/project/dcyd.json
+```
+
+## Usage
+
+### Simple monitoring
+
+```python
+from dcyd.mpm import mpm
+
+@mpm.monitor
+def my_predict_function(features):
+    result = None
+    # run my model(s) logic
+    return result
+```
+
+### Monitor with custom data
+
+```python
+from dcyd.mpm import mpm
+
+@mpm.monitor(my_model_version='1.0')
+def my_predict_function(features):
+    result = None
+    # run my model(s) logic
+    return result
+```
+
+
+
+
