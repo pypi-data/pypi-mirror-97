@@ -1,0 +1,79 @@
+Metadata-Version: 2.1
+Name: espsetup
+Version: 0.0.5
+Summary: simplified setup up for esp8266 / esp32 device
+Home-page: https://github.com/kr-g/espsetup
+Author: k.r. goger
+Author-email: k.r.goger+espsetup@gmail.com
+License: MIT
+Keywords: micropython utility shell setup esp esp32 esp8266
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Embedded Systems
+Classifier: Topic :: Terminals :: Serial
+Classifier: Topic :: Utilities
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: esptool
+
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+
+# esp-setup
+
+simplified setup up for esp8266 / esp32 device 
+
+# how it works
+
+the tool discovers first the connected device type with `esptool.py` and
+searches then the available firmware `bin` files in your download folder.
+the search follows the naming convention of the micropython release (alphabetical sort).
+
+after that it ask which to install.
+
+optional you can erase flash before installing
+
+
+## cmd line
+
+display all available cmd line options with
+
+
+    python3 -m espsetup -h
+
+    usage: espsetup [options]. 
+                it's possible to pass custom parameters to esptool, such as
+                "-fs 1MB -fm dout 0x0" (e.g. for a esp8266 board).
+                the defaults are:
+                    esp8266: "-z 0x1000", and
+                    esp32: "--flash_size=detect 0".
+                a single '-' will set this to ""
+                any custom parameter at the end of the cmd-line
+                will be passed over to esptool as specified.
+
+    setup an esp32/esp8266 device
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -v, --version         show version info and exit
+      -s, --dry             simulate /dry run, only show cmd information
+      -port PORT, -p PORT   port/device to use (default: /dev/ttyUSB0)
+      -baud BAUD, -b BAUD   baud rate to use (default: 115200)
+      -c {ask,y,yes,n,no}, -erase_flash {ask,y,yes,n,no}
+                            erase_flash before installing (default: ['ask'])
+      -r {ask,y,yes,n,no}, -run_cmd {ask,y,yes,n,no}
+                            run final install cmd (default: ['ask'])
+      -image IMAGE, -i IMAGE
+                            image to install, use 'latest' to install the last version available in your folder(default: show list of available images
+                            '*.bin')
+      -dir IMAGE_DIR, -d IMAGE_DIR
+                            image search directory (default: ~/Downloads)
+
+
+
