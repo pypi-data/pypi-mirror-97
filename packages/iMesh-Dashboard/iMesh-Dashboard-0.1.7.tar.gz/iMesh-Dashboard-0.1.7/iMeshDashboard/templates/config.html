@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-4">
+    <div class="card" style="min-height:350px">
+      <div class="card-header">
+        Send Message
+      </div>
+      <div class="card-body">
+        <form action="/sendMessage" method="post">
+          <label for="fmsg">Messaggio</label>
+          <input type="text" id="fmsg" name="fmsg"><br><br>
+          <input type="submit" value="Send">
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-8">
+    <div class="card" style="min-height:350px">
+      <div class="card-header">
+        <span>Set Node </span><b><span id="fid"></span></b>
+      </div>
+      <div class="card-body">
+        <form action="/setNode" method="post">
+          <label for="flongName">Long Name</label>
+          <input type="text" id="flongName" name="flongName" value="{{ nodeInfo['user']['longName'] }}"><br><br>
+          <label for="flatitude">Latitude</label>
+          <input type="text" id="flatitude" name="flatitude" value="{{ nodeInfo['position']['latitude'] }}"><br><br>
+          <label for="flongitude">Longitude</label>
+          <input type="text" id="flongitude" name="flongitude" value="{{ nodeInfo['position']['longitude'] }}"><br><br>
+          <label for="faltitude">Altitude</label>
+          <input type="text" id="faltitude" name="faltitude" value="{{ nodeInfo['position']['altitude'] }}"><br><br>
+          <input type="submit" value="SET">
+        </form>
+        Position and Altitude can be set if device dosn't have GPS and no fixed position is set in config file
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
