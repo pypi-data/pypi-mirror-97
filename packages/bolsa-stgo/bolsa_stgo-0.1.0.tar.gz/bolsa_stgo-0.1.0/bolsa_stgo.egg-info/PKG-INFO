@@ -1,0 +1,297 @@
+Metadata-Version: 2.1
+Name: bolsa-stgo
+Version: 0.1.0
+Summary: SDK de la API de la bolsa de Santiago.
+Home-page: https://github.com/LautaroParada/bolsa-santiago
+Author: Lautaro Parada Opazo
+Author-email: lautaro.parada.opazo@gmail.com
+License: MIT License
+Description: # Bolsa de Santiago startup API
+        [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+        
+        
+        [![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://shields.io/) ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg) [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/) [![PyPI status](https://img.shields.io/pypi/status/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+        
+        **Contenidos**
+        
+        1. [Descripcion general](#descripcion-general-arrow_up)
+        2. [InstalaciÃ³n y requisitos](#instalaciÃ³n-y-requisitos-arrow_up)
+        3. [Demo Servicios de Consulta](#demo-servicios-de-consulta-arrow_up)
+            - [DocumentaciÃ³n servicios de consulta](#documentaciÃ³n-servicios-de-consulta-arrow_up)
+        4. [Demo Servicios de NegociaciÃ³n](#demo-servicios-de-negociaciÃ³n-arrow_up)
+        	- [DocumentaciÃ³n servicios de negociacion](#documentaciÃ³n-servicios-de-negociacion-arrow_up)
+        5. [Disclaimer](#disclaimer-arrow_up)
+        
+        ## Descripcion general [:arrow_up:](#bolsa-de-santiago-startup-api)
+         
+        Cliente de la [API](https://startup.bolsadesantiago.com/#/) de la bolsa de Santiago. Este cliente estandariza la llamada de datos de la API mediante un SDK desarrollado en Python :snake:.
+        
+        ## InstalaciÃ³n y requisitos [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        #### Requisitos
+        - Se debe solicitar una api key con el equipo que mantiene la API. Para aquello deben ir al siguiente [link](https://startup.bolsadesantiago.com/#/)
+        - ```Python``` >= 3.8
+        
+        #### InstalaciÃ³n
+        ```python
+        pip install bolsa-stgo
+        ```
+        
+        ## Demo Servicios de Consulta [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        Los endpoints de las APIs de informaciÃ³n de mercado te permitirÃ¡n simular el uso del de datos de mercado de instrumentos de renta variable, a travÃ©s del consumo de un **web-service**. A continuaciÃ³n un demo de su uso:
+        
+        ```python
+        import os
+        from bolsa.consultas import ConsultasAPI # Cliente de la API Servicios de Consulta
+        
+        # cargar la api key desde las variables de entorno del sistma
+        api_key = os.environ['API_BS']
+        
+        # CreaciÃ³n de la instancia que manipulara las solicitudes a la API
+        con_bs = ConsultasAPI(token=api_key)
+        
+        # Instrumentos validos o disponibles para el usuario
+        resp = con_bs.get_instrumentos_validos()
+        print('Instrumentos validos')
+        print(resp)
+        print('-'*70)
+        
+        # NÃºmero de solicitudes utilizadas y disponibles para el usuario
+        resp = con_bs.get_request_usuario()
+        print('Request usuario')
+        print(resp)
+        print('-'*70)
+        ```
+        
+        *tutorial sobre como guardar y cargar variables de entorno en Python -> [Hiding Passwords and Secret Keys in Environment Variables (Windows)](https://youtu.be/IolxqkL7cD8)*
+        
+        ### DocumentaciÃ³n servicios de consulta [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        La API de Servicios de Consulta posee varios endpoints disponibles para su uso. A continuaciÃ³n se explicaran los mÃ©todos del cliente que estandarizan las solicitudes a la API.
+        
+        1. **Client Market Data:** UUn Market Data es una aplicaciÃ³n que mantiene en memoria el estado del mercado en tiempo real. Se recibe informaciÃ³n sobre estados de negociaciÃ³n, puntas de cotizaciÃ³n, profundidad del libro de Ã³rdenes, resumen o snapshot del mercado, entre otros. Todo esta informaciÃ³n se envÃ­a mediante protocolo **FIX**. Los mÃ©todos disponibles para realizar consultas son:
+        
+        - ```get_indices_rv```: Valor de los principales Ã­ndices de renta variable junto con su variaciÃ³n porcentual y volumen. 
+        
+        	**ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = con_bs.get_indices_rv()
+        print(f"Indices de renta variable\n {resp}")
+        ```
+        
+        - ```get_instrumentos_rv```: Detalle de los instrumentos disponibles para transar en el mercado de renta variable. Se muestra el precio de apertura, mÃ­nimos y mÃ¡ximos y volumen transado, entre otros.
+        	
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python
+        resp = con_bs.get_instrumentos_rv()
+        print(f"Instrumentos de renta variable\n {resp}")
+        ```
+        
+        - ```get_puntas_rv```: Mejores ofertas que se encuentran ingresadas en el mercado de renta variable (compra mÃ¡s cara y venta barata). Se muestra precio de compra, precio de venta, cantidad, monto, condiciÃ³n de liquidaciÃ³n, entre otros.
+        	
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python
+        resp = con_bs.get_puntas_rv()
+        print(f"Puntas de renta variable\n {resp}")
+        ```
+        
+        - ```get_transacciones_rv```: Detalle de las ultimas transacciones de los instrumentos disponibles en renta variable. Se muestra instrumento, condiciÃ³n de liquidaciÃ³n y cantidad, entre otros.
+        
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python
+        resp = con_bs.get_transacciones_rv()
+        print(f"Transacciones de renta variable\n {resp}")
+        ````
+        
+        2. **Instrumentos Disponibles**
+        - ```get_instrumentos_validos```: Permite conocer cuales son los instrumentos del mercado de renta variable que estan disponibles para utilizar.
+        
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python
+        resp = con_bs.get_instrumentos_validos()
+        print(f"Instrumentos validos\n {resp}")
+        ````
+        
+        3. **Request Usuario**
+        - ```get_request_usuario```: NÃºmero de solcitudes disponibles a realizar y limite diario.
+        
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python
+        resp = con_bs.get_request_usuario()
+        print(f"Solicitudes del usuario\n {resp}")
+        ```
+        4. **Ticker on Demand**
+        - ```get_indices```: InformaciÃ³n sobre los Ã­ndices que trazan la actividad comercial de la Bolsa de Santiago. Se muestra el nombre del Ã­ndice, el valor actual, el mayor y menor valor del dÃ­a y la variaciÃ³n porcentual.
+        
+        	**ParÃ¡metros:** Ninguno.
+        
+        ```python 
+        resp = con_bs.get_indices()
+        print(f"Indices de la Bolsa de Santiago\n {resp}")
+        ```
+        
+        - ```get_resumen_accion```: InformaciÃ³n bursÃ¡til detallada de alguna instrumento/acciÃ³n en particular.
+        
+        	**ParÃ¡metros:** *Obligatorios*
+        	- ```Nemo```(str): NemotÃ©cnico o nombre del sÃ­mbolo del instrumento a analizar.
+        
+        ```python
+        import numpy as np
+        
+        # Solicitar los nombres de instrumentos disponibles 
+        resp = con_bs.get_instrumentos_validos()
+        # seleccionar alguno al azar
+        ticker = con_bs.get_instrumentos_validos()[np.random.randint(len(resp))]['NEMO']
+        # solicitar el resumen del instrumento.
+        resp = con_bs.get_resumen_accion(Nemo=ticker)
+        print(f'Resumen de la accion de {ticker}\n {resp}')
+        ```
+        
+        - ```get_variaciones_capital```: VariaciÃ³n de capital asociada a un NemotÃ©cnico/nombre del instrumento en particular. ***Este mÃ©todo estÃ¡ en estado BETA, dado que el equipo que soporta la API tiene inconvenientes tÃ©cnicos para este endpoint.***
+        
+        	**ParÃ¡metros:** *Obligatorios*
+        	- ```Nemo```(str): Nemotecnico o nombre del simbolo del instrumento a analizar.
+        	- ```Fecha_Desde```(str): Inicio de la fecha para solicitar variaciÃ³n de capital. El formato es el siguiente YYYYmmDDhhMMss
+        	- ```Fecha_Hasta```(str): Fin de la fecha para solicitar variaciÃ³n de capital. El formato es el siguiente YYYYmmDDhhMMss
+        
+        ```python
+        resp = con_bs.get_variaciones_capital(Nemo=ticker, Fecha_Desde='2021020111000000', Fecha_Hasta='2021020411000000')
+        print(f"Variacion de capital para {ticker}\n {resp}")
+        ```
+        ## Demo Servicios de NegociaciÃ³n [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        Los endpoints de las APIs de ingreso de ofertas te permitirÃ¡n el ingresar ofertas mediante el sistema **DMA** y experimentar cÃ³mo se distribuyen los datos en el mercado de negociaciones de instrumentos financieros. A continuaciÃ³n un demo de su uso:
+        
+        ```python
+        import os
+        from bolsa.negociacion import NegociacionAPI
+        
+        # Cargar la api key desde las variables de entorno del sistma
+        api_key = os.environ['API_BS']
+        
+        # CreaciÃ³n de la instancia que manipulara las solicitudes a la API
+        neg_bs = NegociacionAPI(token=api_key)
+        
+        # Instrumentos validos o disponibles para el usuario
+        resp = neg_bs.get_instrumentos_validos()
+        print('Instrumentos validos - NEGOCIACION API')
+        print(resp)
+        print('-'*70)
+        
+        # NÃºmero de solicitudes utilizadas y disponibles para el usuario
+        resp = neg_bs.get_request_usuario()
+        print('Request usuario - NEGOCIACION API')
+        print(resp)
+        print('-'*70)
+        ```
+        
+        *tutorial sobre como guardar y cargar variables de entorno en Python -> [Hiding Passwords and Secret Keys in Environment Variables (Windows)](https://youtu.be/IolxqkL7cD8)*
+        
+        ### DocumentaciÃ³n servicios de negociacion [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        1. **Instrumentos disponibles en ingreso de ofertas**
+        	
+        - ```get_instrumentos_validos```: Instrumentos de mercado de renta variable disponibles para ingresar ordenes.
+        
+        	- **ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = neg_bs.get_instrumentos_validos()
+        print(f"Instrumentos validos\n {resp}")
+        ```
+        
+        2. **Request Usuario**
+        
+        - ```get_request_usuario```: NÃºmero de solcitudes utilizadas y disponibles a ocupar.
+        
+        	- **ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = neg_bs.get_request_usuario()
+        print(f"Request usuario\n {resp}")
+        ```
+        
+        3. **Cliente Market Data**: El Market Data Renta Variable es un producto creado por la Bolsa de Comercio de Santiago con el fin de transcribir los mensajes FIX enviados por el Market Data de Renta Variable a una base de datos.
+        
+        *fuente: [Bolsa de Santiago](https://startup.bolsadesantiago.com/#/descripcion_negociacion)*
+        
+        - ```get_puntas_rv```: Mejor oferta del libro de Ã³rdenes para cada instrumento (***compra mÃ¡s cara, venta mÃ¡s barata***). Estas ofertas fueron ingresada mediante el **sistema DMA**. Se muestran los precios de compra y venta, cantidad, monto, condiciÃ³n de liquidaciÃ³n, entre otros.
+        
+        	- **ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = neg_bs.get_puntas_rv()
+        print(f"Puntas de negociacion para renta variable\n {resp}")
+        ```
+        
+        - ```get_transacciones_rv```: Detalle de las transacciones de renta variable que el usuario ha realizado a travÃ©s del sistema DMA. Precio de compra, precio de venta, cantidad, monto, condiciÃ³n de liquidaciÃ³n, entre otros.
+        
+        	- **ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = neg_bs.get_transacciones_rv()
+        print(f"Transacciones del mercado\n {resp}")
+        ```
+        
+        4. **DMA (Direct Market Access):** Los servicios **DMA** - Direct Market Access - permiten la canalizaciÃ³n o ruteo automÃ¡tico de Ã³rdenes de compra y venta de acciones en tiempo real, al sistema **SEBRA HT**.
+        
+        *fuente: [Bolsa de Santiago](https://startup.bolsadesantiago.com/#/descripcion_negociacion)*
+        
+        - ```set_ingreso_oferta```: Ingreso de ofertas para algÃºn instrumento seleccionado.
+        
+        	- **ParÃ¡metros:** *Obligatorios*
+        	   ```nemo```(str): CÃ³digo  del nombre del instrumentos de renta variable.
+               ```cantidad```(int): NÃºmero de instrumentos a ofertar.
+               ```precio```(int): Precio a pagar o recibir por el instrumento.
+               ```tipo_operac```(str): C de compra, V de venta.
+               ```condicion_liquidacion```(str): Cuando se liquida la operaciÃ³n, las opciones disponibles son CN, PH o PM.
+        
+        ```python
+        import numpy as np
+        
+        # Instrumentos validos o disponibles para el usuario
+        resp = neg_bs.get_instrumentos_validos()
+        
+        # Muestra aleatoria para el ingreso de ordenes
+        nemo_test = resp[np.random.randint(len(resp))]['NEMO']
+        nemo_precio = resp[np.random.randint(len(resp))]['PRECIO']
+        
+        # Ingreso de la orden
+        orden_ingresada = neg_bs.set_ingreso_oferta(nemo=nemo_test, cantidad=100, precio=nemo_precio, tipo_operac='C', condicion_liquidacion='CN')
+        print(f"Ingreso de la orden\n {orden_ingresada}")
+        ```
+        
+        - ```get_revision_ingreso```: RevisiÃ³n de los datos correspondientes al ingreso de ofertas a travÃ©s del sistema DMA.
+        
+        	- **ParÃ¡metros:**
+        	```sec_orden```(int): nÃºmero de la orden a revisar
+        
+        ```python
+        resp = neg_bs.get_revision_ingreso(sec_orden=orden_ingresada['SEC_ORDEN'])
+        print(f"Detalles de la orden ingresada:\n {resp}")
+        ```
+        
+        - ```get_revision_transaccion```: RevisiÃ³n de los datos correspondientes a una transacciÃ³n de una orden ingresada por el mÃ©todo ```set_ingreso_oferta```
+        
+        	- **ParÃ¡metros:** Ninguno
+        
+        ```python
+        resp = neg_bs.get_revision_transaccion()
+        print(f"Revision de las transacciones\n {resp}")
+        ```
+        
+        ## Disclaimer [:arrow_up:](#bolsa-de-santiago-startup-api)
+        
+        La informaciÃ³n contenida en este documento es solo para fines informativos y educativos. Nada de lo contenido en este documento se podrÃ¡ interpretar como asesoramiento financiero, legal o impositivo. El contenido de este documento corresponde Ãºnicamente a la opiniÃ³n del autor, el cual no es un asesor financiero autorizado ni un asesor de inversiones registrado. El autor no estÃ¡ afiliado como promotor de los servicios de la Bolsa de Santiago.
+        
+        Este documento no es una oferta para vender ni comprar instrumentos financieros. Nunca invierta mÃ¡s de lo que puede permitirse perder. Usted debe consultar a un asesor profesional registrado antes de realizar cualquier inversiÃ³n.
+        
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
