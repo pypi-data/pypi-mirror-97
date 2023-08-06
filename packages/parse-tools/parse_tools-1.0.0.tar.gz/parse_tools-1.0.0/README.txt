@@ -1,0 +1,15 @@
+parse_tools/
+    db_manager.py
+    get_conclusion.py
+    get_contrast.py
+    get_scene_report.py
+    globalVal.py
+    manual_perform_parse.py
+    read_message.py
+    speech_parse.py
+    stream_perform_parse.py
+    wer_client.py
+    xls.py
+    parseAudioStreamPerfom.py
+setup.py
+README.txt
