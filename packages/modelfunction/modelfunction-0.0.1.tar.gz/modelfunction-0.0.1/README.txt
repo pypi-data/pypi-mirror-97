@@ -1,0 +1,1 @@
+Bu program kolay matematik model oluşturulmasına imkan sağlamaktadır.
