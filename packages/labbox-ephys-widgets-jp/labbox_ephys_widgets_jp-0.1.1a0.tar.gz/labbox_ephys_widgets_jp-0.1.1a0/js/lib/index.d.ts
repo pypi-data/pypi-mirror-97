@@ -1,0 +1,2 @@
+export * from './example';
+export declare const version = "0.1.1";
