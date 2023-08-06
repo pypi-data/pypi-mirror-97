@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.action.act_window" id="act_location_quantity_tree_assigned_excluded">
+            <field name="name">Locations Tree Quantity (Assigned Excluded)</field>
+            <field name="res_model">stock.location</field>
+            <field name="domain" eval="[('parent', '=', None)]" pyson="1"/>
+            <field name="context" pyson="1"
+                eval="If(Eval('active_model') == 'product.template', {'product_template': Eval('active_id'), 'stock_assign': True}, {'product': Eval('active_id'), 'stock_assign': True})"/>
+            <field name="context_model">product.by_location.context</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_location_quantity_tree_assigned_excluded_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="stock.location_quantity_view_tree"/>
+            <field name="act_window" ref="act_location_quantity_tree_assigned_excluded"/>
+        </record>
+        <record model="ir.action.keyword"
+                id="act_location_quantity_tree_assigned_excluded_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">product.product,-1</field>
+            <field name="action" ref="act_location_quantity_tree_assigned_excluded"/>
+        </record>
+        <record model="ir.action.keyword"
+                id="act_location_quantity_tree_assigned_excluded_keyword2">
+            <field name="keyword">form_relate</field>
+            <field name="model">product.template,-1</field>
+            <field name="action" ref="act_location_quantity_tree_assigned_excluded"/>
+        </record>
+        <record model="ir.action-res.group"
+            id="act_location-quantity_tree-group_stock">
+            <field name="action" ref="act_location_quantity_tree_assigned_excluded"/>
+            <field name="group" ref="stock.group_stock"/>
+        </record>
+
+        <record model="ir.action.act_window" id="act_location_quantity_list_assigned_excluded">
+            <field name="name">Locations List Quantity (Assigned Excluded)</field>
+            <field name="res_model">stock.location</field>
+            <field name="search_value" eval="[('quantity', '!=', 0), ('forecast_quantity', '!=', 0)]" pyson="1"/>
+            <field name="context" pyson="1"
+                eval="If(Eval('active_model') == 'product.template', {'product_template': Eval('active_id'), 'with_childs': False, 'stock_assign': True}, {'product': Eval('active_id'), 'with_childs': False, 'stock_assign': True})"/>
+            <field name="context_model">product.by_location.context</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_location_quantity_list_assigned_excluded_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="stock.location_quantity_view_list"/>
+            <field name="act_window" ref="act_location_quantity_list_assigned_excluded"/>
+        </record>
+        <record model="ir.action.keyword"
+                id="act_location_quantity_list_assigned_excluded_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">product.product,-1</field>
+            <field name="action" ref="act_location_quantity_list_assigned_excluded"/>
+        </record>
+        <record model="ir.action.keyword"
+                id="act_location_quantity_list_assigned_excluded_keyword2">
+            <field name="keyword">form_relate</field>
+            <field name="model">product.template,-1</field>
+            <field name="action" ref="act_location_quantity_list_assigned_excluded"/>
+        </record>
+        <record model="ir.action-res.group"
+            id="act_location-quantity_list-group_stock">
+            <field name="action" ref="act_location_quantity_list_assigned_excluded"/>
+            <field name="group" ref="stock.group_stock"/>
+        </record>
+     </data>
+</tryton>
