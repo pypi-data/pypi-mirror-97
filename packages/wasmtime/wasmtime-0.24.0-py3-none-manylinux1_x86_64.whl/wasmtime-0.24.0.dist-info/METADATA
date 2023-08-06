@@ -1,0 +1,121 @@
+Metadata-Version: 2.1
+Name: wasmtime
+Version: 0.24.0
+Summary: A WebAssembly runtime powered by Wasmtime
+Home-page: https://github.com/bytecodealliance/wasmtime-py
+Author: The Wasmtime Project Developers
+Author-email: hello@bytecodealliance.org
+License: Apache-2.0 WITH LLVM-exception
+Project-URL: Bug Tracker, https://github.com/bytecodealliance/wasmtime-py/issues
+Project-URL: Documentation, https://bytecodealliance.github.io/wasmtime-py/
+Project-URL: Source Code, https://github.com/bytecodealliance/wasmtime-py
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Compilers
+Classifier: Topic :: Software Development :: Interpreters
+Classifier: Programming Language :: Rust
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Provides-Extra: testing
+Requires-Dist: coverage ; extra == 'testing'
+Requires-Dist: pytest ; extra == 'testing'
+Requires-Dist: pycparser ; extra == 'testing'
+Requires-Dist: pytest-flake8 ; extra == 'testing'
+Requires-Dist: pytest-mypy ; extra == 'testing'
+
+<div align="center">
+  <h1><code>wasmtime-py</code></h1>
+
+  <p>
+    <strong>Python embedding of
+    <a href="https://github.com/bytecodealliance/wasmtime">Wasmtime</a></strong>
+  </p>
+
+  <strong>A <a href="https://bytecodealliance.org/">Bytecode Alliance</a> project</strong>
+
+  <p>
+    <a href="https://github.com/bytecodealliance/wasmtime-py/actions?query=workflow%3ACI">
+      <img src="https://github.com/bytecodealliance/wasmtime-py/workflows/CI/badge.svg" alt="CI status"/>
+    </a>
+    <a href="https://pypi.org/project/wasmtime/">
+      <img src="https://img.shields.io/pypi/v/wasmtime.svg" alt="Latest Version"/>
+    </a>
+    <a href="https://pypi.org/project/wasmtime/">
+      <img src="https://img.shields.io/pypi/pyversions/wasmtime.svg" alt="Latest Version"/>
+    </a>
+    <a href="https://bytecodealliance.github.io/wasmtime-py/">
+      <img src="https://img.shields.io/badge/docs-main-green" alt="Documentation"/>
+    </a>
+    <a href="https://bytecodealliance.github.io/wasmtime-py/coverage/">
+      <img src="https://img.shields.io/badge/coverage-main-green" alt="Code Coverage"/>
+    </a>
+  </p>
+
+</div>
+
+## Installation
+
+To install `wasmtime-py`, run this command in your terminal:
+
+```bash
+$ pip install wasmtime
+```
+
+The package currently supports 64-bit builds of Python 3.6+ on x86\_64 Windows,
+macOS, and Linux
+
+## Usage
+
+In this example, we compile and instantiate a WebAssembly module and use it from Python:
+
+```python
+from wasmtime import Store, Module, Instance, Func, FuncType
+
+store = Store()
+module = Module(store.engine, """
+  (module
+    (func $hello (import "" "hello"))
+    (func (export "run") (call $hello))
+  )
+""")
+
+def say_hello():
+    print("Hello from Python!")
+hello = Func(store, FuncType([], []), say_hello)
+
+instance = Instance(store, module, [hello])
+run = instance.exports["run"]
+run()
+```
+
+Be sure to check out the [`examples` directory], which has other usage patterns
+as well as the [full API documentation][apidoc] of the `wasmtime-py` package.
+
+[`examples` directory]: https://github.com/bytecodealliance/wasmtime-py/tree/main/examples
+[apidoc]: https://bytecodealliance.github.io/wasmtime-py/
+
+If your WebAssembly module works this way, then you can also import the WebAssembly module
+directly into Python without explicitly compiling and instantiating it yourself:
+
+```python
+# Import the custom loader for `*.wasm` files
+import wasmtime.loader
+
+# Assuming `your_wasm_file.wasm` is in the python load path...
+import your_wasm_file
+
+# Now you're compiled and instantiated and ready to go!
+print(your_wasm_file.run())
+```
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+
