@@ -1,0 +1,42 @@
+{% if sudoers_env_reset %}
+Defaults env_reset
+{% else %}
+Defaults !env_reset
+{% if sudoers_env_delete is defined %}
+{% for item in sudoers_env_delete %}
+Defaults env_delete = "{{ item }}"
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if sudoers_requiretty %}
+Defaults requiretty
+{% else %}
+Defaults !requiretty
+{% endif %}
+
+{% if ansible_distribution == 'MacOSX' %}
+%admin ALL=(ALL) NOPASSWD: ALL
+{% if sudoers_no_log %}
+Defaults: {{ ansible_env.SUDO_USER }} !logfile, !syslog
+{% endif %}
+{% endif %}
+
+{% if ansible_os_family == 'Debian' or ansible_os_family == 'Kali GNU/Linux' %}
+%sudo ALL=(ALL) NOPASSWD: ALL
+
+{% if ansible_env.SUDO_USER is defined %}
+{{ ansible_env.SUDO_USER }} ALL=(ALL) NOPASSWD: ALL
+
+{% if ansible_os_family == 'Kali GNU/Linux' %}
+%kali-trusted  ALL=(ALL) NOPASSWD: ALL
+{% endif %}
+
+{% if sudoers_no_log %}
+Defaults: {{ ansible_env.SUDO_USER }} !logfile, !syslog
+{% endif %}
+
+{% endif %}
+
+{% endif %}
+
