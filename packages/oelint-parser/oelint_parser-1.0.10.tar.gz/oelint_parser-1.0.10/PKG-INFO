@@ -1,0 +1,97 @@
+Metadata-Version: 2.1
+Name: oelint_parser
+Version: 1.0.10
+Summary: Alternative parser for bitbake recipes
+Home-page: https://github.com/priv-kweihmann/oelint-parser
+Author: Konrad Weihmann
+Author-email: kweihmann@outlook.com
+License: UNKNOWN
+Description: oelint-parser
+        =============
+        
+        |Build status| |PyPI version| |Python version| |Downloads|
+        
+        alternative parser for bitbake recipes
+        
+        API documentation
+        -----------------
+        
+        Find the full API docs `here <docs/api-documentation.md>`__
+        
+        Examples
+        --------
+        
+        .. code:: python
+        
+           from oelint_parser.cls_stash import Stash
+        
+           # create an stash object
+           _stash = Stash()
+        
+           # add any bitbake like file
+           _stash.AddFile("/some/file")
+        
+           # Resolves proper cross file dependencies
+           _stash.Finalize()
+        
+           # Use _stash.GetItemsFor() method to filter the stash
+        
+        Get variables from the files
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        To get variables from the stash object do
+        
+        .. code:: python
+        
+           from oelint_parser.cls_item import Variable
+        
+           # get all variables of the name PV from all files
+           for x in _stash.GetItemsFor(attribute=Variable.ATTR_VAR, attributeValue="PV"):
+               print(x)
+        
+        this returns the raw object representation
+        
+        Expand raw variables
+        ~~~~~~~~~~~~~~~~~~~~
+        
+        .. code:: python
+        
+           from oelint_parser.cls_item import Variable
+           from oelint_parser.helper_files import expand_term
+        
+           # get all variables of the name PV from all files
+           for x in _stash.GetItemsFor(attribute=Variable.ATTR_VAR, attributeValue="PV"):
+               # raw unexpanded variable
+               print(x.VarValue)
+               # raw unexpanded variable without quotes
+               print(x.VarValueStripped)
+               # expanded variable
+               print(expand_term(stash, "/some/file", x.VarValueStripped))
+               # single items from a list
+               print(x.get_items())
+               # expanded single items from a list
+               print([expand_term(stash, "/some/file", y) for y in x.get_items()])
+        
+        .. |Build status| image:: https://github.com/priv-kweihmann/oelint-parser/workflows/Python%20package/badge.svg
+        .. |PyPI version| image:: https://badge.fury.io/py/oelint-parser.svg
+           :target: https://badge.fury.io/py/oelint-parser
+        .. |Python version| image:: https://img.shields.io/pypi/pyversions/oelint-parser
+           :target: https://img.shields.io/pypi/pyversions/oelint-parser
+        .. |Downloads| image:: https://img.shields.io/pypi/dm/oelint-parser
+           :target: https://img.shields.io/pypi/dm/oelint-parser
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/x-rst
+Provides-Extra: dev
