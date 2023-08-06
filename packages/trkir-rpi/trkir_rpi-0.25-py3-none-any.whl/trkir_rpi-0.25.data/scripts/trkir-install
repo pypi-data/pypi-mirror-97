@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+sudo pip3 uninstall opencv-python -y
+sudo pip3 install opencv-python==3.4.6.27
+sudo pip3 install numpy
+
+sudo apt-get update -y
+sudo apt-get install libhdf5-dev libhdf5-serial-dev libatlas-base-dev libjasper-dev libqtgui4 libqt4-test -y
+
+sudo apt-get install libusb-1.0-0-dev -y
+git clone https://github.com/mvp/uhubctl
+cd uhubctl && make
+sudo mv uhubctl /usr/bin/
+
+sudo apt-get install supervisor
+service supervisor restart
+
+# wget supervisor_file
+#cp supervisor_file /etc/supervisor/conf.d/trkir-camera-script.conf
+
+supervisorctl reread
+supervisorctl update
