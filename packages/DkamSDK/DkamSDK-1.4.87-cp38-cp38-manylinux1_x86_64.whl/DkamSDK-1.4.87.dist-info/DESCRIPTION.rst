@@ -1,0 +1,30 @@
+1.Python routines rely on DkamSDK.
+
+Before running the routine, install the appropriate version of DkamSDK.
+
+2.This routine is suitable for both Python 2 (Python 2.7) and Python 3 (Python 3.6, Python 3.7, Python 3.8, and Python 3.9). 
+
+Before running the routine, you need to install Python and set Python information in the system environment variables.
+
+3.The Python example mainly demonstrates the following functions:
+
+- DiscoverCamera
+- Connect/Disconnect Camera
+- StreamOn/StreamOff Camera
+- Set Trigger Mode/Set RGB Trigger Mode
+- Set Trigger Source
+- Set Trigger Count/Set RGB Trigger Count
+- Save Pointcloud、Gray、RGB、FilterPointcloud、Depth、FusionImagePointcloudAndRGB、FusionImagePointcloudAndGray、ROIMapping
+- Set ROI
+- Write/Read Register
+- Get Camera Internel/Externel Parameter
+- Set Gain
+- Get Time stamp
+- Set ROI Mapping
+
+4.Attention.
+
+   Python can only run routines that correspond to bits. That is, 32-bit Python runs 32-bit routines (not yet supported), and 64-bit Python runs 64-bit routines.
+
+
+
