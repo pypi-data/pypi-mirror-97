@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: py3status-ups-battery-status
+Version: 0.1.2
+Summary: py3status module to show the status of a UPS battery
+Home-page: https://github.com/mcgillij/py3status-ups-battery-status
+License: MIT
+Keywords: battery,ups,status,i3,py3status
+Author: mcgillij
+Author-email: mcgillivray.jason@gmail.com
+Requires-Python: >=3.9,<4.0
+Classifier: Environment :: X11 Applications
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Desktop Environment :: Window Managers
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Power (UPS)
+Requires-Dist: py3status (>=3.34,<4.0)
+Project-URL: Documentation, https://github.com/mcgillij/py3status-ups-battery-status
+Project-URL: Repository, https://github.com/mcgillij/py3status-ups-battery-status
+Description-Content-Type: text/markdown
+
+# py3status-ups-battery-status
+Python module for py3status to monitor my UPS battery status
+
+## Screenshot
+![py3status-ups-batter-status](https://raw.githubusercontent.com/mcgillij/py3status-ups-battery-status/main/images/ups_battery_status.png)
+
+## Installation
+
+### From Git
+``` bash
+git clone https://github.com/mcgillij/py3status-ups-battery-status.git
+mkdir -p ~/.i3/py3status && cd ~/.i3/py3status
+ln -s <PATH_TO_CLONED_REPO>/src/py3status-ups-battery-status/ups-battery-status.py ./
+```
+
+### Building From AUR (Arch)
+``` bash
+git clone https://aur.archlinux.org/py3status-ups-battery-status.git
+cd py3status-ups-battery-status
+makechrootpkg -c -r $HOME/$CHROOT
+```
+
+### Installing Arch package
+``` bash
+sudo pacman -U --asdeps py3status-ups-battery-status-*-any.pkg.tar.zst
+```
+
+## Dependencies
+
+This module depends on the Network UPS Tools(nut) package. And having already configured your battery with it.
+It assumes that you've named your battery *battery*. If you've named it something else you can change it in the module itself.
+
+Dependency installation on Arch:
+``` bash
+pacman -S nut
+```
+
+Dependency installation on Debian:
+``` bash
+apt install nut
+```
+
+## Usage
+Add the module to your list of configured py3status modules
+
+*~/.config/i3status.conf*
+``` bash
+...
+order += "arch_updates"
+order += "volume_status"
+order += "ups_battery_status"
+...
+
+```
+
+And then just restart your i3 session.
+
