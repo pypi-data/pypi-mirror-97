@@ -1,0 +1,44 @@
+Metadata-Version: 2.1
+Name: plugp100
+Version: 2.1.2.dev3
+Summary: Controller for TP-Link Tapo P100 and other devices
+Home-page: https://github.com/petretiandrea/plugp100
+Author: @petretiandrea
+Author-email: petretiandrea@gmail.com
+License: GPL3
+Download-URL: https://github.com/petretiandrea/plugp100
+Description: # Plug P100
+        This is a fork of original work of [@K4CZP3R](https://github.com/K4CZP3R/tapo-p100-python)
+        
+        The purpose of this fork is to provide the library as PyPi package. 
+        
+        # How to install
+        ```pip install plugp100```
+        
+        # Code example
+        
+        ```python
+        import asyncio
+        from plugp100 import TapoApiClient
+        
+        
+        async def main():
+            # create generic tapo api
+            sw = TapoApiClient("<ip>", "<email>", "<passwd>")
+            await sw.login()
+            await sw.on()
+            await sw.set_brightness(100)
+            print(await sw.get_state())
+        
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        loop.run_until_complete(asyncio.sleep(0.1))
+        loop.close()
+        
+        ```
+        
+        
+Keywords: Tapo,P100
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Description-Content-Type: text/markdown
