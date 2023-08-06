@@ -1,0 +1,2 @@
+class ServiceDiscoveryError(Exception):
+    pass
