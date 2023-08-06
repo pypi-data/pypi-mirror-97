@@ -1,0 +1,83 @@
+<item ident="{{ question.id }}" title="{{ question.title.to_plaintext() if question.title else 'Question' }}">
+    <itemmetadata>
+        <qtimetadata>
+            <qtimetadatafield>
+                <fieldlabel>question_type</fieldlabel>
+                <fieldentry>multiple_choice_question</fieldentry>
+            </qtimetadatafield>
+            <qtimetadatafield>
+                <fieldlabel>points_possible</fieldlabel>
+                <fieldentry>{{ question.points | round(2) }}</fieldentry>
+            </qtimetadatafield>
+            <qtimetadatafield>
+                <fieldlabel>original_answer_ids</fieldlabel>
+                <fieldentry>{{ answer_ids | join(',') }}</fieldentry>
+            </qtimetadatafield>
+            <qtimetadatafield>
+                <fieldlabel>assessment_question_identifierref</fieldlabel>
+                <fieldentry>{{ assessment_question_identifierref }}</fieldentry>
+            </qtimetadatafield>
+        </qtimetadata>
+    </itemmetadata>
+    <presentation>
+        <material>
+            {% filter indent(12, first=True) -%}
+                {% with text=question.text %}
+                    {% include 'mattext.xml' %}
+                {% endwith %}
+            {%- endfilter %}
+        </material>
+        <response_lid ident="response1" rcardinality="Single">
+            <render_choice>
+                {% filter indent(16, first=True) -%}
+                    {% for answer in question.answers %}
+                        {% with answer_id=answer_ids[loop.index0] %}
+                            {% include 'answer_item.xml' %}
+                        {% endwith %}
+
+                    {% endfor %}
+                {%- endfilter %}
+            </render_choice>
+        </response_lid>
+    </presentation>
+    <resprocessing>
+        <outcomes>
+            <decvar maxvalue="100" minvalue="0" varname="SCORE" vartype="Decimal"/>
+        </outcomes>
+        {% filter indent(8, first=True) -%}
+            {% for respcondition in respconditions %}
+                {{ respcondition | safe }}
+
+            {% endfor %}
+        {%- endfilter %}
+    </resprocessing>
+    {% filter indent(4, first=True) -%}
+        {% if question.feedback.general %}
+            {% with feedback_id='general_fb', text=question.feedback.general %}
+                {% include 'itemfeedback.xml' %}
+
+            {% endwith %}
+        {% endif %}
+        {% if question.feedback.on_correct %}
+            {% with feedback_id='correct_fb', text=question.feedback.on_correct %}
+                {% include 'itemfeedback.xml' %}
+
+            {% endwith %}
+        {% endif %}
+        {% if question.feedback.on_incorrect %}
+            {% with feedback_id='general_incorrect_fb', text=question.feedback.on_incorrect %}
+                {% include 'itemfeedback.xml' %}
+
+            {% endwith %}
+        {% endif %}
+        {% for answer in question.answers %}
+            {% if answer.hint %}
+                {% with feedback_id=answer_ids[loop.index0] + '_fb', text=answer.hint %}
+                    {% include 'itemfeedback.xml' %}
+
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+    {%- endfilter %}
+</item>
+
