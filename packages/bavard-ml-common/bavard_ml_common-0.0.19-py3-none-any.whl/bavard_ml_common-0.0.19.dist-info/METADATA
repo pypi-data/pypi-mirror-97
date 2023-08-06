@@ -1,0 +1,53 @@
+Metadata-Version: 2.1
+Name: bavard-ml-common
+Version: 0.0.19
+Summary: Machine learning model utilities
+Home-page: https://github.com/bavard-ai/bavard-ml-common
+Author: Bavard AI, Inc.
+Author-email: dev@bavard.ai
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi (==0.63.0)
+Requires-Dist: pydantic (==1.7.3)
+Requires-Dist: google-cloud-storage (==1.35.1)
+Requires-Dist: google-cloud-pubsub (==2.2.0)
+Requires-Dist: google-cloud-error-reporting (==1.1.1)
+Requires-Dist: numpy (>=1.15.4)
+Requires-Dist: scikit-learn (>=0.20.3)
+Requires-Dist: requests (>=2.21.0)
+Requires-Dist: loguru (>=0.5.1)
+
+# bavard-ml-common
+
+A package of common code and utilities for machine learning and MLOps. Includes classes and methods for:
+
+1. ML model serialization/deserialization
+2. Google Cloud Storage IO operations
+3. Converting an ML model into a runnable web service
+4. Common ML model evaluation utilities
+5. And more
+
+## Testing Locally
+
+With Docker and docker-compose installed, run:
+
+```
+./scripts/lint-and-test-package.sh
+```
+
+## Releasing The Package
+
+Releasing the package is automatically handled by CI, but three steps must be taken to trigger a successful release:
+
+1. Increment the `VERSION` variable in `setup.py` to the new desired version (e.g. `VERSION="1.1.1"`)
+2. Commit and tag the repo with the **exact same** value you populated the `VERSION` variable with (e.g. `git tag 1.1.1`)
+3. Push the commit and tag to remote. These can be done together using: `git push --atomic origin <branch name> <tag>`
+
+CI will then release the package to pypi with that version once the commit and tag are pushed.
+
+
