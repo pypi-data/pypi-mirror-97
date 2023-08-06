@@ -1,0 +1,61 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load xchk_instructions %}
+{% load static %}
+{% load markdownify %}
+{% block course_content %}
+{{ 'Test *Dit is een test*'|markdownify }}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/AwrD4pLilWo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<p>Git is een "versiebeheersysteem", dat wil zeggen een systeem om "snapshots" van je project op een ordelijke manier bij te houden. Zonder systeem voor versiebeheer moet je voortdurend backups van oude versies van bestanden maken. Voor je het weet, heb je enorm veel schijfruimte verbruikt en weet je niet meer in welk bestand de interessantste aanpassingen gebeurd zijn. Met een goed systeem voor versiebeheer gaat dat soort werk veel efficiënter. Bovendien kan je de snapshots die je in versiebeheer plaatst ook met anderen delen, zodat teamwerk veel vlotter gaat.</p>
+
+<p>
+Enkele dingen die zonder versiebeheer heel lastig zijn en met versiebeheer erg eenvoudig worden:
+<ul>
+<li>een logboek met allerlei versies van je code bijhouden</li>
+<li>je code delen met collega's (zonder risico dat ze jouw code overschrijven)</li>
+<li>de verschillen tussen twee specifieke versies van je code bekijken</li>
+<li>experimenteren met twee oplossingen voor één probleem, zodat je achteraf de beste oplossing kan kiezen</li>
+<li>tegelijkertijd aan hetzelfde project werken als een collega en achteraf de aanpassingen samenvoegen</li>
+</ul>
+<P>
+
+<p class="alert alert-info">Meestal bestaat dat project dat je met Git beheert uit code, maar dat hoeft niet. Je kan er vanalles mee bijhouden, van tekeningen in Inkscape tot recepten. Zelfs binaire data is mogelijk, al komt versiebeheer vooral tot zijn recht voor data in een tekstformaat.</p>
+<p class="alert alert-warning">Alle informatie vanaf dit punt is getest met Git 2.20. Je moet dus minstens deze versie hebben. Git 3 is nog niet uit, maar zou incompatibel kunnen zijn met dit cursusmateriaal. Verder wordt verondersteld dat je je persoonlijke gegevens hebt ingesteld via `git config` en dat je geen defaultinstellingen hebt aangepast.</p>
+{% endblock %}
+
+{% block assignment %}
+<ol>
+<li>Zoek via een zoekmachine naar keuze (Google, Bing, DuckDuckGo,...) naar het adres van de officiële Git documentatie.</li>
+<li>Volg de link.</li>
+<li>Klik op de link in <a href="#official-book">de afbeelding</a> van het boek <authored>Pro Git</authored> hieronder.</li>
+<li>Kies links voor de <strong>Nederlandse</strong> vertaling.</li>
+<li>Kopieer de URL uit je browserbalk.</li>
+<li>Maak een nieuw tekstbestand met de naam <filename>{{ uid }}</filename> <strong>zonder extensie</strong>. In Notepad (Kladblok) doe je dit door de bestandsnaam tussen aanhalingstekens te plaatsen en op te slaan als "alle bestanden" in plaats van als tekstbestand. Dit wordt <a href="https://youtu.be/CIyc51xVF7U" target="_blank">hier</a> gedemonstreerd. Hoe je dat in TextEdit doet onder Mac OS, wordt <a href="https://apple.stackexchange.com/questions/297613/how-do-i-force-textedit-to-not-add-txt-extension-sierra" target="_blank">hier</a> uitgelegd. (Als iemand met een Mac hier een schermopname van kan maken en doorsturen, zal ik ze linken.)</li>
+<li>Plak de gekopieerde URL in het tekstbestand dat je net hebt gemaakt en sla op.</li>
+<li>Navigeer in je shell via <code>cd</code> naar de map die je hebt ingesteld voor het vak dat je nu aan het volgen bent. Navigeren via <code>cd</code> wordt <a href="https://youtu.be/5llwOx9Le5w">hier</a> gedemonstreerd.</li>
+<li>Typ volgende drie commando's <strong>exact</strong> in je shell en druk op <code>ENTER</code> na elk commando.:
+<ol>
+  <li><code>git add {{ uid }}</code></li>
+  <li><code>git commit -m "URL"</code></li>
+  <li><code>git push</code></li>
+</ol>
+</li>
+<li>Controleer onderaan op deze pagina dat je repository voor Git geselecteerd is in het dropdownmenu en klik dan op "Deze oefening controleren".</li>
+</ol>
+<figure>
+  <img src="{% static "xchk_git_content/images/officieel-boek-git.png" %}" id="official-book"/>
+  <figcaption>Officiële documentatie in boekvorm</figcaption>
+</figure>
+<h3>Een tweede keer controleren (indien nodig)</h3>
+<p>Als je oefening de eerste keer niet aanvaard is, moet je je oplossing verbeteren en zichtbaar maken voor het systeem. Dit doe je door de nodige aanpassingen te doen, je bestand op te slaan en opnieuw de drie volgende commando's uit te voeren in dezelfde shell van eerder:</p>
+<ol>
+  <li><code>git add {{ uid }}</code></li>
+  <li><code>git commit -m "URL"</code></li>
+  <li><code>git push</code></li>
+</ol>
+{% endblock %}
+
+{% block post_content %}
+<p class="alert alert-info">Waarom deze oefening? Zodat je weet waar je moet kijken als je gevorderde functionaliteit van Git nodig hebt. Dit cursusmateriaal bevat meer dan genoeg om je op weg te zetten, het is niet zo volledig als de officiële documentatie.</p>
+{% endblock %}

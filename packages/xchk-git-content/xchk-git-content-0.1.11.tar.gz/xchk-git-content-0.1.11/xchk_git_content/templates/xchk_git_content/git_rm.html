@@ -1,0 +1,17 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/S8rZGi-Z0cs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<p>Files zijn er niet voor altijd. Sommige files worden per ongeluk opgenomen en moeten uit versiebeheer verwijderd worden. Andere files worden doorheen de tijd overbodig. Om een file te verwijderen uit versiebeheer gebruiken we <code>git rm</code>, gevolgd door de naam van de file.</p>
+<p>Dit verwijdert de file niet <em>meteen</em> uit versiebeheer. Het verwijdert de file wel van de schijf en noteert ("in potlood") in de staging area dat de file verdwenen is. Om de wijziging definitief te maken, is het nog steeds nodig <code>git commit</code> uit te voeren. Vanaf dan zal de file niet meer terug te vinden zijn in snapshots van je project.</p>
+<p>Soms wil je een file wel bewaren op je PC, maar niet in versiebeheer. Dit kan bijvoorbeeld als je eigen nota's of configuratiebestanden in een project zet. Dat kan nuttig zijn, maar er kan gevoelige informatie in staan die je niet met anderen wil delen. Dan moet je de file verwijderen uit versiebeheer zonder hem van je eigen systeem te verwijderen. Dit doe je met <code>git rm --cached</code>.
+<p class="alert alert-warning">Als je een file verwijdert uit versiebeheer, zal hij niet meer aanwezig zijn in <strong>verdere</strong>snapshots. Hij zal <strong>wel</strong> deel blijven uitmaken van je eerdere geschiedenis.</p>
+
+{% endblock course_content %}
+{% block assignment %}
+{% autoescape off %}
+  {{ custom_data.rendered_mc_qs }}
+{% endautoescape %}
+{% endblock assignment %}
