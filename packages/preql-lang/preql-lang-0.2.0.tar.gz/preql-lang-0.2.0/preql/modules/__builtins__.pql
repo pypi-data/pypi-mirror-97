@@ -1,0 +1,560 @@
+"Built-in functions for Preql. Automatically imported by the interpreter."
+
+func _sql_agg_func(name, obj, t=null) {
+    "Helper function. Do not call"
+    if (t==null) {
+        if (not (isa(obj, union[table, aggregated]) and count(columns(obj))==1)) {
+            throw new TypeError(name + "() only accepts lists or tables with one column. Got '" + repr(type(obj)) + "'")
+        }
+
+        obj = list(obj)
+        t = type(obj).item
+    }
+
+    if (isa(obj, aggregated)) {
+        return SQL(t, name + "($obj)")
+    } else {
+        if (not (issubclass(t, number))) {
+            throw new TypeError(name + "() expects numeric elements, instead got: '" + repr(t) + "'")
+        }
+        
+        obj = list(obj)
+        if (isa(obj, list)) {
+            return one one obj{ => item: _sql_agg_func(name, item, t) }     // Recursive
+        }
+    }
+    throw new TypeError(name + "() doesn't support object of type '" + repr(type(field)) + "'")
+}
+func _table_or_agg(n) = union[table[n], aggregated[n]]
+
+func sum(col: _table_or_agg(number)) {
+    """Sums up a column or a list.
+
+    Examples:
+        >> sum([1,2,3])
+        6
+        >> [1,2,3]{ => sum(item) }
+        table  =1
+        ┏━━━━━━━┓
+        ┃   sum ┃
+        ┡━━━━━━━┩
+        │     6 │
+        └───────┘
+    """
+    return _sql_agg_func("SUM", col)
+}
+
+func mean(col: _table_or_agg(number)) = _sql_agg_func("AVG", col, float)
+    """Returns the mean average of a column or a list
+
+    See Also `sum`.
+    """
+
+func min(col: _table_or_agg(number)) = _sql_agg_func("MIN", col)
+    """Finds the minimum of a column or a list
+
+    See Also `sum`.
+    """
+
+func max(col: _table_or_agg(number)) = _sql_agg_func("MAX", col)
+    """Finds the maximum of a column or a list
+
+    See Also `sum`.
+    """
+
+func first(obj: union[table, aggregated]) {
+    """Returns the first member of a column or a list
+
+    Examples:
+        >> first([1,2,3])
+        1
+        >> [1,2,3]{ => first(item) }
+        table  =1
+        ┏━━━━━━━┓
+        ┃ first ┃
+        ┡━━━━━━━┩
+        │     1 │
+        └───────┘
+    """
+
+    if (isa(obj, aggregated)) {
+        return SQL(type(obj).item, "($obj)")
+    } else {
+        obj = list(obj)
+        if (isa(obj, list)) {
+            return one one obj{ => item: first(item) }     // Recursive
+        }
+    }
+}
+
+func first_or_null(obj: union[table, projected]) {
+    """Returns the first member of a column or a list, or null if it's empty
+
+    See Also `first()`.
+    """
+
+    if (isa(obj, aggregated)) {
+        return SQL(type(obj).item, "($obj)")
+    } else {
+        obj = list(obj)
+        if (isa(obj, list)) {
+            row = one? obj{ => item: first(item) }     // Recursive
+            if (row == null) {
+                return null
+            }
+            return one row
+        }
+    }
+}
+
+
+
+func limit(tbl: table, n: int) = tbl[..n]
+    """Returns the first 'n' rows in the table."""
+
+func limit_offset(tbl: table, lim: int, offset: int) {
+    "Returns the first 'n' rows in the table at the given offset."
+    return SQL(type(tbl), "SELECT * FROM $tbl LIMIT $lim OFFSET $offset")
+}
+
+
+
+func upper(s: string) = SQL(string, "upper($s)")
+    "Return a copy of the string converted to uppercase."
+
+func lower(s: string) = SQL(string, "lower($s)")
+    "Return a copy of the string converted to lowercase."
+
+func length(s: string) = SQL(int, "length($s)")
+    """Returns the length of the string
+
+    For tables or lists, use `count()`
+    """
+
+func round(n: number) = SQL(float, "round($n)")
+    """Returns a rounded float
+
+    Example:
+        >> round(3.14)
+        3.0
+    """
+
+
+func dict(...x) = x
+    "Constructs a dictionary"
+
+func _zipjoin(join_func, table1, table2) {
+	"Helper function. Adds index to each table, and then join them"
+	return join_func(a: enum(table1).index, b: enum(table2).index) {
+			// Remove index from nested structs
+			a {... !index}
+			b {... !index}
+		}
+}
+
+func commit() {
+    """Commit the current transaction
+
+    This is necessary for changes to the tables to become persistent.
+    """
+    force_eval(SQL(nulltype, "COMMIT"))
+}
+func rollback() {
+    """Rollback the current transaction
+
+    This reverts the data in all the tables to the last commit.
+    Local variables will remain unaffected.
+    """
+    force_eval(SQL(nulltype, "ROLLBACK"))
+}
+
+func is_empty(tbl) {
+    """Efficiently tests whether the table expression `tbl` is empty or not"""
+    // count(t) would also work, but it will evaluate all the elements of `tbl`
+    // We only care if there is at least one.
+    return count(tbl[..1]) == 0
+}
+
+func list_median(x: list) {
+    """Find the median of a list
+
+    Cannot be used inside a projection.
+    """
+    cnt = count(x)
+    middle_item_offset = (cnt-1)/~2
+    middle_item_count = (2-cnt%2)   // 1 for odd count, 2 for even
+    mid_items = x order {item} [middle_item_offset..][..middle_item_count]
+    return mean(mid_items)
+}
+
+func zipjoin(a: table, b: table) {
+    """Joins two tables on their row index.
+
+    Column names are always `a` and `b`.
+
+    Result is as long as the shortest table.
+
+    Similar to Python's `zip()` function.
+
+    Example:
+        >> zipjoin(["a", "b"], [1, 2])
+                table  =2
+        ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+        ┃ a             ┃ b           ┃
+        ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+        │ {'item': 'a'} │ {'item': 1} │
+        │ {'item': 'b'} │ {'item': 2} │
+        └───────────────┴─────────────┘
+    """
+
+    return _zipjoin(join, a, b)
+}
+
+func zipjoin_left(a: table, b: table) {
+    """Similar to `zipjoin`, but the result is as long as the first parameter.
+
+    Missing rows will be assigned `null`.
+
+    Example:
+        >> zipjoin_left(["a", "b"], [1])
+                    table  =2
+        ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+        ┃ a             ┃ b              ┃
+        ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+        │ {'item': 'a'} │ {'item': 1}    │
+        │ {'item': 'b'} │ {'item': null} │
+        └───────────────┴────────────────┘
+    """
+    return _zipjoin(leftjoin, a, b)
+}
+func zipjoin_longest(a: table, b: table) {
+    """Similar to `zipjoin`, but the result is as long as the longest table.
+
+    Missing rows will be assigned `null`.
+    """
+    return _zipjoin(outerjoin, a, b)
+}
+
+func distinct(t: table) {
+    """Removes identical rows from the given table
+
+    Example:
+        >> distinct(["a","b","b","c"])
+        table  =3
+        ┏━━━━━━━┓
+        ┃ item  ┃
+        ┡━━━━━━━┩
+        │ a     │
+        │ b     │
+        │ c     │
+        └───────┘
+    """
+    return SQL(t, "SELECT distinct * FROM $t")
+}
+
+func _pi() = SQL(float, "PI()")
+
+//
+// Start of database-specific code
+//
+func _repeat(s: string, num: int) = SQL(string, "REPEAT($s, $num)")
+func _now() = SQL(datetime, "NOW()")
+func _count_false(field: aggregated) = SQL(int, "sum(cast($field=0 as int))")
+func _count_true(field: aggregated) = SQL(int, "sum(cast($field!=0 as int))")
+
+
+db_type = get_db_type()
+
+if (db_type == 'sqlite' and PY("sqlite3.sqlite_version_info < (3, 25)", "import sqlite3")) {
+    func enum(tbl: table) {
+        throw new NotImplementedError("Sqlite doesn't support windows functions before version 3.25")
+    }
+} else {
+    func enum(tbl: table) = tbl{index: SQL(int, "(row_number() over ())-1"), ...}
+        """Return the table with a new index column.
+
+        Count starts from 0.
+
+        Example:
+            >> enum(["a", "b", "c"])
+            table  =3
+            ┏━━━━━━━┳━━━━━━┓
+            ┃ index ┃ item ┃
+            ┡━━━━━━━╇━━━━━━┩
+            │     0 │ a    │
+            │     1 │ b    │
+            │     2 │ c    │
+            └───────┴──────┘
+        """
+}
+
+if (db_type == "postgres") {
+    func _random() = SQL(float, "RANDOM()")
+
+    func _str_index(a: string, b: string) = SQL(int, "POSITION($a in $b)-1")
+
+    func _char(n: int) = SQL(string, "chr($n)")
+    func _char_ord(n: string) = SQL(int, "ascii($n)")
+} else if (db_type == "sqlite" or db_type == "duck") {
+    func _repeat(s: string, num: int) = SQL(string, "replace(hex(zeroblob($num)), '00', $s)")
+    func _now() = SQL(datetime, "datetime('now')")
+    func _random() = SQL(float, "abs(CAST(random() AS REAL))/9223372036854775808")
+    func _pi() = SQL(float, "3.141592653589793")
+
+    func year(date) = SQL(int, "strftime('%Y', $date)")
+    func month(date) = SQL(int, "strftime('%m', $date)")
+    func day(date) = SQL(int, "strftime('%d', $date)")
+    func hour(date) = SQL(int, "strftime('%H', $date)")
+    func minute(date) = SQL(int, "strftime('%M', $date)")
+    func day_of_week(date) = SQL(int, "strftime('%w', $date)")
+    func week_of_year(date) = SQL(int, "strftime('%W', $date)")
+    func count_distinct(field: aggregated) = SQL(int, "count(distinct $field)")
+
+    func _str_index(a: string, b: string) = SQL(int, "INSTR($b, $a)-1")
+    func _char(n: int) = SQL(string, "char($n)")
+    func _char_ord(n: string) = SQL(int, "unicode($n)")
+} else if (db_type == "mysql") {
+    func _random() = SQL(float, "RAND()")
+
+    func _str_index(a: string, b: string) = SQL(int, "INSTR($b, $a)-1")    // same as sqlite
+    func _char(n: int) = SQL(string, "char($n)")
+    func _char_ord(n: string) = SQL(int, "ascii($n)")
+
+    // TODO use AST interface instead?
+    func _count_false(field) = SQL(int, "sum(cast($field=0 as unsigned))")
+    func _count_true(field) = SQL(int, "sum(cast($field!=0 as unsigned))")
+
+} else if (db_type == "bigquery") {
+    func _random() = SQL(float, "RAND()")
+    
+    func _str_index(a: string, b: string) = SQL(int, "INSTR($b, $a)-1")    // same as sqlite
+    func _char(n: int) = SQL(string, "char($n)")
+    func _char_ord(n: string) = SQL(int, "ascii($n)")
+
+    func _count_false(field) = SQL(int, "sum(cast($field=0 as int64))")
+    func _count_true(field) = SQL(int, "sum(cast($field!=0 as int64))")
+} else {
+    throw new TypeError("Unexpected")
+}
+// End of database specific code
+// Wrapping database specific code
+
+
+func count_false(field: aggregated) = _count_false(field)
+    """Count how many values in the field are false or zero
+
+    Example:
+        >> [0,1,2,0,3]{ => count_false(item) }
+        table  =1
+        ┏━━━━━━━━━━━━━┓
+        ┃ count_false ┃
+        ┡━━━━━━━━━━━━━┩
+        │           2 │
+        └─────────────┘
+
+    See Also:
+        - `count_true`
+    """
+
+func count_true(field: aggregated) = _count_true(field)
+    """Count how many values in the field are true (non-zero)
+
+    Example:
+        >> [0,1,2,0,3]{ => count_true(item) }
+        table  =1
+        ┏━━━━━━━━━━━━┓
+        ┃ count_true ┃
+        ┡━━━━━━━━━━━━┩
+        │          3 │
+        └────────────┘
+
+    See Also:
+        - `count_false`
+    """
+
+func random() = _random()
+    "Returns a random float number between 0 to 1"
+
+func str_index(substr: string, s: string) = _str_index(substr, s)
+    """Finds in which index does `substr` appear in `s`.
+
+    Parameters:
+        substr: The substring to find
+        s: The string to search in
+
+    Returns:
+        A 0-based index (int) if found the substring, or -1 if not found.
+
+    Example:
+        >> str_index("re", "preql")
+        1
+        >> str_index("x", "preql")
+        -1
+    """
+
+func char(n: int) = _char(n)
+    "Returns the character with the given ASCII code"
+
+func char_ord(n: string) = _char_ord(n)
+    "Returns the ascii code of the given character"
+
+func repeat(s: string, num: int) = _repeat(s, num)
+    """Repeats the string `num` times.
+
+    Example:
+        >> _repeat("ha", 3)
+        "hahaha"
+    """
+
+func now() = _now()
+    "Returns the current datetime"
+
+// End of wrapping of database specific code
+
+
+func str_contains(substr: string, s: string) = str_index(substr, s) >= 0
+    """Tests whether string `substr` is contained in `s`
+
+    Example:
+        >> str_contains("i", "tim")
+        true
+        >> str_contains("i", "team")
+        false
+    """
+
+func str_notcontains(substr: string, s: string) = str_index(substr, s) < 0
+    """Tests whether string `substr` is not contained in `s`
+
+    Equivalent to `not str_contains(substr, s)`.
+    """
+
+func sample_ratio_fast(tbl, ratio) {
+    "Returns a random sample of rows from the table, at the approximate amount of (ratio*count(tbl))."
+    return tbl[random() < ratio]    // random() will be re-evaluated for every row
+}
+
+func sample_fast(tbl: table, n: int, bias: number=0.05) {
+    """Returns a random sample of n rows from the table in one query (or at worst two queries)
+
+    Parameters:
+        tbl: The table to sample from
+        n: The number of items to sample
+        bias: Add bias (reduce randomness) to gain performance. Higher values of 'bias'
+              increase the chance of success in a single query, but may introduce a
+              higher bias in the randomness of the chosen rows, especially in sorted tables.
+    """
+    c = count(tbl)
+    if (n > c) {
+        throw new ValueError("Asking for a sample size larger than the table")
+    }
+    if (bias < 0) {
+        throw new ValueError("Cannot have a negative bias")
+    }
+    if (n <= 0) {
+        throw new ValueError("n must be a number above 0")
+    }
+
+    if (n == c) {
+        return tbl
+    }
+
+    const table results = sample_ratio_fast(tbl, (1+bias) * n / c)[..n]
+    if (count(results) == n) {
+        return results
+    }
+    // This should happen very rarely
+    return results + limit(tbl, n - count(results))
+}
+
+func page(table, index, page_size=20) {
+    "Pagination utility function for tables"
+    offset = index*page_size
+    return table[offset..(offset+page_size)]
+}
+
+func remove_table(table_name) {
+    "Remove table from database (drop table)"
+    SQL(nulltype, "DROP TABLE $table_name")
+}
+
+// func remove_tables(tables) {
+//     "TODO"
+
+//     for (table in tables) {
+//         SQL(nulltype, "DROP TABLE $table")
+//     }
+// }
+
+func char_range(start: string, end: string) {
+    """Produce a list of all characters from 'start' to 'stop'
+
+    Example:
+        >> char_range('a', 'z')
+    """
+    a = char_ord(start)
+    b = char_ord(end)+1
+    return list([a..b]{char(item)})
+}
+
+
+func map_range(tbl: table, start: union[int, function], end: union[int, function]) {
+    """For each row in the table, assigns numbers out of a range, and
+    produces `(end-start)` new rows instead, each attached to a number.
+
+    If `start` or `end` are functions, the index is the result of the function, per row.
+
+    Parameters:
+        tbl: Table to map the range onto
+        start: The starting index, or a function producing the starting index
+        end: The ending index, or a function producing the ending index
+
+    Examples:
+        >> map_range(["a", "b"], 0, 3)
+        table  =6
+        ┏━━━┳━━━━━━┓
+        ┃ i ┃ item ┃
+        ┡━━━╇━━━━━━┩
+        │ 0 │ a    │
+        │ 1 │ a    │
+        │ 2 │ a    │
+        │ 0 │ b    │
+        │ 1 │ b    │
+        │ 2 │ b    │
+        └───┴──────┘
+
+        >> map_range(["a", "ab"], 1, length)
+        table  =3
+        ┏━━━┳━━━━━━┓
+        ┃ i ┃ item ┃
+        ┡━━━╇━━━━━━┩
+        │ 1 │ a    │
+        │ 1 │ ab   │
+        │ 2 │ ab   │
+        └───┴──────┘
+    """
+    if (isa(start, int)) {
+        s = start
+    } else if (isa(start, function)) {
+        s = min(tbl{start(item)})
+    }
+
+    if (isa(end, int)) {
+        e = end
+    } else if (isa(end, function)) {
+        e = max(list(tbl{end(item)})) + 1
+    }
+
+    mul = joinall(t: tbl, i: [s..e]) {i: i.item, ...t }
+
+    if (isa(start, function)) {
+        mul = mul[i >= start(item)]
+    }
+
+    if (isa(end, function)) {
+        mul = mul[i <= end(item)]
+    }
+
+    return mul
+}
+
+pi = _pi()

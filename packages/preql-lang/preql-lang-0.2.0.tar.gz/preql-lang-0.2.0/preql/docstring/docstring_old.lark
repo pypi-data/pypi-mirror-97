@@ -1,0 +1,29 @@
+start: _NL* _INDENT? text sections _DEDENT? _DEDENT?
+
+sections: section*
+
+?section: SECTION_TYPE _NL _INDENT section_items _DEDENT
+
+section_items: decl+
+             | text
+
+decl: DECL [attrs] ":" text
+attrs: "(" _cs_list{NAME} ")"
+
+_cs_list{item}: (item "," )* item
+
+text: _text
+_text: (LINE  _NL | _INDENT _text _DEDENT)+
+
+_NL: ( /\r?\n[\t ]*/ | COMMENT )+
+
+LINE.-10: /.+/
+SECTION_TYPE.10: LINE /:\s*(?=\n)/  // Line, if followed immediately by :\n
+
+DECL: NAME /(?=\s*[:(])/    // NAME, if followed immediately by : or (
+
+%import python (NAME, COMMENT)
+
+%ignore COMMENT
+%ignore /\s/
+%declare _INDENT _DEDENT
