@@ -1,0 +1,29 @@
+<!--! -*- mode: html; -*- -->
+<div tal:define="oid oid|field.oid;
+                 css_class css_class|field.widget.css_class;
+                 style style|field.widget.style;"
+     i18n:domain="deform"
+     tal:omit-tag="">
+  ${field.start_mapping()}
+  <div>
+    <input type="text" name="cases" value="${cases}"
+           tal:attributes="style style;
+                           class string: form-control ${css_class or ''};
+                           cases_attributes|field.widget.cases_attributes|{};"
+           placeholder="cases"
+           autocomplete="off"
+           id="${oid}-cases"/>
+    Cases
+  </div>
+  <div>
+    <input type="text" name="units" value="${units}"
+           tal:attributes="class string: form-control ${css_class or ''};
+                           style style;
+                           units_attributes|field.widget.units_attributes|{};"
+           placeholder="units"
+           autocomplete="off"
+           id="${oid}-units"/>
+    Units
+  </div>
+  ${field.end_mapping()}
+</div>
