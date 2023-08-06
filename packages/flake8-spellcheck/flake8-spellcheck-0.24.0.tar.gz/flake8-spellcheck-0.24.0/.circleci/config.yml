@@ -1,0 +1,88 @@
+---
+
+version: 2
+
+test: &test
+  steps:
+    - checkout
+    - run:
+        name: install python dependencies
+        command: pip install -r dev-requirements.txt
+    - run:
+        name: install self
+        command: pip install .
+    - run:
+        name: run pytest
+        command: pytest
+
+
+jobs:
+  lint:
+    docker:
+      - image: "python:3.8"
+    steps:
+      - checkout
+      - run:
+          name: Install Lint Requirements
+          command: pip install -r lint-requirements.txt
+      - run:
+          name: flake8
+          command: |
+            pip install .
+            flake8 flake8_spellcheck tests
+      - run:
+          name: isort
+          command: isort . --diff -c
+      - run:
+          name: black
+          command: black . --check
+      - run:
+          name: check word dictionaries are sorted
+          command: |
+            for file in "whitelist.txt" flake8_spellcheck/*.txt;
+            do
+              if [ "$(sort < "$file")" != "$(<"$file")" ]; then
+                echo "$file is not sorted correctly"
+                exit 1
+              fi
+            done
+      - run:
+          name: yamllint
+          command: yamllint .
+
+  test-3.9:
+    docker:
+      - image: "python:3.9"
+    <<: *test
+
+  test-3.8:
+    docker:
+      - image: "python:3.8"
+    <<: *test
+
+  test-3.7:
+    docker:
+      - image: "python:3.7"
+    <<: *test
+
+  test-3.6:
+    docker:
+      - image: "python:3.6"
+    <<: *test
+
+  test-3.5:
+    docker:
+      - image: "python:3.5-stretch"
+    <<: *test
+
+
+workflows:
+  version: 2
+  spellcheck_test:
+    jobs:
+      - lint
+      - test-3.5
+      - test-3.6
+      - test-3.7
+      - test-3.8
+      - test-3.9
