@@ -1,0 +1,55 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+{%block title%}{{endpoint_definition.title}} - Executions{%endblock%}
+{% block scripts %}{% endblock %}
+{% block pagecontent %}
+
+<h1>{{endpoint_definition.title}}</h1>
+<span class="code">{{endpoint_definition.endpoint}}</span><br />
+<br />
+{%select_menu options=endpoint_options null_label="Select Another Job" class="form-control" onchange="view_ep_exe($(this));"%}
+<br />
+<br />
+
+<table class="table table-condensed table-striped table-hover">
+    <tr>
+        <th scope="col">Date</th>
+        {%sortable_th col="date_created" label="Time"%}
+        {%sortable_th col="status"%}
+        <th scope="col">Output</th>
+    </tr>
+{%for exe in executions%}
+    <tr id="row-{{exe.id}}">
+        <td>{{exe.date_created|date}}</td>
+        <td>{{exe.date_created|time:"g:i A"}}</td>
+        <td>
+            {{exe.status_description}}
+            {%if exe.http_status%}
+                <br />
+                <span class="code">{{exe.http_status}}</span>
+            {%endif%}
+        </td>
+        <td><textarea class="form-control" rows="5">{{exe.output}}</textarea></td>
+    </tr>
+{%empty%}
+    <tr>
+        <td colspan="9">
+            <em class="text-muted" style="text-align:center;">No Recorded Job Executions</em>
+        </td>
+    </tr>
+{%endfor%}
+</table>
+
+{%pagination executions%}
+
+<br />
+<br />
+
+<script type="text/javascript">
+    function view_ep_exe(el){
+        document.location.href='{%url 'scheduler:executions'%}?endpoint=' + el.val();
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+{%block title%}Manage Endpoints{%endblock%}
+{% block scripts %}{% endblock %}
+{% block pagecontent %}
+
+<h1>Manage Endpoints</h1>
+
+<table class="table table-condensed table-hover">
+    <tr>
+
+        <th scope="col">Job Title</th>
+        <th scope="col">Endpoint</th>
+        <td>&nbsp;</td>
+    </tr>
+{%for endpoint in endpoints%}
+    {% include 'scheduler/_endpoint_tr.html' with endpoint=endpoint%}
+{%empty%}
+    <tr>
+        <td colspan="9">
+            <em class="text-muted" style="text-align:center;">No Defined Endpoints</em>
+        </td>
+    </tr>
+{%endfor%}
+</table>
+
+<br />
+<br />
+
+<form method="post" action="{%url 'scheduler:save_endpoint'%}">
+    {%csrf_token%}
+    <table class="table table-condensed">
+        <tr>
+            <td>
+                <input type="text" name="title" id="title" maxlength="80" class="form-control" />
+                <label for="title">Title</label>
+            </td>
+            <td>
+                <input type="text" name="endpoint" id="endpoint" maxlength="200" class="form-control" />
+                <label for="endpoint">Endpoint</label>
+            </td>
+            <td>
+                <button type="submit" class="btn btn-success">Save</button>
+            </td>
+        </tr>
+    </table>
+</form>
+{% endblock %}

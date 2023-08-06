@@ -1,0 +1,86 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+{%block title%}Scheduled Jobs{%endblock%}
+{% block scripts %}{% endblock %}
+{% block pagecontent %}
+
+<h1>Scheduled Jobs</h1>
+
+<table class="table table-condensed table-hover">
+    <tr>
+        <td>&nbsp;</td>
+        <th scope="col">Job</th>
+        <th scope="col">Performer</th>
+        <th scope="col">Date Range</th>
+        <th scope="col">Run Days</th>
+        <th scope="col">Run Times</th>
+        <th scope="col">Frequency</th>
+        <th scope="col">Active</th>
+    </tr>
+{%for job in jobs%}
+    {% include 'scheduler/_schedule_job_tr.html' with job=job%}
+{%empty%}
+    <tr>
+        <td colspan="9">
+            <em class="text-muted" style="text-align:center;">No Scheduled Jobs</em>
+        </td>
+    </tr>
+{%endfor%}
+</table>
+
+<br />
+<br />
+
+{%if is_developer%}
+    <button type="button" class="btn btn-info" onclick="$(this).addClass('hidden');$('#new-job-div').removeClass('hidden');$('#title').focus();">
+        {%fa fa-plus%} New Job
+    </button>
+    <div class="hidden" id="new-job-div">
+        <form method="post" action="{%url 'scheduler:save_job'%}">
+            {%csrf_token%}
+            <table class="table table-condensed">
+                <tr>
+                    <td>
+                        {%select_menu name="endpoint" id="endpoint" class="form-control" options=endpoint_options null_label="Select a Job"%}
+                        <label for="endpoint">Endpoint</label>
+                    </td>
+                    <td>
+                        <input type="text" name="performer" id="performer" maxlength="30" class="form-control" />
+                        <label for="performer">Performer</label>
+                    </td>
+                    <td>
+                        <input type="date" name="start_date" id="start_date" class="form-control" />
+                        <label for="start_date">Start Date</label>
+                    </td>
+                    <td>
+                        <input type="date" name="end_date" id="end_date" class="form-control" />
+                        <label for="end_date">End Date</label>
+                    </td>
+                    <td>
+                        <label><input type="checkbox" name="run_days" value="6" /> Sunday</label><br />
+                        <label><input type="checkbox" name="run_days" value="0" checked /> Monday</label><br />
+                        <label><input type="checkbox" name="run_days" value="1" checked /> Tuesday</label><br />
+                        <label><input type="checkbox" name="run_days" value="2" checked /> Wednesday</label><br />
+                        <label><input type="checkbox" name="run_days" value="3" checked /> Thursday</label><br />
+                        <label><input type="checkbox" name="run_days" value="4" checked /> Friday</label><br />
+                        <label><input type="checkbox" name="run_days" value="5" /> Saturday</label><br />
+                    </td>
+                    <td>
+                        <input type="text" name="run_times_csv" id="run_times" class="form-control" />
+                        <label for="run_times">Run Times</label>
+                    </td>
+                    <td>
+                        <input type="number" name="run_frequency" id="run_frequency" class="form-control" />
+                        <label for="run_frequency">Run Frequency (minutes)</label>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{%endif%}
+
+{% endblock %}
