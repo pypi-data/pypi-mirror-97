@@ -1,0 +1,18 @@
+{% set version_short = version.split('.')[0] %}
+[Unit]
+Description=Odoo Service
+After=network.target
+
+[Service]
+Type=simple
+User={{ user }}
+ExecStart=/srv/odoo/venv/odoo{{ version_short }}/bin/python /srv/odoo/src/odoo-{{ version }}/odoo-bin --config /etc/odoo/odoo{{ version_short }}.conf --syslog
+Restart=on-failure
+RestartSec=10
+SyslogIdentifier=odoo
+StandardError=journal
+StandardOutput=journal
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

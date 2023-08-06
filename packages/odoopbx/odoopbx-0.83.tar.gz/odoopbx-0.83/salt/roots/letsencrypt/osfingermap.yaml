@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+#
+# Setup variables using grains['osfinger'] based logic.
+# You just need to add the key:values for an `osfinger` that differ
+# from `defaults.yaml` + `osarch.yaml` + `os_family.yaml` + `osmap.yaml`.
+# Only add an `osfinger` which is/will be supported by the formula.
+#
+# If you do not need to provide defaults via the `osfinger` grain,
+# you will need to provide at least an empty dict in this file, e.g.
+# osfingermap: {}
+---
+# os: CentOS
+CentOS Linux-7:
+  pkgs:
+    - python2-certbot-apache
+CentOS Linux-8:
+  pkgs:
+    - python3-certbot-apache
+# os: OEL
+Oracle Linux Server-7:
+  pkgs:
+    - python2-certbot-apache
