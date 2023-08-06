@@ -1,0 +1,88 @@
+{
+  "$schema": "metaschema/strict_meta_schema.json#",
+  "$id": "available_assays",
+  "title": "Assays which are available in the network",
+  "description": "Reference for every available assay in network.",
+  "mergeStrategy": "objectMerge",
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "wes": {
+      "type": "array",
+      "description": "Whole exome sequencing.",
+      "items": {
+        "$ref": "assays/wes_assay.json"
+      },
+      "mergeStrategy": "append"
+    },
+    "rna": {
+      "type": "array",
+      "description": "RNA assay for expression analysis.",
+      "items": {
+        "$ref": "assays/rna_assay.json"
+      },
+      "mergeStrategy": "append"
+    },
+    "tcr": {
+      "type": "array",
+      "description": "TCR sequencing assay.",
+      "items": {
+        "$ref": "assays/tcr_assay.json"
+      },
+      "mergeStrategy": "arrayMergeById",
+      "mergeOptions": {
+        "idRef": "batch_id"
+      }
+    },
+    "cytof": {
+      "type": "array",
+      "description": "Base information about the acquisition and analysis of CyTOF data.",
+      "items": {
+        "$ref": "assays/cytof_assay.json"
+      },
+      "mergeStrategy": "arrayMergeById",
+      "mergeOptions": {
+        "idRef": "assay_run_id"
+      }
+    },
+    "elisa": {
+      "type": "array",
+      "description": "Base information about the acquisition and analysis of ELISA data.",
+      "items": {
+        "$ref": "assays/elisa_assay.json"
+      },
+      "mergeStrategy": "arrayMergeById",
+      "mergeOptions": {
+        "idRef": "assay_run_id"
+      }
+    },
+    "olink": {
+      "$comment": "NB This is not array as every other assay. Will update data on any olink upload.",
+      "$ref": "assays/olink_assay.json"
+    },
+    "mif": {
+      "type": "array",
+      "description": "Multiplex immunofluorescence.",
+      "items": {
+        "$ref": "assays/mif_assay.json"
+      },
+      "mergeStrategy": "append"
+    },
+    "micsss": {
+      "type": "array",
+      "description": "Multiplexed immunohistochemical consecutive staining on single slide.",
+      "items": {
+        "$ref": "assays/micsss_assay.json"
+      },
+      "mergeStrategy": "append"
+    },
+    "ihc": {
+      "type": "array",
+      "description": "Immunohistochemical analysis.",
+      "items": {
+        "$ref": "assays/ihc_assay.json"
+      },
+      "mergeStrategy": "append"
+    }
+  }
+}

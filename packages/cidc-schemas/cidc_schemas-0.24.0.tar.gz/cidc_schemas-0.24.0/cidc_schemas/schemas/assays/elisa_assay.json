@@ -1,0 +1,34 @@
+{
+  "$schema": "metaschema/strict_meta_schema.json#",
+  "$id": "elisa_assay",
+  "title": "ELISA Assay",
+  "type": "object",
+  "description": "High-throughput multiplexed assays for protein biomarker discovery.",
+  "allOf": [
+      {"$ref": "assays/components/assay_core.json"}
+  ],
+  "properties": {
+    "assay_creator": {"$ref": "assays/components/assay_core.json#properties/assay_creator"},
+    "assay_run_id": {
+      "type": "string",
+      "description": "User defined unique identifier for this assay run."
+    },
+    "assay_xlsx": {
+      "$ref": "artifacts/artifact_elisa_xlsx.json"
+    },
+    "antibodies": {
+      "type": "array",
+      "description": "Data specific to antibody preparation on the ELISA assay.",
+      "items": {
+          "$ref": "assays/components/elisa/elisa_antibody.json"
+      },
+      "mergeStrategy": "arrayMergeById",
+      "mergeOptions": {
+        "idRef": "antibody"
+      }
+    }
+  },
+  "mergeStrategy": "objectMerge",
+  "additionalProperties": false,
+  "required": ["assay_run_id", "assay_xlsx", "antibodies"]
+}
