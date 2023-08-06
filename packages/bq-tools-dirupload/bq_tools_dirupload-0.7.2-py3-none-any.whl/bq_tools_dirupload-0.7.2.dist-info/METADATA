@@ -1,0 +1,150 @@
+Metadata-Version: 2.1
+Name: bq-tools-dirupload
+Version: 0.7.2
+Summary: Upload/Download files to bisque/ViQi in parallel
+Home-page: https://www.viqi.org
+Author: ViQi Inc
+Author-email: support@viqi.org
+License: BSD
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Requires-Dist: bisque-api (>=0.5.10.11)
+Requires-Dist: configparser
+Requires-Dist: lxml
+
+bq-dirupload
+============
+
+Upload directories and files to a ViQi/BisQue server
+
+::
+
+    usage: Upload files to bisque [-h] [-c CONFIG] [--profile PROFILE] [-n] [-d]
+                                  [-q] [-a CREDENTIALS]
+                                  [--bisque-host BISQUE_HOST] [--tag TAG]
+                                  [--path-tags PATH_TAGS] [--re-tags RE_TAGS]
+                                  [--include INCLUDE] [--exclude EXCLUDE]
+                                  [--dataset DATASET] [--threads THREADS] [-s]
+                                  [--tagmap TAGMAP] [--tagtable TAGTABLE]
+                                  [--tagkey TAGKEY]
+                                  directories [directories ...]
+
+    positional arguments:
+      directories           director(ies) to upload
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -c CONFIG, --config CONFIG
+                            bisque config ~/.bisque/config
+      --profile PROFILE     Profile to use in bisque config default
+      -n, --dry-run         report actions w/o changes
+      -d, --debug           print debugging info
+      -q, --quiet           print actions
+      -a CREDENTIALS, --credentials CREDENTIALS
+                            A bisque login.. admin
+      --bisque-host BISQUE_HOST
+                            Default bisque server to connect to
+      --tag TAG             fixed name:value pair. Any number allow
+      --path-tags PATH_TAGS
+                            tag names for a parsible path i.e.
+                            /project/date/subject/
+      --re-tags RE_TAGS     re expressions for tags i.e.
+                            (?P<location>\w+)--(?P<date>[\d-]+)
+      --include INCLUDE     shell expression for files to include. Can be repeated
+      --exclude EXCLUDE     shell expression for files to exclude. Can be repeated
+      --dataset DATASET     create dataset and add files to it
+      --threads THREADS     set number of uploader threads
+      -s, --skip            Skip upload if there is file with the same name
+                            already present on the server
+      --tagmap TAGMAP       Supply a map tag/value -> tag/value found in tag path
+                            and re decoder. carp=carpenteria or @tagmap.csv
+      --tagtable TAGTABLE   Table of fixed tags to add to resource: First column
+                            is key
+      --tagkey TAGKEY       Used with tagtable can be filename, image_path or any
+                            extracted tag
+
+Examples
+--------
+
+1. Simple decoding of path/filename into metadata tags
+
+   ``bq-dirupload --skip --include *.JPG --tag activity:bear  --re-tags "(?P<location>\w+)_(?P<camera>\w+)__(?P<date>[\d-]+)__(?P<time>[\d-]+).*" ~/Desktop/pics/bears/``
+
+2. Complex mapping of path/filename metadata into tag
+
+   ``bq-dirupload -n  --threads 1 --re-tags "(?P<photo_site_code>\w+)_(?P<target_assemblage>\D+)(?P<plot>\d+)_(?P<season>\D+)(?P<year>\d+).+\.JPG" --dataset upload --tagmap @speciesmap.csv --tagmap @locationmap.csv --tagmap fa=fall --tagmap 15=2015 --tagtable photo_code_reference_2019_0912.csv --tagkey photo_site_code``
+
+   Magic decoder ring:
+
+::
+
+        -n: dry run
+        --threads 1: one thread for debugging
+        --retags :   use filename to create tags: photo_site_code, target_assemblage, season and year.
+        --dataset : create a dataset "upload"
+        --tagmap @speciesmap.csv: use value ins speciesmap.csv to rename tag/values for target_assemblage
+        --tagmap @locationmap: Use location map to rename tag/value from phto_site_code
+        --tagmap fa=fall : rename season 'fa' to 'fall'
+        --tagmap 15=2015 : remame year from '15' to 2015
+        --tagtable photo_code... :   table of fixed tag data keyed by --tagkey
+        --tagkey   photo_site_code:  use photo_site_code to key into tagtable to read extra tags```
+
+
+
+
+bq-dirfetch
+============
+
+Fetch a set of files from a bisque server
+
+
+::
+    Usage: Fetch files from bisque [-h] [-c CONFIG] [--profile PROFILE] [-n]
+                                   [-d [DEBUG]] [--debug-file DEBUG_FILE] [-q]
+                                   [-a CREDENTIALS] [--bisque-host BISQUE_HOST]
+                                   [--alias ALIAS] [--threads THREADS]
+                                   [datasets [datasets ...]]
+
+    positional arguments:
+      datasets              datasets to download
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -c CONFIG, --config CONFIG
+                            bisque config
+      --profile PROFILE     Profile to use in bisque config
+      -n, --dry-run         report actions w/o changes
+      -d DEBUG, --debug DEBUG
+                            set debug level: debug,info,warn,error
+      --debug-file DEBUG_FILE
+                            output filename for debug messages
+      -q, --quiet           print actions
+      -a CREDENTIALS, --credentials CREDENTIALS
+                            A bisque login.. admin
+      --bisque-host BISQUE_HOST
+                            Default bisque server to connect to
+      --alias ALIAS         Use admin credentials to login as alias
+      --threads THREADS     set number of uploader threads
+
+    bq-dirfetch -n  --threads 1 dataset_uri
+
+
+Configuration
+-------------
+
+Create a file config file containing you login info at
+``~/.bisque/config``
+
+::
+
+        [default]
+        host=https://data.viqi.org/
+        user=demo
+        password=<demopass>
+
+
