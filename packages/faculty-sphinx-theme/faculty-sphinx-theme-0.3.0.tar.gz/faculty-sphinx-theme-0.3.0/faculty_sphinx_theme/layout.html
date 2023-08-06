@@ -1,0 +1,91 @@
+{% extends "sphinx_rtd_theme/layout.html" %}
+
+{# Default to Faculty favicon #}
+{% if not favicon %}
+  {% set favicon = "images/favicon.ico" %}
+{% endif %}
+{# Default to Faculty logo #}
+{% if not logo %}
+  {% set logo = "images/faculty.svg" %}
+{% endif %}
+
+{% set css_files = css_files + [
+    "_static/css/faculty.css",
+    "https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Roboto:400,700|Roboto+Mono:400,700&display=swap"
+] %}
+
+{% macro navbar_entry(heading, content) -%}
+  {% if heading.strip() %}
+    {% set (heading_title, heading_url) = heading.strip().rsplit(None, 1) %}
+    <li class="component">
+      <a href="{{ heading_url }}">{{ heading_title }}</a>
+      {% set menu_items = content.split(",") %}
+      {% if menu_items %}
+        <ul>
+          {% for entry in menu_items %}
+            {% if entry %}
+              {% set (entry_title, entry_url) = entry.strip().rsplit(None, 1) %}
+              <li class="section">
+                <a href="{{ entry_url }}">{{ entry_title }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+  {% endif %}
+{%- endmacro %}
+
+{% block sidebartitle %}
+
+  {% if theme_navbar | tobool %}
+    <a class="heading" href="{{ theme_navbar_root }}">
+      <div class="logo-box">
+        <img class="logo" src="{{ pathto('_static/' + logo, 1) }}"/>
+      </div>
+    </a>
+    {% if not theme_logo_only %}
+      <a href="{{ pathto(master_doc) }}" class="icon icon-home"> {{ project }}</a>
+    {% endif %}
+  {% else %}
+    <a class="heading heading-extra-margin" href="{{ pathto(master_doc) }}">
+      <div class="logo-box logo-box-large">
+        <img class="logo" src="{{ pathto('_static/' + logo, 1) }}"/>
+      </div>
+      {% if not theme_logo_only %}
+        <span class="icon icon-home"> {{ project }}</span>
+      {% endif %}
+    </a>
+  {% endif %}
+
+  {% if theme_display_version %}
+    {%- set nav_version = version %}
+    {% if READTHEDOCS and current_version %}
+      {%- set nav_version = current_version %}
+    {% endif %}
+    {% if nav_version %}
+      <div class="version">{{ nav_version }}</div>
+    {% endif %}
+  {% endif %}
+
+  {% include "searchbox.html" %}
+
+{% endblock %}
+
+{% block content %}
+
+  {% if theme_navbar | tobool %}
+    <nav class="platform-navbar">
+      <ul>
+        {{ navbar_entry(theme_navbar_0_heading, theme_navbar_0_content) }}
+        {{ navbar_entry(theme_navbar_1_heading, theme_navbar_1_content) }}
+        {{ navbar_entry(theme_navbar_2_heading, theme_navbar_2_content) }}
+        {{ navbar_entry(theme_navbar_3_heading, theme_navbar_3_content) }}
+        {{ navbar_entry(theme_navbar_4_heading, theme_navbar_4_content) }}
+      </ul>
+    </nav>
+  {% endif %}
+
+  {{ super() }}
+
+{% endblock %}
