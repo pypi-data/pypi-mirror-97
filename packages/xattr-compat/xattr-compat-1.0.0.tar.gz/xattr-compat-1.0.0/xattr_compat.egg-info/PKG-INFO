@@ -1,0 +1,58 @@
+Metadata-Version: 2.1
+Name: xattr-compat
+Version: 1.0.0
+Summary: Multi-platform extended attributes support
+Home-page: https://github.com/dgilman/xattr_compat
+Author: David Gilman
+Author-email: davidgilman1@gmail.com
+License: UNKNOWN
+Project-URL: Bug Reports, https://github.com/dgilman/xattr_compat/issues
+Project-URL: Source, https://github.com/dgilman/xattr_compat/
+Description: # xattr-compat
+        
+        Support for extended attributes on multiple platforms. Also includes a mutable mapping class for easy access to file xattrs.
+        
+        No C modules have to be compiled to use this library and it has no dependencies. The ctypes module in the standard library is used to make the required libc calls. Performance should be fine for all purposes. I mean, it's just xattrs, who is making so many xattr calls from Python that they need something above and beyond this?
+        
+        ## Usage
+        
+        The package exports the `getxattr`, `listxattr`, `removexattr` and `setxattr` functions. They have identical function signatures to the [versions implemented in the os module in the standard library.](https://docs.python.org/3/library/os.html#linux-extended-attributes)
+        
+        There's also a class `Xattrs` that provides a simple mutable mapping over a file's extended attributes:
+        
+        ```python
+        # class Xattrs(path: os.PathLike, follow_symlinks: bool = True)
+        
+        import xattr_compat
+        
+        xattrs = xattr_compat.Xattrs("./my_file")
+        
+        xattrs["user.humanfund.xattr"] = b"hello\0world"
+        
+        print("Extended attributes:", xattrs.items())
+        ```
+        
+        ## License
+        
+        MIT
+        
+        ## Sponsorship
+        
+        Development of xattr-compat is sponsored by [Pro Football History.com, your source for NFL coaching biographies.](https://pro-football-history.com)
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: MacOS X
+Classifier: Operating System :: POSIX :: BSD :: FreeBSD
+Classifier: Operating System :: POSIX :: BSD :: NetBSD
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
