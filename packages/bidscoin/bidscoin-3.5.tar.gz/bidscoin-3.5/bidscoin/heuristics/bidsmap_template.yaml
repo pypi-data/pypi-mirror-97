@@ -1,0 +1,1317 @@
+# --------------------------------------------------------------------------------
+# This is a bidsmap YAML file with the key-value mappings for the different BIDS
+# datatypes (anat, func, dwi, etc). The datatype attributes are the keys that map
+# onto the BIDS labels. The bidsmap data-structure should be 5 levels deep:
+# dict > dict > list > dict > dict
+#
+# NB:
+# 1) Edit the bidsmap file to your needs before feeding it to bidscoiner.py
+# 2) (Institute) users may create their own bidsmap_[template].yaml or
+#    bidsmap_[sample].yaml file
+#
+# For more information, see:
+# https://github.com/Donders-Institute/bidscoin
+# https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+# --------------------------------------------------------------------------------
+
+
+Options:
+# --------------------------------------------------------------------------------
+# General options
+# --------------------------------------------------------------------------------
+  bidscoin:
+    version: '3.5'                # BIDScoin version (should correspond with the version in ../bidscoin/version.txt)
+    bidsignore: extra_data/       # Semicolon-separated list of entries that are added to the .bidsignore file (for more info, see BIDS specifications), e.g. extra_data/;pet/;myfile.txt;yourfile.csv
+  dcm2niix:                       # See dcm2niix -h and https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage for more info
+    path: module add dcm2niix;    # Command to set the path to dcm2niix (note the semi-colon), e.g. module add dcm2niix/1.0.20180622; or PATH=/opt/dcm2niix/bin:$PATH; or /opt/dcm2niix/bin/ or '"C:\Program Files\dcm2niix\"' (note the quotes to deal with the whitespace)
+    args: -b y -z y -i n          # Argument string that is passed to dcm2niix. Tip: SPM users may want to use '-z n' (which produces unzipped nifti's, see dcm2niix -h for more information)
+
+
+PlugIns:
+# --------------------------------------------------------------------------------
+# List of plugins to edit the key-value heuristics / perform additional operations
+# --------------------------------------------------------------------------------
+- ~                               # Either a fullpath name of the plugin or just the basename when it is in the default bidscoin/plugins folder
+
+
+DICOM:
+# --------------------------------------------------------------------------------
+# DICOM key-value heuristics (DICOM fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+  subject: <<SourceFilePath>>     # <<SourceFilePath>> extracts the subject label from the source directory during bidscoiner runtime. A DICOM attribute can also be used as subject-label instead, e.g. <PatientID>
+  session: <<SourceFilePath>>     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime. A DICOM attribute can also be used as session-label instead, e.g. <StudyID>
+
+  anat:       # ----------------------- All anatomical runs --------------------
+  - provenance: ~                 # The fullpath name of the DICOM file from which the attributes are read. Serves also as a look-up key to find a run in the bidsmap
+    attributes: &anat_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids: &anat_dicoment_nonparametric  # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: T1w
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: T2w
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: PDw
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: T2starw
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: FLAIR
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: inplaneT1
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: inplaneT2
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: PDT2
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_nonparametric
+      suffix: angio
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_parametric     # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      suffix: T1map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: T2map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: T2starmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: R1map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: R2map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: R2starmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: PDmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: MTRmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: MTsat
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: UNIT1
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: T1rho
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: MWFmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: MTVmap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: PDT2map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: Chimap
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: S0map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_parametric
+      suffix: M0map
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_defacemask     # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      mod: ~
+      suffix: defacemask
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_multiecho      # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MESE
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_multiecho
+      suffix: MEGRE
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_multiflip      # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      flip: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: VFA
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_multiinv       # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: IRT1
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_mp2rage        # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      flip: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MP2RAGE
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_vfamt          # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      flip: ~
+      mt: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MPM
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids:
+      <<: *anat_dicoment_vfamt
+      suffix: MTS
+  - provenance: ~
+    attributes: *anat_dicomattr
+    bids: &anat_dicoment_mtr            # See: schema/datatypes/anat.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      mt: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MTR
+
+  func:       # ----------------------- All functional runs --------------------
+  - provenance: ~
+    attributes: &func_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids: &func_dicoment_func           # See: schema/datatypes/func.yaml
+      task: <SeriesDescription>
+      acq: <ProtocolName>
+      ce: ~
+      dir: ~
+      rec: ~
+      run: <<1>>
+      echo: <EchoNumbers>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: bold
+  - provenance: ~
+    attributes: *func_dicomattr
+    bids:
+      <<: *func_dicoment_func
+      suffix: cbv
+  - provenance: ~
+    attributes: *func_dicomattr
+    bids:
+      <<: *func_dicoment_func
+      suffix: sbref
+  - provenance: ~
+    attributes: *func_dicomattr
+    bids: &func_dicoment_events         # See: schema/datatypes/func.yaml
+      task: <SeriesDescription>
+      acq: <ProtocolName>
+      ce: ~
+      dir: ~
+      rec: ~
+      run: <<1>>
+      suffix: events
+  - provenance: ~
+    attributes: *func_dicomattr
+    bids: &func_dicoment_timeseries     # See: schema/datatypes/func.yaml
+      task: <SeriesDescription>
+      acq: <ProtocolName>
+      ce: ~
+      dir: ~
+      rec: ~
+      recording: ~
+      run: <<1>>
+      suffix: physio
+  - provenance: ~
+    attributes: *func_dicomattr
+    bids:
+      <<: *func_dicoment_timeseries
+      suffix: stim
+
+  perf:       # ----------------------- All perfusion runs ---------------------
+  - provenance: ~
+    attributes: &perf_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids: &perf_dicoment_group1         # See: schema/datatypes/perf.yaml
+      acq: <ProtocolName>
+      rec: <SeriesDescription>
+      dir: ~
+      run: <<1>>
+      suffix: asl
+  - provenance: ~
+    attributes: *perf_dicomattr
+    bids:
+      <<: *perf_dicoment_group1
+      suffix: m0scan
+  - provenance: ~
+    attributes: *perf_dicomattr
+    bids: &perf_dicoment_group2         # See: schema/datatypes/perf.yaml
+      acq: <ProtocolName>
+      rec: <SeriesDescription>
+      dir: ~
+      run: <<1>>
+      suffix: aslcontext
+  - provenance: ~
+    attributes: *perf_dicomattr
+    bids: &perf_dicoment_group3         # See: schema/datatypes/perf.yaml
+      acq: <ProtocolName>
+      rec: <SeriesDescription>
+      run: <<1>>
+      suffix: asllabeling
+
+  dwi:        # ----------------------- All diffusion runs ---------------------
+  - provenance: ~
+    attributes: &dwi_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids: &dwi_dicoment_DWI             # See: schema/datatypes/dwi.yaml
+      acq: <SeriesDescription>
+      dir: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: dwi
+  - provenance: ~
+    attributes: *dwi_dicomattr
+    bids: &dwi_dicoment_sbref           # See: schema/datatypes/dwi.yaml
+      acq: <SeriesDescription>
+      dir: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: sbref
+  - provenance: ~
+    attributes: *dwi_dicomattr
+    bids: &dwi_dicoment_physio          # Not (yet) in: schema/datatypes/dwi.yaml
+      acq: <SeriesDescription>
+      dir: ~
+      run: <<1>>
+      suffix: physio
+
+  fmap:       # ----------------------- All fieldmap runs ----------------------
+  - provenance: ~
+    attributes: &fmap_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids: &fmap_dicoment_fieldmaps      # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      run: <<1>>
+      suffix: phasediff
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: phase1
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: phase2
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: magnitude1
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: magnitude2
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: magnitude
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_fieldmaps
+      suffix: fieldmap
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids: &fmap_dicoment_PEPolar        # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      dir: ~
+      run: <<1>>
+      suffix: epi
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_PEPolar
+      suffix: m0scan
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids: &fmap_dicoment_TB1DAM         # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      flip: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1DAM
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids: &fmap_dicoment_TB1EPI         # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1EPI
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids: &fmap_dicoment_RFFieldMaps    # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1AFI
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_RFFieldMaps    # See: schema/datatypes/fmap.yaml
+      suffix: TB1TFL
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_RFFieldMaps    # See: schema/datatypes/fmap.yaml
+      suffix: TB1RFM
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids:
+      <<: *fmap_dicoment_RFFieldMaps    # See: schema/datatypes/fmap.yaml
+      suffix: RB1COR
+  - provenance: ~
+    attributes: *fmap_dicomattr
+    bids: &fmap_dicoment_TB1SRGE        # See: schema/datatypes/fmap.yaml
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1SRGE
+      IntendedFor: ~
+  - provenance: ~
+    attributes:
+      <<: *fmap_dicomattr
+      SeriesDescription: ['*b1map*', '*B1map*']
+      ImageType: 'FLIP ANGLE MAP'
+    bids: &fmap_dicoment_parametric
+      acq: <SeriesDescription>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      suffix: TB1map
+      IntendedFor: ~
+  - provenance: ~
+    attributes:
+      <<: *fmap_dicomattr
+      SeriesDescription: ['*b1map*', '*B1map*']
+    bids:
+      <<: *fmap_dicoment_parametric
+      suffix: RB1map
+
+  eeg:        # ----------------------- All EEG data ---------------------------
+  - provenance: ~
+    attributes:
+      Modality: EEG
+      ProtocolName: ~
+      SeriesDescription: ~
+    bids:                               # See: schema/datatypes/eeg.yaml
+      acq: <ProtocolName>
+      task: <SeriesDescription>
+      run: <<1>>
+      suffix: eeg
+
+  ieeg:       # ----------------------- All iEEG data --------------------------
+  - provenance: ~
+    attributes:
+      Modality: EEG
+      ProtocolName: ~
+      SeriesDescription: ~
+    bids:                               # See: schema/datatypes/ieeg.yaml
+      acq: <ProtocolName>
+      task: <SeriesDescription>
+      run: <<1>>
+      suffix: ieeg
+
+  beh:        # ----------------------- All behavioural data -------------------
+  - provenance: ~
+    attributes: &beh_dicomattr
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+    bids: &beh_dicoment_group1          # See: schema/datatypes/beh.yaml
+      task: <SeriesDescription>
+      acq: ~
+      recording: ~
+      run: ~
+      suffix: physio
+  - provenance: ~
+    attributes: *beh_dicomattr
+    bids:
+      <<: *beh_dicoment_group1
+      suffix: stim
+  - provenance: ~
+    attributes: *beh_dicomattr
+    bids: &beh_dicoment_group2          # See: schema/datatypes/beh.yaml
+      task: <SeriesDescription>
+      acq: ~
+      run: ~
+      suffix: events
+  - provenance: ~
+    attributes: *beh_dicomattr
+    bids:
+      <<: *beh_dicoment_group2
+      suffix: beh
+
+  pet:        # ----------------------- All PET runs ---------------------------
+  - provenance: ~
+    attributes: &pet_dicomattr
+      Modality: PT
+      SeriesDescription: ~
+      Radiopharmaceutical: ~
+      ImageType: ~
+      SliceThickness: ~
+      PixelSpacing: ~
+      Rows: ~
+      Columns: ~
+    bids: &pet_dicoment_group1
+      task: <SeriesDescription>
+      acq: <Radiopharmaceutical>
+      rec: ['', 'acdyn', 'acstat', 'nacdyn', 'nacstat', 0]
+      run: <<1>>
+      suffix: pet
+
+  extra_data: # ----------------------- All extra data -------------------------
+  - provenance: ~
+    attributes:
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids:
+      acq: <ProtocolName>
+      inv: ~
+      rec: <MRAcquisitionType><ImageType>
+      ce: ~
+      task: ~
+      echo: <EchoNumbers>
+      dir: ~
+      run: <<1>>
+      mod: <SeriesDescription>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: <ScanningSequence>
+
+  leave_out:  # ----------------------- Data that will be left out -------------
+  - provenance: ~
+    attributes:
+      Modality: ~
+      ProtocolName: ~
+      SeriesDescription: ~
+      ImageType: ~
+      SequenceName: ~
+      SequenceVariant: ~
+      ScanningSequence: ~
+      MRAcquisitionType: ~
+      SliceThickness: ~
+      FlipAngle: ~
+      EchoNumbers: ~
+      EchoTime: ~
+      RepetitionTime: ~
+      PhaseEncodingDirection: ~
+    bids:
+      acq: <ProtocolName>
+      rec: <ImageType>
+      task: <SeriesDescription>
+      echo: <EchoNumbers>
+      mod: <MRAcquisitionType>
+      suffix: <ScanningSequence>
+
+
+PAR:
+# --------------------------------------------------------------------------------
+# PAR key-value heuristics (Philips PAR fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+  subject: <<SourceFilePath>>     # <<SourceFilePath>> extracts the subject label from the source directory during bidscoiner runtime. A DICOM attribute can also be used as subject-label instead, e.g. <PatientID>
+  session: <<SourceFilePath>>     # <<SourceFilePath>> extracts the session label from the source directory during bidscoiner runtime. A DICOM attribute can also be used as session-label instead, e.g. <StudyID>
+
+  anat:       # ----------------------- All anatomical runs --------------------
+  - provenance: ""                # The fullpath name of the DICOM file from which the attributes are read. Serves also as a look-up key to find a run in the bidsmap
+    attributes: &anat_parattr
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids: &anat_parent_nonparametric    # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: T1w
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: T2w
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: PDw
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: T2starw
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: FLAIR
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: inplaneT1
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: inplaneT2
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: PDT2
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_nonparametric
+      suffix: angio
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_parametric       # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      suffix: T1map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: T2map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: T2starmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: R1map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: R2map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: R2starmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: PDmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: MTRmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: MTsat
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: UNIT1
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: T1rho
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: MWFmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: MTVmap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: PDT2map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: Chimap
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: S0map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_parametric
+      suffix: M0map
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_defacemask       # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      mod: ~
+      suffix: defacemask
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_multiecho        # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MESE
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_multiecho
+      suffix: MEGRE
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_multiflip        # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      flip: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: VFA
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_multiinv         # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: IRT1
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_mp2rage          # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      flip: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MP2RAGE
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_vfamt            # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      flip: ~
+      mt: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MPM
+  - provenance: ~
+    attributes: *anat_parattr
+    bids:
+      <<: *anat_parent_vfamt
+      suffix: MTS
+  - provenance: ~
+    attributes: *anat_parattr
+    bids: &anat_parent_mtr              # See: schema/datatypes/anat.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      mt: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: MTR
+
+  func:       # ----------------------- All functional runs --------------------
+  - provenance: ~
+    attributes: &func_parattr
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids: &func_parent_func             # See: schema/datatypes/func.yaml
+      task: <protocol_name>
+      acq: <tech>
+      ce: ~
+      dir: ~
+      rec: ~
+      run: <<1>>
+      echo: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: bold
+  - provenance: ~
+    attributes: *func_parattr
+    bids:
+      <<: *func_parent_func
+      suffix: cbv
+  - provenance: ~
+    attributes: *func_parattr
+    bids:
+      <<: *func_parent_func
+      suffix: sbref
+  - provenance: ~
+    attributes: *func_parattr
+    bids: &func_parent_events           # See: schema/datatypes/func.yaml
+      task: ~
+      acq: <protocol_name>
+      ce: ~
+      dir: ~
+      rec: ~
+      run: <<1>>
+      suffix: events
+  - provenance: ~
+    attributes: *func_parattr
+    bids: &func_parent_timeseries       # See: schema/datatypes/func.yaml
+      task: ~
+      acq: <protocol_name>
+      ce: ~
+      dir: ~
+      rec: ~
+      recording: ~
+      run: <<1>>
+      suffix: physio
+  - provenance: ~
+    attributes: *func_parattr
+    bids:
+      <<: *func_parent_timeseries
+      suffix: stim
+
+  perf:       # ----------------------- All perfusion runs ---------------------
+  - provenance: ~
+    attributes: &perf_parattr
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids: &perf_parent_group1           # See: schema/datatypes/perf.yaml
+      acq: <protocol_name>
+      rec: <tech>
+      dir: ~
+      run: <<1>>
+      suffix: asl
+  - provenance: ~
+    attributes: *perf_parattr
+    bids:
+      <<: *perf_parent_group1
+      suffix: m0scan
+  - provenance: ~
+    attributes: *perf_parattr
+    bids: &perf_parent_group2           # See: schema/datatypes/perf.yaml
+      acq: <protocol_name>
+      rec: <tech>
+      dir: ~
+      run: <<1>>
+      suffix: aslcontext
+  - provenance: ~
+    attributes: *perf_parattr
+    bids: &perf_parent_group3           # See: schema/datatypes/perf.yaml
+      acq: <protocol_name>
+      rec: <tech>
+      run: <<1>>
+      suffix: asllabeling
+
+  dwi:        # ----------------------- All diffusion runs ---------------------
+  - provenance: ~
+    attributes: &dwi_parattr
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids: &dwi_parent_DWI               # See: schema/datatypes/dwi.yaml
+      acq: <protocol_name>
+      dir: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: dwi
+  - provenance: ~
+    attributes: *dwi_parattr
+    bids: &dwi_parent_sbref             # See: schema/datatypes/dwi.yaml
+      acq: <protocol_name>
+      dir: ~
+      run: <<1>>
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: sbref
+  - provenance: ~
+    attributes: *dwi_parattr
+    bids: &dwi_parent_physio            # Not (yet) in: schema/datatypes/dwi.yaml
+      acq: <protocol_name>
+      dir: ~
+      run: <<1>>
+      suffix: physio
+
+  fmap:       # ----------------------- All fieldmap runs ----------------------
+  - provenance: ~
+    attributes: &fmap_parattr
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids: &fmap_parent_fieldmaps        # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      run: <<1>>
+      suffix: phasediff
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: phase1
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: phase2
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: magnitude1
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: magnitude2
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: magnitude
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_fieldmaps
+      suffix: fieldmap
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_PEPolar          # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      ce: ~
+      dir: ~
+      run: <<1>>
+      suffix: epi
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_PEPolar
+      suffix: m0scan
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_TB1DAM           # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      flip: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1DAM
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_TB1EPI           # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1EPI
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_RFFieldMaps      # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1AFI
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_RFFieldMaps      # See: schema/datatypes/fmap.yaml
+      suffix: TB1TFL
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_RFFieldMaps      # See: schema/datatypes/fmap.yaml
+      suffix: TB1RFM
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_RFFieldMaps      # See: schema/datatypes/fmap.yaml
+      suffix: RB1COR
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_TB1SRGE          # See: schema/datatypes/fmap.yaml
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      flip: ~
+      echo: ~
+      inv: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      run: <<1>>
+      suffix: TB1SRGE
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids: &fmap_parent_parametric
+      acq: <protocol_name>
+      ce: ~
+      rec: ~
+      run: <<1>>
+      suffix: TB1map
+      IntendedFor: ~
+  - provenance: ~
+    attributes: *fmap_parattr
+    bids:
+      <<: *fmap_parent_parametric
+      suffix: RB1map
+
+  eeg: ~      # ----------------------- All EEG data ---------------------------
+
+  ieeg: ~     # ----------------------- All iEEG data --------------------------
+
+  meg: ~      # ----------------------- All MEG data ---------------------------
+
+  beh: ~      # ----------------------- All behavioural data -------------------
+
+  pet: ~      # ----------------------- All PET runs ---------------------------
+
+  extra_data: # ----------------------- All extra data -------------------------
+  - provenance: ~
+    attributes:
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids:
+      acq: <protocol_name>
+      inv: ~
+      rec: <tech>
+      ce: ~
+      task: ~
+      echo: ~
+      dir: ~
+      run: <<1>>
+      mod: ~
+      part: ['', 'mag', 'phase', 'real', 'imag', 0]
+      suffix: ~
+
+  leave_out:  # ----------------------- Data that will be left out -------------
+  - provenance: ~
+    attributes:
+      series_type: ~
+      exam_name: ~
+      protocol_name: ~
+      tech: ~
+      diffusion: ~
+      fov: ~
+      scan_resolution: ~
+      scan_mode: ~
+      max_slices: ~
+      flow_compensation: ~
+      max_echoes: ~
+      repetition_time: ~
+      prep_direction: ~
+    bids:
+      acq: <protocol_name><exam_name>
+      rec: <tech>
+      suffix: <series_type>
+
+
+P7: ~
+# --------------------------------------------------------------------------------
+# P*.7 key-value heuristics (GE fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+
+
+Nifti: ~
+# --------------------------------------------------------------------------------
+# Nifti key-value heuristics (Nifti fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+
+
+FileSystem: ~
+# --------------------------------------------------------------------------------
+# File system key-value heuristics (these file- and foldernames will be mapped
+# to the BIDS labels; Special substitutions can be performed using python's
+# Format Specification Mini-Language)
+# --------------------------------------------------------------------------------
