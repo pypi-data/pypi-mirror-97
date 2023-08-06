@@ -1,0 +1,254 @@
+'''
+NXOS specific clean stages
+'''
+
+# Python
+import time
+import logging
+
+# pyATS
+from pyats import aetest
+from pyats.async_ import pcall
+from pyats.log.utils import banner
+from pyats.utils.fileutils import FileUtils
+
+# Genie
+from genie.libs import clean
+from genie.abstract import Lookup
+from genie.libs.clean.recovery.recovery import _disconnect_reconnect
+from genie.libs.clean.utils import clean_schema
+
+# MetaParser
+from genie.metaparser.util.schemaengine import Optional
+
+# Logger
+log = logging.getLogger(__name__)
+
+
+@clean_schema({
+    Optional('images'): {
+        'system': list,
+        Optional('kickstart'): list
+    },
+    Optional('copy_vdc_all'): bool,
+    Optional('timeout'): int,
+    Optional('max_time'): int,
+    Optional('check_interval'): int,
+    Optional('stabilize_time'): int,
+    Optional('standby_copy_max_time'): int,
+    Optional('standby_copy_check_interval'): int
+})
+@aetest.test
+def change_boot_variable(section, steps, device, images, copy_vdc_all=False,
+    timeout=300, max_time=300, check_interval=60, stabilize_time=100,
+    standby_copy_max_time=300, standby_copy_check_interval=20):
+    """ This stage configures the boot variables to the provided image in
+    preparation for the next device reload.
+
+    Stage Schema
+    ------------
+    change_boot_variable:
+        images:
+            kickstart: [<kickstart image>] (Optional)
+            system: [<system image>] (Mandatory)
+        copy_vdc_all: <Copy on all VDCs, 'Boolean'> (Optional)
+        timeout: <Execute timeout in seconds, 'int'> (Optional)
+        max_time: <Maximum time section will take for checks in seconds, 'int'> (Optional)
+        check_interval: <Time interval, 'int'> (Optional)
+        stabilize_time: <Time in seconds till boot variables stabilization, 'int'> (Optional)
+        standby_copy_max_time: <Maximum time section will take for checks in seconds, 'int'> (Optional)
+        standby_copy_check_interval: <Time interval, 'int'> (Optional)
+
+
+    Example
+    -------
+    change_boot_variable:
+        images:
+            kickstart: bootflash:/kisckstart.gbin
+            system: bootflash:/system.gbin
+        copy_vdc_all: True
+        timeout: 150
+        max_time: 300
+        check_interval: 20
+        stabilize_time: 100
+        standby_copy_max_time: 100
+        standby_copy_check_interval: 10
+
+    """
+
+    log.info("Section steps:\n1- Execute changing the boot variables"
+             "\n2- Save running configuration to startup configuration"
+             "\n3- Verify next boot variables as expected"
+             "\n4- Verify files transferred successfully to the standby (if HA)")
+
+    kickstart = images.get('kickstart')
+    kickstart = kickstart[0] if kickstart else None
+
+    system = images.get('system')
+    system = system[0] if system else None
+
+    with steps.start("Changing the boot variables") as step:
+        try:
+            device.api.execute_change_boot_variable(kickstart=kickstart,
+                                                    system=system,
+                                                    timeout=timeout)
+        except Exception as e:
+            step.failed('{e}'.format(e=e))
+
+    with steps.start("Save running configuration to startup "
+                     "configuration") as step:
+        try:
+            device.api.execute_copy_run_to_start(copy_vdc_all=copy_vdc_all,
+                                                 command_timeout=timeout,
+                                                 max_time=max_time,
+                                                 check_interval=check_interval)
+        except Exception as e:
+            step.failed('{e}'.format(e=e))
+
+
+    with steps.start("Verify next boot variables") as step:
+        try:
+            device.api.is_next_reload_boot_variable_as_expected(
+                                              kickstart=kickstart,
+                                              system=system)
+        except Exception as e:
+            step.failed('{e}'.format(e=e))
+
+    if device.is_ha:
+        with steps.start("Verify the files transferred successfully to "
+                         "the standby") as step:
+            try:
+                device.api.verify_files_copied_on_standby(
+                                    max_time=standby_copy_max_time,
+                                    check_interval=standby_copy_check_interval)
+            except Exception as e:
+                step.failed('{e}'.format(e=e))
+    else:
+        section.passed("Successfully loaded boot variables for {}".\
+                       format(device.name))
+
+
+#===============================================================================
+#                       stage: tftp_boot
+#===============================================================================
+
+
+@clean_schema({
+    'image': list,
+    'ip_address': list,
+    'subnet_mask': str,
+    'gateway': str,
+    'tftp_server': str,
+    'timeout': int,
+    Optional('reboot_delay'): int,
+    Optional('reconnect_delay'): int
+})
+@aetest.test
+def tftp_boot(section, steps, device, ip_address, subnet_mask, gateway,
+              tftp_server, image, timeout, reconnect_delay=60,
+              reboot_delay=20):
+    """ This stage boots a new image onto your device using the tftp booting
+    method.
+
+    Stage Schema
+    ------------
+    tftp_boot:
+        image: <Image to boot with `str`> (Mandatory)
+        ip_address: <Management ip address to configure to reach to the TFTP server `str`> (Mandatory)
+        subnet_mask: <Management subnet mask `str`> (Mandatory)
+        gateway: <Management gateway `str`> (Mandatory)
+        tftp_server: <tftp server is reachable with management interface> (Mandatory)
+        timeout: <Maximum time for tftp boot `int`> (Mandatory)
+        reboot_delay: <Maximum time for tftp boot `int`> (Optional)
+        reconnect_delay: <Once device recovered, delay before final reconnect>, 'int'> (Default: 60)
+
+    Example:
+    --------
+    tftp_boot:
+        image:
+          - /auto/some-location/that-this/image/stay-isr-image.bin
+        ip_address: [10.1.7.126, 10.1.7.127]
+        gateway: 10.1.7.1
+        subnet_mask: 255.255.255.0
+        tftp_server: 11.1.7.251
+
+    There is more than one ip address, one for each supervisor.
+
+    """
+
+    device.api.execute_write_erase_boot()
+    # Using sendline, as we dont want unicon boot to kick in and send "boot" to
+    # the device
+    # Cannot use .reload as in case of HA, we need both sup to do the commands
+    device.sendline('reload')
+    device.sendline('y')
+    device.sendline()
+    log.info('** Rebooting the device **')
+
+    # We now want to overwrite the statemachine
+    device.destroy_all()
+    # Sleep to make sure the device is reloading
+    time.sleep(reboot_delay)
+
+    # Need to instantiate to get the device.start
+    # The device.start only works because of a|b
+    device.instantiate(connection_timeout=timeout)
+
+    tftp_boot = {'ip_address': ip_address,
+                 'subnet_mask': subnet_mask,
+                 'gateway': gateway,
+                 'tftp_server': tftp_server,
+                 'image': image}
+    try:
+        abstract = Lookup.from_device(device, packages={'clean': clean})
+        # Item is needed to be able to know in which parallel child
+        # we are
+
+        # device.start only gets filled with single rp devices
+        # for multiple rp devices we need to use subconnections
+        if device.is_ha and hasattr(device, 'subconnections'):
+            start = [i.start[0] for i in device.subconnections]
+        else:
+            start = device.start
+
+        result = pcall(abstract.clean.recovery.recovery.recovery_worker,
+                       start=start,
+                       ikwargs = [{'item': i} for i, _ in enumerate(start)],
+                       ckwargs = \
+                            {'device': device,
+                             'timeout': timeout,
+                             'tftp_boot': tftp_boot,
+                             # Irrelevant as we will not use this pattern anyway
+                             # But needed for the recovery
+                             'break_count': 0,
+                             'console_activity_pattern': '\\.\\.\\.\\.',
+                             'golden_image': None,
+                             'recovery_password': None})
+    except Exception as e:
+        log.error(str(e))
+        section.failed("Failed to recover the device '{}'".\
+                        format(device.name))
+    else:
+        log.info("Successfully recovered the device '{}'".\
+                 format(device.name))
+
+    log.info('Sleeping for {r} before reconnection'.format(r=reconnect_delay))
+    time.sleep(reconnect_delay)
+
+    # Disconnect and reconnect to the device
+    if not _disconnect_reconnect(device):
+        # If that still doesnt work, Thats all we got
+        section.failed("Cannot reconnect to the device {d}".
+                        format(d=device.name))
+    else:
+        log.info("Success - Have recovered and reconnected to device '{}'".\
+                 format(device.name))
+
+    log.info('Set the boot variables')
+    output = device.api.get_running_image()
+    if not output:
+        section.failed('Could not retrieved the running image')
+    image = output[0].rsplit('/', 1)[1]
+    device.api.execute_change_boot_variable(system='bootflash:/{image}'
+                                                  .format(image=image))
+    device.api.execute_copy_run_to_start()
