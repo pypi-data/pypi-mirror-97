@@ -1,0 +1,115 @@
+Metadata-Version: 2.1
+Name: kitica
+Version: 1.3a7
+Summary: Kitica Devicepool.
+Home-page: https://github.com/MainSystemDev/kitica
+Author: Joshua Kim Rivera
+Author-email: joshua.rivera@mnltechnology.com
+License: Type license() to see the full license text
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: Testing
+Description-Content-Type: text/markdown
+Requires-Dist: eventlet
+Requires-Dist: Flask
+Requires-Dist: Flask-Cors
+Requires-Dist: flask-marshmallow
+Requires-Dist: Flask-RESTful
+Requires-Dist: Flask-SocketIO
+Requires-Dist: gunicorn
+Requires-Dist: pycodestyle
+Requires-Dist: python-socketio
+Requires-Dist: PyYAML
+Requires-Dist: webargs
+
+Kitica API
+================
+
+## Introduction
+Kitica's REST API was built to support parallel device automation testing,
+It serves device's information through HTTP protocol.
+
+## Setup
+Kitica's API service was designed to be hosted behind **nginx** web server, but could also
+be run locally for development.
+
+### Development Server Setup
+**Step 1**  
+Before anything else, it is recommended that you run the service in a virtual environment.  
+So, first, install python'3 virtualenv.
+```bash
+pip install virtualenv
+```
+After installing, create a virtualenv inside the api folder(``repository_root/api``). Run:
+```bash
+virtualenv venv
+```
+> Where venv is the name of the virtualenv instance.  
+
+Output
+```bash
+Using base prefix '/usr'
+New python executable in /home/yourusername/sample/venv/bin/python3
+Also creating executable in /home/yourusername/sample/venv/bin/python
+Installing setuptools, pip, wheel...
+done.
+```
+
+Next, activate the virtualenv:
+```bash
+source venv/bin/activate
+```
+Now that virtualenv is active, install the dependencies for the api service.
+```bash
+pip install -r requirements.txt
+```
+After that, all dependencies should be installed.
+
+**Step 2**
+To start the API service, run:
+```bash
+python kiticaApi.py
+```
+> Output
+```bash
+ * Serving Flask app "kiticaAPI" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: xxx-xxx-xxx
+```
+Service should be running now.  
+To Verify, Create a get request in postman.  
+> **url**: http://localhost:5000/devices  
+> **method**: GET  
+Response should be something like this:
+```json
+[
+    {
+        "deviceId": 3,
+        "deviceName": "Pixel 2",
+        "platformName": "Android",
+        "server": "xxx.xxx.xxx.xxx",
+        "port": "4723/wd/hub",
+        "udid": "emulator-5554",
+        "platformVersion": "9",
+        "status": "FREE",
+        "teamName": "TEAM",
+        "version": 1,
+        "borrowerIp": null,
+        "borrowerHostname": null,
+        "lastBorrowed": "2020-02-12 15:29:29",
+        "deviceType": "Emulator"
+    }
+]
+```
+That's it, local development server is now running.
+
+
