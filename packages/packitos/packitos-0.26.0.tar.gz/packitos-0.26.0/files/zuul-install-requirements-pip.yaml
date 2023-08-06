@@ -1,0 +1,15 @@
+---
+- name: pip install packit dependencies
+  hosts: all
+  tasks:
+    - include_tasks: tasks/generic-dnf-requirements.yaml
+    - include_tasks: tasks/python-compile-deps.yaml
+    - name: Install deps from PyPI
+      pip:
+        name: "{{ item }}"
+      with_items:
+        - ogr
+        - rebasehelper
+        - sandcastle
+        - requre
+      become: true

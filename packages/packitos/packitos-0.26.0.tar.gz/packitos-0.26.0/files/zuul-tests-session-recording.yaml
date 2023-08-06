@@ -1,0 +1,17 @@
+---
+- name: This is a recipe for how to run packit tests
+  hosts: all
+  vars:
+    project_dir: "{{ playbook_dir }}/.."
+  tasks:
+    - include_tasks: tasks/rpm-test-deps.yaml
+    - include_tasks: tasks/install-packit.yaml
+    - include_tasks: tasks/configure-git.yaml
+    - include_tasks: tasks/sandcastle.yaml
+    - name: Run session recorded tests
+      command: make check TESTS_TARGET=tests_recording
+      # uncomment once https://github.com/packit/requre/issues/145 is resolved
+      #      environment:
+      #        REQURE_MODE: read
+      args:
+        chdir: "{{ project_dir }}"
