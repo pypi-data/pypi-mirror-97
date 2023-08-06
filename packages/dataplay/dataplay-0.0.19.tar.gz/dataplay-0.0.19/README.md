@@ -1,0 +1,318 @@
+# Data Handling Handbook
+> The one stop shop to learn about data intake, processing, and visualization.
+
+
+The [Dataplay](https://karpatic.github.io/dataplay/) Handbook uses techniques covered in the [Datalabs](https://karpatic.github.io/datalabs/) Guidebook.
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/karpatic/datalab/master?filepath=%2Fnotebooks%2Findex.ipynb)
+[![Binder](https://pete88b.github.io/fastpages/assets/badges/colab.svg)](https://colab.research.google.com/github/karpatic/datalab/blob/master/notebooks/index.ipynb)
+[![Binder](https://pete88b.github.io/fastpages/assets/badges/github.svg)](https://github.com/karpatic/datalab/tree/master/notebooks/index.ipynb)
+[![Open Source Love svg3](https://badges.frapsoft.com/os/v3/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
+
+[![NPM License](https://img.shields.io/npm/l/all-contributors.svg?style=flat)](https://github.com/karpatic/dataplay/blob/master/LICENSE)
+[![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://karpatic.github.io) 
+[![Python Versions](https://img.shields.io/pypi/pyversions/dataplay.svg)](https://pypi.python.org/pypi/dataplay/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/karpatic/dataplay.svg?style=flat)]() 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
+
+[![GitHub stars](https://img.shields.io/github/stars/karpatic/dataplay.svg?style=social&label=Star)](https://github.com/karpatic/dataplay) 
+[![GitHub watchers](https://img.shields.io/github/watchers/karpatic/dataplay.svg?style=social&label=Watch)](https://github.com/karpatic/dataplay) 
+[![GitHub forks](https://img.shields.io/github/forks/karpatic/dataplay.svg?style=social&label=Fork)](https://github.com/karpatic/dataplay) 
+[![GitHub followers](https://img.shields.io/github/followers/karpatic.svg?style=social&label=Follow)](https://github.com/karpatic/dataplay) 
+
+[![Tweet](https://img.shields.io/twitter/url/https/github.com/karpatic/dataplay.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20%E2%9C%A8%20colab%20by%20@bniajfi%20https://github.com/karpatic/dataplay%20%F0%9F%A4%97) 
+[![Twitter Follow](https://img.shields.io/twitter/follow/bniajfi.svg?style=social)](https://twitter.com/bniajfi)
+
+## Install
+
+The code is on <a href="https://pypi.org/project/test-template/">PyPI</a> so you can just run:
+
+```
+pip install dataplay geopandas
+```
+
+From the terminal to install the code and its dependencies
+
+## How to use
+
+1) Import the installed module into your code:
+``` 
+from dataplay.acsDownload import retrieve_acs_data 
+```
+2) use it
+```
+retrieve_acs_data(state, county, tract, tableId, year, saveAcs)
+```
+Heres another one
+```
+from dataplay.merge import mergeDatasets
+mergeDatasets(left_ds=False, right_ds=False, crosswalk_ds=False,  use_crosswalk = True, left_col=False, right_col=False, crosswalk_left_col = False, crosswalk_right_col = False, merge_how=False, interactive=True)
+```
+
+### Examples
+
+Import your modules
+
+```
+%%capture 
+from dataplay.acsDownload import retrieve_acs_data
+from dataplay.merge import mergeDatasets
+```
+
+```
+import pandas as pd
+```
+
+```
+from dataplay.geoms import readInGeometryData
+from dataplay.geoms import workWithGeometryData
+```
+
+Read in some data
+
+Define our download parameters.
+
+More information on these parameters can be found in the tutorials!
+
+```
+tract = '*'
+county = '510'
+state = '24'
+tableId = 'B19001'
+year = '17'
+saveAcs = False
+```
+
+```
+df = retrieve_acs_data(state, county, tract, tableId, year, saveAcs)
+```
+
+    Number of Columns 17
+
+
+```
+#hide_input
+df.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>B19001_001E_Total</th>
+      <th>B19001_002E_Total_Less_than_$10_000</th>
+      <th>B19001_003E_Total_$10_000_to_$14_999</th>
+      <th>...</th>
+      <th>state</th>
+      <th>county</th>
+      <th>tract</th>
+    </tr>
+    <tr>
+      <th>NAME</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Census Tract 1901</th>
+      <td>796</td>
+      <td>237</td>
+      <td>76</td>
+      <td>...</td>
+      <td>24</td>
+      <td>510</td>
+      <td>190100</td>
+    </tr>
+    <tr>
+      <th>Census Tract 1902</th>
+      <td>695</td>
+      <td>63</td>
+      <td>87</td>
+      <td>...</td>
+      <td>24</td>
+      <td>510</td>
+      <td>190200</td>
+    </tr>
+    <tr>
+      <th>Census Tract 2201</th>
+      <td>2208</td>
+      <td>137</td>
+      <td>229</td>
+      <td>...</td>
+      <td>24</td>
+      <td>510</td>
+      <td>220100</td>
+    </tr>
+    <tr>
+      <th>Census Tract 2303</th>
+      <td>632</td>
+      <td>3</td>
+      <td>20</td>
+      <td>...</td>
+      <td>24</td>
+      <td>510</td>
+      <td>230300</td>
+    </tr>
+    <tr>
+      <th>Census Tract 2502.07</th>
+      <td>836</td>
+      <td>102</td>
+      <td>28</td>
+      <td>...</td>
+      <td>24</td>
+      <td>510</td>
+      <td>250207</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 20 columns</p>
+</div>
+
+
+
+Here we can import and display a dataset
+
+```
+#hide
+# This dataset is taken from the public database provided by BNIAJFI hosted by Esri / ArcGIS
+# BNIA ArcGIS Homepage: https://data-bniajfi.opendata.arcgis.com/
+csa_gdf_url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/ArcGIS/rest/services/Hhchpov/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=pgeojson"
+csa_gdf = readInGeometryData(url=csa_gdf_url, porg=False, geom='geometry', lat=False, lng=False, revgeocode=False,  save=False, in_crs=2248, out_crs=False)
+csa_gdf.plot(column='hhchpov18')
+```
+
+    RECIEVED url: https://services1.arcgis.com/mVFRs7NF4iFitgbY/ArcGIS/rest/services/Hhchpov/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=pgeojson, 
+     porg: g, 
+     geom: geometry, 
+     lat: False, 
+     lng: False, 
+     revgeocode: False, 
+     in_crs: 2248, 
+     out_crs: 2248
+
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f8840335048>
+
+
+
+
+![png](docs/images/output_18_2.png)
+
+
+Now in this example we will load in a bunch of coorinates
+
+```
+geoloom_gdf_url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/ArcGIS/rest/services/Geoloom_Crowd/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=pgeojson"
+geoloom_gdf = readInGeometryData(url=geoloom_gdf_url, porg=False, geom='geometry', lat=False, lng=False, revgeocode=False,  save=False, in_crs=4326, out_crs=False)
+geoloom_gdf = geoloom_gdf.dropna(subset=['geometry']) 
+```
+
+    RECIEVED url: https://services1.arcgis.com/mVFRs7NF4iFitgbY/ArcGIS/rest/services/Geoloom_Crowd/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=pgeojson, 
+     porg: g, 
+     geom: geometry, 
+     lat: False, 
+     lng: False, 
+     revgeocode: False, 
+     in_crs: 4326, 
+     out_crs: 4326
+
+
+And then use the dataset we retrieved just before it to attach community labels on which the points sit
+
+```
+geoloom_w_csas = workWithGeometryData(method='pinp', df=geoloom_gdf, polys=csa_gdf, ptsCoordCol='geometry', polygonsCoordCol='geometry', polyColorCol='hhchpov18', polygonsLabel='CSA2010', pntsClr='red', polysClr='white')
+```
+
+    Total Points:  61.0
+    Total Points in Polygons:  50
+    Prcnt Points in Polygons:  0.819672131147541
+
+
+    /usr/local/lib/python3.6/dist-packages/dataplay/geoms.py:112: FutureWarning:     You are passing non-geometry data to the GeoSeries constructor. Currently,
+        it falls back to returning a pandas Series. But in the future, we will start
+        to raise a TypeError instead.
+      polygons['pointsinpolygon'] = gpd.GeoSeries(pts_in_polys)
+
+
+Lets map it after inspecting it a bit!
+
+```
+type(geoloom_w_csas)
+```
+
+
+
+
+    geopandas.geodataframe.GeoDataFrame
+
+
+
+```
+geoloom_w_csas.plot(column='pointsinpolygon')
+```
+
+
+
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f88403b8710>
+
+
+
+
+![png](docs/images/output_25_1.png)
+
+
+## Legal
+
+__Disclaimer__
+
+**Views Expressed**:
+All views expressed in this tutorial are the authors own and do not represent the opinions of any entity whatsover with which they have been, are now, or will be affiliated.
+
+**Responsibility, Errors and Ommissions**: 
+The author makes no assurance about the reliability of the information. The author makes takes no responsibility for updating the tutorial nor maintaining it porformant status. Under no circumstances shall the Author or its affiliates be liable for any indirect incedental, consequential, or special and or exemplary damages arising out of or in connection with this tutorial. Information is provided 'as is' with distinct plausability of errors and ommitions. Information found within the contents is attached with an **MIT license**. Please refer to the License for more information. 
+
+**Use at Risk**:
+Any action you take upon the information on this Tutorial is strictly at your own risk, and the author will not be liable for any losses and damages in connection with the use of this tutorial and subsequent products.
+
+**Fair Use**
+this site contains copyrighted material the use of which has not always been specifically authorized by the copyright owner. While no intention is made to unlawfully use copyrighted work, circumstanes may arise in which such material is made available in effort to advance scientific literacy. We believe this constitutes a 'fair use' of any such copyrighted material as provided for in section 107 of the US Copyright Law. In accordance with Titile 17 U.S.C. Section 108, the material on this tutorial is distributed without profit to those who have expressed a prior interest in receiving the included information for research and education purposes. 
+
+for more information go to: http://www.law.cornell.edu/uscode/17/107.shtml. If you wish to use copyrighted material from this site for purposes of your own that go beyond 'fair use', you must obtain permission from the copyright owner.
+
+__License__
+
+Copyright © 2019 BNIA-JFI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
