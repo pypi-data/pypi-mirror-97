@@ -1,0 +1,47 @@
+Metadata-Version: 2.1
+Name: superfilter
+Version: 1.0.0
+Summary: Compute implied arguments for your functions
+Home-page: UNKNOWN
+Author: Perzan
+Author-email: PerzanDevelopment@gmail.com
+License: UNKNOWN
+Description: Recommended example usage
+        -------------------------
+        ```python
+        import superfilter
+        from argskwargs import argskwargs
+        
+        @superfilter
+        def myfilter():
+            return argskwargs(foo="foobar", message="Hello World!")
+        
+        @myfilter
+        def myfunction(foo, message):
+            print(message)
+            return foo
+        
+        myfunction() # Arguments are supplied by 'myfilter'
+        ```
+        Usage with other decorators
+        ---------------------------
+        ```python
+        import superfilter
+        from argskwargs import argskwargs
+        
+        @superfilter
+        def myfilter(cls):
+            return argskwargs(cls, foo="foobar", message="Hello World!")
+        
+        class MyClass:
+            @classmethod
+            @myfilter # Decorate with myfilter first
+            def myfunction(cls, foo, message):
+                print(message)
+                return foo
+        
+        MyClass.myfunction()
+        ```
+Platform: UNKNOWN
+Requires-Python: ~=3.5
+Description-Content-Type: text/markdown
