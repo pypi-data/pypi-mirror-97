@@ -1,0 +1,38 @@
+graphs:
+
+  - id: Sender
+    nodes:
+    - id: random
+      module: timeflux.nodes.random
+      class: Random
+    - id: outlet
+      module: timeflux.nodes.lsl
+      class: Send
+      params:
+        name: test
+    edges:
+      - source: random
+        target: outlet
+    rate: 1
+
+  - id: Receiver
+    nodes:
+    - id: inlet
+      module: timeflux.nodes.lsl
+      class: Receive
+      params:
+        prop: name
+        value: test
+        unit: ns
+        sync: null
+    - id: display
+      module: timeflux.nodes.debug
+      class: Display
+    edges:
+      - source: inlet
+        target: display
+    rate: 1
+
+
+
+
