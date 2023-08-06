@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="supplier_lead_time_view_form">
+            <field name="model">purchase.supplier.lead_time</field>
+            <field name="type">form</field>
+            <field name="name">supplier_lead_time_form</field>
+        </record>
+        <record model="ir.ui.view" id="supplier_lead_time_view_tree">
+            <field name="model">purchase.supplier.lead_time</field>
+            <field name="type">tree</field>
+            <field name="priority" eval="10"/>
+            <field name="name">supplier_lead_time_tree</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_supplier_lead_time_form">
+            <field name="name">Supplier Lead Times</field>
+            <field name="res_model">purchase.supplier.lead_time</field>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_supplier_lead_time_list_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="supplier_lead_time_view_tree"/>
+            <field name="act_window" ref="act_supplier_lead_time_form"/>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_supplier_lead_time_form_view">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="supplier_lead_time_view_form"/>
+            <field name="act_window" ref="act_supplier_lead_time_form"/>
+        </record>
+
+        <menuitem parent="product.menu_main_product" sequence="20"
+            id="menu_supplier_lead_time" action="act_supplier_lead_time_form"/>
+
+        <record model="ir.rule.group" id="rule_group_supplier_lead_time">
+            <field name="name">Supplier Lead Time User in Company</field>
+            <field name="model" search="[('model', '=', 'purchase.supplier.lead_time')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_supplier_lead_time">
+            <field name="domain"
+                eval="[('company', '=', Eval('user', {}).get('company', None))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_supplier_lead_time"/>
+        </record>
+
+        <record model="ir.model.access" id="access_supplier_lead_time">
+            <field name="model" search="[('model', '=', 'purchase.supplier.lead_time')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_supplier_lead_time_admin">
+            <field name="model" search="[('model', '=', 'purchase.supplier.lead_time')]"/>
+            <field name="group" ref="product.group_product_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+    </data>
+</tryton>
