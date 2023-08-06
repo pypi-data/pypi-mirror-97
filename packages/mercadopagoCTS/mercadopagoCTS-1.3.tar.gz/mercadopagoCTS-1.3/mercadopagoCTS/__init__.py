@@ -1,0 +1,1 @@
+from .mercadopagoCTS import MP
