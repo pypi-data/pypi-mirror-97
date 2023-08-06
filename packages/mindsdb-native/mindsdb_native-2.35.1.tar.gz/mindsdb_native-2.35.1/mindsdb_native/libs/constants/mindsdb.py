@@ -1,0 +1,81 @@
+TRANSACTION_LEARN = 'learn'
+TRANSACTION_PREDICT = 'predict'
+TRANSACTION_ANALYSE = 'analyse'
+TRANSACTION_NORMAL_SELECT = 'normal_select'
+TRANSACTION_NORMAL_MODIFY = 'normal_modify'
+TRANSACTION_BAD_QUERY = 'bad_query'
+TRANSACTION_DROP_MODEL ='drop_model'
+
+STOP_TRAINING = 'stop_training'
+KILL_TRAINING = 'kill_training'
+
+
+class DATA_SUBTYPES:
+    # Numeric
+    INT = 'Int'
+    FLOAT = 'Float'
+    BINARY = 'Binary' # Should we have this ?
+
+    # DATETIME
+    DATE = 'Date' # YYYY-MM-DD
+    TIMESTAMP = 'Timestamp' # YYYY-MM-DD hh:mm:ss or 1852362464
+
+    # CATEGORICAL
+    SINGLE = 'Binary Category'
+    MULTIPLE = 'Category'
+    TAGS = 'Tags'
+
+    # FILE_PATH
+    IMAGE = 'Image'
+    VIDEO = 'Video'
+    AUDIO = 'Audio'
+
+    # SEQUENTIAL
+    ARRAY = 'Array'
+
+    # TEXT
+    SHORT = 'Short Text'
+    RICH = 'Rich Text'
+
+
+class DATA_TYPES:
+    NUMERIC = 'Numeric'
+    DATE = 'Date'
+    CATEGORICAL = 'Categorical'
+    FILE_PATH = 'File Path'
+    SEQUENTIAL = 'Sequential'
+    TEXT = 'Text'
+
+
+class DATA_TYPE_ALIASES:
+    NUMERICAL_LOW_GRANULARITY = 'Numerical (Low Granularity)'
+
+
+DATA_TYPES_SUBTYPES = {
+    DATA_TYPES.NUMERIC: [DATA_SUBTYPES.INT, DATA_SUBTYPES.FLOAT, DATA_SUBTYPES.BINARY],
+    DATA_TYPES.DATE: [DATA_SUBTYPES.DATE, DATA_SUBTYPES.TIMESTAMP],
+    DATA_TYPES.CATEGORICAL: [DATA_SUBTYPES.SINGLE, DATA_SUBTYPES.MULTIPLE, DATA_SUBTYPES.TAGS],
+    DATA_TYPES.FILE_PATH: [DATA_SUBTYPES.IMAGE, DATA_SUBTYPES.VIDEO, DATA_SUBTYPES.AUDIO],
+    DATA_TYPES.SEQUENTIAL: [DATA_SUBTYPES.ARRAY],
+    DATA_TYPES.TEXT: [DATA_SUBTYPES.SHORT, DATA_SUBTYPES.RICH],
+}
+
+MODEL_STATUS_TRAINED = "Trained"
+MODEL_STATUS_PREPARING = "Preparing"
+MODEL_STATUS_DATA_ANALYSIS = "Data Analysis"
+MODEL_STATUS_TRAINING= "Training"
+MODEL_STATUS_ANALYZING = "Analyzing"
+MODEL_STATUS_ERROR = "Error"
+MODEL_STATUS_DONE = "Done"
+
+WORD_SEPARATORS = [',', "\t", ' ']
+
+DEBUG_LOG_LEVEL = 10
+INFO_LOG_LEVEL = 20
+WARNING_LOG_LEVEL = 30
+ERROR_LOG_LEVEL = 40
+NO_LOGS_LOG_LEVEL = 50
+
+# Magic numbers for extracting significant clusters out of the confidence distribution
+PEAK_CONFIDENCE_THRESHOLD = 0.12
+CLUSTER_MEMBER_CONFIDENCE_THRESHOLD = 0.06
