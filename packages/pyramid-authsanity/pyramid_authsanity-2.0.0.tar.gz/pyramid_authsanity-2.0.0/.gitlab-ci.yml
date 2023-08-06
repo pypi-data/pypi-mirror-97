@@ -1,0 +1,68 @@
+.test: &test
+    stage: test
+    script: 
+        - export TOXENV=''
+    tags:
+        - docker
+
+test:pypy3:
+    <<: *test
+    image: pypy:3
+    script:
+        - pip install tox
+        - TOXENV=pypy3 tox
+
+test:3.6:
+    <<: *test
+    image: python:3.6
+    script:
+        - pip install tox
+        - TOXENV=py36 tox
+
+test:3.7:
+    <<: *test
+    image: python:3.7
+    script:
+        - pip install tox
+        - TOXENV=py37 tox
+
+test:3.8:
+    <<: *test
+    image: python:3.8
+    script:
+        - pip install tox
+        - TOXENV=py38 tox
+
+test:3.9:
+    <<: *test
+    image: python:3.9
+    script:
+        - pip install tox
+        - TOXENV=py39 tox
+
+test_cov:
+    <<: *test
+    image: python:3.9
+    script:
+        - pip install tox
+        - TOXENV=py39-cover tox
+
+test:pep8:
+    <<: *test
+    image: python:3.6
+    script:
+        - pip install tox
+        - TOXENV=lint tox
+
+pages:
+    image: python:3.9
+    script:
+        - apt-get install make
+        - pip install tox
+        - TOXENV=docs tox
+        - mv .tox/docs/html public
+    artifacts:
+        paths:
+            - public
+    tags:
+        - docker
