@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup
+
+packages = \
+['qmm']
+
+package_data = \
+{'': ['*']}
+
+install_requires = \
+['numpy>=1.19.4,<2.0.0']
+
+setup_kwargs = {
+    'name': 'qmm',
+    'version': '0.2.3',
+    'description': 'The Quadratic Majorize-Minimize toolbox',
+    'long_description': "Q-MM: A Python toolbox for Quadratic Majorization-Minimization\n==============================================================\n\n.. image:: ./docs/qmm.png\n\nQ-MM is a Python implementation of Majorize-Minimize Quadratic optimization\nalgorithms. Algorithms provided here come from\n\n.. [1] C. Labat and J. Idier, “Convergence of Conjugate Gradient Methods with a\n   Closed-Form Stepsize Formula,” J Optim Theory Appl, p. 18, 2008.\n\n.. [2] E. Chouzenoux, J. Idier, and S. Moussaoui, “A Majorize–Minimize Strategy\n   for Subspace Optimization Applied to Image Restoration,” IEEE Trans. on\n   Image Process., vol. 20, no. 6, pp. 1517–1528, Jun. 2011, doi:\n   10.1109/TIP.2010.2103083.\n\nSee `documentation <https://qmm.readthedocs.io/en/stable/index.html>`_ for more\nbackground. If you use this code, please cite the references above. A citation\nof this toolbox will also be appreciated.\n\n::\n\n    @software{qmm,\n       title = {Q-MM: The Quadratic Majorize-Minimize Python toolbox},\n       author = {Orieux, Fran\\c{c}ois},\n       url = {https://github.com/forieux/qmm},\n    }\n\nQuadratic Majorize-Minimize\n---------------------------\n\nThe Q-MM optimization algorithms compute the minimizer of criteria like\n\nJ(x) = ∑ₖ μₖ ψₖ(Vₖ·x - ωₖ)\n\nwhere x is the unknown vector, Vₖ a linear operator, ωₖ a fixed data, μₖ a\nscalar, ψₖ(u) = ∑ᵢφₖ(uᵢ), and φₖ a function that must be differentiable, even,\ncoercive, φ(√·) concave, and 0 < φ'(u) / u < +∞.\n\nThe optimization is done thanks to quadratic sugorate function. In particular,\nno linesearch or sub-iteration is necessary, and close form formula for the step\nare used with guaranteed convergence.\n\nA classical example, like in the figure below that show an image deconvolution\nproblem, is the resolution of an inverse problem with the minimization of\n\nJ(x) = ||y - H·x||² + μ ψ(V·x)\n\nwhere H is a low-pass forward model, V a regularization operator that\napproximate gradient (kind of high-pass filter) and ψ an edge preserving\nfunction like Huber. The above criterion is obtained with k ∈ {1, 2}, ψ₁(·) =\n||·||², V₁ = H, ω₁ = y, and ω₂ = 0.\n\n.. image:: ./docs/image.png\n\nFeatures\n--------\n\n- The ``mmmg``, Majorize-Minimize Memory Gradient algorithm. See documentation\n  and [2] for details.\n- The ``mmcg``, Majorize-Minimize Conjugate Gradient algorithm. See\n  documentation and [1] for details.\n- **No linesearch**: the step is obtained from a close form formula without\n  sub-iteration.\n- **No conjugacy choice**: a conjugacy strategy is not necessary thanks to the\n  subspace nature of the algorithms. The ``mmcg`` algorithm use a Polak-Ribière\n  formula.\n- Generic and flexible: there is no restriction on the number of regularizer,\n  their type, .., as well as for data adequacy.\n- Provided base class for criteria and potentials allowing easy and fast\n  implementation.\n- Comes with examples of implemented linear operator.\n\nInstallation and documentation\n------------------------------\n\nQ-MM is essentially just one file ``qmm.py``. We recommend using poetry for\ninstallation\n\n.. code-block:: sh\n\n   poetry add qmm\n\nThe package can also be installed with pip. More options are described in the\n`documentation <https://qmm.readthedocs.io/en/stable/index.html>`_.\n\nQ-MM only depends on ``numpy`` and Python 3.6.\n\nExample\n-------\n\nThe ``demo.py`` presents an example on image deconvolution. The first step is to\nimplement the operators ``V`` and the adjoint ``Vᵗ`` as callable (function or\nmethods). The user is in charge of these operators and these callable must\naccept a unique parameter ``x`` and a unique return value. There is no\nconstraints on the shape, everything is vectorized internally.\n\nAfter import of ``qmm``, user must instantiate ``Potential`` objects that\nimplement ``φ`` and ``Criterion`` object that implements ``μ ψ(V·x - ω)``\n\n.. code:: python\n\n   from qmm import qmm\n   phi = qmm.Huber(delta=10)  # φ\n\n   data_adeq = qmm.QuadCriterion(H, Ht, HtH, data=data)  # ||y - H·x||²\n   prior = qmm.Criterion(V, Vt, phi, hyper=0.01)  # μ ψ(V·x) = μ ∑ᵢ φ(vᵢᵗ·x)\n   \nThen you can run the algorithm\n\n.. code:: python\n\n   res, norm_grad = qmm.mmmg([data_adeq, prior], init, max_iter=200)\n\nwhere :code:`[data_adeq, prior]` means that the two criteria are summed. For\nmore details, see `documentation\n<https://qmm.readthedocs.io/en/stable/index.html>`_.\n\nContribute\n----------\n\n- Source code: `<https://github.com/forieux/qmm>`_\n- Issue tracker: `<https://github.com/forieux/qmm/issues>`_\n\nAuthor\n------\n\nIf you are having issues, please let us know\n\norieux AT l2s.centralesupelec.fr\n\nMore information about me `here <https://pro.orieux.fr>`_. F. Orieux is\naffiliated to the Signal and Systems Laboratory `L2S\n<https://l2s.centralesupelec.fr/>`_.\n\nAcknowledgement\n---------------\n\nAuthor would like to thanks `J. Idier\n<https://pagespersowp.ls2n.fr/jeromeidier/en/jerome-idier-3/>`_, `S. Moussaoui\n<https://scholar.google.fr/citations?user=Vkr8yxkAAAAJ&hl=fr>`_ and `É.\nChouzenoux <http://www-syscom.univ-mlv.fr/~chouzeno/>`_. É. Chouzenoux has also\na Matlab package that implements 3MG for image deconvolution that can be found\non her `webpage <http://www-syscom.univ-mlv.fr/~chouzeno/Logiciel.html>`_.\n\nLicense\n-------\n\nThe project is licensed under the GPLv3 license.\n\nTODO\n----\n\n- Add preconditionner to mmmg.\n- Logo ?\n",
+    'author': 'François Orieux',
+    'author_email': 'francois.orieux@universite-paris-saclay.fr',
+    'maintainer': 'François Orieux',
+    'maintainer_email': 'francois.orieux@universite-paris-saclay.fr',
+    'url': 'https://qmm.readthedocs.io/en/stable/',
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.6,<4.0',
+}
+
+
+setup(**setup_kwargs)
