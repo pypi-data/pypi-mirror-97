@@ -1,0 +1,103 @@
+Metadata-Version: 2.1
+Name: e360-charting
+Version: 1.3.1
+Summary: Create charts for E360 Plotly Visualisations.
+Home-page: UNKNOWN
+Author: IQVIA
+Author-email: e360pypi@iqvia.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: marshmallow-dataclass[enum,union]
+Requires-Dist: pandas
+
+E360 Charting (VRS)
+===
+
+_Create charts for E360 Plotly Visualisations._
+
+## Introduction
+
+- Creates payloads for E360 Visualisation Resource Service (VRS).
+- VRS payloads have a Plotly-like structure, but are significantly different.
+- Merge multiple charts into a single report.
+- Convert visualisation instances to pure Plotly payloads.
+
+
+## Quick start
+
+```python
+from e360_charting import PieVisualisation
+from e360_charting import AnnotationModel  # Optional
+
+# Create a simple visualisation instance
+vis = PieVisualisation(
+    report_title='My Pie Chart',
+    labels=['a', 'b', 'c'],
+    values=[33, 66, 1],
+    annotations=[AnnotationModel(text='Some Text', x=0.5, y=0.5)]  # Optional
+)
+
+# Get a payload from the instance as a dictionary
+vis.dump()  # -> {...}
+
+# Convert to a pure Plotly payload
+vis.as_plotly().dump()  # -> {...}
+
+```
+
+
+## Grouping
+
+```python
+from e360_charting import GroupedVisualisations
+
+"""Extends previous example"""
+
+# Instance for holding multiple reports
+group = GroupedVisualisations()
+
+# Add a visualisation to the group
+group += vis  # This way multiple instances can be merged
+
+# Use the group to dump to a VRS payload
+group.dump()  # -> {...}
+
+```
+
+
+## Charting classes available
+
+- `e360_charting.BarStackStratifiedVisualisation`
+- `e360_charting.BarStackVisualisation`
+- `e360_charting.BarStratifiedVisualisation`
+- `e360_charting.BarVisualisation`
+- `e360_charting.DonutVisualisation`
+- `e360_charting.FallenTreePlotStratifiedVisualisation`
+- `e360_charting.FallenTreePlotVisualisation`
+- `e360_charting.MultiChartAxesVisualisation`
+- `e360_charting.MultiLineStratifiedVisualisation`
+- `e360_charting.MultiLineVisualisation`
+- `e360_charting.MultiSteppedLineStratifiedVisualisation`
+- `e360_charting.MultiSteppedLineVisualisation`
+- `e360_charting.MultiStraightLineStratifiedVisualisation`
+- `e360_charting.PieVisualisation`
+- `e360_charting.RelativeBarStackStratifiedVisualisation`
+- `e360_charting.RelativeBarStackVisualisation`
+- `e360_charting.SankeyVisualisation`
+- `e360_charting.StaticSankeyVisualisation`
+- `e360_charting.SunburstVisualisation`
+- `e360_charting.TableStratifiedVisualisation`
+- `e360_charting.TableVisualisation`
+- `e360_charting.WaterfallStratifiedVisualisation`
+- `e360_charting.WaterfallVisualisation`
+
+
+
