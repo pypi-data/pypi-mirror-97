@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Constrained neural network training. &#8212; chop  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Stochastic constrained optimization dynamics." href="plot_stochastic_dynamics.html" />
+    <link rel="prev" title="Example Gallery" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-training-constrained-net-on-mnist-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="constrained-neural-network-training">
+<span id="sphx-glr-auto-examples-training-constrained-net-on-mnist-py"></span><h1>Constrained neural network training.<a class="headerlink" href="#constrained-neural-network-training" title="Permalink to this headline">¶</a></h1>
+<p>Trains a LeNet5 model on MNIST using constraints on the weights.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="kn">from</span> <span class="nn">easydict</span> <span class="kn">import</span> <span class="n">EasyDict</span>
+
+<span class="kn">from</span> <span class="nn">advertorch.test_utils</span> <span class="kn">import</span> <span class="n">LeNet5</span>
+<span class="kn">from</span> <span class="nn">advertorch_examples.utils</span> <span class="kn">import</span> <span class="n">get_mnist_train_loader</span>
+<span class="kn">from</span> <span class="nn">advertorch_examples.utils</span> <span class="kn">import</span> <span class="n">get_mnist_test_loader</span>
+
+<span class="kn">import</span> <span class="nn">chop</span>
+
+<span class="c1"># Setup</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">use_cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">use_cuda</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="c1"># Data Loaders</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">get_mnist_train_loader</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">get_mnist_test_loader</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Model setup</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LeNet5</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="c1"># Outer optimization parameters</span>
+<span class="n">nb_epochs</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">momentum</span> <span class="o">=</span> <span class="o">.</span><span class="mi">9</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># Choose optimizer here</span>
+<span class="c1"># optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)</span>
+
+<span class="c1"># Make constraints</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">chop</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">LinfBall</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+<span class="c1"># Project model parameters in the constraint set.</span>
+<span class="n">constraint</span><span class="o">.</span><span class="n">make_feasible</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="../generated/chop.stochastic.html#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe" class="sphx-glr-backref-module-chop-stochastic sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">chop</span><span class="o">.</span><span class="n">stochastic</span><span class="o">.</span><span class="n">FrankWolfe</span></a></a></a></a></a></a></a></a></a></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="n">momentum</span><span class="p">)</span>
+
+<span class="c1"># Training loop</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_epochs</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">train_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Training epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">nb_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+        <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">train_loss</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="c1"># TODO: get accuracy</span>
+
+    <span class="c1"># Evaluate on clean and adversarial test data</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">EasyDict</span><span class="p">(</span><span class="n">nb_test</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">correct</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">correct_adv_pgd</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">correct_adv_pgd_madry</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">correct_adv_fw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">correct_adv_mfw</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Val epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">nb_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Compute corresponding predictions</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Get clean accuracies</span>
+        <span class="n">report</span><span class="o">.</span><span class="n">nb_test</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">report</span><span class="o">.</span><span class="n">correct</span> <span class="o">+=</span> <span class="n">pred</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Val acc on clean examples (%): </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">correct</span> <span class="o">/</span> <span class="n">report</span><span class="o">.</span><span class="n">nb_test</span> <span class="o">*</span> <span class="mf">100.</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  0 MB</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-training-constrained-net-on-mnist-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/7c38ac1ba329cbc92efe5897bcadc9d3/training_constrained_net_on_mnist.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">training_constrained_net_on_mnist.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/7e9c54f5c06ec3fd4a5864a2ece17291/training_constrained_net_on_mnist.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">training_constrained_net_on_mnist.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">chop</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.optim.html">chop.optim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.stochastic.html">chop.stochastic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.constraints.html">chop.constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.adversary.html">chop.adversary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.penalties.html">chop.penalties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.utils.html">chop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.data.html">chop.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.image.html">chop.image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generated/chop.logging.html">chop.logging</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#miscellaneous-examples">Miscellaneous examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#adversarial-robustness">Adversarial Robustness</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Example Gallery</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Example Gallery</a></li>
+      <li>Next: <a href="plot_stochastic_dynamics.html" title="next chapter">Stochastic constrained optimization dynamics.</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, chop developers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/auto_examples/training_constrained_net_on_mnist.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

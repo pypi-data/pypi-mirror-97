@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chop.constraints &#8212; chop  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chop.adversary" href="chop.adversary.html" />
+    <link rel="prev" title="chop.stochastic" href="chop.stochastic.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-chop.constraints">
+<span id="chop-constraints"></span><h1>chop.constraints<a class="headerlink" href="#module-chop.constraints" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="constraints">
+<h2>Constraints.<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h2>
+<p>This module contains classes representing constraints.
+The methods on each constraint object function batch-wise.
+Reshaping will be of order if the constraints are used on the parameters of a model.</p>
+<p>This uses an API similar to the one for
+the COPT project, <a class="reference external" href="https://github.com/openopt/copt">https://github.com/openopt/copt</a>.
+Part of this code is adapted from <a class="reference external" href="https://github.com/ZIB-IOL">https://github.com/ZIB-IOL</a>.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.constraints.create_lp_constraints" title="chop.constraints.create_lp_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_lp_constraints</span></code></a>(model[, p, value, mode])</p></td>
+<td><p>Create LpBall constraints for each layer of model, and value depends on mode (either radius or factor to multiply average initialization norm with)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.constraints.euclidean_proj_l1ball" title="chop.constraints.euclidean_proj_l1ball"><code class="xref py py-obj docutils literal notranslate"><span class="pre">euclidean_proj_l1ball</span></code></a>(v[, s])</p></td>
+<td><p>Compute the Euclidean projection on a L1-ball Solves the optimization problem (using the algorithm from [1]):   ..math::     min_w 0.5 * || w - v ||_2^2 , s.t. || w ||_1 &lt;= s.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.constraints.euclidean_proj_simplex" title="chop.constraints.euclidean_proj_simplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">euclidean_proj_simplex</span></code></a>(v[, s])</p></td>
+<td><p>Compute the Euclidean projection on a positive simplex Solves the optimization problem (using the algorithm from [1]):   ..math::     min_w 0.5 * || w - v ||_2^2 , s.t. sum_i w_i = s, w_i &gt;= 0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.constraints.get_avg_init_norm" title="chop.constraints.get_avg_init_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_avg_init_norm</span></code></a>(layer[, param_type, p, …])</p></td>
+<td><p>Computes the average norm of default layer initialization</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_LpBall</span></code>(alpha[, p])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroupL1Ball</span></code>(alpha, groups)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1Ball</span></code>(alpha)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Ball</span></code>(alpha)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfBall</span></code>(alpha)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LpBall</span></code>(alpha)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.constraints.NuclearNormBall" title="chop.constraints.NuclearNormBall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NuclearNormBall</span></code></a>(alpha)</p></td>
+<td><p>Nuclear norm constraint, i.e. sum of absolute eigenvalues.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simplex</span></code>(alpha)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="chop.constraints.NuclearNormBall">
+<em class="property">class </em><code class="sig-prename descclassname">chop.constraints.</code><code class="sig-name descname">NuclearNormBall</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../../../../../../../chop/chop/constraints.py#L337"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.NuclearNormBall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nuclear norm constraint, i.e. sum of absolute eigenvalues.
+Also known as the Schatten-1 norm.
+We consider the last two dimensions of the input are the ones we compute the Nuclear Norm on.</p>
+<dl class="py method">
+<dt id="chop.constraints.NuclearNormBall.lmo">
+<code class="sig-name descname">lmo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grad</span></em>, <em class="sig-param"><span class="n">iterate</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L348"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.NuclearNormBall.lmo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the LMO for the Nuclear Norm Ball on the last two dimensions.
+Returns :math: <cite>s - $iterate$</cite> where</p>
+<blockquote>
+<div><dl class="simple">
+<dt>..math::</dt><dd><p>s = rgmin_u u^     op grad.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grad</strong> – torch.Tensor of shape (<a href="#id1"><span class="problematic" id="id2">*</span></a>, m, n)</p></li>
+<li><p><strong>iterate</strong> – torch.Tensor of shape (<a href="#id3"><span class="problematic" id="id4">*</span></a>, m, n)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>torch.Tensor of shape (<a href="#id5"><span class="problematic" id="id6">*</span></a>, m, n)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>update_direction</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.constraints.NuclearNormBall.prox">
+<code class="sig-name descname">prox</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L371"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.NuclearNormBall.prox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Projection operator on the Nuclear Norm constraint set.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.constraints.create_lp_constraints">
+<code class="sig-prename descclassname">chop.constraints.</code><code class="sig-name descname">create_lp_constraints</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'initialization'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L33"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.create_lp_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create LpBall constraints for each layer of model, and value depends on mode (either radius or
+factor to multiply average initialization norm with)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.constraints.euclidean_proj_l1ball">
+<code class="sig-prename descclassname">chop.constraints.</code><code class="sig-name descname">euclidean_proj_l1ball</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L114"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.euclidean_proj_l1ball" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Euclidean projection on a L1-ball
+Solves the optimization problem (using the algorithm from [1]):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>..math::</dt><dd><p>min_w 0.5 * || w - v ||_2^2 , s.t. || w ||_1 &lt;= s</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – (n,) numpy array,
+n-dimensional vector to project</p></li>
+<li><p><strong>s</strong> – float, optional, default: 1,
+radius of the L1-ball</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>(n,) numpy array,</dt><dd><p>Euclidean projection of v on the L1-ball of radius s</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>w</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Solves the problem by a reduction to the positive simplex case</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#chop.constraints.euclidean_proj_simplex" title="chop.constraints.euclidean_proj_simplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">euclidean_proj_simplex()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.constraints.euclidean_proj_simplex">
+<code class="sig-prename descclassname">chop.constraints.</code><code class="sig-name descname">euclidean_proj_simplex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L68"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.euclidean_proj_simplex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Euclidean projection on a positive simplex
+Solves the optimization problem (using the algorithm from [1]):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>..math::</dt><dd><p>min_w 0.5 * || w - v ||_2^2 , s.t. sum_i w_i = s, w_i &gt;= 0</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>(</em><em>n</em><em>,</em><em>) </em><em>numpy array</em><em>,</em>) – n-dimensional vector to project</p></li>
+<li><p><strong>s</strong> (<em>float</em><em>, </em><em>optional</em><em>, </em><em>default: 1</em><em>,</em>) – radius of the simplex</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>w</strong> – Euclidean projection of v on the simplex</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(n,) numpy array,</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The complexity of this algorithm is in O(n log(n)) as it involves sorting v.
+Better alternatives exist for high-dimensional sparse vectors (cf. [1])
+However, this implementation still easily scales to millions of dimensions.</p>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>[1] Efficient Projections onto the .1-Ball for Learning in High Dimensions</dt><dd><p>John Duchi, Shai Shalev-Shwartz, Yoram Singer, and Tushar Chandra.
+International Conference on Machine Learning (ICML 2008)
+<a class="reference external" href="http://www.cs.berkeley.edu/~jduchi/projects/DuchiSiShCh08.pdf">http://www.cs.berkeley.edu/~jduchi/projects/DuchiSiShCh08.pdf</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.constraints.get_avg_init_norm">
+<code class="sig-prename descclassname">chop.constraints.</code><code class="sig-name descname">get_avg_init_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">layer</span></em>, <em class="sig-param"><span class="n">param_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">repetitions</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/539cf61/copt/../torch/autograd/grad_mode.py#L23"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.constraints.get_avg_init_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the average norm of default layer initialization</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">chop</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chop.optim.html">chop.optim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.stochastic.html">chop.stochastic</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">chop.constraints</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#constraints">Constraints.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chop.adversary.html">chop.adversary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.penalties.html">chop.penalties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.utils.html">chop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.data.html">chop.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.image.html">chop.image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.logging.html">chop.logging</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Example Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="chop.stochastic.html" title="previous chapter">chop.stochastic</a></li>
+      <li>Next: <a href="chop.adversary.html" title="next chapter">chop.adversary</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, chop developers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/chop.constraints.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
