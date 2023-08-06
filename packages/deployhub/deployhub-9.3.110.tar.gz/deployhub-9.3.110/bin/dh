@@ -1,0 +1,935 @@
+#!/usr/bin/env python3
+"""
+DeployHub's CLI using the dhapi module.
+
+Args:
+
+    ACTION - one of the following
+
+        deploy: deploy the application to the evironment
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --appname
+                --appversion (optional)
+                --deployenv
+
+        approve: approve the application version
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --appname
+                --appversion (optional)
+
+        move: move the application version using the supplied task
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --appname
+                --appversion (optional)
+                --from_domain
+                --task
+
+        updatecomp: create/replace the component version for the application verion
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --compname
+                --compvariant (optional)
+                --compversion (optional)
+                --autocompinc (optional)
+                --appname (optional)
+                --appversion (optional)
+                --autoappinc (optional)
+                --compattr
+
+            - Predefined Key/Values:
+                * BuildUrl: url for the CI job
+                * BuildId: Identifier for the CI job
+                * BuildNumber: Build number for the CI job
+                * Chart: Helm Chart for the component
+                * ChartNamespace: Name space for the component to be deployed to
+                * ChartVersion: Helm Chart version
+                * DockerBuildDate: Timestamp when the image was created
+                * DockerRepo: Repository which the image was pushed to
+                * DockerSha: Digest for the image
+                * DockerTag: Tag for the image
+                * GitCommit: Git commit that triggered the CI job
+                * GitRepo: Git repo that triggered the CI job
+                * GitTag: Git tag in the git repo
+                * GitUrl: Full url to the git repo
+                * operator: Operator name
+
+        assign: assigns a component version to an application verion
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --compname
+                --compvariant (optional)
+                --compversion (optional)
+                --appname
+                --appversion (optional)
+
+        kv: assigns the key/values pairs to the component verion
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --compname
+                --compvariant (optional)
+                --compversion (optional)
+                --kvconfig
+
+        envscript: creates a bash file from the component toml file
+            Usage:
+                --envvars
+                --envvars_sh
+
+        export: exports a domain including all objects to stdout
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --from_dom
+
+        import: imports the export file into the new domain
+            Usage:
+                --dhurl
+                --dhuser
+                --dhpass
+                --from_dom
+                --to_dom
+
+    Parameter Descriptions:
+        --dhurl: DeployHub Url
+        --dhuser: DeployHub User
+        --dhpass: DeployHub Password
+        --appname: Application Name
+        --appversion: Application Version
+        --appautoinc: Application Auto Increment Version
+        --deployenv: Deployment Environment
+        --compname: Component Name
+        --compvariant: Component Variant
+        --compversion: Component Version
+        --compautoinc: Component Auto Increment Version
+        --kvconfig: Directory containing the json and properties file
+        --crdatasource: Change Request Data Source for the Component
+        --changerequest: Change Request for Component, use multiple time for each Change Request Id
+        --deploydata: The json file that contains the application, environment and log details
+        --from_domain: Move from domain
+        --task: Task to use for move
+        --envvars: Env Variables TOML file
+        --envvars_sh: Env Variables Output sh file
+        --docker: docker Kind of the component item
+        --file: file Kind of the component item
+        --compattr: Component Attributes, use multiple time for each attr
+        --envs: Environments to Associate App to, use multiple time for each env
+        --importfile: File to Import
+        --fromdom: From Domain
+        --todom: To Domain
+"""
+
+# To generate markdown use:
+#  pydoc-markdown -I bin | sed 's/  --/    > --/g' | sed 's/Usage:/- Usage:/g' | sed 's/- `--/  - `--/g' | sed 's/  \\* /    \\* /g' | tr '\n' '\a' | grep -o '.*dh\\.main' | tr '\a' '\n' | sed -e '$ d' > doc/dh.md
+
+__version__ = '9.3.110'
+
+import json
+import os
+import re
+import stat
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pprint import pprint
+
+import click
+import qtoml
+from deployhub import dhapi
+
+
+@click.command()
+@click.argument('action', required=True)
+@click.option('--dhurl', help='DeployHub Url', envvar='DHURL', required=True)
+@click.option('--dhuser', help='DeployHub User', envvar='DHUSER', required=True)
+@click.option('--dhpass', help='DeployHub Password', envvar='DHPASS', required=True)
+@click.option('--appname', help='Application Name', envvar='COMPONENT_APPLICATION')
+@click.option('--appversion', help='Application Version', envvar='COMPONENT_APPLICATION_VERSION')
+@click.option('--appautoinc', help='Application Auto Increment Version', envvar='COMPONENT_APPLICATION_AUTOINC')
+@click.option('--deployenv', help='Deployment Environment')
+@click.option('--compname', help='Component Name', envvar='COMPONENT_NAME')
+@click.option('--compvariant', help='Component Variant', envvar='COMPONENT_VARIANT')
+@click.option('--compversion', help='Component Version', envvar='COMPONENT_VERSION')
+@click.option('--compautoinc', help='Component Auto Increment Version', envvar='COMPONENT_AUTOINC')
+@click.option('--kvconfig', help='Directory containing the json and properties file', envvar='KVCONFIG')
+@click.option('--crdatasource', help='Change Request Data Source for the Component', envvar='CR_DATASOURCE')
+@click.option('--changerequest', help='Change Request for Component, use multiple time for each Change Request Id', multiple=True)
+@click.option('--deploydata', help='The json file that contains the application, environment and log details', envvar='DEPLOY_DATA')
+@click.option('--from_domain', help='Move from domain')
+@click.option('--task', help='Task to use for move')
+@click.option('--envvars', help='Env Variables TOML file')
+@click.option('--envvars_sh', help='Env Variables Output sh file')
+@click.option('--docker', 'kind', flag_value='docker', default=True, help='Component Item Type')
+@click.option('--file', 'kind', flag_value='file')
+@click.option('--compattr', help='Component Attributes, use multiple time for each attr', multiple=True)
+@click.option('--envs', help='Environments to Associate App to, use multiple time for each env', multiple=True)
+@click.option('--importfile', help='File to Import')
+@click.option('--fromdom', help='From Domain')
+@click.option('--todom', help='To Domain')
+def main(dhurl, dhuser, dhpass, action, appname, appversion, appautoinc, compname, compvariant, compversion, compautoinc, kind, deployenv, envs, compattr, kvconfig, deploydata, from_domain, task, envvars, envvars_sh, importfile, fromdom, todom, crdatasource, changerequest):
+    """
+    ACTION: deploy, updatecomp, approve, move, envscript, kv, export or import for the type of action to perform.
+
+        deploy: deploy the application to the evironment\n
+        approve: approve the application version\n
+        move: move the application version using the supplied task\n
+        updatecomp: create/replace the component version for the application verion\n
+            Predefined Key/Values:\n
+                BuildUrl - url for the CI job\n
+                BuildId - Identifier for the CI job\n
+                BuildNumber - Build number for the CI job\n
+                Chart - Helm Chart for the component\n
+                ChartNamespace - Name space for the component to be deployed to\n
+                ChartVersion - Helm Chart version\n
+                DockerBuildDate - Timestamp when the image was created\n
+                DockerRepo - Repository which the image was pushed to\n
+                DockerSha - Digest for the image\n
+                DockerTag - Tag for the image\n
+                GitCommit - Git commit that triggered the CI job\n
+                GitRepo - Git repo that triggered the CI job\n
+                GitTag - Git tag in the git repo\n
+                GitUrl - Full url to the git repo\n
+                operator - Operator name\n
+        assign: assigns a component version to an application verion\n
+        kv: assigns the key/values pairs to the component verion\n
+        envscript: creates a bash file from the component toml file\n
+        export: exports a domain including all objects to stdout\n
+        import: imports the export file into the new domain\n
+    """
+
+    if (action.lower() == "kv" or action.lower() == "deploy" or action.lower() == "updatecomp" or action.lower() == "approve" or action.lower() == "export" or action.lower() == "import" or action.lower() == "assign"):
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        errors = []
+
+        cookies = dhapi.login(dhurl, dhuser, dhpass, errors)
+
+        if cookies is None:
+            if (errors):
+                print(errors[0])
+            sys.exit(1)
+
+    if (action.lower() == "deploy"):
+        # Deploy Application to Environment
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(deploydata)):
+            if (dhapi.is_empty(appname) and dhapi.is_empty(compname)):
+                print("--appname is required")
+                sys.exit(1)
+
+            retcode = 0
+            applist = []
+            if (dhapi.is_not_empty(appname)):
+                if (dhapi.is_not_empty(appname) and dhapi.is_empty(appversion)):
+                    parts = appname.split(';')
+                    if (len(parts) == 3):
+                        appname = parts[0] + ';' + parts[1]
+                        appversion = parts[2]
+
+                data = dhapi.get_application(dhurl, cookies, appname, appversion, True)
+                appid = data[0]
+                appname = data[1]
+                applist.append({"appid": appid, "appname": appname, "deployenv": deployenv, "circleci_pipeline": ""})
+
+                if (dhapi.is_empty(deployenv)):
+                    print("--deployenv is required")
+                    sys.exit(1)
+
+            if (dhapi.is_empty(appname) and dhapi.is_not_empty(compname)):
+                data = dhapi.get_component(dhurl, cookies, compname, "", "", True, True)
+                parent_compid = data[0]
+                data = dhapi.get_component_fromid(dhurl, cookies, parent_compid)
+
+                if (data is not None and 'result' in data):
+                    result = data['result']
+                    if (result.get('applications', None) is not None):
+                        data = result.get('applications', None)
+                        for app in data:
+                            appname = app.get('name', '')
+                            appid = app.get('id', '')
+                            appdata = dhapi.get_application(dhurl, cookies, appname, "latest", True)
+                            latest_appid = appdata[0]
+
+                            if (appid == latest_appid):
+                                app_attrs = dhapi.get_application_attrs(dhurl, cookies, appid)
+
+                                deployenv = ""
+                                pipeline = ""
+                                for entry in app_attrs:
+                                    if ('DeployEnv' in entry):
+                                        deployenv = entry['DeployEnv']
+                                    if ('CircleCI_Pipeline' in entry):
+                                        pipeline = entry['CircleCI_Pipeline']
+
+                                if (dhapi.is_not_empty(deployenv)):
+                                    applist.append({"appid": appid, "appname": appname, "deployenv": deployenv, "circleci_pipeline": pipeline})
+
+            for entry in applist:
+                appid = entry['appid']
+                appname = entry['appname']
+                deployenv = entry['deployenv']
+                pipeline = entry['circleci_pipeline']
+
+                print('Deploying ' + appname + ' to ' + deployenv)
+                data = dhapi.deploy_application_by_appid(dhurl, cookies, appid, deployenv)
+
+                deployid = data[0]
+                if (deployid < 0):
+                    print(data[1])
+                    sys.exit(1)
+
+                print("Fetching Logs for " + str(deployid))
+                data = dhapi.get_logs(dhurl, cookies, deployid)
+
+                print(data[1])
+                if (data[0]):
+                    print("Successful")
+                    if (dhapi.is_not_empty(pipeline)):
+                        data = dhapi.run_circleci_pipeline(pipeline)
+                        pprint(data)
+                else:
+                    print("Failed")
+                    retcode = retcode + 1
+
+            if (retcode == 0):
+                sys.exit(0)
+            else:
+                sys.exit(1)
+        else:
+            payload = ""
+            with open(deploydata, "r") as fin_data:
+                payload = fin_data.read()
+
+            data = {}
+            if (dhapi.is_not_empty(payload)):
+                data = json.loads(payload)
+
+            appname = data.get('application', '')
+            appversion = data.get('appversion', '')
+            compname = data.get('config_component', None)
+            compvariant = data.get('environment', '')
+            environment = data.get('environment', '')
+            compversion = ""
+
+            dhapi.log_deploy_application(dhurl, cookies, deploydata)
+
+            print("Logged Deployment for " + appname + " to " + compvariant)
+
+            if ('.' in compvariant):
+                compvariant = compvariant.split('.')[-1]
+
+            if (kvconfig is None):
+                kvconfig = data.get('kvconfig', '')
+
+            if (compautoinc is None):
+                compautoinc = "Y"
+
+            if (compname is not None):
+                print('Load config from ' + kvconfig)
+                dhapi.set_kvconfig(dhurl, cookies, kvconfig, appname, appversion, appautoinc, compname, compvariant, compversion, compautoinc, kind, environment, crdatasource, changerequest)
+    elif (action.lower() == "updatecomp"):
+
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(compname)):
+            print("--compname is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(compvariant)):
+            compvariant = ""
+
+        if (dhapi.is_empty(compvariant) and "-v" in compversion):
+            compvariant = compversion.split("-v")[0]
+            compversion = "v" + compversion.split("-v")[1]
+
+        if (dhapi.is_empty(compvariant) and "-V" in compversion):
+            compvariant = compversion.split("-V")[0]
+            compversion = "v" + compversion.split("-V")[1]
+
+        saveappver = ""
+        if (dhapi.is_not_empty(appversion)):
+            saveappver = appversion
+
+        retcode = 0
+        cnt = 1
+        while True:
+            data = dhapi.get_component(dhurl, cookies, compname, "", "", True, True)
+            parent_compid = data[0]
+
+            # create component version
+            print("Creating Component")
+            compid = dhapi.new_component_version(dhurl, cookies, compname, compvariant, compversion, kind, None, compautoinc)
+            print("Creation Done: " + dhapi.get_component_name(dhurl, cookies, compid))
+
+            attrs = {}
+            print("Updating Component Attributes\n")
+            for attr in compattr:
+                if (':' in attr):
+                    key = attr.split(':')[0]
+                    value = ':'.join(attr.split(':')[1:])
+                else:
+                    key = attr
+                    value = ""
+
+                if ("@sha256:" in value):
+                    value = value.split("@sha256:")[1]
+
+                if (value.startswith('@')):
+                    value = value[1:]
+                    if (os.path.exists(value)):
+                        value = open(value, 'r').read().replace('\n', '')
+                        attrs[key] = value
+                    else:
+                        attrs[key] = ""
+                else:
+                    attrs[key] = value
+
+            gittag = attrs.get("GitTag", None)
+            if (dhapi.is_empty(gittag) and attrs.get('GitBranch', None) is not None):
+                attrs['GitTag'] = attrs.get('GitBranch', '')
+
+            now = datetime.now()
+            date_time = now.strftime("%c")
+
+            attrs['BuildUrl'] = attrs.get('BuildUrl', os.getenv('BUILD_URL', ''))
+            attrs['BuildId'] = attrs.get('BuildId', os.getenv('BUILD_ID', ''))
+            attrs['BuildNumber'] = attrs.get('BuildNumber', os.getenv('BUILD_NUMBER', ''))
+            attrs['DockerBuildDate'] = attrs.get('DockerBuildDate', date_time)
+            attrs['GitCommit'] = attrs.get('GitCommit', os.getenv('GIT_COMMIT', ''))
+            attrs['GitBranch'] = attrs.get('GitBranch', os.getenv('GIT_BRANCH', ''))
+            attrs['GitTag'] = attrs.get('GitTag', os.getenv('GIT_BRANCH', ''))
+            attrs['GitUrl'] = attrs.get('GitUrl', os.getenv('GIT_URL', ''))
+            if (attrs.get('GitRepo', None) is None):
+                if ('/' in os.getenv('GIT_URL', '')):
+                    attrs['GitRepo'] = "/".join(os.getenv('GIT_URL', '').split('/')[-2:]).replace(".git", "")
+            # comptype = attrs.get("CompType", None)
+            # if (dhapi.is_empty(comptype)):
+            #     if (kind == "file"):
+            #         attrs['CompType'] = "Application File"
+            #     else:
+            #         attrs['CompType'] = "Container"
+
+            pprint(attrs)
+            print("")
+
+            print("Updating Change Requests\n")
+
+            data = dhapi.update_component_attrs(dhurl, cookies, compname, compvariant, compversion, attrs, crdatasource, changerequest)
+            print("Attribute Update Done")
+
+            applist = []
+
+            if (dhapi.is_empty(appname) and dhapi.is_not_empty(appautoinc)):  # derive appname and inc
+                data = dhapi.get_component_fromid(dhurl, cookies, parent_compid)
+
+                if (data is not None and 'result' in data):
+                    result = data['result']
+                    if (result.get('applications', None) is not None):
+                        data = result.get('applications', None)
+                        for app in data:
+                            appname = app.get('domain', '') + "." + app.get('name', '')
+                            appid = app.get('id', '')
+                            appdata = dhapi.get_application_fromid(dhurl, cookies, appid, "latest")
+                            latest_appid = appdata[0]
+                            # latest_appname = appdata[1]
+                            if (appid == latest_appid):
+                                if (appname is not None):
+                                    applist.append(appname)
+            else:
+                if (appname is not None):
+                    applist.append(appname)
+
+            for appname in applist:
+                print(appname)
+                if (dhapi.is_not_empty(saveappver)):
+                    appversion = saveappver
+                else:
+                    appversion = ""
+
+                if (dhapi.is_empty(appversion)):
+                    parts = appname.split(';')
+                    if (len(parts) == 3):
+                        appname = parts[0] + ';' + parts[1]
+                        appversion = parts[2]
+
+                if (dhapi.is_empty(appversion)):
+                    parts = appname.split(';')
+                    if (len(parts) == 3):
+                        appname = parts[0] + ';' + parts[1]
+                        appversion = parts[2]
+
+                if (dhapi.is_empty(appversion)):
+                    appversion = ""
+
+                print("Creating Application Version '" + str(appname) + "' '" + appversion + "'")
+                data = dhapi.new_application(dhurl, cookies, appname, appversion, appautoinc, envs)
+                appid = data[0]
+                appname = dhapi.get_application_name(dhurl, cookies, appid)
+                print("Creation Done: " + appname)
+
+                print("Assigning Component Version to Application Version " + appname)
+
+                data = dhapi.add_compver_to_appver(dhurl, cookies, appid, compid)
+                print("Assignment Done")
+
+                if (dhapi.is_not_empty(deployenv)):
+                    print('Deploying ' + appname + ' to ' + deployenv)
+                    data = dhapi.deploy_application_by_appid(dhurl, cookies, appid, deployenv)
+
+                    deployid = data[0]
+                    if (deployid < 0):
+                        print(data[1])
+                        sys.exit(1)
+
+                    print('Fetching Logs for ' + str(deployid))
+                    data = dhapi.get_logs(dhurl, cookies, deployid)
+
+                    print(data[1])
+                    if (data[0]):
+                        print("Successful")
+                    else:
+                        print("Failed")
+                        retcode = retcode + 1
+
+            compname = os.environ.get("COMPONENT_NAME_" + str(cnt), None)
+            compversion = os.environ.get("COMPONENT_VERSION_" + str(cnt), None)
+            appname = os.environ.get("COMPONENT_APPLICATION_" + str(cnt), None)
+            appversion = os.environ.get("COMPONENT_APPLICATION_VERSION_" + str(cnt), None)
+
+            cnt = cnt + 1
+
+            if (compname is None):  # leave loop if no more components defined in env
+                break
+
+        if (retcode == 0):
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    elif (action.lower() == "kv"):
+
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(kvconfig) and dhapi.is_empty(deploydata)):
+            print("--kvconfig is required")
+            sys.exit(1)
+
+        if (dhapi.is_not_empty(deploydata)):
+            with open(deploydata, "r") as fin_data:
+                payload = fin_data.read()
+
+            data = None
+            if (dhapi.is_not_empty(payload)):
+                data = json.loads(payload)
+
+            appname = data.get('application', '')
+            appversion = data.get('appversion', '')
+            compname = data.get('config_component', None)
+            compvariant = data.get('environment', '')
+            compversion = ''
+
+            if (kvconfig is None):
+                kvconfig = data.get('kvconfig', '')
+
+            print('Config for ' + appname + ' to ' + compvariant)
+
+        if (dhapi.is_empty(compname)):
+            print("--compname is required")
+            sys.exit(1)
+
+        if ('.' in compvariant):
+            compvariant = compvariant.split('.')[-1]
+
+        if (compautoinc is None):
+            compautoinc = "Y"
+
+        dhapi.set_kvconfig(dhurl, cookies, kvconfig, appname, appversion, appautoinc, compname, compvariant, compversion, compautoinc, kind, crdatasource, changerequest)
+
+    elif (action.lower() == "assign"):
+
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(appname)):
+            print("--appname is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(compname)):
+            print("--compname is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(compvariant)):
+            compvariant = ""
+
+        if (dhapi.is_empty(compvariant) and "-v" in compversion):
+            compvariant = compversion.split("-v")[0]
+            compversion = "v" + compversion.split("-v")[1]
+
+        if (dhapi.is_empty(compvariant) and "-V" in compversion):
+            compvariant = compversion.split("-V")[0]
+            compversion = "v" + compversion.split("-V")[1]
+
+        saveappver = ""
+        if (dhapi.is_not_empty(appversion)):
+            saveappver = appversion
+
+        assign_completed = []
+
+        cnt = 1
+        while True:
+            # create component version
+            [compid, name] = dhapi.get_component(dhurl, cookies, compname, compvariant, compversion, True, False)
+
+            if (compid > 0):
+                print("Found " + name)
+
+                if (dhapi.is_not_empty(saveappver)):
+                    appversion = saveappver
+
+                if (dhapi.is_empty(appversion)):
+                    parts = appname.split(';')
+                    if (len(parts) == 3):
+                        appname = parts[0] + ';' + parts[1]
+                        appversion = parts[2]
+
+                if (dhapi.is_empty(appversion)):
+                    parts = appname.split(';')
+                    if (len(parts) == 3):
+                        appname = parts[0] + ';' + parts[1]
+                        appversion = parts[2]
+
+                if (dhapi.is_empty(appversion)):
+                    appversion = ""
+
+                data = dhapi.get_application(dhurl, cookies, appname, appversion, True)
+                appid = data[0]
+
+                if (appid < 0):
+                    print("Creating Application Version '" +
+                          str(appname) + "' '" + appversion + "'")
+                    data = dhapi.new_application(dhurl, cookies, appname, appversion, appautoinc, envs)
+                    appid = data[0]
+                    appname = dhapi.get_application_name(dhurl, cookies, appid)
+                    print("Creation Done: " + appname)
+
+                if (appname not in [assign_completed]):
+                    dhapi.assign_app_to_env(dhurl, cookies, appname, envs)
+                    assign_completed.append(appname)
+
+                print("Assigning Component Version to Application Version " + str(appid))
+
+                data = dhapi.add_compver_to_appver(dhurl, cookies, appid, compid)
+                print("Assignment Done")
+
+            compname = os.environ.get("COMPONENT_NAME_" + str(cnt), None)
+            compversion = os.environ.get("COMPONENT_VERSION_" + str(cnt), None)
+            appname = os.environ.get("COMPONENT_APPLICATION_" + str(cnt), None)
+            appversion = os.environ.get("COMPONENT_APPLICATION_VERSION_" + str(cnt), None)
+
+            cnt = cnt + 1
+
+            if (compname is None):  # leave loop if no more components defined in env
+                break
+
+    elif (action.lower() == "approve"):
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(appname)):
+            print("--appname is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(appversion)):
+            parts = appname.split(';')
+            if (len(parts) == 3):
+                appname = parts[0] + ';' + parts[1]
+                appversion = parts[2]
+
+        print('Approving ' + appname + ' ' + appversion)
+        data = dhapi.approve_application(dhurl, cookies, appname, appversion)
+        print(data[1])
+    elif (action.lower() == "move"):
+        if (dhapi.is_empty(appname)):
+            print("--appname is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(from_domain)):
+            print("--from_domain is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(task)):
+            print("--task is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(appversion)):
+            parts = appname.split(';')
+            if (len(parts) == 3):
+                appname = parts[0] + ';' + parts[1]
+                appversion = parts[2]
+
+        print('Moving ' + appname + ' ' + appversion + ' from ' + from_domain)
+        data = dhapi.move_application(dhurl, cookies, appname, appversion, from_domain, task)
+        print(data[1])
+    elif (action.lower() == "envscript"):
+        if (dhapi.is_empty(envvars)):
+            print("--envvars is required")
+            sys.exit(1)
+
+        print('Creating env shell script from ' + envvars)
+        envscript(envvars, envvars_sh)
+    elif (action.lower() == "export"):
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(fromdom)):
+            print("--fromdom is required")
+            sys.exit(1)
+
+        allobjs = {}
+        filterdict(dhurl, cookies, "users", fromdom, allobjs)
+        filterdict(dhurl, cookies, "groups", fromdom, allobjs)
+        filterdict(dhurl, cookies, "comptypes", fromdom, allobjs)
+        filterdict(dhurl, cookies, "credentials", fromdom, allobjs)
+        filterdict(dhurl, cookies, "endpoints", fromdom, allobjs)
+        filterdict(dhurl, cookies, "datasources", fromdom, allobjs)
+        filterdict(dhurl, cookies, "tasks", fromdom, allobjs)
+        filterdict(dhurl, cookies, "engines", fromdom, allobjs)
+        filterdict(dhurl, cookies, "repositories", fromdom, allobjs)
+        filterdict(dhurl, cookies, "environments", fromdom, allobjs)
+        filterdict(dhurl, cookies, "components", fromdom, allobjs)
+        filterdict(dhurl, cookies, "applications", fromdom, allobjs)
+        filterdict(dhurl, cookies, "releases", fromdom, allobjs)
+
+        jstr = json.dumps(allobjs, indent=2)
+        print(jstr)
+    elif (action.lower() == "import"):
+        if (dhapi.is_empty(dhurl)):
+            print("--dhurl is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhuser)):
+            print("--dhuser is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(dhpass)):
+            print("--dhpass is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(fromdom)):
+            print("--fromdom is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(todom)):
+            print("--todom is required")
+            sys.exit(1)
+
+        if (dhapi.is_empty(importfile)):
+            print("--importfile is required")
+            sys.exit(1)
+
+        file = open(importfile, 'r')
+        all_of_it = file.read()
+        file.close()
+        jstr = re.sub(fromdom, todom, all_of_it, flags=re.IGNORECASE)
+        allobjs = json.loads(jstr)
+
+        importdict(dhurl, cookies, "users", allobjs)
+        importdict(dhurl, cookies, "groups", allobjs)
+        importdict(dhurl, cookies, "comptypes", allobjs)
+        importdict(dhurl, cookies, "credentials", allobjs)
+        importdict(dhurl, cookies, "endpoints", allobjs)
+        importdict(dhurl, cookies, "datasources", allobjs)
+        importdict(dhurl, cookies, "tasks", allobjs)
+        importdict(dhurl, cookies, "engines", allobjs)
+        importdict(dhurl, cookies, "repositories", allobjs)
+        importdict(dhurl, cookies, "environments", allobjs)
+        importdict(dhurl, cookies, "components", allobjs)
+        importdict(dhurl, cookies, "applications", allobjs)
+        importdict(dhurl, cookies, "releases", allobjs)
+    else:
+        print("Action is not defined.  Use deploy, envscript, approve, move or updatecomp for action")
+        sys.exit(1)
+
+
+def envscript(envvars, envvars_sh):
+    """
+    Add the variabes from the envvars toml file to the shell script.
+
+    Args:
+        envvars (string): file name for the environment toml file
+        envvars_sh (string): the shell script to update with var from toml file
+
+    Returns:
+        no data returned.  Output is in the shell script file.
+    """
+    lines = subprocess.run(['cat', envvars], check=False, stdout=subprocess.PIPE).stdout.decode('utf-8')
+
+    vardict = qtoml.loads(lines)
+
+    if (dhapi.is_empty(envvars_sh)):
+        envvars_sh = 'cloudbuild.sh'
+
+    fp_script = open(envvars_sh, 'a')
+
+    if ("Component" in vardict):
+        vardict = vardict["Component"]
+
+    fp_script.write("export BLDDATE=\"" + time.ctime(time.time()) + "\"\n")
+
+    for key in vardict:
+        if (key.upper() == "COMPONENTS"):
+            comp_to_app = vardict[key]
+
+            cnt = 0
+            for compapp in comp_to_app:
+                if (cnt == 0):
+                    fp_script.write("export COMPONENT_NAME=\"" + compapp.get("Name", "") + "\"\n")
+                    fp_script.write("export COMPONENT_VERSION=\"" + vardict.get("Version", "") + "\"\n")
+                    fp_script.write("export COMPONENT_APPLICATION=\"" + compapp.get("Application", "") + "\"\n")
+                    fp_script.write("export COMPONENT_APPLICATION_VERSION=\"" + compapp.get("AppVersion", "") + "\"\n")
+                else:
+                    fp_script.write("export COMPONENT_NAME_" + str(cnt) + "=\"" + compapp.get("Name", "") + "\"\n")
+                    fp_script.write("export COMPONENT_VERSION_" + str(cnt) + "=\"" + vardict.get("Version", "") + "\"\n")
+                    fp_script.write("export COMPONENT_APPLICATION_" + str(cnt) + "=\"" + compapp.get("Application", "") + "\"\n")
+                    fp_script.write("export COMPONENT_APPLICATION_VERSION_" + str(cnt) + "=\"" + compapp.get("AppVersion", "") + "\"\n")
+
+                cnt = cnt + 1
+        else:
+            fp_script.write("export COMPONENT_" + key.upper() + '="' + str(vardict[key]) + "\"\n")
+
+    fp_script.close()
+    os.chmod(envvars_sh, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+
+
+def filterdict(dhurl, cookies, objtype, fromdom, allobjs):
+    """
+    Export all the objects from the server for the from domain and filter the dictionary for the object name.
+
+    Args:
+        dhurl (string): url for the server
+        cookies (string): cookies from the login
+        objtype (sting): object type to look for in the dictionary
+        fromdom (string): name of the domain in the dictionary
+        allobjs (dict): return of the objects found
+
+    Returns:
+        data returned in allobjs
+    """
+    data = dhapi.get_json(dhurl + "/dmadminweb/API/export/" + objtype, cookies)
+
+    objlist = []
+    for obj in data.get(objtype, []):
+        objname = obj.get("objname", "")
+        if (fromdom.lower() in objname.lower()):
+            objlist.append(obj)
+
+    allobjs[objtype] = objlist
+
+
+def importdict(dhurl, cookies, objtype, allobjs):
+    """
+    Import the objects based on objtype and add them to the server.
+
+    Args:
+        dhurl (string): url for the server
+        cookies (string): cookies from the login
+        objtype (sting): object type to look for in the dictionary
+        allobjs (dict): return of the objects found
+
+    Returns:
+        no data returned
+    """
+    print(objtype)
+
+    for obj in allobjs.get(objtype, []):
+        pprint(obj)
+        jstr = json.dumps(obj, indent=2)
+        data = dhapi.post_json(dhurl + "/dmadminweb/API/import/", jstr, cookies)
+        pprint(data)
+
+
+if __name__ == '__main__':
+    main()
