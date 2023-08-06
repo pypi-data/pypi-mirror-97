@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: deltae2000
+Version: 1.0.0
+Summary: deltae2000 implements an algorithm for perceptual distance between colours in pure Python.
+Home-page: https://gitlab.com/landreville/deltae2000
+Author: Landreville
+License: UNKNOWN
+Description: deltae2000 is an implementation of the CIEDE2000 algorithm to calculate the perceptual
+        distance between two colours. This is implemented in pure Python with the intention to
+        run optimal on the PyPy interpreter.
+        
+        See the [Wikipedia article](https://en.wikipedia.org/wiki/Color_difference#CIEDE2000) for
+        more information on the distance calculation.
+        
+        Example usage:
+        
+        ```python
+        from deltae2000 import delta_e_cie2000
+        from colormath.color_conversions import convert_color
+        from colormath.color_objects import sRGBColor, LabColor
+        
+        delta_e_cie2000(
+            convert_color(sRGBColor(255, 0, 0, is_upscaled=True), LabColor),
+            convert_color(sRGBColor(125, 255, 125, is_upscaled=True), LabColor)
+        )
+        ```
+        
+        This is based on the implementation from [colormath](https://python-colormath.readthedocs.io)
+        which uses Numpy in the implementation. Use the colormath version if you are using the
+        CPython interpreter.
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: License :: OSI Approved :: MIT License
+Description-Content-Type: text/markdown
