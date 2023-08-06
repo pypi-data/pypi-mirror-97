@@ -1,0 +1,91 @@
+name: python testsuite and deploy
+on: [push]
+jobs:
+  run_testsuite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install fpga-tools
+        run: |
+          curl -s https://api.github.com/repos/yosysHQ/fpga-toolchain/releases/latest | grep "browser_download_url.*xz" | cut -d : -f 2,3 | tr -d "\"" | wget -qi - -O fpga_toolchain.tar.xz
+          sudo tar -C / --strip-components=1 -xf fpga_toolchain.tar.xz
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install deps
+        run: |
+          pip3 install -e .[doc,test]
+      - name: Run test suite
+        run:
+          pytest
+
+  publish_pypi:
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - run_testsuite
+      - publish_docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install deps
+        run: |
+          pip3 install twine setuptools-scm
+      - name: Build package
+        env:
+          DOC_SHA: ${{ needs.publish_docs.outputs.doc_sha }}
+        run: |
+          ./setup.py build sdist
+      - name: Upload to pypi
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          TWINE_NON_INTERACTIVE: 1
+        run: |
+          twine upload dist/naps*
+      - name: upload
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+            name: sdist
+            path: dist/*
+
+  publish_docs:
+    if: github.ref == 'refs/heads/main'
+    needs: run_testsuite
+    runs-on: ubuntu-latest
+    outputs:
+      doc_sha: ${{ steps.pages.outputs.dst_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install deps
+        run: |
+          pip3 install -e .[doc,test]
+      - name: Run sphinx autodoc
+        run: |
+          sphinx-apidoc  -o doc naps
+      - name: Build docs
+        run: |
+          make -C doc html
+      - name: Deploy
+        id: pages
+        uses: peaceiris/actions-gh-pages@7e55c73ee896b01b8b8668370794b96f1bc9c759 #514
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./doc/_build/html
+          allow_empty_commit: true
+      - name: Update docs server
+        run: |
+          curl ${{ secrets.DOCS_UPDATE_HOOK }}
