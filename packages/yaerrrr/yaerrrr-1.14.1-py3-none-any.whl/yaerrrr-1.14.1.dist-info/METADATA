@@ -1,0 +1,66 @@
+Metadata-Version: 2.1
+Name: yaerrrr
+Version: 1.14.1
+Summary: Generate ER diagrams with python and graphviz
+Home-page: https://github.com/Koldar/yaerrrr
+Author: Massimo Bono
+Author-email: massimobono1@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: decorator
+Requires-Dist: networkx
+
+# Introduction
+
+The packages allows you to programmatically create ER diagrams.
+The pacakges is simple, but it should help you generate ER diagrams like the one provided by Chen.
+
+# Installation
+
+```
+pip install yaerrrr
+```
+
+# Example
+
+A single ER can be generated as follows:
+
+```
+import yaerrrr
+
+
+class TestEr(yaerrrr.AbstractYaerrrrScript):
+
+    def generate_er(self, context: 'yaerrrr.YaerrrContext') -> "yaerrrr.ErDiagram":
+        er = context.er
+
+        er.add_entity(name="authors", fields=[
+            er.generate_primary_id_key(),
+        ])
+        er.add_entity(name="books", fields=[
+            er.generate_primary_id_key()
+        ])
+        er.add_1_to_0_n("authors", "books", "writes")
+
+        return er
+
+
+def main():
+    x = TestEr()
+    x.run("output.svg")
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+and it outputs (for now):
+
+![ER](output.svg "ER")
+
