@@ -1,0 +1,43 @@
+image: python
+
+stages:
+- test
+- build
+- release
+
+before_script:
+- apt-get update -qq && apt-get install -y -q ghostscript
+- pip install -r requirements.txt
+
+python36:
+  image: python:3.6
+  stage: test
+  script: tox -e py36
+
+python37:
+  image: python:3.7
+  stage: test
+  script: tox -e py37
+
+python38:
+  image: python:3.8
+  stage: test
+  script: tox -e py38
+
+python39:
+  image: python:3.9
+  stage: test
+  script: tox -e py39
+
+linters:
+  image: python:3.9
+  stage: test
+  script: tox -e linters
+
+build:
+  stage: build
+  script: tox -e build
+  artifacts:
+    paths:
+    - dist/
+    expire_in: 1 week

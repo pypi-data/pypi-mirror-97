@@ -1,0 +1,118 @@
+Changes
+==================
+
+0.7 (2021-03-06)
+----------------
+
+* BREAKING: ``Ghostscript()`` no longer allows passing arbitrary
+  keyword arguments.
+
+* The high-level interface now allows passing unicode strings as
+  arguments. Passing bytes as arguments is still possible, but now
+  deprecated.
+
+* The high-level interface now requires ghostscript >= 9.0.8 (released
+  2013-08-14).
+
+* Allow multiple Ghostscript instances. Actually using this requires
+  the library is compiled with -DGS_THREADSAFE.
+
+* Ensure proper clean-up on error.
+
+* High-level revision() now returns unicode strings instead of byte
+  strings.
+
+* Add low-level interface for set_arg_encoding().
+
+* Miscellaneous small fixes.
+
+* Drop support for Python 2.7, 3.4 and 3.5.
+  Minimum required Python version is now 3.6.
+
+
+:0.6 (2018-01-16):
+
+  * Add support for Python 3.x (tested with Python 3.4).
+    Minimum required Python version is now 2.7.
+
+  * Add support for display callback and an example program
+    using it. Thanks to Lasse Fister.
+
+  * Add context-interface (for the ``with``-statement).
+
+  * ``GhostscriptError`` now has an attribute ``code`` holding
+    the numeric error-code.
+
+  * ``Ghostscript()`` now accepts keyword-arguments ``stdin``,
+    ``stdout``, ``stderr`` for setting the respective stream. This was
+    already implementd in version 0.4.1, but not documented.
+
+  * Add unittest suite (using pytest).
+
+  * Several bug fixes and smaller changes.
+
+  * Switch version control to git and move project to gitlab. See
+    Readme-file for the new URL.
+
+  * Set up continuous integration tests.
+
+
+:0.5 (skipped):
+
+   * v0.5 was skipped to avoid version conflicts with fork
+     `python3-ghostscript`. All changes of that fork are integrated
+     into v0.6.
+
+
+:0.4.1 (2011-02-09):
+
+  * Fixed import module on Windows XP. Thanks to Akihiro Takizawa for
+    the patch.
+
+:0.4 (2011-01-29):
+
+  * Fixed typo in function call name ctypes.util.find_library
+
+  * (Unix) No longer try to load a specific version (version 8) of
+    libgs.so
+
+  * Added low-level interface for set_stdio() plus wrappers for
+    file handles
+
+  * (win32) Improved search for best Ghostscript installation:
+    Consider Aladdin and GNU Ghostscript, too; Check for existence of
+    DLL found in registry; take highest version available.
+
+  * Added win32 example-batch file for testing and other
+    improvements/fixes on examples an documentation.
+
+:0.3 (2010-08-12):
+
+  * Added support for win32: The DLL to load is searched in registry.
+
+  * On other platforms: Be more inteligent about finding Ghostscript
+    shared object file (fall back to ctypes.util.find_library() if
+    `libgs.8.so` can not be loaded
+
+  * Better error messages if lib/dll is not found.
+
+  * Removed relative imports, so older versions of Python can be used.
+
+  * Added nice project logo
+
+:0.2 (2010-08-06):
+
+  * Fixed several bugs, esp. for running strings by Ghostscript.
+
+:0.1 (2010-08-06):
+
+  * This is the first public release of the Python Ghostscript C-API
+    interface.
+
+
+
+.. Emacs config:
+ Local Variables:
+ mode: rst
+ ispell-local-dictionary: "american"
+ End:
