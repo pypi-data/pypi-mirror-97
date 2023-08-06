@@ -1,0 +1,49 @@
+image: python
+
+stages:
+  - tests
+  - after-tests
+
+before_script:
+  - pip install tox
+
+py3:
+  stage: tests
+  script: tox -e py3
+
+flake8:
+  stage: tests
+  script: tox -e flake8
+
+check-manifest:
+  stage: tests
+  script: tox -e check-manifest
+
+black:
+  stage: tests
+  script: tox -e black
+
+# If you have mypy set up
+# mypy:
+#   stage: tests
+#   script: tox -e mypy
+
+# If you have your project on readthedocs, you can automatically trigger its
+# build by setting:
+# - READTHEDOCS_TOKEN
+# - READTHEDOCS_ID
+# in your heptapod project Settings > CI/CD > Variables.
+# You can find those secrets by creating a new integration in your readthedocs
+# project here: https://readthedocs.org/dashboard/cubicweb_%(cubename)s/integrations/
+#
+# Related documentation:
+# https://docs.readthedocs.io/en/latest/webhooks.html#using-the-generic-api-integration
+#
+# trigger-readthedocs:
+#   only:
+#     refs:
+#       - branch/default
+#   stage: after-tests
+#   script:
+#   # regarding the " everywhere when there is a '%%': yaml is extremly weird when %% are involved
+#   - curl -X POST -d "token=${READTHEDOCS_TOKEN}" https://readthedocs.org/api/v2/webhook/cubicweb_%(cubename)s/${READTHEDOCS_ID} -w "\nhttp code:"\ "%%{http_code}\n" -f
