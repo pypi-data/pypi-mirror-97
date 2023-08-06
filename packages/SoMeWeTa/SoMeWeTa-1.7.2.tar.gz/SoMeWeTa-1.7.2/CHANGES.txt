@@ -1,0 +1,101 @@
+# CHANGELOG #
+
+## Version 1.7.2, 2021-03-05 ##
+
+- Bugfix: Do not choke on chunks of XML that do not contain actual
+  word tokens (usually at the end of a file).
+- Updated regular expressions for emojis, emoticons, numbers and URLs.
+
+## Version 1.7.1, 2019-11-07 ##
+
+- Fixed an XML-related bug in STTS_IBK_postprocessor
+- Fixed a minor bug in emoticon regex
+
+## Version 1.7.0, 2019-11-07 ##
+
+- Added Reddit links and Reddit-specific emoticons
+- Moved command-line interface to cli.py
+- Helper script for tagging multiple files (somewe-tagger-multifile)
+- Postprocessing script for some deterministic tagging decisions in
+  STTS_IBK, e.g. URLs, Emoticons, etc. (STTS_IBK_postprocessor)
+
+## Version 1.6.2, 2019-10-17 ##
+
+- Sanity-check input: Warn if there are extremely long sentences (≥
+  500 words) in the input as this might indicate missing sentence
+  boundaries.
+- Use np.frombuffer() instead of np.fromstring() to fix a
+  DeprecationWarning.
+
+## Version 1.6.1, 2019-10-02 ##
+
+- New option -v/--version to output version information.
+- Explicitly specify input encoding as UTF-8.
+- Fixed a bug in progress display.
+
+## Version 1.6.0, 2019-07-02 ##
+
+- New method tag_xml_sentence for simplified processing of SoMaJo's
+  output for XML files.
+- Updated regular expressions for emojis (taken from SoMaJo).
+- Fixed a bug where SoMeWeTa could not be installed when numpy was not
+  already there.
+
+## Version 1.5.1, 2019-06-19 ##
+
+- Got rid of FutureWarning about possible nested sets in regular
+  expression.
+
+## Version 1.5.0, 2019-04-12 ##
+
+- Added support for parallel tagging of XML input.
+- New option --progress for showing tagging progress and remaining
+  time.
+- Fixed calculation of confidence interval when reporting
+  crossvalidation results.
+
+## Version 1.4.0, 2018-11-14 ##
+
+- Replaced XML parsing with a shallower approach. When tagging an XML
+  file, we do no longer have to keep the whole file in memory.
+- Minor improvements regarding URLs and emojis.
+
+## Version 1.3.1, 2018-03-27 ##
+
+Bugfix: Sentence boundaries are correctly recognized when reading an
+XML file.
+
+## Version 1.3.0, 2018-03-23 ##
+
+- SoMeWeTa has now XML support. To tag an XML file, use the option
+  -x/--xml. It is assumed that each XML tag is on a separate line.
+- The implementation of the beam search algorithm has been slightly
+  improved.
+
+## Version 1.2.0, 2018-02-23 ##
+
+It is now possible to use the option --ignore-tag to specify a tag
+that will not be learned during training and that will be ignored
+during evaluation. Use case: Partially annotated data that use a
+pseudo-tag for tokens without annotation.
+
+## Version 1.1.2, 2017-10-27 ##
+
+Bugfix: Using the --parallel option does no longer change the order of
+the sentences.
+
+## Version 1.1.1, 2017-10-25 ##
+
+This version fixes a bug that made it impossible to use the --parallel
+option when reading from STDIN.
+
+## Version 1.1.0, 2017-10-24 ##
+
+- Bugfix: Removed trailing space from last tag in sentence.
+- The new option --parallel makes it possible to use a pool of worker
+  processes to speed up tagging.
+- We also print a log message that indicates tagging speed.
+
+## Version 1.0.0, 2017-09-15 ##
+
+First release.
