@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Rules Documentation</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+
+</head>
+<body>
+<div class="container-md">
+
+<h1>Rules Documentation</h1>
+
+<h2>Contents</h2>
+
+<ul>
+    {% for rule in rules %}
+    <li><a href="#{{rule.override_name}}">{{ rule.title }}</a></li>
+    {% endfor %}
+</ul>
+
+<h2>Rules</h2>
+
+    {% for rule in rules %}
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card">
+                <a name="{{ rule.override_name }}"></a>
+                <h3 class="card-header">{{ rule.title }}</h3>
+                <div class="card-body">
+
+                    {% if rule.dependencies %}
+                    <p>Depends on:
+                        {% for dependency in rule.dependencies %}
+                        <a href="#{{dependency.override_name}}">{{ dependency.name }}</a>
+                        {{ ", " if not loop.last else "" }}
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+
+                    <p>{{rule.description}}</p>
+
+                    <table class="table">
+                        <tbody>
+                            <tr><th>Function Name</th><td>{{rule.name}}</td></tr>
+                            <tr><th>Override Name</th><td>{{rule.override_name}}</td></tr>
+                            <tr><th>Override Level</th><td>{{rule.override_level}}</td></tr>
+                            {% for key, value in rule.doc_properties.items() %}
+                            <tr>
+                                <th>{{key}}</th><td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Source Code -->
+
+                    <div class="accordion" id="{{rule.override_name}}-accordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="codeheader-{{rule.override_name}}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#codecollapse-{{rule.override_name}}" aria-expanded="true" aria-controls="codecollapse-{{rule.override_name}}">
+                                    Source Code
+                                </button>
+                            </h2>
+                            <div id="codecollapse-{{rule.override_name}}" class="accordion-collapse collapse" aria-labelledby="{{rule.override_name}}-code" data-bs-parent="#codeheader-{{rule.override_name}}">
+                                <div class="accordion-body">
+                                    <pre class="bg-light p-4"><code>{{rule.sourcecode}}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+</body>
+</html>
