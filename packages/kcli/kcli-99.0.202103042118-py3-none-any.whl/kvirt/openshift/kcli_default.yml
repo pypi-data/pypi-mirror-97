@@ -1,0 +1,96 @@
+info: |
+    Deploys an openshift cluster with an arbitray number of masters or workers using openshift-install
+    and creating the node with kcli instead of terraforms.
+    This allows easily tweaking the hardware caracteristics of those nodes.
+    When running on cloud platforms, loadbalancer and dns from the platform is used.
+    Otherwise, extra static pods (coredns with mdns, keepalived and haproxy) are deployed on the nodes to provide a self contained platform.
+    Default version is latest stable but you can instead use ci, for which you will need a specific pull secret
+    Upstream okd version can be specified with the upstream flag.
+    Sdn defaults to OpenShiftSDN but OVNKubernetes, Calico or Contrail can be specified instead.
+    To avoid keepalived collision, you can force virtual_router_id. Otherwise, the id is calculated from cluster variable
+    You can deploy extra apps with the apps array and for each of the supported app, indicate with the variable
+    ${app}_version with version to target (instead of latest)
+version: nightly
+tag: '4.6'
+pull_secret: openshift_pull.json
+image: rhcos45
+helper_image: CentOS-7-x86_64-GenericCloud.qcow2
+network: default
+api_ip: 
+ingress_ip: 
+masters: 1
+workers: 0
+fips: false
+cluster: testk
+domain: karmalabs.com
+network_type: OpenShiftSDN
+minimal: false
+pool: default
+flavor:
+flavor_bootstrap:
+flavor_master:
+flavor_worker:
+numcpus: 4
+bootstrap_numcpus:
+master_numcpus:
+worker_numcpus:
+memory: 8192
+bootstrap_memory:
+master_memory:
+worker_memory:
+mdns: true
+master_tpm: false
+master_rng: false
+worker_tpm: false
+worker_rng: false
+disk_size: 30
+autostart: false
+keys: []
+apps: []
+extra_disks: []
+extra_master_disks: []
+extra_worker_disks: []
+extra_networks: []
+extra_master_networks: []
+extra_worker_networks: []
+master_macs: []
+master_ips: []
+bootstrap_mac: 
+bootstrap_ip: 
+worker_macs: []
+worker_ips: []
+pcidevices:
+numa:
+numa_master:
+numa_worker:
+numamode:
+numamode_master:
+numamode_worker:
+cpupinning:
+cpupinning_master:
+cpupinning_worker:
+disconnected_url:
+disconnected_deploy: False
+disconnected_reuse: False
+disconnected_disk_size: 100
+disconnected_user:
+disconnected_password:
+disconnected_origin: quay.io
+disconnected_prefix: ocp4
+imagecontentsources: []
+ca:
+ipv6: false
+dualstack: false
+cloud_tag:
+cloud_scale: false
+cloud_api_internal: false
+virtual_router_id:
+zerotier_nets: []
+zerotier_ip:
+zerotier_kubelet: false
+http_proxy:
+no_proxy:
+sno: false
+sno_baremetal: false
+sno_disk: vda
+sno_dns: true
