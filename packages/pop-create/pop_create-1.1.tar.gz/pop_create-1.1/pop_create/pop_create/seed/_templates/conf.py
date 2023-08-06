@@ -1,0 +1,4 @@
+CLI_CONFIG = {}
+CONFIG = {}
+SUBCOMMANDS = {}
+DYNE = {"R__DYNE__"}
