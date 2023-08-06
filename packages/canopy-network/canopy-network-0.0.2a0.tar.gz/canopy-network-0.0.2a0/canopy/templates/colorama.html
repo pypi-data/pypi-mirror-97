@@ -1,0 +1,56 @@
+$def with ()
+$var title: Colorama
+
+<input type=range min=0 max=255 value=0 id=colorRed>
+<input type=range min=0 max=255 value=0 id=colorGreen>
+<input type=range min=0 max=255 value=0 id=colorBlue>
+
+<script src=/static/braid-client.js></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var data = {}
+  var braid = new BraidClient('/colorama')
+  var red = document.querySelector('#colorRed')
+  var green = document.querySelector('#colorGreen')
+  var blue = document.querySelector('#colorBlue')
+
+  const updateBackground = () => {
+    document.querySelector('body').style.backgroundImage =
+      `linear-gradient(135deg, rgb($${red.value}, $${green.value}, $${blue.value}), black)`
+  }
+
+  braid.subscribe(data => {
+    var color = data.color
+    red.value = color[0]
+    green.value = color[1]
+    blue.value = color[2]
+    updateBackground()
+  });
+  red.addEventListener('input', ev => {
+    braid.publish({
+      patch: [{ 'op': 'replace', 'path': '/color/0', 'value': red.value }]
+    })
+    updateBackground()
+  })
+  green.addEventListener('input', ev => {
+    braid.publish({
+      patch: [{ 'op': 'replace', 'path': '/color/1', 'value': green.value }]
+    })
+    updateBackground()
+  })
+  blue.addEventListener('input', ev => {
+    braid.publish({
+      patch: [{ 'op': 'replace', 'path': '/color/2', 'value': blue.value }]
+    })
+    updateBackground()
+  })
+});
+</script>
+
+<style>
+html, body {
+  height: 100%; }
+body {
+  overflow: hidden; }
+</style>

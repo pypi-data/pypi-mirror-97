@@ -1,0 +1,51 @@
+$def with (card, entries)
+$var title: $card["name"]
+
+<article class=h-feed>
+
+<h1 class="h-card p-author"><a class="u-url u-uid p-name"
+href=/>$card["name"]</a></h1>
+
+<div id=recent>
+$for entry in entries:
+    $ e = entry["resource"]
+    $ type = discover_post_type(e)
+    <div class=h-entry>
+    $if type == "note":
+        <p><big class=p-content>$e["content"]</big></p>
+    $elif type == "like":
+        $ like = e["like-of"][0]
+        <p><big>Liked <a class=u-like-of
+        href=$like["url"]>$like["name"]</a></big></p>
+    $elif type == "bookmark":
+        $ bookmark = e["bookmark-of"][0]
+        <p><big>Bookmarked <a class=u-bookmark-of
+        href=$bookmark["url"]>$bookmark["name"]</a></big></p>
+    <p><small><a class="dt-published u-url"
+    href=$e["url"]>$e["published"].diff_for_humans()</a></small></p>
+    </div>
+</div>
+
+</article>
+
+$if tx.is_owner:
+    <p>Hello $card["name"] &mdash; <a href=/about>update your profile</a></p>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  new BraidClient().subscribe((range, body) => {
+    var recent = document.querySelector('#recent')
+    var entry = document.createElement('div')
+    entry.classList.add('h-entry')
+    entry.innerHTML = `<p><big class=p-name>$${body.name}</big></p>`
+    recent.insertBefore(entry, recent.firstChild)
+  })
+  new BraidClient("https://maxwelljoslyn.com").subscribe((range, body) => {
+    var recent = document.querySelector('#recent')
+    var entry = document.createElement('div')
+    entry.classList.add('h-entry')
+    entry.innerHTML = `<p><big class=p-name>$${body.name}</big></p>`
+    recent.insertBefore(entry, recent.firstChild)
+  })
+})
+</script>

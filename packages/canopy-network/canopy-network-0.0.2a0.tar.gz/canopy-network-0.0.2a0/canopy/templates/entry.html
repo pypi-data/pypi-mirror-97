@@ -1,0 +1,30 @@
+$def with (entry)
+$ e = entry["resource"]
+
+<article class=h-entry>
+$ type = discover_post_type(e)
+$if type == "note":
+    $var title: $e["content"]
+    <p><big class=p-content>$e["content"]</big></p>
+$elif type == "like":
+    $ like = e["like-of"][0]
+    $var title: Liked $like["name"]
+    <p class=p-name><big class="h-cite u-like-of">Liked <a class="p-name u-url"
+    href=$like["url"]>$like["name"]</a></big></p>
+$elif type == "bookmark":
+    $ bookmark = e["bookmark-of"][0]
+    $var title: Bookmarked $bookmark["name"]
+    <p><big>Bookmarked <a class=u-bookmark-of
+    href=$bookmark["url"]>$bookmark["name"]</a></big></p>
+$ a = e["author"]
+<p class="p-author h-card"><a class="u-url p-name"
+href=$a["url"][0]>$a["name"]</a></p>
+<p>
+<small><a class=u-url href=$e["url"]><time class=dt-published
+datetime="$e['published'].isoformat()">$e["published"].diff_for_humans()</time></a></small></p>
+</article>
+
+<style>
+big.p-name {
+    font-size: 2em; }
+</style>
