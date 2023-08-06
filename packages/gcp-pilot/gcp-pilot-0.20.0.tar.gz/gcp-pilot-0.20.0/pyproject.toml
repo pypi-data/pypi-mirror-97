@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "gcp-pilot"
+version = "0.20.0"
+description = "Google Cloud Platform Friendly Pilot"
+authors = ["Joao Daher <joao@daher.dev>"]
+repository = "https://github.com/flamingo-run/gcp-pilot"
+readme = "README.md"
+keywords = ["gcp", "google cloud python", "datastore orm"]
+packages = [
+    { include = "gcp_pilot" },
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.10"
+google-api-python-client = "^1"
+google-cloud-tasks = { version = "^2", optional = true}
+google-cloud-scheduler = { version = "^2", optional = true}
+google-cloud-storage = { version = "^1", optional = true}
+google-cloud-build = { version = "^3", optional = true}
+google-cloud-bigquery = { version = "^2", optional = true}
+google-cloud-speech = { version = "^2", optional = true}
+gspread = { version = "^3", optional = true}
+google-cloud-pubsub = { version = "^2", optional = true}
+google-cloud-datastore = { version = "^2", optional = true}
+google-cloud-dns = { version = "^0", optional = true}
+google-cloud-logging = { version = "^2", optional = true}
+google-cloud-error-reporting = { version = "^1", optional = true}
+
+[tool.poetry.extras]
+tasks = ["google-cloud-tasks", "google-cloud-scheduler"]
+build = ["google-cloud-build"]
+storage = ["google-cloud-storage"]
+bigquery = ["google-cloud-bigquery"]
+speech = ["google-cloud-speech"]
+sheets = ["gspread"]
+pubsub = ["google-cloud-pubsub"]
+datastore = ["google-cloud-datastore"]
+dns = ["google-cloud-dns"]
+monitoring = ["google-cloud-logging", "google-cloud-error-reporting"]
+
+
+[tool.poetry.dev-dependencies]
+pylint = "*"
+nose = "*"
+coverage = "*"
+
+
+[build-system]
+requires = ["poetry"]
+build-backend = "poetry.masonry.api"
