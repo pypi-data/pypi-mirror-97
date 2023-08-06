@@ -1,0 +1,2 @@
+HK_CORRELATION_BLOOD_PRESSURE = "HKCorrelationTypeIdentifierBloodPressure"
+HK_CORRELATION_FOOD = "HKCorrelationTypeIdentifierFood"
