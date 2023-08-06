@@ -1,0 +1,58 @@
+Metadata-Version: 2.1
+Name: iMesh-Dashboard
+Version: 0.0.7
+Summary: Create Dashboard for serial connected meshtastic device
+Home-page: https://github.com/iz1kga/Meshtastic-rpi-dashboard
+Author: iz1kga
+Author-email: iz1kga@gmail.com
+License: apache 2.0
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: Flask-BasicAuth (==0.2.0)
+Requires-Dist: Flask (==1.1.2)
+Requires-Dist: configparser (>=5.0.1)
+Requires-Dist: meshtastic (>=1.1.49)
+Requires-Dist: paho-mqtt (==1.5.1)
+Requires-Dist: timeago (>=1.0.15)
+Requires-Dist: waitress (==1.4.4)
+
+# Meshtastic-rpi-dashboard
+### Create Dashboard for serial connected meshtastic device
+
+## Setup:
+`sudo pip3 install iMesh-Dashboard`
+
+## Configuration
+
+Edit /usr/local/iMeshDashboard/conf/app.conf
+
+```
+[AUTH] #authentication for dashboard
+username=user
+password=testPassword
+
+[NET] # binding address and port for dashboard
+bind=0.0.0.0
+port=5000
+
+[MQTT] #mqtt server for publishing received nodes (i use it to render imeshmap.iz1kga.it)
+host=mqtt.test.org
+port=1883
+username=MQTTuser
+password=MQTTpassword
+keepalive=60
+enabled=True #set False i you dont want to publish to MQTT
+```
+
+## Run
+from console run `iMeshDashboard`, right now I'm using screen to keep daskbaord running... I've to find a better way to do that, but I'm not so skilled so... be patient
+
+### Disclaimer
+
+This software is experimental. Please Avoid unauthorized persons to acces your systems!
+
+
