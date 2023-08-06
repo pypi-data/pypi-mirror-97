@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.0">
+  <object class="ttk.Frame" id="master">
+    <property name="height">600</property>
+    <property name="width">1300</property>
+    <layout manager="pack">
+      <property name="propagate">True</property>
+      <property name="side">top</property>
+    </layout>
+    <child>
+      <object class="ttk.Progressbar" id="progressbar_label">
+        <property name="length">400</property>
+        <property name="maximum">1</property>
+        <property name="orient">horizontal</property>
+        <property name="value">0.2</property>
+        <property name="variable">double:var_progress_label</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.82</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_load_data">
+        <property name="background">#54ff30</property>
+        <property name="command">load_data</property>
+        <property name="foreground">#293114</property>
+        <property name="justify">center</property>
+        <property name="takefocus">true</property>
+        <property name="text" translatable="yes">Load Data</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.12</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_open_image_dir">
+        <property name="command">choose_image_dir</property>
+        <property name="text" translatable="yes">Choose Image Dir</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.25</property>
+          <property name="rely">0.1</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_delete_img">
+        <property name="background">#c32e21</property>
+        <property name="command">delete_image</property>
+        <property name="text" translatable="yes">Delete</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.22</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_open_label">
+        <property name="command">choose_label_file</property>
+        <property name="text" translatable="yes">Choose Label File</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.75</property>
+          <property name="rely">0.1</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Label" id="label_2">
+        <property name="text" translatable="yes">Label OCR Tool</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.02</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Entry" id="txt_label">
+        <property name="font">{courier 10 pitch} 48 {bold}</property>
+        <property name="justify">center</property>
+        <property name="takefocus">true</property>
+        <property name="textvariable">string:var_label</property>
+        <bind sequence="&lt;1&gt;" handler="change_txt_label" add="" />
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="height">80</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.6</property>
+          <property name="width">600</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_prev_img">
+        <property name="command">prev_img</property>
+        <property name="text" translatable="yes">&lt;&lt; Prev (Down)</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.4</property>
+          <property name="rely">0.9</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_save_all">
+        <property name="command">save_all</property>
+        <property name="text" translatable="yes">Save All</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.9</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_next">
+        <property name="command">next_img</property>
+        <property name="text" translatable="yes">(Up) Next &gt;&gt;</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.6</property>
+          <property name="rely">0.9</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Entry" id="txt_index">
+        <property name="text" translatable="yes">3</property>
+        <property name="textvariable">int:var_index_goto</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.88</property>
+          <property name="rely">0.85</property>
+          <property name="width">50</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Label" id="lbl_number_file">
+        <property name="text" translatable="yes">/3944</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.92</property>
+          <property name="rely">0.85</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Label" id="lbl_index">
+        <property name="text" translatable="yes">123/333</property>
+        <property name="textvariable">string:var_cur_index</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.7</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_goto">
+        <property name="command">goto</property>
+        <property name="text" translatable="yes">Goto</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.9</property>
+          <property name="rely">0.9</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Entry" id="txt_label_path">
+        <property name="textvariable">string:var_label_path</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="height">30</property>
+          <property name="relx">0.75</property>
+          <property name="rely">0.2</property>
+          <property name="width">400</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Entry" id="txt_img_path">
+        <property name="textvariable">string:var_img_path</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="height">30</property>
+          <property name="relx">0.25</property>
+          <property name="rely">0.2</property>
+          <property name="width">400</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Label" id="lbl_image_name">
+        <property name="text" translatable="yes">Image Name</property>
+        <property name="textvariable">string:var_image_name</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.76</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Canvas" id="canvas">
+        <property name="background">#ffffff</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="height">100</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.4</property>
+          <property name="width">600</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Label" id="lbl_image">
+        <property name="bitmap">hourglass</property>
+        <property name="justify">center</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="height">100</property>
+          <property name="relx">0.5</property>
+          <property name="rely">0.4</property>
+          <property name="width">600</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="btn_resize">
+        <property name="command">resize_img</property>
+        <property name="text" translatable="yes">Resize</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.82</property>
+          <property name="rely">0.45</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Scale" id="scale_image">
+        <property name="command">scale_image</property>
+        <property name="from_">10</property>
+        <property name="orient">horizontal</property>
+        <property name="to">600</property>
+        <property name="value">600</property>
+        <property name="variable">int:var_scale_width_img</property>
+        <layout manager="place">
+          <property name="anchor">center</property>
+          <property name="relx">0.82</property>
+          <property name="rely">0.5</property>
+          <property name="width">200</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+      </object>
+    </child>
+  </object>
+</interface>
