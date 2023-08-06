@@ -1,0 +1,185 @@
+Metadata-Version: 1.1
+Name: fs.webdavfs
+Version: 0.4.0
+Summary: WebDAV support for pyfilesystem2
+Home-page: http://pypi.python.org/pypi/fs.webdavfs/
+Author: Andreas Jung and others
+Author-email: info@zopyx.com
+License: MIT
+Description: fs.webdavfs
+        ===========
+        
+        ``fs.webdavfs`` is a WebDAV driver for PyFileSystem2.
+        
+        
+        Supported Python versions
+        -------------------------
+        
+        - Python 2.7
+        - Python 3.5
+        - Python 3.6
+        - Python 3.7
+        
+        
+        Usage
+        -----
+        
+        Use the ``fs.open_fs`` method with the ``webdav://`` protocol:
+        
+        .. code:: python
+        
+            >>> import fs
+            >>> handle = fs.open_fs('webdav://admin:admin@zopyx.com:22082/exist/webdav/db')
+        
+        or use the public constructor of the ``WebDAVFS`` class:
+        
+        .. code:: python
+        
+            >>> from webdavfs.webdavfs import WebDAVFS
+            >>> url = 'http://zopyx.com:22082'
+            >>> root = '/exist/webdav/db'
+            >>> handle = WebDAVFS(url, login='admin', password='admin', root)
+            >>> handle.makedir('foo')
+            >>> print(handle.listdir('.'))
+            ....
+        
+        For WebDAV over HTTPS you can use either `webdav://` with port 443 
+        
+        .. code:: python
+        
+            >>> handle = fs.open_fs('webdav://admin:admin@zopyx.com:443/exist/webdav/db')
+        
+        or `webdavs://`: 
+        
+        .. code:: python
+        
+            >>> handle = fs.open_fs('webdavs://admin:admin@zopyx.com/exist/webdav/db')
+        
+        
+        Repository
+        ----------
+        
+        - https://github.com/PyFilesystem/webdavfs
+        
+        Issue tracker
+        -------------
+        
+        - https://github.com/PyFilesystem/webdavfs/issues
+        
+        Tests
+        -----
+        
+        - https://travis-ci.org/PyFilesystem/webdavfs/builds
+        
+        Author and contributors
+        -----------------------
+        
+        - Yuriy Homyakov
+        - Semyon Gaivoronskiy
+        - Andreas Jung
+        - `Martin Larralde <https://github.com/althonos>`_
+        
+        
+        License
+        -------
+        
+        This module is published under the MIT license.
+        
+        This module was sponsored and financed by Andreas Jung/ZOPYX
+        
+        
+        Contact
+        -------
+        
+        | Andreas Jung/ZOPYX
+        | Hundskapfklinge 33
+        | D-72074 Tübingen
+        | info@zopyx.com
+        | www.zopyx.com
+        
+        
+        Release notes
+        =============
+        
+        0.4.0 (2021/03/09)
+        ------------------
+        - fixes situation where there is no display name 
+          [joequant]
+        - use webdavclient3
+          [joequant]
+        - fix non-standard ports for webdav
+          [joequant]
+        - added caching support
+          [joequant]
+        
+        0.3.8 (2020/06/25)
+        ------------------
+        - fixed port handling for webdavs:// in opener
+          [ajung]
+        
+        0.3.7 (2019/04/29)
+        ------------------
+        - fixed testsuite
+          [ajung]
+        
+        0.3.6 (2019/04/29)
+        ------------------
+        - support for webdavs:// opener protocol
+          [ajung]
+        
+        
+        0.3.5 (2018/08/06)
+        ------------------
+        - fixed return type of getinfo() dates due to strong
+          checks in fs > 2.0.27
+        
+        0.3.4 (2018/04/16)
+        ------------------
+        - merged PR #14 (`openbin` not raising `ResourceNotFound` on 
+          missing parent)
+          [ajung, althonos]
+        
+        
+        0.3.3 (2017/12/29)
+        ------------------
+        - fixed issue with hardcoded http  method in opener.py
+          [ajung]
+        
+        0.3.2 (2017/11/13)
+        ------------------
+        - details/modified + details/created are correctly converted according
+          to the PyFilesystem2 docs to datetime
+          [ajung]
+        
+        0.3.1 (2017/10/19)
+        ------------------
+        - fixed LICENSE file (MIT)
+        
+        0.3.0 (2017/10/16)
+        ------------------
+        - merged https://github.com/PyFilesystem/webdavfs/pull/3
+          [althonos]
+        - WebDAVFS constructor uses `login` and `password` parameter
+          instead of `credentials` dict
+        
+        0.2.0 (2017/05/04)
+        ------------------
+        - new testing infrastructure on Travis using Docker images for
+          testing against Python 2.7-3.6
+        
+        0.1.0 (2017/04/10)
+        ------------------
+        
+        - initial release
+        
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Topic :: System :: Filesystems
