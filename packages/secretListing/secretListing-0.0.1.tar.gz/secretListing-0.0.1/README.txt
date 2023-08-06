@@ -1,0 +1,1 @@
+Secret module' was created to ease operations on python lists.
