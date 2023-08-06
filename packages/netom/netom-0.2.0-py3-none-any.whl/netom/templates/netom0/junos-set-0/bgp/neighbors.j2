@@ -1,0 +1,30 @@
+{% for name, group in peer_groups.items() %}
+{%  for peer in group %}
+set protocols bgp group {{ peer.peer_group }} type {{ peer.peer_type }}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} peer-as {{ peer.peer_as }}
+{% if peer.description %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} description "{{ peer.description }}"
+{% endif %}
+{% if peer.local_address %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} local-address {{ peer.local_address }}
+{% endif %}
+{% if peer.local_as %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} local-as {{ peer.local_as }}
+{% endif %}
+{% if peer.import_policy %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} import {{ peer.import_policy }}
+{% endif %}
+{% if peer.export_policy %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} export {{ peer.export_policy }}
+{% endif %}
+{% if peer.auth_password %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} authentication-key {{ peer.auth_password }}
+{% endif %}
+{% if peer.max_prefixes %}
+set protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }} family inet unicast prefix-limit maximum {{ peer.max_prefixes }}
+{% endif %}
+{% if peer.enabled == False %}
+deactivate protocols bgp group {{ peer.peer_group }} neighbor {{ peer.neighbor_address }}
+{% endif %}
+{%  endfor %}
+{% endfor %}

@@ -1,0 +1,40 @@
+{% for name, group in peer_groups.items() %}
+group {{ name }} {
+{%  for peer in group %}
+{% if peer.local_address %}
+    local-address {{ peer.local_address }};
+{% endif %}
+{% if peer.local_as %}
+    local-as {{ peer.local_as }};
+{% endif %}
+{% if peer.enabled == False %}
+    inactive: neighbor {{ peer.neighbor_address }} {
+{% else %}
+    neighbor {{ peer.neighbor_address }} {
+{% endif %}
+{% if peer.description %}
+        description "{{ peer.description }}";
+{% endif %}
+{% if peer.import_policy %}
+        import {{ peer.import_policy }};
+{% endif %}
+{% if peer.export_policy %}
+        export {{ peer.export_policy }};
+{% endif %}
+{% if peer.max_prefixes %}
+        family inet {
+            unicast {
+                prefix-limit {
+                    maximum {{ peer.max_prefixes }};
+                }
+            }
+        }
+{% endif %}
+{% if peer.auth_password %}
+        authentication-key {{ peer.auth_password }};
+{% endif %}
+        peer-as {{ peer.peer_as }};
+    }
+{%  endfor %}
+}
+{% endfor %}

@@ -1,0 +1,34 @@
+{% for name, group in peer_groups.items() %}
+group "{{ name }}"
+{%  for peer in group %}
+{% if peer.local_as %}
+    local-as {{ peer.local_as }}
+{% endif %}
+{% if peer.local_address %}
+    local-address {{ peer.local_address }}
+{% endif %}
+    neighbor {{ peer.neighbor_address }}
+{% if peer.enabled == False %}
+        shutdown
+{% endif %}
+{% if peer.description %}
+        description "{{ peer.description }}"
+{% endif %}
+        family ipv{{ peer.neighbor_address | ip_version }}
+{% if peer.auth_password %}
+        authentication-key {{ peer.auth_password }}
+{% endif %}
+{% if peer.max_prefixes %}
+        prefix-limit ipv{{ peer.neighbor_address | ip_version }} {{ peer.max_prefixes }}
+{% endif %}
+{% if peer.import_policy %}
+        import "{{ peer.import_policy }}"
+{% endif %}
+{% if peer.export_policy %}
+        export "{{ peer.export_policy }}"
+{% endif %}
+        peer-as {{ peer.peer_as }}
+    exit
+{%  endfor %}
+exit
+{% endfor %}

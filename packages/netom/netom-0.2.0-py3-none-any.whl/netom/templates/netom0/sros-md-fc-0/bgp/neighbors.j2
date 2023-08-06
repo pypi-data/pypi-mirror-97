@@ -1,0 +1,42 @@
+{% for name, group in peer_groups.items() %}
+/configure router "Base" bgp group "{{ name }}" { }
+{% for peer in group %}
+{% if peer.type %}
+/configure router "Base" bgp group "{{ name }}" type {{ peer.type }}
+{% endif %}
+{% if peer.local_address %}
+/configure router "Base" bgp group "{{ name }}" local-address {{ peer.local_address }}
+{% endif %}
+{% if peer.local_as %}
+/configure router "Base" bgp group "{{ name }}" local-as as-number {{ peer.local_as }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% for name, group in peer_groups.items() %}
+{% for peer in group %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" { }
+{% if peer.enabled == False %} 
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" admin-state disable
+{% else %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" admin-state enable
+{% endif %}
+{% if peer.description %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" description "{{ peer.description }}"
+{% endif %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" group "{{ name }}"
+{% if peer.auth_password %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" authentication-key "{{ peer.auth_password }}"
+{% endif %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" peer-as {{ peer.peer_as }}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" family ipv{{ peer.neighbor_address | ip_version }} true
+{% if peer.import_policy %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" import policy ["{{ peer.import_policy }}"]
+{% endif %}
+{% if peer.export_policy %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" export policy ["{{ peer.export_policy }}"]
+{% endif %}
+{% if peer.max_prefixes %}
+/configure router "Base" bgp neighbor "{{ peer.neighbor_address }}" prefix-limit ipv{{ peer.neighbor_address | ip_version }} maximum {{ peer.max_prefixes }}
+{% endif %}
+{% endfor %}
+{% endfor %}
