@@ -1,0 +1,77 @@
+Metadata-Version: 2.1
+Name: pywisetransfer
+Version: 0.1.5
+Summary: Python library for the TransferWise API
+Home-page: https://www.github.com/jayaddison/pywisetransfer
+License: AGPL-3.0
+Keywords: payments,transferwise
+Author: James Addison
+Author-email: jay@jp-hosting.net
+Requires-Python: >=3.7,<4.0
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Dist: apiron (>=5.1.0,<6.0.0)
+Requires-Dist: cryptography (>=3.4.6,<4.0.0)
+Requires-Dist: munch (>=2.5.0,<3.0.0)
+Project-URL: Repository, https://www.github.com/jayaddison/pywisetransfer
+Description-Content-Type: text/markdown
+
+# pywisetransfer
+
+An unofficial, experimental Python client library for the [TransferWise API](https://api-docs.transferwise.com).
+
+:warning: The classes, functions and interfaces that this library provides are very much in-development and prone to change.
+
+## Installation
+
+```bash
+# Within your project directory
+poetry add pywisetransfer
+```
+
+## Usage
+
+### API Requests
+
+```python
+import pywisetransfer
+
+pywisetransfer.api_key = "your-api-key-here"
+# pywisetransfer.environment = "live"
+
+client = pywisetransfer.Client()
+
+for profile in client.profiles.list():
+    accounts = client.borderless_accounts.list(profile_id=profile.id)
+    for account in accounts:
+        currencies = [balance.currency for balance in account.balances]
+        print(f"AccountID={account.id}, Currencies={currencies}")
+```
+
+### Webhook signature verification
+
+```python
+import pywisetransfer
+from pywisetransfer.webhooks import verify_signature
+
+# pywisetransfer.environment = "live"
+
+payload = b"webhook-request-body-here"
+signature = "webhook-signature-data-here"
+
+valid = verify_signature(payload, signature)
+print(f"Valid webhook signature: {valid}")
+
+```
+
+## Run tests
+
+```bash
+# Within the pywisetransfer working directory
+poetry install
+poetry run pytest --forked
+```
+
