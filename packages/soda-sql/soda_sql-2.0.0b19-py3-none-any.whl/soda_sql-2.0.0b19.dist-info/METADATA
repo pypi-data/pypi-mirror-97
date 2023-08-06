@@ -1,0 +1,220 @@
+Metadata-Version: 2.1
+Name: soda-sql
+Version: 2.0.0b19
+Summary: Soda SQL library & CLI
+Home-page: UNKNOWN
+Author: Tom Baeyens
+Author-email: tom@soda.io
+License: UNKNOWN
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
+Requires-Dist: asn1crypto (==1.4.0)
+Requires-Dist: azure-common (==1.1.25)
+Requires-Dist: azure-core (==1.8.2)
+Requires-Dist: azure-storage-blob (==12.5.0)
+Requires-Dist: boto3 (==1.15.18)
+Requires-Dist: botocore (==1.18.18)
+Requires-Dist: cachetools (==4.2.0)
+Requires-Dist: certifi (==2020.12.5)
+Requires-Dist: cffi (==1.14.3)
+Requires-Dist: chardet (==3.0.4)
+Requires-Dist: click (==7.1.2)
+Requires-Dist: cryptography (==3.3.2)
+Requires-Dist: future (==0.18.2)
+Requires-Dist: google-api-core[grpc] (==1.24.1)
+Requires-Dist: google-auth (==1.24.0)
+Requires-Dist: google-cloud-bigquery (==2.5.0)
+Requires-Dist: google-cloud-core (==1.5.0)
+Requires-Dist: google-crc32c (==1.1.0)
+Requires-Dist: google-resumable-media (==1.2.0)
+Requires-Dist: googleapis-common-protos (==1.52.0)
+Requires-Dist: grpcio (==1.34.0)
+Requires-Dist: idna (==2.10)
+Requires-Dist: isodate (==0.6.0)
+Requires-Dist: jinja2 (==2.11.2)
+Requires-Dist: jmespath (==0.10.0)
+Requires-Dist: markupsafe (==1.1.1)
+Requires-Dist: msrest (==0.6.19)
+Requires-Dist: oauthlib (==3.1.0)
+Requires-Dist: oscrypto (==1.2.1)
+Requires-Dist: proto-plus (==1.13.0)
+Requires-Dist: protobuf (==3.14.0)
+Requires-Dist: psycopg2-binary (==2.8.5)
+Requires-Dist: pyasn1-modules (==0.2.8)
+Requires-Dist: pyasn1 (==0.4.8)
+Requires-Dist: pyathena (==1.10.7)
+Requires-Dist: pycparser (==2.20)
+Requires-Dist: pycryptodomex (==3.9.8)
+Requires-Dist: pyjwt (==1.7.1)
+Requires-Dist: pyodbc (==4.0.30)
+Requires-Dist: pyopenssl (==19.1.0)
+Requires-Dist: python-dateutil (==2.8.1)
+Requires-Dist: pytz (==2020.1)
+Requires-Dist: pyyaml (==5.3.1)
+Requires-Dist: requests-oauthlib (==1.3.0)
+Requires-Dist: requests (==2.23.0)
+Requires-Dist: rsa (==4.6)
+Requires-Dist: s3transfer (==0.3.3)
+Requires-Dist: six (==1.15.0)
+Requires-Dist: snowflake-connector-python (==2.4.0)
+Requires-Dist: tenacity (==6.2.0)
+Requires-Dist: urllib3 (==1.25.10)
+
+<p align="center"><img src="https://raw.githubusercontent.com/sodadata/soda-sql/main/docs/assets/images/soda-banner.png" alt="Soda logo" /></p>
+
+<h1 align="center">Soda SQL</h1>
+<p align="center"><b>Data testing, monitoring and profiling for SQL accessible data.</b></p>
+
+<p align="center">
+  <a href="https://github.com/sodadata/soda-sql/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg" alt="License: Apache 2.0"></a>
+  <a href="https://join.slack.com/t/soda-community/shared_invite/zt-m77gajo1-nXJF7JtbbRht2zwaiLb9pg"><img alt="Slack" src="https://img.shields.io/badge/chat-slack-green.svg"></a>
+  <a href="https://pypi.org/project/soda-sql/"><img alt="Pypi Soda SQL" src="https://img.shields.io/badge/pypi-soda%20sql-green.svg"></a>
+</p>
+
+**What does Soda SQL do?**
+
+Soda SQL allows you to
+
+ * Stop your pipeline when bad data is detected
+ * Extract metrics and column profiles through super efficient SQL
+ * Full control over metrics and queries through declarative config files
+
+**Why Soda SQL?**
+
+To protect against silent data issues for the consumers of your data,
+it's best-practice to profile and test your data:
+
+ * as it lands in your warehouse,
+ * after every important data processing step
+ * right before consumption.
+
+This way you will prevent delivery of bad data to downstream consumers.
+You will spend less time firefighting and gain a better reputation.
+
+**How does Soda SQL work?**
+
+Soda SQL is a Command Line Interface (CLI) and a Python library to measure
+and test your data using SQL.
+
+As input, Soda SQL uses YAML configuration files that include:
+ * SQL connection details
+ * What metrics to compute
+ * What tests to run on the measurements
+
+Based on those configuration files, Soda SQL will perform scans.  A scan
+performs all measurements and runs all tests associated with one table.  Typically
+a scan is executed after new data has arrived.  All soda-sql configuration files
+can be checked into your version control system as part of your pipeline
+code.
+
+> Want to try Soda SQL? Head over to our ['5 minute tutorial'](https://docs.soda.io/soda-sql/getting-started/5_min_tutorial.html) and get started straight away!
+
+**"[Show me the metrics](https://www.youtube.com/watch?v=1-mOKMq19zU)"**
+
+Let's walk through an example. Simple metrics and tests can be configured in scan YAML configuration 
+files. An example of the contents of such a file:
+
+```yaml
+metrics:
+    - row_count
+    - missing_count
+    - missing_percentage
+    - values_count
+    - values_percentage
+    - valid_count
+    - valid_percentage
+    - invalid_count
+    - invalid_percentage
+    - min
+    - max
+    - avg
+    - sum
+    - min_length
+    - max_length
+    - avg_length
+    - distinct
+    - unique_count
+    - duplicate_count
+    - uniqueness
+    - maxs
+    - mins
+    - frequent_values
+    - histogram
+columns:
+    ID:
+        metrics:
+            - distinct
+            - duplicate_count
+        valid_format: uuid
+        tests:
+            duplicate_count == 0
+    CATEGORY:
+        missing_values:
+            - N/A
+            - No category
+        tests:
+            missing_percentage < 3
+    SIZE:
+        tests:
+            max - min < 20
+sql_metrics:
+    - sql: |
+        SELECT sum(volume) as total_volume_us
+        FROM CUSTOMER_TRANSACTIONS
+        WHERE country = 'US'
+      tests:
+        - total_volume_us > 5000
+```
+
+Based on these configuration files, Soda SQL will scan your data
+each time new data arrived like this:
+
+```bash
+$ soda scan ./soda/metrics my_warehouse my_dataset
+Soda 1.0 scan for dataset my_dataset on prod my_warehouse
+  | SELECT column_name, data_type, is_nullable
+  | FROM information_schema.columns
+  | WHERE lower(table_name) = 'customers'
+  |   AND table_catalog = 'datasource.database'
+  |   AND table_schema = 'datasource.schema'
+  - 0.256 seconds
+Found 4 columns: ID, NAME, CREATE_DATE, COUNTRY
+  | SELECT
+  |  COUNT(*),
+  |  COUNT(CASE WHEN ID IS NULL THEN 1 END),
+  |  COUNT(CASE WHEN ID IS NOT NULL AND ID regexp '\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b' THEN 1 END),
+  |  MIN(LENGTH(ID)),
+  |  AVG(LENGTH(ID)),
+  |  MAX(LENGTH(ID)),
+  | FROM customers
+  - 0.557 seconds
+row_count : 23543
+missing   : 23
+invalid   : 0
+min_length: 9
+avg_length: 9
+max_length: 9
+
+...more queries...
+
+47 measurements computed
+23 tests executed
+All is good. No tests failed. Scan took 23.307 seconds
+```
+
+The next step is to add Soda SQL scans in your favorite
+data pipeline orchestration solution like:
+
+* Airflow
+* AWS Glue
+* Prefect
+* Dagster
+* Fivetran
+* Matillion
+* Luigi
+
+If you like the goals of this project, encourage us! Star [sodadata/soda-sql on Github](https://github.com/sodadata/soda-sql).
+
+> Next, head over to our ['5 minute tutorial'](https://docs.soda.io/soda-sql/getting-started/5_min_tutorial.html) and get your first project going!
+
+
