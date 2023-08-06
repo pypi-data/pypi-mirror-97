@@ -1,0 +1,68 @@
+Metadata-Version: 2.1
+Name: gapi-helper
+Version: 0.2.3
+Summary: Helpers around Google APIs
+Home-page: https://github.com/upOwa/gapi-helper
+License: LGPL-3.0-or-later
+Author: Thomas Muguet
+Author-email: thomas.muguet@upowa.org
+Requires-Python: >=3.6.1,<4.0.0
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Database
+Classifier: Topic :: Utilities
+Requires-Dist: Flask (>=1.1.2,<2.0.0)
+Requires-Dist: Flask-SQLAlchemy (>=2.4.4,<3.0.0)
+Requires-Dist: google-api-python-client (>=1.11.0,<2.0.0)
+Requires-Dist: oauth2client (>=4.1.3,<5.0.0)
+Requires-Dist: simpletasks-data (>=0.2.0,<0.3.0)
+Project-URL: Repository, https://github.com/upOwa/gapi-helper
+Description-Content-Type: text/markdown
+
+# gapi-helper
+
+Helpers around Google APIs:
+
+- [Google Drive API](gapi_helper/drive/README.md)
+- [Google Mail API](gapi_helper/mail/README.md)
+- [Google Sheets API](gapi_helper/sheets/README.md)
+
+Also provides new classes for [simpletasks-data](https://github.com/upOwa/simpletasks-data):
+
+- `DumpTask` to dump a [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/) model into a Google Sheet
+- `TransferTask` to write arbitrary data to a Google Sheet
+  - `TransferCsvTask` to write CSV data to a Google Sheet
+  - `TransferSheetTask` to write a Google Sheet to another Google Sheet
+- `ImportSheet` to use a Google Sheet as source for `ImportTask`
+
+## Contributing
+
+To initialize the environment:
+
+```bash
+poetry install --no-root
+```
+
+To run tests (including linting and code formatting checks), please run:
+
+```bash
+poetry run pytest --mypy --flake8 && poetry run black --check .
+```
+
+### Tips
+
+How to generate requests mocks:
+
+1. Put breakpoints in _.venv/lib/python3.6/site-packages/googleapiclient/http.py:211_ (end of `_retry_request` method)
+2. Create a script that will do the actions
+3. Ensure the debugger is configured to debug external code (`"justMyCode": false` in VSCode)
+4. Debug that script
+5. Save all results to `_retry_request` (status and *anonymized* content) to files in _data_ folder (if not already existing)
+
