@@ -1,0 +1,208 @@
+Metadata-Version: 2.1
+Name: pop-create-idem
+Version: 0.1
+Summary: UNKNOWN
+Home-page: https://gitlab.com/saltstack/pop/pop-create-idem
+Author: Tyler Johnson
+Author-email: tyjohnson@vmware.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Development Status :: 5 - Production/Stable
+Requires-Python: >=3.6
+Description-Content-Type: text/x-rst
+Requires-Dist: idem
+Requires-Dist: openapi3
+Requires-Dist: pop (>=16)
+Requires-Dist: pop-create (>=1.1)
+
+===============
+POP-CREATE-IDEM
+===============
+
+First, install `pop-create-idem` this is an extension of `pop-create` that
+is designed to easily create boilerplate code for idem-cloud projects.
+
+.. code-block:: bash
+
+    pip3 install pop-create-idem
+
+You now have access to the `pop-create` command with the `idem-cloud` subcommand.
+
+To create a new idem-cloud project, run:
+
+.. code-block:: bash
+
+    pop-create idem-cloud --directory /path/to/new/project --project-name=idem-{my_cloud} --simple-cloud-name={my_cloud}
+
+A new project will have been created with all the boilerplate code needed to get started with idem-cloud:
+The directory tree should now look something like this::
+
+    .
+    ├── build.conf
+    ├── cicd
+    │   └── upload-code-coverage.sh
+    ├── {project_name}
+    │   ├── acct
+    │   │   ├── contracts
+    │   │   └── {simple_cloud_name}
+    │   │       └── basic_auth.py
+    │   ├── conf.py
+    │   ├── exec
+    │   │   ├── contracts
+    │   │   └── {simple_cloud_name}
+    │   │       └── init.py
+    │   ├── states
+    │   │   ├── contracts
+    │   │   └── {simple_cloud_name}
+    │   │       └── init.py
+    │   ├── tool
+    │   │   └── contracts
+    │   └── version.py
+    ├── LICENSE
+    ├── noxfile.py
+    ├── README.rst
+    ├── requirements
+    │   ├── base.txt
+    │   └── tests.in
+    ├── setup.py
+    └── tests
+        ├── __init__.py
+        ├── integration
+        │   ├── acct
+        │   ├── conftest.py
+        │   ├── exec
+        │   ├── __init__.py
+        │   ├── states
+        │   └── tool
+        └── unit
+            ├── acct
+            ├── conftest.py
+            ├── exec
+            ├── __init__.py
+            ├── states
+            └── tool
+
+
+Installation
+============
+
+Install your new project with pip, it needs to be added to the python environment.
+
+.. code-block:: bash
+
+    pip install -e {project_root}
+
+After installation the new Idem Cloud Provider execution and state modules will be accessible to the pop `hub`.
+
+You can verify with pop-tree
+
+.. code-block:: bash
+
+    pip install pop-tree
+
+    # Show the exec modules that properly app-merged onto the hub
+    pop-tree exec --add-sub idem
+
+Authenticating with idem-cloud
+==============================
+
+Edit the file at {project_name}/acct/{simple_cloud_name}/basic_auth.py
+This is where you can customize authentication to your cloud.
+You can create other plugins in this directory that authenticate in different ways to the same cloud.
+
+After installing idem with pip, acct, exe  and state modules will be accessible to the pop `hub`.
+In order to use them we need to set up our credentials.
+
+Create a new file called `credentials.yaml` and populate it with credentials.
+The `default` profile will be used automatically by `idem` unless you specify one with `--acct-profile=profile_name` on the idem cli.
+
+There are many ways aws providers/profiles can be stored. See `acct backends <https://gitlab.com/saltstack/pop/acct-backends>`_
+for more information.
+
+credentials.yaml
+
+.. code-block:: sls
+
+    {simple_cloud_name}.basic_auth:
+      default:
+        username: my_user
+        password: my_pass
+
+
+Now encrypt the credentials file and add the encryption key and encrypted file path to the ENVIRONMENT.
+
+The `acct` command should be available as it is a requisite of `idem` and `idem-csp`.
+Encrypt the the credential file.
+
+.. code:: bash
+
+    acct encrypt credentials.yaml
+
+output::
+
+    -A9ZkiCSOjWYG_lbGmmkVh4jKLFDyOFH4e4S1HNtNwI=
+
+Add these to your environment:
+
+.. code:: bash
+
+    export ACCT_KEY="-A9ZkiCSOjWYG_lbGmmkVh4jKLFDyOFH4e4S1HNtNwI="
+    export ACCT_FILE=$PWD/credentials.yaml.fernet
+
+Idem will now be able to read these credentials for authentication to your cloud!
+
+Exec modules
+============
+
+functions placed in `{project_name}/exec/{simple_cloud_name}/` will appear on the hub under.
+`hub.exec.{simple_cloud_name}.*`.  The directory structure under `exec` is arbitrary to idem, so use it to keep your
+functions organized.  Do NOT put all your functions in one giant file.  That is not very pop.
+
+The directory structure affects where functions are placed on the hub, and how they are referenced on the CLI.
+
+If you create a function called `get` in `{project_name}/exec/{simple_cloud_name}/instance`,
+it can be called from the hub within code like so:
+
+.. code-block:: python
+
+    hub.exec.simple_cloud_name.instance.get("instance_name")
+
+It could be called from the idem cli like this:
+
+.. code-block:: bash
+
+    idem exec {simple_cloud_name}.instance.get instance_name
+
+The profile you want to use from your encrypted credentials file can be specified on the command line when calling an exec module directly.
+The default is to use the profile named "default".
+
+.. code:: bash
+
+    idem exec --acct-profile my-staging-env {simple_cloud_name}.instance.list
+
+States
+======
+
+A profile can be specified for use with a specific state.
+If no profile is specified, the profile called "default", if one exists, will be used:
+
+.. code:: sls
+
+    ensure_user_exists:
+      {simple_cloud_name}.user.present:
+        - acct_profile: my-staging-env
+        - name: a_user_name
+        - kwarg1: val1
+
+It can also be specified from the command line when executing states.
+
+.. code:: bash
+
+    idem state --acct-profile my-staging-env my_state.sls
+
+
