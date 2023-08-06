@@ -1,0 +1,332 @@
+Metadata-Version: 2.1
+Name: aicsimageio
+Version: 4.0.0.dev3
+Summary: Image Reading, Metadata Conversion, and Image Writing for Microscopy Images in Pure Python
+Home-page: https://github.com/AllenCellModeling/aicsimageio
+Author: Jackson Maxfield Brown, Allen Institute for Cell Science
+Author-email: jmaxfieldbrown@gmail.com, jamies@alleninstitute.org, bowdenm@spu.edu
+License: BSD-3-Clause
+Keywords: imageio,image reading,image writing,metadata,microscopy,allen cell
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: aicspylibczi (~=2.8.0)
+Requires-Dist: dask[array] (>=2021.1.0)
+Requires-Dist: fsspec (~=0.8.4)
+Requires-Dist: imagecodecs (>=2020.5.30)
+Requires-Dist: imageio[ffmpeg] (~=2.9.0)
+Requires-Dist: numpy (~=1.16)
+Requires-Dist: ome-types (~=0.2.4)
+Requires-Dist: readlif (~=0.5.1)
+Requires-Dist: tifffile (>=2021.2.1)
+Requires-Dist: toolz (~=0.11.0)
+Requires-Dist: xarray (~=0.16.1)
+Requires-Dist: xmlschema
+Requires-Dist: zarr (~=2.6.1)
+Provides-Extra: all
+Requires-Dist: aicspylibczi (~=2.8.0) ; extra == 'all'
+Requires-Dist: dask[array] (>=2021.1.0) ; extra == 'all'
+Requires-Dist: fsspec (~=0.8.4) ; extra == 'all'
+Requires-Dist: imagecodecs (>=2020.5.30) ; extra == 'all'
+Requires-Dist: imageio[ffmpeg] (~=2.9.0) ; extra == 'all'
+Requires-Dist: numpy (~=1.16) ; extra == 'all'
+Requires-Dist: ome-types (~=0.2.4) ; extra == 'all'
+Requires-Dist: readlif (~=0.5.1) ; extra == 'all'
+Requires-Dist: tifffile (>=2021.2.1) ; extra == 'all'
+Requires-Dist: toolz (~=0.11.0) ; extra == 'all'
+Requires-Dist: xarray (~=0.16.1) ; extra == 'all'
+Requires-Dist: xmlschema ; extra == 'all'
+Requires-Dist: zarr (~=2.6.1) ; extra == 'all'
+Requires-Dist: pytest-runner (>=5.2) ; extra == 'all'
+Requires-Dist: black (>=19.10b0) ; extra == 'all'
+Requires-Dist: codecov (>=2.1.4) ; extra == 'all'
+Requires-Dist: distributed (~=2.9.0) ; extra == 'all'
+Requires-Dist: docutils (<0.16,>=0.10) ; extra == 'all'
+Requires-Dist: flake8 (>=3.8.3) ; extra == 'all'
+Requires-Dist: flake8-debugger (>=3.2.1) ; extra == 'all'
+Requires-Dist: isort (>=5.7.0) ; extra == 'all'
+Requires-Dist: mypy (>=0.800) ; extra == 'all'
+Requires-Dist: psutil (>=5.7.0) ; extra == 'all'
+Requires-Dist: pytest (>=5.4.3) ; extra == 'all'
+Requires-Dist: pytest-cov (>=2.9.0) ; extra == 'all'
+Requires-Dist: pytest-raises (>=0.11) ; extra == 'all'
+Requires-Dist: s3fs (~=0.5.1) ; extra == 'all'
+Requires-Dist: asv (>=0.4.2) ; extra == 'all'
+Requires-Dist: bump2version (>=1.0.1) ; extra == 'all'
+Requires-Dist: coverage (>=5.1) ; extra == 'all'
+Requires-Dist: gitchangelog (>=3.0.4) ; extra == 'all'
+Requires-Dist: ipython (>=7.15.0) ; extra == 'all'
+Requires-Dist: m2r2 (>=0.2.7) ; extra == 'all'
+Requires-Dist: Sphinx (>=3.4.3) ; extra == 'all'
+Requires-Dist: sphinx-rtd-theme (>=0.5.1) ; extra == 'all'
+Requires-Dist: tox (>=3.15.2) ; extra == 'all'
+Requires-Dist: twine (>=3.1.1) ; extra == 'all'
+Requires-Dist: wheel (>=0.34.2) ; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: pytest-runner (>=5.2) ; extra == 'dev'
+Requires-Dist: black (>=19.10b0) ; extra == 'dev'
+Requires-Dist: codecov (>=2.1.4) ; extra == 'dev'
+Requires-Dist: distributed (~=2.9.0) ; extra == 'dev'
+Requires-Dist: docutils (<0.16,>=0.10) ; extra == 'dev'
+Requires-Dist: flake8 (>=3.8.3) ; extra == 'dev'
+Requires-Dist: flake8-debugger (>=3.2.1) ; extra == 'dev'
+Requires-Dist: isort (>=5.7.0) ; extra == 'dev'
+Requires-Dist: mypy (>=0.800) ; extra == 'dev'
+Requires-Dist: psutil (>=5.7.0) ; extra == 'dev'
+Requires-Dist: pytest (>=5.4.3) ; extra == 'dev'
+Requires-Dist: pytest-cov (>=2.9.0) ; extra == 'dev'
+Requires-Dist: pytest-raises (>=0.11) ; extra == 'dev'
+Requires-Dist: s3fs (~=0.5.1) ; extra == 'dev'
+Requires-Dist: asv (>=0.4.2) ; extra == 'dev'
+Requires-Dist: bump2version (>=1.0.1) ; extra == 'dev'
+Requires-Dist: coverage (>=5.1) ; extra == 'dev'
+Requires-Dist: gitchangelog (>=3.0.4) ; extra == 'dev'
+Requires-Dist: ipython (>=7.15.0) ; extra == 'dev'
+Requires-Dist: m2r2 (>=0.2.7) ; extra == 'dev'
+Requires-Dist: Sphinx (>=3.4.3) ; extra == 'dev'
+Requires-Dist: sphinx-rtd-theme (>=0.5.1) ; extra == 'dev'
+Requires-Dist: tox (>=3.15.2) ; extra == 'dev'
+Requires-Dist: twine (>=3.1.1) ; extra == 'dev'
+Requires-Dist: wheel (>=0.34.2) ; extra == 'dev'
+Provides-Extra: setup
+Requires-Dist: pytest-runner (>=5.2) ; extra == 'setup'
+Provides-Extra: test
+Requires-Dist: black (>=19.10b0) ; extra == 'test'
+Requires-Dist: codecov (>=2.1.4) ; extra == 'test'
+Requires-Dist: distributed (~=2.9.0) ; extra == 'test'
+Requires-Dist: docutils (<0.16,>=0.10) ; extra == 'test'
+Requires-Dist: flake8 (>=3.8.3) ; extra == 'test'
+Requires-Dist: flake8-debugger (>=3.2.1) ; extra == 'test'
+Requires-Dist: isort (>=5.7.0) ; extra == 'test'
+Requires-Dist: mypy (>=0.800) ; extra == 'test'
+Requires-Dist: psutil (>=5.7.0) ; extra == 'test'
+Requires-Dist: pytest (>=5.4.3) ; extra == 'test'
+Requires-Dist: pytest-cov (>=2.9.0) ; extra == 'test'
+Requires-Dist: pytest-raises (>=0.11) ; extra == 'test'
+Requires-Dist: s3fs (~=0.5.1) ; extra == 'test'
+
+# AICSImageIO
+
+[![Build Status](https://github.com/AllenCellModeling/aicsimageio/workflows/Build%20Main/badge.svg)](https://github.com/AllenCellModeling/aicsimageio/actions)
+[![Documentation](https://github.com/AllenCellModeling/aicsimageio/workflows/Documentation/badge.svg)](https://AllenCellModeling.github.io/aicsimageio/)
+[![Code Coverage](https://codecov.io/gh/AllenCellModeling/aicsimageio/branch/main/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/aicsimageio)
+
+Image Reading, Metadata Conversion, and Image Writing for Microscopy Images in Pure Python
+
+---
+
+## Features
+
+-   Supports reading metadata and imaging data for:
+    -   `CZI`
+    -   `OME-TIFF`
+    -   `TIFF`
+    -   `LIF`
+    -   Any additional format supported by [imageio](https://github.com/imageio/imageio)
+-   Supports writing metadata and imaging data for:
+    -   `OME-TIFF`
+-   Supports reading from and writing to any
+    [fsspec](https://github.com/intake/filesystem_spec) supported file system:
+
+    -   Local paths (i.e. `my-file.png`)
+    -   HTTP URLs (i.e. `https://my-domain.com/my-file.png`)
+    -   [s3fs](https://github.com/dask/s3fs) (i.e. `s3://my-bucket/my-file.png`)
+    -   [gcsfs](https://github.com/dask/gcsfs) (i.e. `gcs://my-bucket/my-file.png`)
+
+    See the [list of known implementations](https://filesystem-spec.readthedocs.io/en/latest/?badge=latest#implementations).
+
+## Installation
+
+**Stable Release:** `pip install aicsimageio`<br>
+**Development Head:** `pip install git+https://github.com/AllenCellModeling/aicsimageio.git`
+
+## Documentation
+
+For full package documentation please visit
+[allencellmodeling.github.io/aicsimageio](https://allencellmodeling.github.io/aicsimageio/index.html).
+
+## Quickstart
+
+### Full Image Reading
+
+```python
+from aicsimageio import AICSImage, imread
+
+# Get an AICSImage object
+img = AICSImage("my_file.tiff")  # selects the first scene found
+img.data  # returns 5D TCZYX numpy array
+img.xarray_data  # returns 5D TCZYX xarray data array backed by numpy
+img.dims  # returns a Dimensions object
+img.dims.order  # returns string "TCZYX"
+img.dims.X  # returns size of X dimension
+img.shape  # returns tuple of dimension sizes in TCZYX order
+img.get_image_data("CZYX", T=0)  # returns 4D CZYX numpy array
+
+# Get the id of the current operating scene
+img.current_scene
+
+# Get a list valid scene ids
+img.scenes
+
+# Change scene
+img.set_scene("Image:1")
+
+# Same operations on a different scene
+img.data  # returns 5D TCZYX numpy array
+img.xarray_data  # returns 5D TCZYX xarray data array backed by numpy
+img.dims  # returns a Dimensions object
+img.dims.order  # returns string "TCZYX"
+img.dims.X  # returns size of X dimension
+img.shape  # returns tuple of dimension sizes in TCZYX order
+img.get_image_data("CZYX", T=0)  # returns 4D CZYX numpy array
+
+# Get 5D TCZYX numpy array
+data = imread("my_file.tiff")  # optionally provide a scene id, default first
+```
+
+#### Full Image Reading Notes
+
+The `.data` and `.xarray_data` properties will load the whole image into memory.
+The `.get_image_data` function will load the whole image into memory and then retrieve
+the specific chunk.
+
+### Delayed Image Reading
+
+```python
+from aicsimageio import AICSImage, imread_dask
+
+# Get an AICSImage object
+img = AICSImage("my_file.tiff")  # selects the first scene found
+img.dask_data  # returns 5D TCZYX dask array
+img.xarray_dask_data  # returns 5D TCZYX xarray data array backed by dask array
+img.dims  # returns a Dimensions object
+img.dims.order  # returns string "TCZYX"
+img.dims.X  # returns size of X dimension
+img.shape  # returns tuple of dimension sizes in TCZYX order
+img.get_image_dask_data("CZYX", T=0)  # returns 4D CZYX dask array
+
+# Get the id of the current operating scene
+img.current_scene
+
+# Get a list valid scene ids
+img.scenes
+
+# Change scene
+img.set_scene("Image:1")
+
+# Same operations on a different scene
+img.dask_data  # returns 5D TCZYX dask array
+img.xarray_dask_data  # returns 5D TCZYX xarray data array backed by dask array
+img.dims  # returns a Dimensions object
+img.dims.order  # returns string "TCZYX"
+img.dims.X  # returns size of X dimension
+img.shape  # returns tuple of dimension sizes in TCZYX order
+img.get_image_dask_data("CZYX", T=0)  # returns 4D CZYX dask array
+
+# Read a specified portion of dask array
+lazy_t0 = img.get_image_dask_data("CZYX", T=0)  # returns 4D CZYX dask array
+t0 = lazy_t0.compute()  # returns 4D CZYX numpy array
+
+# Get a 5D TCZYX dask array
+lazy_data = imread_dask("my_file.tiff")  # optionally provide a scene id, default first
+lazy_t0 = lazy_data[0, :]
+t0 = lazy_t0.compute()
+```
+
+#### Delayed Image Reading Notes
+
+The `.dask_data` and `.xarray_dask_data` properties and the `.get_image_dask_data`
+function will not load any piece of the pixel data into memory until you specifically
+call `.compute` on the returned Dask array. In doing so, you will only then load the
+selected data in-memory.
+
+### Remote Image Reading
+
+```python
+from aicsimageio import AICSImage
+
+# Get an AICSImage object
+img = AICSImage("http://my-website.com/my_file.tiff")
+img = AICSImage("s3://my-bucket/my_file.tiff")
+img = AICSImage("gcs://my-bucket/my_file.tiff")
+
+# All other normal operations work just fine
+```
+
+Remote reading requires that the file-system specification implementation for the
+target backend is installed.
+
+-   For `s3`: `pip install s3fs`
+-   For `gs`: `pip install gcsfs`
+
+See the [list of known implementations](https://filesystem-spec.readthedocs.io/en/latest/?badge=latest#implementations).
+
+### Metadata Reading
+
+```python
+from aicsimageio import AICSImage
+
+# Get an AICSImage object
+img = AICSImage("my_file.tiff")  # selects the first scene found
+img.metadata  # returns the metadata object for this image type
+img.channel_names  # returns a list of string channel names found in the metadata
+img.physical_pixel_size.Z  # returns the Z dimension pixel size as found in the metadata
+img.physical_pixel_size.Y  # returns the Y dimension pixel size as found in the metadata
+img.physical_pixel_size.X  # returns the X dimension pixel size as found in the metadata
+```
+
+### Base Reader Specification
+
+All base readers (`TiffReader`, `OmeTiffReader`, `DefaultReader`, etc.) all follow the
+same base specification. Each reader will have documentation for functions and properties
+specific to themselves while
+[the base Reader documentation](./aicsimageio.readers.html#module-aicsimageio.readers.reader)
+is the best place to get an overview of all functions and properties available to all
+base reading classes.
+
+## Performance Considerations
+
+-   **If your image fits in memory:** use `AICSImage.data`, `AICSImage.xarray_data`,
+    `AICSImage.get_image_data`, or `Reader` equivalents.
+-   **If your image is too large to fit in memory:** use `AICSImage.dask_data`,
+    `AICSImage.xarray_dask_data`, `AICSImage.get_image_dask_data`, or `Reader` equivalents.
+-   **If your image does not support native chunk reading:** it may not be best to read
+    chunks from a remote source. While possible, the format of the image matters a lot for
+    chunked read performance.
+
+## Benchmarks
+
+AICSImageIO is benchmarked using [asv](https://asv.readthedocs.io/en/stable/).
+You can find the benchmark results for every commit to `main` starting at the 4.0
+release on our
+[benchmarks page](https://AllenCellModeling.github.io/aicsimageio/_benchmarks/index.html).
+
+## Napari Interactive Viewer
+
+[napari](https://github.com/Napari/napari) is a fast, interactive, multi-dimensional
+image viewer for python and it is pretty useful for imaging data that this package
+tends to interact with.
+
+We have also released
+[napari-aicsimageio](https://github.com/AllenCellModeling/napari-aicsimageio), a plugin
+that allows use of all the functionality described in this library, but in the `napari`
+default viewer itself.
+
+## Development
+
+See our
+[developer resources](https://allencellmodeling.github.io/aicsimageio/developer_resources)
+for information related to developing the code.
+
+_Free software: BSD-3-Clause_
+
+
