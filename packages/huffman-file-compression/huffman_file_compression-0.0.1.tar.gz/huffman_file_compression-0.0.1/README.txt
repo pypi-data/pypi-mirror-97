@@ -1,0 +1,1 @@
+The library can be used to compress/decompress data files to/from the respective binary format using the Huffman Encoding algorithm.
