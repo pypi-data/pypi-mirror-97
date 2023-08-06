@@ -1,0 +1,82 @@
+{
+    "table": {
+        "AttributeDefinitions": [{
+                "AttributeName": "_id",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "_attr",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "_resource_type",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "_resource_type_index",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "_account_id_index",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "_resource_type_range",
+                "AttributeType": "S"
+            }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [{
+                "AttributeName": "_id",
+                "KeyType": "HASH"
+            },
+            {
+                "AttributeName": "_attr",
+                "KeyType": "RANGE"
+            }
+        ],
+        "GlobalSecondaryIndexes": [{
+                "IndexName": "resource_type",
+                "Projection": {
+                    "ProjectionType": "INCLUDE",
+                    "NonKeyAttributes": [
+                        "_account_id",
+                        "_region",
+                        "_resource_type",
+                        "_service"
+                    ]
+                },
+                "KeySchema": [{
+                        "AttributeName": "_resource_type_index",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "_resource_type_range",
+                        "KeyType": "RANGE"
+                    }
+                ]
+            },
+            {
+                "IndexName": "account_id",
+                "Projection": {
+                    "ProjectionType": "INCLUDE",
+                    "NonKeyAttributes": [
+                        "_account_id",
+                        "_region",
+                        "_resource_type",
+                        "_service"
+                    ]
+                },
+                "KeySchema": [{
+                        "AttributeName": "_account_id_index",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "_resource_type",
+                        "KeyType": "RANGE"
+                    }
+                ]
+            }
+        ]
+    }
+}
