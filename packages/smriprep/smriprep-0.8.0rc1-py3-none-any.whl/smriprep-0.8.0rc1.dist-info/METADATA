@@ -1,0 +1,168 @@
+Metadata-Version: 2.1
+Name: smriprep
+Version: 0.8.0rc1
+Summary: sMRIPrep (Structural MRI PREProcessing) pipeline
+Home-page: https://github.com/nipreps/smriprep
+Maintainer: The NiPreps developers
+Maintainer-email: nipreps@gmail.com
+License: 3-clause BSD
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Image Recognition
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6
+Description-Content-Type: text/x-rst; charset=UTF-8
+Requires-Dist: indexed-gzip (>=0.8.8)
+Requires-Dist: lockfile
+Requires-Dist: matplotlib (>=2.2.0)
+Requires-Dist: nibabel (>=3.0.1)
+Requires-Dist: nipype (>=1.5.1)
+Requires-Dist: niworkflows (<1.5,>=1.4.0rc4)
+Requires-Dist: numpy
+Requires-Dist: packaging
+Requires-Dist: pybids (>=0.11.1)
+Requires-Dist: pyyaml
+Requires-Dist: templateflow (>=0.6)
+Provides-Extra: all
+Requires-Dist: datalad ; extra == 'all'
+Requires-Dist: nbsphinx ; extra == 'all'
+Requires-Dist: packaging ; extra == 'all'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'all'
+Requires-Dist: pydotplus ; extra == 'all'
+Requires-Dist: sphinx (<3,>=2.1.2) ; extra == 'all'
+Requires-Dist: sphinx-argparse ; extra == 'all'
+Requires-Dist: sphinx-rtd-theme ; extra == 'all'
+Requires-Dist: sphinxcontrib-apidoc (~=0.3.0) ; extra == 'all'
+Requires-Dist: sphinxcontrib-napoleon ; extra == 'all'
+Requires-Dist: sphinxcontrib-versioning ; extra == 'all'
+Requires-Dist: duecredit ; extra == 'all'
+Requires-Dist: psutil (>=5.4.0) ; extra == 'all'
+Requires-Dist: coverage ; extra == 'all'
+Requires-Dist: codecov ; extra == 'all'
+Requires-Dist: pytest ; extra == 'all'
+Requires-Dist: pytest-cov ; extra == 'all'
+Requires-Dist: pytest-env ; extra == 'all'
+Provides-Extra: datalad
+Requires-Dist: datalad ; extra == 'datalad'
+Provides-Extra: doc
+Requires-Dist: nbsphinx ; extra == 'doc'
+Requires-Dist: packaging ; extra == 'doc'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'doc'
+Requires-Dist: pydotplus ; extra == 'doc'
+Requires-Dist: sphinx (<3,>=2.1.2) ; extra == 'doc'
+Requires-Dist: sphinx-argparse ; extra == 'doc'
+Requires-Dist: sphinx-rtd-theme ; extra == 'doc'
+Requires-Dist: sphinxcontrib-apidoc (~=0.3.0) ; extra == 'doc'
+Requires-Dist: sphinxcontrib-napoleon ; extra == 'doc'
+Requires-Dist: sphinxcontrib-versioning ; extra == 'doc'
+Provides-Extra: docs
+Requires-Dist: nbsphinx ; extra == 'docs'
+Requires-Dist: packaging ; extra == 'docs'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'docs'
+Requires-Dist: pydotplus ; extra == 'docs'
+Requires-Dist: sphinx (<3,>=2.1.2) ; extra == 'docs'
+Requires-Dist: sphinx-argparse ; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme ; extra == 'docs'
+Requires-Dist: sphinxcontrib-apidoc (~=0.3.0) ; extra == 'docs'
+Requires-Dist: sphinxcontrib-napoleon ; extra == 'docs'
+Requires-Dist: sphinxcontrib-versioning ; extra == 'docs'
+Provides-Extra: duecredit
+Requires-Dist: duecredit ; extra == 'duecredit'
+Provides-Extra: resmon
+Requires-Dist: psutil (>=5.4.0) ; extra == 'resmon'
+Provides-Extra: style
+Requires-Dist: flake8 ; extra == 'style'
+Provides-Extra: test
+Requires-Dist: coverage ; extra == 'test'
+Requires-Dist: codecov ; extra == 'test'
+Requires-Dist: pytest ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: pytest-env ; extra == 'test'
+Provides-Extra: tests
+Requires-Dist: coverage ; extra == 'tests'
+Requires-Dist: codecov ; extra == 'tests'
+Requires-Dist: pytest ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pytest-env ; extra == 'tests'
+
+sMRIPrep: Structural MRI PREProcessing pipeline
+===============================================
+
+.. image:: https://img.shields.io/badge/docker-nipreps/smriprep-brightgreen.svg?logo=docker&style=flat
+  :target: https://hub.docker.com/r/nipreps/smriprep/tags/
+  :alt: Docker image available!
+
+.. image:: https://circleci.com/gh/nipreps/smriprep/tree/master.svg?style=shield
+  :target: https://circleci.com/gh/nipreps/smriprep/tree/master
+
+.. image:: https://codecov.io/gh/nipreps/smriprep/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/nipreps/smriprep
+  :alt: Coverage report
+
+.. image:: https://img.shields.io/pypi/v/smriprep.svg
+  :target: https://pypi.python.org/pypi/smriprep/
+  :alt: Latest Version
+
+.. image:: https://img.shields.io/badge/doi-10.1038%2Fs41592--018--0235--4-blue.svg
+  :target: https://doi.org/10.1038/s41592-018-0235-4
+  :alt: Published in Nature Methods
+
+
+*sMRIPrep* is a structural magnetic resonance imaging (sMRI) data
+preprocessing pipeline that is designed to provide an easily accessible,
+state-of-the-art interface that is robust to variations in scan acquisition
+protocols and that requires minimal user input, while providing easily
+interpretable and comprehensive error and output reporting.
+It performs basic processing steps (subject-wise averaging, B1 field correction,
+spatial normalization, segmentation, skullstripping etc.) providing
+outputs that can be easily connected to subsequent tools such as
+`fMRIPrep <https://github.com/nipreps/fmriprep>`__ or
+`dMRIPrep <https://github.com/nipreps/dmriprep>`__.
+
+.. image:: https://github.com/oesteban/smriprep/raw/033a6b4a54ecbd9051c45df979619cda69847cd1/docs/_resources/workflow.png
+
+The workflow is based on `Nipype <https://nipype.readthedocs.io>`__ and encompases
+a combination of tools from well-known software packages, including
+`FSL <https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/>`__,
+`ANTs <https://stnava.github.io/ANTs/>`__,
+`FreeSurfer <https://surfer.nmr.mgh.harvard.edu/>`__,
+and `AFNI <https://afni.nimh.nih.gov/>`__.
+
+More information and documentation can be found at
+https://www.nipreps.org/smriprep/.
+Support is provided on `neurostars.org <https://neurostars.org/tags/smriprep>`_.
+
+Principles
+----------
+
+*sMRIPrep* is built around three principles:
+
+1. **Robustness** - The pipeline adapts the preprocessing steps depending on
+   the input dataset and should provide results as good as possible
+   independently of scanner make, scanning parameters or presence of additional
+   correction scans (such as fieldmaps).
+2. **Ease of use** - Thanks to dependence on the BIDS standard, manual
+   parameter input is reduced to a minimum, allowing the pipeline to run in an
+   automatic fashion.
+3. **"Glass box"** philosophy - Automation should not mean that one should not
+   visually inspect the results or understand the methods.
+   Thus, *sMRIPrep* provides visual reports for each subject, detailing the
+   accuracy of the most important processing steps.
+   This, combined with the documentation, can help researchers to understand
+   the process and decide which subjects should be kept for the group level
+   analysis.
+
+
+Acknowledgements
+----------------
+
+Please acknowledge this work by mentioning explicitly the name of this software
+(sMRIPrep) and the version, along with a link to the `GitHub repository
+<https://github.com/nipreps/smriprep>`__ or the Zenodo reference
+(doi:`10.5281/zenodo.2650521 <https://doi.org/10.5281/zenodo.2650521>`__).
+
+
