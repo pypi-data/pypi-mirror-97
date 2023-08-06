@@ -1,0 +1,58 @@
+name: "Minimal test & Release"
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    name: Minimal Testing
+    # these tests are just to ensure that a minimal quality is given. full tests are done in "pythonpackage" action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Code
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        # see https://github.com/actions/setup-python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: Python version
+        run: python --version
+      - name: Install dependencies
+        # install requirements as set in `setup.py`
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade 'setuptools>=40' 'tox>=3.14'
+      - name: Test nichtparasoup
+        # since the version got retired, we dont need online tests
+        run: python -m tox -r -e py3 -- -m "not online"
+      - name: "Test examples::nichtparasoup-imagecrawler-plugin"
+        run: python -m tox -r -e py3 -c examples/nichtparasoup-imagecrawler-plugin/
+  publish:
+    name: Publishing
+    # build in an isolated env
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Code
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        # see https://github.com/actions/setup-python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools setuptools_scm wheel twine
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          rm -rf build dist
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
