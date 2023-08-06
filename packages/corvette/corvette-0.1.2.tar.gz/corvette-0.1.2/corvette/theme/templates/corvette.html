@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-md font-monospace">
+    <br>
+    <h1><a href="https://github.com/philipkiely/corvette">Corvette</a> &mdash; Autoindex Directory Listing
+    <br>
+    <br>
+    <ul class="list-inline fs-3 fw-bold">
+        <a href="{{ root_link }}">{{ root_name }}</a>
+        <li class="list-inline-item">/</li>
+        {% for b in breadcrumbs %}
+            <li class="list-inline-item"><a href="/{{ b[1] }}">{{ b[0] }}</a></li>
+            <li class="list-inline-item">/</li>
+        {% endfor %}
+    </ul>
+    {% for l in lines %}
+        {% if not l.hide %}
+            <p class="fs-5 text-dark {% if not l.file %}fw-bold{% endif %}"><span class="fs-3">&nbsp;&nbsp;</span><i class="bi-{{ l.icon }}"></i><span class="fs-3">&nbsp;</span><a class="text-reset" href="{{ l.link }}">{{ l.text }}</a></p>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
