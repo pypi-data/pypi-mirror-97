@@ -1,0 +1,57 @@
+CAPI=2:
+
+name : ::serv:1.0.2
+
+filesets:
+  core:
+    files:
+      - rtl/serv_params.vh : {is_include_file : true}
+      - rtl/serv_bufreg.v
+      - rtl/serv_alu.v
+      - rtl/serv_csr.v
+      - rtl/serv_ctrl.v
+      - rtl/serv_decode.v
+      - rtl/serv_immdec.v
+      - rtl/serv_mem_if.v
+      - rtl/serv_rf_if.v
+      - rtl/serv_rf_ram_if.v
+      - rtl/serv_rf_ram.v
+      - rtl/serv_state.v
+      - rtl/serv_top.v
+      - rtl/serv_rf_top.v
+    file_type : verilogSource
+
+targets:
+  default:
+    filesets : [core]
+    parameters :
+      - "is_toplevel? (RESET_STRATEGY)"
+      - RISCV_FORMAL
+      - SERV_CLEAR_RAM
+      - "is_toplevel? (WITH_CSR)"
+    toplevel : ["is_toplevel? (serv_rf_top)"]
+
+  lint:
+    default_tool : verilator
+    filesets : [core]
+    tools:
+      verilator:
+        mode : lint-only
+    toplevel : serv_rf_top
+
+parameters:
+  RESET_STRATEGY:
+    datatype : str
+    paramtype : vlogparam
+
+  RISCV_FORMAL:
+    datatype  : bool
+    paramtype : vlogdefine
+
+  SERV_CLEAR_RAM:
+    datatype  : bool
+    paramtype : vlogdefine
+
+  WITH_CSR:
+    datatype  : int
+    paramtype : vlogparam
