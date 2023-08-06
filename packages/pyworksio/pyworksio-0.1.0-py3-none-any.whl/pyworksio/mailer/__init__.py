@@ -1,0 +1,1 @@
+from pyworks_mailer.mailer import Mailer
