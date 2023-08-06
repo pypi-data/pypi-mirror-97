@@ -1,0 +1,136 @@
+Metadata-Version: 2.1
+Name: ibm-cpp-orchestration
+Version: 0.1.0
+Summary: Supports users in usage of CPD Orchestration
+Home-page: https://github.ibm.com/AILifecycle/ibm-cpp-orchestration
+Author: Michalina Kotwica
+Author-email: michalina.kotwica@ibm.com
+License: UNKNOWN
+Description: # IBM CPD Orchestration Python Client
+        
+        This package supports users in usage of CPD Orchestration.
+        It's primary usage is to enable users to store artifact results
+        of a Orchestration Flow run.
+        
+        
+        ## Usage
+        
+        ### Client construction
+        
+        `CPDOrchestration` client is constructed from IAM APIKEY, which can be provided
+        in a few ways:
+        
+        * explicitly:
+        
+          ```python
+          from ibm_cpp_orchestration import CPDOrchestration
+          
+          client = CPDOrchestration(apikey)
+          # or
+          client = CPDOrchestration.from_apikey(apikey)
+          ```
+        
+        * implicitly:
+        
+          ```bash
+          APIKEY=...
+          export APIKEY
+          ```
+        
+          ```python
+          from ibm_cpp_orchestration import CPDOrchestration
+        
+          client = CPDOrchestration()
+          # or
+          client = CPDOrchestration.new_instance()
+          # or
+          client = CPDOrchestration.from_apikey()
+          ```
+        
+        All of the above may also define `service_name` and `url`.
+        
+        
+        ### Usage in Python notebooks
+        
+        Notebooks run in Orchestration Platform get inputs and expose outputs
+        as a node in Orchestration Flow:
+        
+        ```
+        {
+          "id": ...,
+          "type": "execution_node",
+          "op": "run_container",
+          "app_data": {
+            "pipeline_data": {
+              "name": ...,
+              "config": {
+                "link": {
+                  "component_id_ref": "run-notebook"
+                }
+              },
+              "inputs": [
+                ...,
+                {
+                  "name": "model_name",
+                  "group": "env_variables",
+                  "type": "String",
+                  "value_from": ...
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "trained_model",
+                  "group": "output_variables",
+                  "type": {
+                    "CPDPath": {
+                      "path_type": "resource",
+                      "resource_type": "asset",
+                      "asset_type": "wml_model"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          ...
+        }
+        ```
+        
+        Inside of the notebook, inputs are available as environmental
+        variables:
+        
+        ```python
+        model_name = os.environ['model_name']
+        ```
+        
+        Outputs are exposed using sdk method, `store_results`:
+        
+        ```python
+        client = CPDOrchestration.from_apikey(...)
+        client.store_results({
+          "trained_model": ... // cpd path to the trained model
+        })
+        ```
+        
+        
+        ### Other features
+        
+        Client also provides a method to get WML instance credentials:
+        
+        ```python
+        client.get_wml_credentials() # the scope passed in notebook
+        # or
+        client.get_wml_credentials("cpd://projects/123456789")
+        ```
+        
+        
+        ## Contribution
+        
+        See a separate [document on contribution](CONTRIBUTING.md).
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
