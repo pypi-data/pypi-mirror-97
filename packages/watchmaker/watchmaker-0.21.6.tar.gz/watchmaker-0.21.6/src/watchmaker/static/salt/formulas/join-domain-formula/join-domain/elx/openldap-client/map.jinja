@@ -1,0 +1,22 @@
+{#- Set join-domain defaults for this ad connector #}
+{%- load_yaml as defaults %}
+
+ad_site_name: ''
+dns_name: ''
+oupath: ''
+
+{%- endload %}
+
+{#-
+    Lookup settings in pillar, merging them with defaults, and overriding them
+    with grains
+#}
+{%- set join_domain = salt.pillar.get(
+    'join-domain:lookup',
+    default = defaults,
+    merge = True
+) %}
+
+{% do join_domain.update(
+    salt.grains.get('join-domain', {})
+) %}

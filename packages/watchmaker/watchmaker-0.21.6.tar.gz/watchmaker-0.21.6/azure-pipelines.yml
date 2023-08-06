@@ -1,0 +1,136 @@
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - develop
+    - refs/tags/*
+pr:
+  branches:
+    include:
+    - master
+    - develop
+
+variables:
+  # satsuki looks by default for dir named .gravitybee, using that name simplifies
+  artifactDir: .gravitybee
+
+jobs:
+- template: ci/azure-pipelines-template.yml
+  parameters:
+    tox_version: ''
+    jobs:
+      py37_64:
+        image: [win16, win19]
+        architecture: x64
+        py: "3.7"
+      py37_32:
+        image: [win16, win19]
+        architecture: x86
+        py: "3.7"
+      py36_64:
+        image: [win16, win19]
+        architecture: x64
+        py: "3.6"
+      py27_64:
+        image: [win16, win19]
+        architecture: x64
+        py: "2.7"
+
+- job: build
+  displayName: build standalone
+  pool:
+    vmImage: 'vs2017-win2016'
+  variables:
+    py: "3.7"
+    architecture: "x64"
+    venv: $(System.DefaultWorkingDirectory)\venv
+    artifactDirFull: $(System.DefaultWorkingDirectory)\$(artifactDir)
+  steps:
+  - checkout: self
+    displayName: checkout source code (with submodules)
+    submodules: true
+  - task: UsePythonVersion@0
+    displayName: ${{ format('provision build python {0} ({1})', variables.py, variables.architecture) }}
+    inputs:
+      versionSpec: $(py)
+      architecture: $(architecture)
+    name: buildPython
+  - ${{ if eq(variables['build.sourceBranch'], 'refs/heads/develop') }}:
+    - powershell: |
+        $ver = (git show -s --format=%cd --date=format:'%Y%m%d%H%M%S')
+        (Get-Content setup.cfg) -replace '^(version = )(\d+\.\d+\.\d+).*$', ('$1$2.dev' + $ver) | Set-Content setup.cfg
+      displayName: mark the version as development
+  - script: $(buildPython.pythonLocation)\python -m pip install -r requirements/basics.txt
+    displayName: install python basics
+  - script: $(buildPython.pythonLocation)\python -m virtualenv $(venv)
+    displayName: setup virtual environment
+  - script: |
+      call $(venv)\Scripts\activate.bat
+      call ci/build.cmd
+    displayName: build standalone
+  - script: move requirements\deploy.txt $(artifactDirFull)
+    displayName: include requirements.txt for deploy
+  - script: dir $(artifactDirFull)
+    displayName: see directory
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(artifactDirFull)
+      artifactName: $(artifactDir)
+    displayName: publish standalone artifacts
+
+- deployment: deploy
+  displayName: deploy standalone to github and s3
+  dependsOn: build
+  condition: succeeded()
+  pool:
+    vmImage: 'vs2017-win2016'
+  environment: 'standalone'
+  variables: # alternate syntax needed when using a group
+  - group: wam-windows-ci
+  - name: artifactDirFull
+    value: $(System.DefaultWorkingDirectory)\$(artifactDir)
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: none
+        - task: DownloadBuildArtifacts@0
+          displayName: download standalone artifacts
+          inputs:
+            artifactName: $(artifactDir)
+            downloadPath: $(System.DefaultWorkingDirectory)
+        - script: |
+            cd
+            dir $(artifactDir)
+          displayName: check artifacts
+        - task: S3Upload@1
+          displayName: upload dev standalone binaries to s3 (dev)
+          condition: eq(variables['build.sourceBranch'], 'refs/heads/develop')
+          inputs:
+            awsCredentials: dev-lab
+            targetFolder: $(keyPrefix)
+            bucketName: $(devBucket)
+            sourceFolder: $(artifactDirFull)\dist\
+        - task: S3Upload@1
+          displayName: upload standalone binaries to s3 (release)
+          condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+          inputs:
+            awsCredentials: dev-lab
+            targetFolder: $(keyPrefix)
+            bucketName: $(releaseBucket)
+            sourceFolder: $(artifactDirFull)\dist\
+        - script: |
+            call $(artifactDir)\gravitybee-environs.bat
+            set SATS_TAG=%GB_ENV_APP_VERSION%
+            set SATS_BODY=* [%GB_ENV_APP_NAME% v%GB_ENV_APP_VERSION% CHANGELOG](https://github.com/plus3it/%GB_ENV_APP_NAME%/blob/%GB_ENV_APP_VERSION%/CHANGELOG.md)
+            set SATS_REL_NAME=Release v%GB_ENV_APP_VERSION%
+            set
+            python -m pip install -r $(artifactDir)\deploy.txt
+            satsuki
+          displayName: deploy to github with satsuki
+          condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+          env:
+            SATS_TOKEN: $(githubToken)
