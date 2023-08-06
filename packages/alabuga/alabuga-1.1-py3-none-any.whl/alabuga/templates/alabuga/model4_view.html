@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %} Model4 {% endblock title %}
+
+{% block content %} 
+<h3> Model4 - View </h3>
+
+<a href="{% url 'model4-add' %}"><h4> Add object </h4></a>
+
+	<table>
+		<tr>
+			<th>Model1 objects (generic_inlineformset_factory) </th>
+		</tr>
+		{% if countries %}	
+		{% for country in countries %}
+			<tr>
+				<td>
+					<a href="{% url 'model4-formset' country.pk %}">{{ country.title }}</a>
+				</td>
+			</tr>
+		{% endfor %}
+		{% endif %}
+	</table>
+
+
+<br>
+<br>
+	<table>
+		<tr>
+			<th>Model4 Objects</th>
+		</tr>
+		{% for brand in brands %}
+			<tr>
+				<td>
+					<a href="{{ brand.get_absolute_url }}">{{ brand.title }}</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

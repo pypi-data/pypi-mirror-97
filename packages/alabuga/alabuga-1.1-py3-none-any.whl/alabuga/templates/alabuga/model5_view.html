@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+	
+	{% load static %}
+
+	<script src="{% static 'alabuga/js/scripts.js' %}"></script> 
+
+{% block title %} Model5 {% endblock title %}
+
+{% block content %} 
+<h3> Model5 - View </h3> 
+	<a href="{% url 'model5-add' %}"><h4> Add object </h4></a>
+
+	<table border="1">
+	<tr>
+		<th>Country</th><th>Region</th><th>SubRegion</th><th>Brand</th>
+	</tr>
+	{% for obj in objs %}
+		<tr>
+			<td>
+				{{ obj.country.title }}
+			</td>			
+			<td>
+				{{ obj.region.title }}
+			</td>			
+			<td>
+				{{ obj.sub_region.title }}
+			</td>			
+			<td>
+				{{ obj.brand.title }}
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock content %}
