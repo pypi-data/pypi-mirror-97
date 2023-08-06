@@ -1,0 +1,43 @@
+<img src="./glom2.png" width="400px"></img>
+
+<img src="./glom1.png" width="600px"></img>
+
+## GLOM - Pytorch (wip)
+
+An attempt at the implementation of <a href="https://arxiv.org/abs/2102.12627">Glom</a>, Geoffrey Hinton's new idea that integrates neural fields, predictive coding, top-down-bottom-up, and attention (consensus between columns) for emergent part-whole heirarchies from data.
+
+## Install
+
+```bash
+$ pip install glom-pytorch
+```
+
+## Usage
+
+```python
+import torch
+from glom_pytorch import Glom
+
+model = Glom(
+    dim = 512,         # dimension
+    levels = 6,        # number of levels
+    image_size = 224,  # image size
+    patch_size = 14    # patch size
+)
+
+img = torch.randn(1, 3, 224, 224)
+levels = model(img, iters = 12) # (1, 256, 6, 512) - (batch - patches - levels - dimension)
+```
+
+## Citations
+
+```bibtex
+@misc{hinton2021represent,
+    title   = {How to represent part-whole hierarchies in a neural network}, 
+    author  = {Geoffrey Hinton},
+    year    = {2021},
+    eprint  = {2102.12627},
+    archivePrefix = {arXiv},
+    primaryClass = {cs.CV}
+}
+```
