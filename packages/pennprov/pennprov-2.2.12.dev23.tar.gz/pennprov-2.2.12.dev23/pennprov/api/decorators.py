@@ -1,0 +1,180 @@
+import logging
+import uuid
+from datetime import timezone, datetime
+from functools import partial, wraps
+
+from pennprov import RelationModel
+from pennprov.connection.mprov_connection import MProvConnection
+from pennprov.connection.mprov_connection_cache import MProvConnectionCache
+from pennprov.metadata.stream_metadata import BasicSchema, BasicTuple
+import pandas as pd
+import inspect
+
+blank = BasicSchema({})
+blank_tuple = BasicTuple(blank)
+
+get_entity_id = MProvConnection.get_entity_id
+get_token_qname = MProvConnection.get_token_qname
+
+stored = {}
+
+class MProvAgg:
+    def __init__(self, in_stream_name,out_stream_name,in_stream_key=['index'],out_stream_key=['index'],collection=None,connection_key=None):
+        """
+        MProvAgg: decorator for an aggregation operation over windows.  Creates a provenance
+        node for each output stream element and attaches it to the in_stream_keys for the inputs.
+
+        :param in_stream_name: The name of the input stream schema
+        :param out_stream_name: The name of the output stream schema
+        :param in_stream_key: The key fields in the input stream
+        :param out_stream_key: The key fields of the output stream
+        :param collection: The name of the output stream collection, to which this result should be appended
+        :param connection_key: Unique ID for reusing cached connection to MProv server
+        :return:
+        """
+        self.in_stream_name = in_stream_name
+        self.out_stream_name = out_stream_name
+        self.in_stream_key = in_stream_key
+        self.out_stream_key = out_stream_key
+        self.collection = collection
+        self.connection_key = connection_key or MProvConnectionCache.Key()
+
+        global stored
+        mprov_conn = MProvConnectionCache.get_connection(self.connection_key)
+        if mprov_conn:
+            if self.in_stream_name not in stored:
+                in_stream_part = mprov_conn.create_collection(self.in_stream_name)
+                stored[self.in_stream_name] = in_stream_part
+            if self.out_stream_name not in stored:
+                out_stream_part = mprov_conn.create_collection(self.out_stream_name)
+                stored[self.out_stream_name] = out_stream_part
+            mprov_conn.flush()
+        else:
+            stored[self.in_stream_name] =  get_token_qname(self.in_stream_name + '_no_conn')
+            stored[self.out_stream_name] =  get_token_qname(self.out_stream_name + '_no_conn')
+
+
+    def md_key(self, stream, key_list):
+        if isinstance(stream, tuple) and len(stream) == 1:
+            stream = stream[0]
+        # If the stream is a dataframe, return the subset matching the key
+        if isinstance(stream, pd.DataFrame):
+            if not self.in_stream_key:
+                return stream
+            else:
+                return str(stream.reset_index()[key_list])
+        else:
+            return repr(stream)
+
+    def rel_keys(self, stream, key_list):
+        if isinstance(stream, tuple) and len(stream) == 1:
+            stream = stream[0]
+        # If the stream is a dataframe, return the subset matching the key
+        if isinstance(stream, pd.DataFrame):
+            if not self.in_stream_key:
+                return stream
+            else:
+                return stream.reset_index()[key_list].to_dict('records')
+        else:
+            return repr(stream)
+
+    @staticmethod
+    def _write_collection_relationships(mprov_conn, sig, derived, source):
+        mprov_conn.store_derived_from(derived, source)
+        activity_token = mprov_conn.store_activity(sig, None, None, None)
+
+        uses = RelationModel(
+            type='USAGE', subject_id=activity_token, object_id=source, attributes=[])
+        mprov_conn.cache.store_relation(resource=mprov_conn.get_graph(), body=uses, label='used')
+
+        generates = RelationModel(
+            type='GENERATION', subject_id=derived, object_id=activity_token, attributes=[])
+        mprov_conn.cache.store_relation(resource=mprov_conn.get_graph(), body=generates, label='wasGeneratedBy')
+
+    def __call__(self, func):
+        # Need this to happen here (decoration-time and not call-time)
+        # while the source file is still available to Spark.
+        global stored
+        in_stream_part = stored[self.in_stream_name]
+        out_stream_part = stored[self.out_stream_name]
+        mprov_conn = MProvConnectionCache.get_connection(self.connection_key)
+        func_key = func.__module__ + '.' + func.__name__
+        if mprov_conn:
+            if func_key not in stored:
+                d = (inspect.getsource(func))
+                logging.debug('Read source of %s as %s', func_key, d)
+                code_token = mprov_conn.store_code(d)
+                stored[func_key] = code_token
+            # Add derivation to source input
+            code_token = stored[func_key]
+            self._write_collection_relationships(mprov_conn, code_token, out_stream_part, in_stream_part)
+            mprov_conn.flush()
+        else:
+            stored[func_key] = get_token_qname(func_key + 'no_conn')
+        
+        code_token = stored[func_key]
+        # pandas_udf with function type GROUPED_MAP have either one arg: (data), or two (key, data)
+        args_count = len(inspect.getfullargspec(func)[0])
+
+        @wraps(func)
+        def wrapper(key, data):
+            #args_repr = [md_key(a, in_stream_key) for a in args]
+            #kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+            #signature = ", ".join(args_repr + kwargs_repr)
+            #print(f"Calling {func.__name__}({signature})")
+            
+            val = func(key, data) if args_count > 1 else func(data)
+
+            mprov_conn = MProvConnectionCache.get_connection(self.connection_key)
+
+            # Create a window with the appropriate keys
+            window_ids = []
+            for t in self.rel_keys(data, self.in_stream_key):
+                if mprov_conn:
+                    window_ids.append(get_entity_id(self.in_stream_name, [t[k] for k in self.in_stream_key]))
+                else:
+                    window_ids.append(get_entity_id(self.in_stream_name, [t[k] for k in self.in_stream_key]))
+
+            if isinstance(self.out_stream_key,list):
+                if len(self.out_stream_key) == 1:
+                    out_keys = val.reset_index()[self.out_stream_key[0]].to_list()
+                else:
+                    out_keys = []
+                    # print(val.reset_index()[out_stream_key])
+                    for tup in val.reset_index()[self.out_stream_key].iterrows():
+                        out_keys.append(tup[1].to_list())
+            else:
+                out_keys = val.reset_index()[self.out_stream_key].to_list()
+            output_stream_index = 'w' + str(out_keys) if out_keys else 'w{!s}'.format(uuid.uuid4())
+            
+            ts = datetime.now(timezone.utc)
+            if mprov_conn:
+                try:
+                    for t in self.rel_keys(data, self.in_stream_key):
+                        #print('Input: %s' %in_stream_name + str([t[k] for k in in_stream_key]))
+
+                        # This ensures that the input tuples actually exist.  It needs to merge
+                        # if the tuple is already there
+                        tup = mprov_conn.store_stream_tuple(self.in_stream_name,
+                                                            [t[k] for k in self.in_stream_key], blank_tuple)
+
+                        # Ensure that the input tuples are also linked to the appropriate stream
+                        mprov_conn.add_to_collection(tup, in_stream_part)
+                except:
+                    pass
+                #print (window_ids)
+                
+                result = mprov_conn.store_windowed_result(self.out_stream_name, output_stream_index, blank_tuple,
+                                                 window_ids, code_token, ts, ts)
+                mprov_conn.add_to_collection(result, out_stream_part)
+                if self.collection:
+                    mprov_conn.add_to_collection(result, self.collection)
+                mprov_conn.flush()
+            else:
+                logging.warning("Output: %s.%s <(%s)- %s", self.out_stream_name, output_stream_index, code_token, str(window_ids))
+
+            return val
+        return wrapper if args_count > 1 else partial(wrapper, None)
+
+#if __name__ == '__main__':
+
