@@ -1,0 +1,303 @@
+Metadata-Version: 2.1
+Name: pyrin
+Version: 0.4.26
+Summary: A rich platform-independent application framework to build apps using Flask on top of it.
+Home-page: https://github.com/mononobi/pyrin
+Author: Mohamad Nobakht
+Author-email: mohamadnobakht@gmail.com
+Maintainer: Mohamad Nobakht
+Maintainer-email: mohamadnobakht@gmail.com
+License: GPL-3.0
+Project-URL: Code, https://github.com/mononobi/pyrin
+Project-URL: Issue tracker, https://github.com/mononobi/pyrin/issues
+Keywords: flask python sqlalchemy pyrin core alembic multi-database application-framework rest-api dependency-injection ioc
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Flask
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI :: Application
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown
+Requires-Dist: aniso8601 (>=8.0.0)
+Requires-Dist: bcrypt (>=3.1.7)
+Requires-Dist: pytz (>=2019.3)
+Requires-Dist: Flask (>=1.1.1)
+Requires-Dist: PyJWT (>=2.0.1)
+Requires-Dist: SQLAlchemy (<1.4,>=1.3.13)
+Requires-Dist: colorama (>=0.4.3)
+Requires-Dist: python-dotenv (>=0.10.5)
+Requires-Dist: cryptography (>=2.8)
+Requires-Dist: flask-babel (>=1.0.0)
+Requires-Dist: babel (>=2.8.0)
+Requires-Dist: alembic (>=1.4.0)
+Requires-Dist: fire (>=0.2.1)
+Requires-Dist: sqlparse (>=0.3.0)
+Provides-Extra: celery
+Requires-Dist: celery (>=4.4.7) ; extra == 'celery'
+Provides-Extra: docs
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: sphinxcontrib-log-cabinet ; extra == 'docs'
+Requires-Dist: sphinx-issues ; extra == 'docs'
+Provides-Extra: memcached
+Requires-Dist: pymemcache (>=3.3.0) ; extra == 'memcached'
+Provides-Extra: redis
+Requires-Dist: redis (>=3.5.3) ; extra == 'redis'
+Provides-Extra: sentry
+Requires-Dist: sentry-sdk (>=0.17.4) ; extra == 'sentry'
+Requires-Dist: blinker (>=1.4) ; extra == 'sentry'
+Provides-Extra: tests
+Requires-Dist: aniso8601 (>=8.0.0) ; extra == 'tests'
+Requires-Dist: bcrypt (>=3.1.7) ; extra == 'tests'
+Requires-Dist: pytz (>=2019.3) ; extra == 'tests'
+Requires-Dist: Flask (>=1.1.1) ; extra == 'tests'
+Requires-Dist: PyJWT (>=2.0.1) ; extra == 'tests'
+Requires-Dist: SQLAlchemy (<1.4,>=1.3.13) ; extra == 'tests'
+Requires-Dist: colorama (>=0.4.3) ; extra == 'tests'
+Requires-Dist: python-dotenv (>=0.10.5) ; extra == 'tests'
+Requires-Dist: cryptography (>=2.8) ; extra == 'tests'
+Requires-Dist: flask-babel (>=1.0.0) ; extra == 'tests'
+Requires-Dist: babel (>=2.8.0) ; extra == 'tests'
+Requires-Dist: alembic (>=1.4.0) ; extra == 'tests'
+Requires-Dist: fire (>=0.2.1) ; extra == 'tests'
+Requires-Dist: sqlparse (>=0.3.0) ; extra == 'tests'
+Requires-Dist: pytest ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pygments ; extra == 'tests'
+
+# Pyrin
+
+A rich platform-independent application framework to build apps using Flask on top of it.
+
+Pyrin is an application framework built on top of Flask micro-framework to make 
+life easier for developers who want to develop an enterprise application 
+using Flask, without having to make their own core layer and getting better code
+design and structure that is more maintainable.
+
+Pyrin could be used as the parent package of an application, so other application 
+packages will use its functionality and features to maintain their goals without 
+worrying about basic implementations.
+It is also possible for application packages to extend existing Pyrin packages.
+
+Pyrin point of view is to build an application that is more decoupled, so making it 
+possible to have customized implementations of different packages and also making it 
+easier to write unit-test packages.
+
+Another major fact of Pyrin is to avoid centralized locations for application features, so a team
+of multiple developers be able to work on the same repository without facing conflicts here
+and there. Also reducing the chances of annoying bugs due to forgetting to register
+something in somewhere.
+
+## Installing
+
+**Install using pip**:
+
+**`pip install pyrin`**
+
+## Running Tests
+
+To be able to run tests:
+
+1. Pyrin tests are developed using pytest, you should first 
+   install pyrin tests dependencies using pip:
+
+**`pip install pyrin[tests]`**
+
+2. Now you could execute **`python3 start_unit.py`** to start all unit tests.
+
+## Demo Application
+
+A demo application developed using Pyrin framework is available at: 
+[Pyrin-Demo](https://github.com/mononobi/pyrin_demo)
+
+## Contribute In Pyrin Development
+
+We highly appreciate any kind of contributions to Pyrin development.
+Fork Pyrin and implement a new feature and make a pull request, we'll let
+you know when your work becomes a part of Pyrin.
+So, open the project in your IDE and create your pipenv environment.
+Then you could start developing Pyrin.
+
+## Thanks To JetBrains
+![](./resources/images/jetbrains.png)
+
+We develop pyrin using [JetBrains](https://www.jetbrains.com/?from=pyrin) products with the 
+awesome open source license provided by JetBrains.
+
+## Extremely Simple Usage Example
+
+The sample code below, is just a rapid showcase on how to develop using Pyrin. 
+for a real world application, it is best fit to use the concept of dependency injection 
+and IoC which Pyrin is built upon.
+
+To be able to create an application based on Pyrin, the only thing that is required to do
+is to subclass from pyrin **`Application`** class in your application package. this is 
+needed for Pyrin to be able to find out your application path for generating different 
+paths and also loading your application packages. there is no difference where to put 
+your subclassed **`Application`**, in this example we put it inside the project's main 
+package, inside **`__init__.py`**.
+
+
+**Sample Project Structure:**
+
+- root_dir
+  - demo
+    - `__init__.py`
+    - `api.py`
+    - `models.py`
+  - `start.py`
+
+**`__init__.py:`**
+
+```python
+from pyrin.application.base import Application
+
+
+class DemoApplication(Application):
+    pass
+```
+
+**`models.py:`**
+
+```python
+from pyrin.database.model.base import CoreEntity
+from pyrin.database.orm.sql.schema.columns import GUIDPKColumn, StringColumn, SmallIntegerColumn
+
+
+class GuestEntity(CoreEntity):
+
+    _table = 'guest'
+
+    id = GUIDPKColumn(name='id')
+    name = StringColumn(name='name', max_length=100, validated=True)
+    age = SmallIntegerColumn(name='age', min_value=1, validated=True)
+```
+
+**`api.py:`**
+
+```python
+from pyrin.api.router.decorators import api
+from pyrin.core.structs import DTO
+from pyrin.database.services import get_current_store
+
+from demo.models import GuestEntity
+
+
+@api('/introduce/<name>', authenticated=False)
+def introduce(name, **options):
+    store = get_current_store()
+    guest = GuestEntity(name=name)
+    store.add(guest)
+    return 'Hello dear {name}, you have been added into our database.'.format(name=name)
+
+
+@api('/guests', authenticated=False)
+def guests(**options):
+    store = get_current_store()
+    return store.query(GuestEntity).all()
+
+
+@api('/', authenticated=False)
+def hello(**options):
+    store = get_current_store()
+    count = store.query(GuestEntity.id).count()
+    result = DTO(message='Welcome to our demo application, please introduce yourself.',
+                 current_guests=count)
+    return result
+```
+
+**`start.py:`**
+
+```python
+from demo import DemoApplication
+
+
+if __name__ == '__main__':
+    app = DemoApplication()
+    app.run(use_reloader=False)
+```
+
+Now you could start application by executing this command in your terminal:
+
+**`python3 start.py`**
+
+Application will be available at **`127.0.0.1:5000`** by default.
+
+Pyrin on default configurations, will use an **`in-memory sqlite`** database.
+
+## Creating a New Pyrin Project
+
+Pyrin has a command line tool that can be used to create a new project.
+to use the command line interface of Pyrin, install Pyrin and then open a terminal and write:
+
+```shell
+pyrin project
+```
+
+after hitting enter, a couple of questions will be asked to create your project, answer
+questions accordingly, and your project will be created without a hassle.
+
+## Using Project's Extended Command Line Tool
+
+After creating a new project using **`pyrin project`** command, a **`cli.py`** file will 
+be generated in the root of your new project directory. there are a couple of command 
+groups that can be used to perform different actions. 
+execute each command with **`--help`** option to see all available commands of each group.
+
+- **Builtin Commands:**
+
+  - **`python cli.py alembic`**
+  - **`python cli.py babel`**
+  - **`python cli.py template`**
+  - **`python cli.py security`**
+
+
+- **Integration Commands:**
+  - **`python cli.py celery`**
+
+## Integrations
+
+Pyrin has builtin integrations for different services. to use each one of integrations inside
+your application, you must install dependencies of that integration.
+
+**Celery:**
+
+**`pip install pyrin[celery]`**
+
+To enable celery after installing its dependencies, open **`settings/packaging.ini`** file
+and remove **`pyrin.task_queues.celery`** from the **`ignore_packages`** list.
+
+**Sentry:**
+
+**`pip install pyrin[sentry]`**
+
+To enable sentry after installing its dependencies, open **`settings/packaging.ini`** file
+and remove **`pyrin.logging.sentry`** from the **`ignore_packages`** list.
+
+**Redis:**
+
+**`pip install pyrin[redis]`**
+
+To enable redis after installing its dependencies, open **`settings/packaging.ini`** file
+and remove **`pyrin.caching.remote.handlers.redis`** from the **`ignore_modules`** list.
+
+**Memcached:**
+
+**`pip install pyrin[memcached]`**
+
+To enable memcached after installing its dependencies, open **`settings/packaging.ini`** file
+and remove **`pyrin.caching.remote.handlers.memcached`** from the **`ignore_modules`** list.
+
+
