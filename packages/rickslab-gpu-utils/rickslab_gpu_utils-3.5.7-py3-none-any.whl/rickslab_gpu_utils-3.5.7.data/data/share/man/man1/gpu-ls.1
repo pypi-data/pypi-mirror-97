@@ -1,0 +1,131 @@
+.TH GPU\-LS 1 "June 2020" "rickslab-gpu-utils" "Ricks-Lab GPU Utilities"
+.nh
+.SH NAME
+gpu-ls \- display details about compatible GPU cards
+
+.SH SYNOPSIS
+.B gpu-ls
+.RB [ \-\-short ]
+.br
+.B gpu-ls
+.RB [ \-\-help " | " \-\-about "]"
+.br
+.B gpu-ls
+.RB [ \-\-clinfo "] [" \-\-no_fan "] [" \-\-ppm "] [" \-\-pstates "]
+
+.SH DESCRIPTION
+.B gpu-ls
+displays most relevant parameters for installed and compatible GPUs. The
+default behavior is to list relevant parameters by GPU.  OpenCL platform information is
+added when the \fB--clinfo\fR option is used.  A brief listing of key parameters is
+available with the \fB--short\fR command line option.  A simplified table of current
+GPU state is displayed with the \fB--table\fR option. The \fB--no_fan\fR can be used to
+ignore fan settings.  The \fB--pstate\fR option can be used to output the p-state table
+for each GPU instead of the list of basic parameters.  The \fB--ppm\fR option is used
+to output the table of available power/performance modes instead of basic parameters.
+
+.SH OPTIONS
+.TP
+.BR " \-\-about"
+Will display details about 
+.B gpu-ls\fP.
+.TP
+.BR " \-\-clinfo"
+If the clinfo package is installed, openCL details will be included in the output
+for each compatible GPU.
+.TP
+.BR " \-\-no_fan"
+Will exclude fan information from the display.  Useful with water cooled GPUs.
+.TP
+.BR " \-\-short"
+Will display short list of key descriptive parameters for each installed GPU.
+.TP
+.BR " \-\-table"
+Will display table of basic GPU parameters.
+.TP
+.BR " \-\-ppm"
+Will display descriptions of available power performance modes.
+.TP
+.BR " \-\-pstates"
+Will display P-state table for system and memory clocks.
+.TP
+.BR " \-\-debug"
+Will output additional useful debug/troubleshooting details to a log file.
+.TP
+.BR \-h , " \-\-help"
+Display help text and exit.
+
+.SH "EXAMPLES"
+.nf
+.B gpu-ls
+
+.fi
+This will display the basic parameters for all compatible GPUs.  These include
+device ID, GPU frequency/voltage control type, decoded device ID, card model, short card model,
+display card model, card number, card path, PCIe ID, driver, vBIOS version, HWmon path, current power,
+power cap, power cap range, fan enable, fan PWM mode, current fan PWM, current fan speed,
+fan target speed, fan speed range, fan PWM range, current temp, critical temp, current VddGF,
+Vddc range, current GPU loading, memory details, link speed, link width, current Sclk p-state,
+current Sclk frequency, Sclk range, current Mclk p-state, current Mclk frequency,
+Mclk range, power performance mode, and power force performance level.
+.P
+.B gpu-ls \-\-short
+
+.fi
+This will produce a short list of key descriptive parameters for each installed GPU.
+.P
+.B gpu-ls \-\-clinfo
+
+.fi
+In addition to the basic parameters, openCL parameters are also displayed for each compatible GPU.
+This option is dependent on the installation of \fBclinfo\fR.
+.P
+.B gpu-ls \-\-ppm
+
+.fi
+Instead of the basic parameters, a table of power/performance modes is displayed.
+.P
+.B gpu-ls \-\-pstates
+
+.fi
+Instead of the basic parameters, a table of power states or curve points is displayed.
+.P
+
+.SH CONFIGURATION
+In order to get maximum capability of these utilities, you should be running with a kernel that
+provides support of the GPUs you have installed.  If using AMD GPUs, installing the latest amdgpu
+driver package or the latest ROCm release, may provide additional capabilities. If you have Nvidia
+GPUs installed, nvidia-smi must also be installed in order for the utility reading of the cards
+to be possible.  Writing to GPUs is currently only possible for AMD GPUs, and only with compatible
+cards and with the the AMD ppfeaturemask set to 0xfffd7fff. This can be accomplished by adding
+amdgpu.ppfeaturemask=0xfffd7fff to the GRUB_CMDLINE_LINUX_DEFAULT value in
+/etc/default/grub and executing sudo update-grub.
+
+.SH "FILES"
+.PP
+.TP
+\fB/usr/share/misc/pci.ids\fR
+The system list of all known PCI ID's (vendors, devices, classes and subclasses).
+It can be updated with the \fBupdate-pciids\fR command.
+.TP
+\fB/sys/class/drm/card*/device/pp_od_clk_voltage\fR
+Special driver file for each AMD GPU required by some \fBrickslab-gpu-utils\fR.
+.TP
+\fB/etc/default/grub\fR
+The grub defaults file where amdgpu.ppfeaturemask needs to be set.
+
+.SH BUGS
+Known to not work well with Fiji ProDuo cards and will issue warning messages for Fiji Nano cards.
+Please report any additional bugs/issues at https://github.com/Ricks-Lab/gpu-utils
+
+.SH "SEE ALSO"
+.BR clinfo (1),
+.BR amdgpu (4),
+.BR nvidia-smi (1),
+.BR update-grub (8),
+.BR update-pciids (8),
+.BR lspci (8)
+
+.SH AVAILABILITY
+The gpu-ls command is part of the rickslab-gpu-utils package and is available from
+https://github.com/Ricks-Lab/gpu-utils

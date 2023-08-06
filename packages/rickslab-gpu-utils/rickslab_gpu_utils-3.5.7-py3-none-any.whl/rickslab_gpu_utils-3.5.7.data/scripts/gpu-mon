@@ -1,0 +1,402 @@
+#!python
+""" gpu-mon  -  Displays current status of all active GPUs
+
+    A utility to give the current state of all compatible GPUs. The default behavior
+    is to continuously update a text based table in the current window until Ctrl-C is
+    pressed.  With the *--gui* option, a table of relevant parameters will be updated
+    in a Gtk window.  You can specify the delay between updates with the *--sleep N*
+    option where N is an integer > zero that specifies the number of seconds to sleep
+    between updates.  The *--no_fan* option can be used to disable the reading and display
+    of fan information.  The *--log* option is used to write all monitor data to a psv log
+    file.  When writing to a log file, the utility will indicate this in red at the top of
+    the window with a message that includes the log file name. The *--plot* will display a
+    plot of critical GPU parameters which updates at the specified *--sleep N* interval. If
+    you need both the plot and monitor displays, then using the --plot option is preferred
+    over running both tools as a single read of the GPUs is used to update both displays.
+    The *--ltz* option results in the use of local time instead of UTC.
+
+    Copyright (C) 2019  RicksLab
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+__author__ = 'RueiKe'
+__copyright__ = 'Copyright (C) 2019 RicksLab'
+__credits__ = ['Craig Echt - Testing, Debug, Verification, and Documentation',
+               'Keith Myers - Testing, Debug, Verification of NV Capability']
+__license__ = 'GNU General Public License'
+__program_name__ = 'gpu-mon'
+__maintainer__ = 'RueiKe'
+__docformat__ = 'reStructuredText'
+# pylint: disable=multiple-statements
+# pylint: disable=line-too-long
+# pylint: disable=bad-continuation
+
+import argparse
+import subprocess
+import threading
+import os
+import logging
+import sys
+import shlex
+import shutil
+import time
+import signal
+from typing import Callable
+from numpy import isnan
+
+try:
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import GLib, Gtk
+except ModuleNotFoundError as error:
+    print('gi import error: {}'.format(error))
+    print('gi is required for {}'.format(__program_name__))
+    print('   In a venv, first install vext:  pip install --no-cache-dir vext')
+    print('   Then install vext.gi:  pip install --no-cache-dir vext.gi')
+    sys.exit(0)
+
+from GPUmodules import __version__, __status__
+from GPUmodules import GPUgui
+from GPUmodules import GPUmodule as Gpu
+from GPUmodules import env
+
+set_gtk_prop = GPUgui.GuiProps.set_gtk_prop
+LOGGER = logging.getLogger('gpu-utils')
+
+
+def ctrl_c_handler(target_signal: signal.Signals, _frame) -> None:
+    """
+    Signal catcher for ctrl-c to exit monitor loop.
+
+    :param target_signal: Target signal name
+    :param _frame: Ignored
+    """
+    LOGGER.debug('ctrl_c_handler (ID: %s) has been caught. Setting quit flag...', target_signal)
+    print('Setting quit flag...')
+    MonitorWindow.quit = True
+
+
+signal.signal(signal.SIGINT, ctrl_c_handler)
+
+# SEMAPHORE ############
+UD_SEM = threading.Semaphore()
+########################
+
+
+class MonitorWindow(Gtk.Window):
+    """
+    Custom PAC Gtk window.
+    """
+    quit = False
+
+    def __init__(self, gpu_list, devices):
+
+        init_chk_value = Gtk.init_check(sys.argv)
+        LOGGER.debug('init_check: %s', init_chk_value)
+        if not init_chk_value[0]:
+            print('Gtk Error, Exiting')
+            sys.exit(-1)
+        Gtk.Window.__init__(self, title=env.GUT_CONST.gui_window_title)
+        self.set_border_width(0)
+        GPUgui.GuiProps.set_style()
+
+        if env.GUT_CONST.icon_path:
+            icon_file = os.path.join(env.GUT_CONST.icon_path, 'gpu-mon.icon.png')
+            LOGGER.debug('Icon file: [%s]', icon_file)
+            if os.path.isfile(icon_file):
+                self.set_icon_from_file(icon_file)
+
+        grid = Gtk.Grid()
+        self.add(grid)
+
+        col = 0
+        row = 0
+        num_amd_gpus = gpu_list.num_gpus()['total']
+        if env.GUT_CONST.DEBUG:
+            debug_label = Gtk.Label(name='warn_label')
+            debug_label.set_markup('<big><b> DEBUG Logger Active </b></big>')
+            lbox = Gtk.Box(spacing=6, name='warn_box')
+            set_gtk_prop(debug_label, top=1, bottom=1, right=1, left=1)
+            lbox.pack_start(debug_label, True, True, 0)
+            grid.attach(lbox, 0, row, num_amd_gpus+1, 1)
+        row += 1
+        if env.GUT_CONST.LOG:
+            log_label = Gtk.Label(name='warn_label')
+            log_label.set_markup('<big><b> Logging to:    </b>{}</big>'.format(env.GUT_CONST.log_file))
+            lbox = Gtk.Box(spacing=6, name='warn_box')
+            set_gtk_prop(log_label, top=1, bottom=1, right=1, left=1)
+            lbox.pack_start(log_label, True, True, 0)
+            grid.attach(lbox, 0, row, num_amd_gpus+1, 1)
+        row += 1
+        row_start = row
+
+        row = row_start
+        row_labels = {'card_num': Gtk.Label(name='white_label')}
+        row_labels['card_num'].set_markup('<b>Card #</b>')
+        for param_name, param_label in gpu_list.table_param_labels().items():
+            row_labels[param_name] = Gtk.Label(name='white_label')
+            row_labels[param_name].set_markup('<b>{}</b>'.format(param_label))
+        for row_label_item in row_labels.values():
+            lbox = Gtk.Box(spacing=6, name='head_box')
+            set_gtk_prop(lbox, top=1, bottom=1, right=1, left=1)
+            set_gtk_prop(row_label_item, top=1, bottom=1, right=4, left=4, align=(0.0, 0.5))
+            lbox.pack_start(row_label_item, True, True, 0)
+            grid.attach(lbox, col, row, 1, 1)
+            row += 1
+        for gpu in gpu_list.gpus():
+            devices[gpu.prm.uuid] = {'card_num':  Gtk.Label(name='white_label')}
+            devices[gpu.prm.uuid]['card_num'].set_markup('<b>CARD{}</b>'.format(gpu.get_params_value('card_num')))
+            devices[gpu.prm.uuid]['card_num'].set_use_markup(True)
+            for param_name in gpu_list.table_param_labels():
+                devices[gpu.prm.uuid][param_name] = Gtk.Label(label=gpu.get_params_value(str(param_name)),
+                                                              name='white_label')
+                devices[gpu.prm.uuid][param_name].set_width_chars(10)
+                set_gtk_prop(devices[gpu.prm.uuid][param_name], width_chars=10)
+
+        for gui_component in devices.values():
+            col += 1
+            row = row_start
+            for comp_name, comp_item in gui_component.items():
+                comp_item.set_text('')
+                if comp_name == 'card_num':
+                    lbox = Gtk.Box(spacing=6, name='head_box')
+                else:
+                    lbox = Gtk.Box(spacing=6, name='med_box')
+                set_gtk_prop(lbox, top=1, bottom=1, right=1, left=1)
+                set_gtk_prop(comp_item, top=1, bottom=1, right=3, left=3, width_chars=17)
+                lbox.pack_start(comp_item, True, True, 0)
+                grid.attach(lbox, col, row, 1, 1)
+                row += 1
+
+    def set_quit(self, _arg2, _arg3) -> None:
+        """
+        Set quit flag when Gtk quit is selected.
+        """
+        self.quit = True
+
+
+def update_data(gpu_list: Gpu.GpuList, devices: dict, cmd: subprocess.Popen) -> None:
+    """
+    Update monitor data with data read from GPUs.
+
+    :param gpu_list: A gpuList object with all gpuItems
+    :param devices: A dictionary linking Gui items with data.
+    :param cmd: Subprocess return from running plot.
+    """
+    # SEMAPHORE ############
+    if not UD_SEM.acquire(blocking=False):
+        LOGGER.debug('Update while updating, skipping new update')
+        return
+    ########################
+    gpu_list.read_gpu_sensor_set(data_type=Gpu.GpuItem.SensorSet.Monitor)
+    if env.GUT_CONST.LOG:
+        gpu_list.print_log(env.GUT_CONST.log_file_ptr)
+    if env.GUT_CONST.PLOT:
+        try:
+            gpu_list.print_plot(cmd.stdin)
+        except (OSError, KeyboardInterrupt) as except_err:
+            LOGGER.debug('gpu-plot has closed: [%s]', except_err)
+            print('gpu-plot has closed')
+            env.GUT_CONST.PLOT = False
+
+    # update gui
+    for uuid, gui_component in devices.items():
+        for comp_name, comp_item in gui_component.items():
+            if comp_name == 'card_num':
+                comp_item.set_markup('<b>Card{}</b>'.format(gpu_list[uuid].get_params_value('card_num')))
+            else:
+                data_value_raw = gpu_list[uuid].get_params_value(comp_name)
+                LOGGER.debug('raw data value: %s', data_value_raw)
+                if isinstance(data_value_raw, float):
+                    if not isnan(data_value_raw):
+                        data_value_raw = round(data_value_raw, 3)
+                data_value = str(data_value_raw)[:16]
+                comp_item.set_text(data_value)
+            set_gtk_prop(comp_item, width_chars=17)
+
+    while Gtk.events_pending():
+        Gtk.main_iteration_do(True)
+    # SEMAPHORE ############
+    UD_SEM.release()
+    ########################
+
+
+def refresh(refreshtime: int, update_data_func: Callable, gpu_list: Gpu.GpuList, devices: dict,
+            cmd: subprocess.Popen, gmonitor: Gtk.Window) -> None:
+    """
+    Method called for monitor refresh.
+
+    :param refreshtime:  Amount of seconds to sleep after refresh.
+    :param update_data_func: Function that does actual data update.
+    :param gpu_list: A gpuList object with all gpuItems
+    :param devices: A dictionary linking Gui items with data.
+    :param cmd: Subprocess return from running plot.
+    :param gmonitor:
+    """
+    while True:
+        if gmonitor.quit:
+            print('Quitting...')
+            Gtk.main_quit()
+            sys.exit(0)
+        GLib.idle_add(update_data_func, gpu_list, devices, cmd)
+        tst = 0.0
+        sleep_interval = 0.2
+        while tst < refreshtime:
+            time.sleep(sleep_interval)
+            tst += sleep_interval
+
+
+def main() -> None:
+    """
+    Flow for gpu-mon.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--about', help='README', action='store_true', default=False)
+    parser.add_argument('--gui', help='Display GTK Version of Monitor', action='store_true', default=False)
+    parser.add_argument('--log', help='Write all monitor data to logfile', action='store_true', default=False)
+    parser.add_argument('--plot', help='Open and write to gpu-plot', action='store_true', default=False)
+    parser.add_argument('--ltz', help='Use local time zone instead of UTC', action='store_true', default=False)
+    parser.add_argument('--sleep', help='Number of seconds to sleep between updates', type=int, default=2)
+    parser.add_argument('--no_fan', help='do not include fan setting options', action='store_true', default=False)
+    parser.add_argument('-d', '--debug', help='Debug output', action='store_true', default=False)
+    parser.add_argument('--pdebug', help='Plot debug output', action='store_true', default=False)
+    args = parser.parse_args()
+
+    # About me
+    if args.about:
+        print(__doc__)
+        print('Author: ', __author__)
+        print('Copyright: ', __copyright__)
+        print('Credits: ', *['\n      {}'.format(item) for item in __credits__])
+        print('License: ', __license__)
+        print('Version: ', __version__)
+        print('Install Type: ', env.GUT_CONST.install_type)
+        print('Maintainer: ', __maintainer__)
+        print('Status: ', __status__)
+        sys.exit(0)
+
+    if int(args.sleep) <= 1:
+        print('Invalid value for sleep specified.  Must be an integer great than zero')
+        sys.exit(-1)
+    env.GUT_CONST.set_args(args)
+    LOGGER.debug('########## %s %s', __program_name__, __version__)
+
+    if env.GUT_CONST.check_env() < 0:
+        print('Error in environment. Exiting...')
+        sys.exit(-1)
+
+    # Get list of AMD GPUs and get basic non-driver details
+    gpu_list = Gpu.GpuList()
+    gpu_list.set_gpu_list()
+
+    # Check list of GPUs
+    num_gpus = gpu_list.num_vendor_gpus()
+    print('Detected GPUs: ', end='')
+    for i, (type_name, type_value) in enumerate(num_gpus.items()):
+        if i:
+            print(', {}: {}'.format(type_name, type_value), end='')
+        else:
+            print('{}: {}'.format(type_name, type_value), end='')
+    print('')
+    if 'AMD' in num_gpus.keys():
+        env.GUT_CONST.read_amd_driver_version()
+        print('AMD: {}'.format(gpu_list.wattman_status()))
+    if 'NV' in num_gpus.keys():
+        print('nvidia smi: [{}]'.format(env.GUT_CONST.cmd_nvidia_smi))
+
+    num_gpus = gpu_list.num_gpus()
+    if num_gpus['total'] == 0:
+        print('No GPUs detected, exiting...')
+        sys.exit(-1)
+
+    # Read data static/dynamic/info/state driver information for GPUs
+    gpu_list.read_gpu_sensor_set(data_type=Gpu.GpuItem.SensorSet.All)
+
+    # Check number of readable/writable GPUs again
+    num_gpus = gpu_list.num_gpus()
+    print('{} total GPUs, {} rw, {} r-only, {} w-only\n'.format(num_gpus['total'], num_gpus['rw'],
+                                                                num_gpus['r-only'], num_gpus['w-only']))
+
+    time.sleep(1)
+    # Generate a new list of only compatible GPUs
+    if num_gpus['r-only'] + num_gpus['rw'] < 1:
+        print('No readable GPUs, exiting...')
+        sys.exit(0)
+    com_gpu_list = gpu_list.list_gpus(compatibility=Gpu.GpuItem.GPU_Comp.Readable)
+    # Check readable and compatible
+    num_gpus = com_gpu_list.num_gpus()
+    if num_gpus['total'] == 0:
+        print('No readable and compatible GPUs detected, exiting...')
+        sys.exit(-1)
+
+    if args.log:
+        env.GUT_CONST.LOG = True
+        env.GUT_CONST.log_file = './log_monitor_{}.txt'.format(
+            env.GUT_CONST.now(ltz=env.GUT_CONST.USELTZ).strftime('%m%d_%H%M%S'))
+        env.GUT_CONST.log_file_ptr = open(env.GUT_CONST.log_file, 'w', 1)
+        gpu_list.print_log_header(env.GUT_CONST.log_file_ptr)
+
+    if args.plot:
+        args.gui = True
+    if args.gui:
+        # Display Gtk style Monitor
+        devices = {}
+        gmonitor = MonitorWindow(com_gpu_list, devices)
+        gmonitor.connect('delete-event', gmonitor.set_quit)
+        gmonitor.show_all()
+
+        cmd = None
+        if args.plot:
+            env.GUT_CONST.PLOT = True
+            plot_util = shutil.which('gpu-plot')
+            if not plot_util:
+                plot_util = os.path.join(env.GUT_CONST.repository_path, 'gpu-plot')
+            if os.path.isfile(plot_util):
+                if env.GUT_CONST.PDEBUG:
+                    cmd_str = '{} --debug --stdin --sleep {}'.format(plot_util, env.GUT_CONST.SLEEP)
+                else:
+                    cmd_str = '{} --stdin --sleep {}'.format(plot_util, env.GUT_CONST.SLEEP)
+                cmd = subprocess.Popen(shlex.split(cmd_str), bufsize=-1, shell=False, stdin=subprocess.PIPE)
+                com_gpu_list.print_plot_header(cmd.stdin)
+            else:
+                print('Fatal Error: gpu-plot not found.')
+
+        # Start thread to update Monitor
+        threading.Thread(target=refresh, daemon=True,
+                         args=[env.GUT_CONST.SLEEP, update_data, com_gpu_list, devices, cmd, gmonitor]).start()
+
+        Gtk.main()
+    else:
+        # Display text style Monitor
+        try:
+            while True:
+                com_gpu_list.read_gpu_sensor_set(data_type=Gpu.GpuItem.SensorSet.Monitor)
+                os.system('clear')
+                if env.GUT_CONST.DEBUG:
+                    print('{}DEBUG logger is active{}'.format('\033[31m \033[01m', '\033[0m'))
+                if env.GUT_CONST.LOG:
+                    print('{}Logging to:  {}{}'.format('\033[31m \033[01m', env.GUT_CONST.log_file, '\033[0m'))
+                    com_gpu_list.print_log(env.GUT_CONST.log_file_ptr)
+                com_gpu_list.print_table()
+                time.sleep(env.GUT_CONST.SLEEP)
+                if MonitorWindow.quit:
+                    sys.exit(-1)
+        except KeyboardInterrupt:
+            if env.GUT_CONST.LOG:
+                env.GUT_CONST.log_file_ptr.close()
+            sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()
