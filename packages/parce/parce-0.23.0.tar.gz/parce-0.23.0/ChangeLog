@@ -1,0 +1,297 @@
+ChangeLog
+=========
+
+
+2021-03-08: parce-0.23.0
+
+- added lang.numbers to parse english numbers
+- lexer: only advance position in circular target when pushing
+- scheme: fixed shorthand complex notations like 0+i, -i etc.
+- lilypond: recognize $@ and #@ as Scheme starters
+- small improvements and documentation improvements
+
+
+2021-02-16: parce-0.22.0
+
+- general code cleanup and improvements
+- transform: add Items.arg, so a transform can access the lexicon argument
+- lilypond language definition:
+   * fixed whitespace in list separator token
+   * added \fermata markup command
+   * unit now has its own action Name.Builtin.Unit
+- scheme language definition:
+   * better number parsing, now supports all features of Scheme/Guile numbers
+     bin/dec/hex/oct, fraction, +/- inf, nan, complex, polar, exact/inexact
+   * a helper function parsing scheme number tokens into a python value
+   * test suite for scheme numbers
+
+
+2021-02-11: parce-0.21.0
+
+- small change in GroupToken handling: now the last token has a negative index.
+  This makes it easier to recognize the last group token in a stream.
+- adapt some more places where erroneously Python 3.8 syntax was used (asterisk
+  in return or yield statements without parentheses).
+- lilypond language definition:
+   * in lyric word, highlight tie and space separately
+   * added many missing commands/words
+
+
+2021-02-09: parce-0.20.0
+
+- don't (yet) use positional-only arguments, keep python 3.6 support
+- simplified LilyPond tokenizing, removed identifier context
+
+
+2021-02-07: parce-0.19.0
+
+- simplified LilyPond language definition, many improvements
+- rule.findmember now creates one dict under the hood which is faster
+- fixed deadlock when a rule in a lexicon derived the same lexicon
+- Lexicon.arg is now readonly (a Lexicon should be a immutable).
+
+
+2021-01-31: parce-0.18.0
+
+- fix a treebuilder bug where different derived lexicons compared the same
+- here documents in bash are supported, other bash improvements
+- improvements to lilypond lexing
+- improvements to util.Dispatcher: tread safe and more powerful
+- more editor style properties were added to the themes
+- added pastel and solarized light and dark themes
+- improved terminal theme colors
+- small indenting fixes
+- added tests/themes.html to view the themes in a browser
+- added examples page to the docs, using the examples from the tests/ dir.
+- many documentation updates
+
+
+2021-01-21: parce-0.17.0
+
+- fixed treebuilder.build_tree() function with root lexicon None
+- fixed multiple selectors in css prelude not working
+- fixed small formatting glitches with multi-theme formatter
+- Formatter can now handle _unparsed class, added debug theme
+- more colors in default theme
+- language examples in documentation are now rendered with parce
+- added chapter about syntax highlighting to documentation
+- many parce classes now have prettier repr
+- added Bash and C languages
+
+
+2021-01-17: parce-0.16.0
+
+- redesigned theme and formatter module
+- HtmlFormatter is now usable and documented
+- fixed first ±10 tokens marked as updated even if they didn't change
+- added Tcl and DocBook languages
+- many documentation updates and improvements
+
+
+2021-01-12: parce-0.15.0
+
+- documentation switched to Furo theme, looks better on small devices
+- the rule item MATCH(n) has changed to MATCH[n], which is more uniform
+- the rule item char() has been renamed to chars()
+- regex.to_string() now supports named Unicode literals
+- fixed transformation of escaped text in Json
+- util.Switch can now be used as class instance, as descriptor
+- added methods to indent.Indenter to auto_indent, increase or decrease indent
+- added Document.append() to append text at the end
+
+
+2021-01-02: parce-0.14.0
+
+- documentation updates and improvements
+- removed Context.source and Token.target (and their Query counterparts)
+- removed get_group_* functions from tree.py, added them as methods to
+  GroupToken
+- Cursor.start is now Cursor.pos (in line with Token and Block etc.)
+- added document block api
+- added Document.token, Cursor.token and Cursor.tokens, etc.
+- Context.find_* and Context.tokens_range() are more robust now
+- added indent module
+- Event.tokens is now Event.lexemes to avoid confusion
+
+
+2020-06-02: parce-0.13.0
+
+- documentation updates and improvements
+- added rule.anyof() and rule.gselect()
+- added the @lexicon consume argument, which puts a switching token in the
+  target context
+- added transform.Items.grouped() and .objects()
+- TreeBuilder.replace_pos() now gets the index as second arg, not the slice
+
+
+2020-05-18: parce-0.12.0
+
+- the built-in CSS parser now uses CssTransform to parse a CSS file instead
+  of using the query module
+- added Transformer.connect_treebuilder() to keep a transformed result auto-
+  matically up-to-date.
+- a BackgroundTransformer was added
+- the parent attribute of a tree Node now uses a weak reference
+- the group attribute of a _GroupToken is not a tuple of _GroupTokens anymore,
+  it's just an integer value indicating the index of the token in the group.
+  This is done to annihilate circular references.
+
+
+2020-05-13: parce-0.11.0
+
+- fix NameError: name 'Escape' is not defined in parce/css.py
+- in the bundled languages __all__ is defined and from import * is not used
+  anymore
+- documentation improvements
+
+
+2020-05-13: parce-0.10.0
+
+- dynamic rule item infrastructure completely rewritten, rule items
+  are simpler, more powerful and fine-grained
+- some modules have been renamed:
+  action → StandardAction is now in standardaction, ActionItem in ruleitem
+  stdactions → action
+- the rule item helpers are not in the parce namepace, but in parce.rule
+- the standard actions are not in the parce namespace, but in parce.action
+- parce.document.Document now inherits from Observable and emits events
+- fixed: AttributeError: 'str' object has no attribute 'IfArg'
+
+
+2020-05-04: parce-0.9.0
+
+- initial version of a transform module, that can transform a parce tree
+  to any structure you want using a Transform class, potentionally using
+  caching on contexts
+- added util.Observable, and use it in TreeBuilder to emit events
+- added unicharclass module
+- added using(), like in Pygments, it lexes a match with another lexicon
+- added JavaScript parser
+- added Python console session parser (with prompts)
+- added basic GNU Texinfo parser
+- added groff/troff parser, even includes LilyPond (as per the groff manual!)
+- fixed parsing resume when first part of a match was skipped or not used
+  (e.g. r'( )(")', bygroup(skip, String) or r' (")', bygroup(String))
+
+
+2020-04-25: parce-0.8.5
+
+- restructured standard actions, easier to combine actions
+- improved default styles, added a template for new CSS styles
+- added oldfashioned terminal CSS style (see parce/themes)
+- parce is now fully recursion proof, there is no limit on the depth of a tree
+- added toml parser
+- added tex/latex parser
+- added HTML parser, building on the XML parser and supporting CSS
+- support \score inside \markup in LilyPond
+- added the registry module, and the main find() function
+- TreeBuilder.peek(start, tree) now also gets start position
+- default_action can now be a dynamic item (TextItem)
+- added the main maparg() helper
+
+
+2020-04-07: parce-0.8.0
+
+- added documentation with examples for bundled languages
+- added ini file parser
+- added mapmember and mapgroupmember rule items
+- tree builder: simpler API, all types now simply use rebuild()
+- tree builder: while building new tree, keep old tree intact
+- tree builder: now it is possible to get fine-grained updates
+- added treebuilder.peek() functionality to get a quick first part of a build
+
+
+2020-03-14: parce-0.7.0
+
+- bytext() and bymatch() are now generic "replacables", they can be used
+  to specify an alternative action, target or both in one go. tomatch() was not
+  needed anymore and is gone.
+- much more replacables, all replacable items now inherit from DynamicItem,
+  (except for Pattern)
+- make it possible to create derived lexicons, e.g. to parse here documents
+- improved LilyPond and Scheme parser
+- added JSON parser
+- lexer resurrected, now generates an event stream, which is used by the tree
+  builder
+- documentation improvements, more examples in doc strings
+
+
+2020-02-16: parce-0.6.0
+
+- Large improvements in theme module, MetaTheme working well
+- MetaTheme can render embedded themes with their own window style
+- Added formatter module to format/highlight/colorize text using a Theme
+- More queries in query module, and a query evaluates to False when no results
+- Smart Context.context_slices method that yields slices of nodes per-context
+  for every range. When processing the nodes from each slice we know they
+  originated in the same lexicon and language.
+- Documentation improvements, better cross-linking
+
+
+2020-02-07: parce-0.5.0
+
+- Added CSS module to parse and use stylesheets, using CSS lang def
+- Added theme module using CSS to assign text formats to standard actions
+
+
+2020-01-27: parce-0.4.0
+
+- Added testing using pytest
+- Added CSS parser
+- Improved LilyPond and Scheme parser
+- Documentation added and improved
+- Running `pytest-3` now also validates all languages
+
+
+2020-01-22: parce-0.3.0
+
+- Renamed to parce. Better, not a company name and sounds like 'parse'
+
+
+2020-01-21: livelex-0.3.0
+
+- add query module
+- fixed util.merge_adjacent_tokens()
+- optimize: when there is only one rule in a lexicon and the pattern does not
+  use regexp classes or qualifiers, and there are no dynamic actions or
+  targets that depend on a match object; convert it to a string and use
+  str.find instead of re.search.
+
+
+2020-01-15: livelex-0.2.0
+
+- API added to tokenize in background thread
+- qtdocument moved to livelex-qt
+
+
+2020-01-08: livelex-0.1.0
+
+- Moved from pre-alpha to alpha :-)
+- Much more documention in code
+- Tree construction and partial rebuild very robust now
+- Standard actions defined
+- add lang/xml.py as a sketch how to implement a language with lexicons
+- Full api in livelex.*
+- experimental QtDocument, implementing TreeDocument around a QTextDocument
+- Improvements in tree navigation and iteration speed
+- Nice find/replace methods for AbstractDocument
+
+
+2020-01-02: livelex-0.0.7
+
+- Lots of new stuff, document, tree structure etc, old lexer gone
+- test/validation functions
+- Fix missing parentheses around two-character expression, e.g. when creating a
+  regexp from ['a', 'abc']
+
+
+2019-12-18: livelex-0.0.6
+
+- Fix AttributeError: module 'livelex.regex' has no attribute 'RegexBuilder'
+- improve README
+- remove test cruft from language
+
+
+2019-12-18: livelex-0.0.5
+
+- Initial release
