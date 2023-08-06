@@ -1,0 +1,1359 @@
+#!/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2015-2016 James Clark <james.clark@ligo.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from __future__ import print_function
+
+import argparse
+import ast
+import gzip
+import os
+import shutil
+import subprocess
+import sys
+
+try:
+    import configparser
+except ImportError:  # python < 3
+    import ConfigParser as configparser
+
+import numpy as np
+
+from glue import pipeline
+
+from lalapps import inspiralutils
+from ligo import segments
+import lalframe.frread as fr
+
+from bayeswave_pipe import bayeswave_pipe_utils as pipe_utils
+
+
+#############################################
+#
+# Local function defs
+def confirm(prompt=None, resp=False):
+    """Lifted from:
+    http://code.activestate.com/recipes/541096-prompt-the-user-for-confirmation/
+    Prompts for yes or no response from the user. Returns True for yes and
+    False for no.
+
+    'resp' should be set to the default value assumed by the caller when
+    user simply types ENTER.
+
+    >>> confirm(prompt='Proceed?', resp=True)
+    Create Directory? [y]|n: 
+    True
+    >>> confirm(prompt='Proceed?', resp=False)
+    Create Directory? [n]|y: 
+    False
+    >>> confirm(prompt='Proceed?', resp=False)
+    Create Directory? [n]|y: y
+    True
+
+    """
+
+    if prompt is None:
+        prompt = 'Confirm'
+
+    if resp:
+        prompt = '%s [%s]|%s: ' % (prompt, 'y', 'n')
+    else:
+        prompt = '%s [%s]|%s: ' % (prompt, 'n', 'y')
+
+    while True:
+        ans = input(prompt)
+        if not ans:
+            return resp
+        if ans not in ['y', 'Y', 'n', 'N']:
+            print('please enter y or n.')
+            continue
+        if ans == 'y' or ans == 'Y':
+            return True
+        if ans == 'n' or ans == 'N':
+            return False
+
+
+def localize_xml(xmlfile, old_path, new_path):
+    """
+    Modify absolute paths in xml files to relative paths
+    """
+
+    try:
+        with gzip.open(xmlfile, 'r') as oldxml:
+            filedata = oldxml.read()
+    except IOError:
+        with open(xmlfile, 'r') as oldxml:
+            filedata = oldxml.read()
+
+    # Search and replace on the abs path
+    newdata = filedata.replace(old_path, new_path)
+
+    # Backup the original xml file
+    shutil.move(xmlfile, xmlfile + '.bk')
+
+    if xmlfile.endswith('.gz'):
+        with gzip.open(xmlfile, 'w') as newxml:
+            newxml.write(newdata)
+    else:
+        with open(xmlfile, 'w') as newxml:
+            newxml.write(newdata)
+
+    return
+
+
+def job_times(trigtime, seglen, psdlen, padding):
+    """
+    Compute the gps times corresponding to a given trigger time
+
+    psdstart = trigtime - (psdlen + padding)
+    start = floor(min(psdstart, trigtime-0.5*seglen))
+    stop  = ceil(max(start+psdlen, trigtime+0.5*Sseglen))
+
+    returns segment(start,stop), psdstart
+
+    so that start can be used easily as a psd start
+    """
+
+    psdstart = trigtime - (0.5 * psdlen + padding)
+    start = np.floor(min(psdstart, trigtime - 0.5 * seglen))
+    stop = np.ceil(max(start + psdlen, trigtime + 0.5 * seglen))
+
+    return segments.segment(start, stop), psdstart
+
+
+def dump_job_info(job_dir, trigger):
+    """
+    Writes a text file with job info to outputDir:
+
+    GPS time, hl_lag or GraceID, frequency, and cWB’s rho
+    """
+    f = open(os.path.join(job_dir, 'job_info.txt'), 'w')
+
+    f.write('# rho gps hl_lag hv_lag freq veto1 veto2 graceID\n')
+    f.write('{rho} {gps_time} {hl_time_lag} {hv_time_lag} {trig_frequency} \
+            {veto1} {veto2} {graceID}\n'.format(
+        gps_time=trigger.trigger_time,
+        hl_time_lag=trigger.hl_time_lag,
+        hv_time_lag=trigger.hv_time_lag,
+        trig_frequency=trigger.trigger_frequency,
+        rho=trigger.rho,
+        veto1=trigger.veto1,
+        veto2=trigger.veto2,
+        graceID=trigger.graceID))
+    f.close()
+
+
+def parser():
+    """
+    Parser for input (command line and ini file)
+    """
+
+    # cmd line
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument(dest="configfile", help="Config file")
+    parser.add_argument("-r", "--workdir", type=str, default=None, required=True)
+    parser.add_argument("-t", "--trigger-time", type=float, default=None)
+    parser.add_argument("-l", "--trigger-list", type=str, default=None)
+    parser.add_argument("--bayesline-median-psd", default=False,
+                        action="store_true")
+    parser.add_argument("--cwb-trigger-list", type=str, default=None)
+    parser.add_argument("--server", type=str, default=None)
+    parser.add_argument("--copy-frames", default=False, action="store_true")
+    parser.add_argument("--skip-datafind", default=False, action="store_true")
+    parser.add_argument("--sim-data", default=False, action="store_true")
+    parser.add_argument("-I", "--injfile", default=None)
+    parser.add_argument("-F", "--followup-injections", default=None)
+    parser.add_argument("-G", "--graceID", default=None)
+    parser.add_argument("--graceID-list", default=None)
+    parser.add_argument("--gdb-playground", default=False, action="store_true")
+    parser.add_argument("--bw-inject", default=False, action="store_true")
+    parser.add_argument("--submit-to-gracedb", default=False, action="store_true")
+    parser.add_argument("--html-root", default=None)
+    parser.add_argument("--skip-megapy", default=False, action="store_true")
+    parser.add_argument("--skip-post", default=False, action="store_true")
+    parser.add_argument("--separate-post-dag", default=False, action="store_true")
+    parser.add_argument("--fpeak-analysis", default=False, action="store_true")
+    parser.add_argument("--trigger-time-delta", type=float, default=0.0)
+    parser.add_argument("--bayeswave-clean-frame", default=False, action="store_true")
+    parser.add_argument("--condor-submit", default=False, action="store_true")
+
+    # Advanced condor options
+    parser.add_argument("--bayeswave-retries", type=int, default=1)
+    parser.add_argument("--osg-deploy", default=False, action="store_true")
+    # parser.add_argument("--max-runtime", type=float, default=84600)
+    # parser.add_argument("--resume-time", type=float, default=300)
+    parser.add_argument("--transfer-files", default=True, action="store_true")
+    parser.add_argument("--shared-filesystem", default=False, action="store_true")
+    parser.add_argument("--singularity", default=None)
+
+    opts = parser.parse_args()
+
+    if opts.workdir is None:
+        print("ERROR: must specify --workdir", file=sys.stderr)
+        sys.exit(1)
+
+    if not os.path.isfile(opts.configfile):
+        print("ERROR: config file %s does not exist" % opts.configfile, file=sys.stderr)
+        sys.exit(1)
+
+    #  --- Read config file
+    cp = configparser.ConfigParser()
+    cp.optionxform = str
+    cp.read(opts.configfile)
+
+    return opts, cp
+
+
+#
+# Parse options, arguments and ini file
+#
+opts, cp = parser()
+cp.set('condor', 'copy-frames', str(opts.copy_frames))
+
+workdir = os.path.abspath(opts.workdir)
+
+if os.path.exists(workdir):
+    print("""
+    \nXXX DANGER XXX: path {} already exists.
+
+    Continuing workflow generation will OVERWRITE current workflow files
+    (configuration file, injection data, DAGMAN and Bash scripts).  This may
+    complicate book-keeping and is not recommended for production analyses.
+
+    Proceeding is only recommended to re-run POSTPROCESSING.
+
+    **Sanity is not guarenteed** if re-running parent bayeswave jobs\n""".format(
+        workdir), file=sys.stderr)
+
+    if not confirm(prompt='Proceed?', resp=False):
+        print("You chose wisely, exiting", file=sys.stderr)
+        sys.exit(1)
+
+else:
+    print("making work-directory: %s" % workdir, file=sys.stdout)
+    os.makedirs(workdir)
+    os.makedirs(workdir + "/logs")
+    os.makedirs(workdir + "/datafind")
+
+# Decide whether setting a bayesline parent PSD job
+if cp.has_option('bayeswave_options', 'bayesline-median-psd'):
+    # override command line
+    opts.bayesline_median_psd = True
+
+# Decide whether analysing fpeak
+if cp.has_option('bayeswave_fpeak_options', 'fpeak-analysis'):
+
+    # override command line
+    opts.fpeak_analysis = True
+
+    if cp.has_option('bayeswave_fpeak_options', 'fpeak-srate'):
+        fpeak_srate = cp.getfloat('bayeswave_fpeak_options', 'fpeak-srate')
+    if cp.has_option('bayeswave_fpeak_options', 'fpeak-flow'):
+        fpeak_flow = cp.getfloat('bayeswave_fpeak_options', 'fpeak-flow')
+
+if cp.has_option('bayeswave_clean_frame_options', 'ifos'):
+    opts.bayeswave_clean_frame = True
+
+    clean_frame_ifos = ast.literal_eval(cp.get('bayeswave_clean_frame_options', 'ifos'))
+    clean_frame_srates = {}
+    channel_names = ast.literal_eval(cp.get('datafind', 'channel-list'))
+
+if opts.bayeswave_clean_frame:
+    if cp.has_option('bayeswave_options', 'signalOnly'):
+        print('Cannot run glitch Cleaning with signalOnly model')
+        opts.bayeswave_clean_frame = False
+# Make local copies of necessary input files
+shutil.copy(opts.configfile, os.path.join(workdir, 'config.ini'))
+
+#
+# Injection Options
+#
+
+# Injection file (e.g., sim-inspiral table).  Try commandline first, if none,
+# try config file
+injfile = opts.injfile
+if injfile is None:
+    try:
+        injfile = cp.get('injections', 'injfile')
+    except:
+        injfile = None
+
+if injfile is not None:
+    # Copy injfile locally
+    shutil.copy(injfile, workdir)
+    injfile = os.path.basename(injfile)
+
+# NR HDF5 data
+if injfile is not None:  # and cp.has_option('injections','nrhdf5'):
+
+    xmldoc = pipe_utils.ligolw_utils.load_filename(os.path.join(workdir,
+                                                                injfile),
+                                                   contenthandler=pipe_utils.LIGOLWContentHandler, verbose=
+                                                   True)
+    sim_inspiral_table = pipe_utils.lsctables.SimInspiralTable.get_table(xmldoc)
+
+    # Get approximant
+    waveform_column = sim_inspiral_table.getColumnByName('waveform')
+
+    waveform = [waveform_column[ndx] for ndx in range(len(waveform_column))]
+
+    assert len(np.unique(waveform)) == 1, ("More than 1 approximant found in"
+                                           " sim-inspiral.  Unsupported.")
+    waveform = waveform[0]
+
+    if 'NR_hdf5' in waveform:
+        print("Setting up NRHDF5 injections")
+
+        # Get numrel_data
+        numrel_column = sim_inspiral_table.getColumnByName('numrel_data')
+        numrel_data = [numrel_column[ndx] for ndx in range(len(numrel_column))]
+        errmsg = ("More than 1 numrel data file found in sim-inspiral")
+        assert len(np.unique(numrel_data)) == 1, ("More than 1 numrel data file"
+                                                  " found in sim-inspiral."
+                                                  " Unsupported.")
+        numrel_data = numrel_data[0]
+
+        if os.path.exists(numrel_data):
+            shutil.copy(numrel_data, workdir)
+            nr_full_path = os.path.abspath(numrel_data)
+            numrel_data = os.path.basename(numrel_data)
+
+            # Make sure normal permissions on hdf5
+            os.chmod(os.path.join(workdir, numrel_data), 0o644)
+
+            # Modify xml IN WORKDIR to point to local hdf5
+            localize_xml(os.path.join(workdir, injfile), nr_full_path, numrel_data)
+        else:
+            print("NRHDF5 does not exist at {}".format(numrel_data),
+                  file=sys.stderr)
+            sys.exit(1)
+    else:
+        numrel_data = None
+else:
+    numrel_data = None
+
+#
+# Advanced Condor options
+#
+# Config file takes precedence over commandline
+try:
+    cp.getboolean('condor', 'osg-deploy')
+except:
+    cp.set('condor', 'osg-deploy', str(opts.osg_deploy))
+
+if cp.getboolean('condor', 'osg-deploy'):
+    opts.server = "datafind.ligo.org:443"
+    cp.set('condor', 'transfer-files', str(True))
+
+#   try:
+#       cp.set('condor', 'max-runtime')
+#   except:
+#       cp.set('condor', 'max-runtime', str(opts.max_runtime))
+#
+#   try:
+#       cp.set('condor', 'resume-time')
+#   except:
+#       cp.set('condor', 'resume-time', str(opts.resume_time))
+
+try:
+    cp.get('engine', 'singularity')
+except:
+    cp.set('engine', 'singularity', str(opts.singularity))
+
+if cp.get('engine', 'singularity') == 'None':
+    print("NOT requiring HAS_SINGULARITY=?=TRUE")
+    cp.set('engine', 'use-singularity', str(False))
+else:
+    cp.set('engine', 'use-singularity', str(True))
+    cp.set('condor', 'transfer-files', str(True))
+    print("Requiring HAS_SINGULARITY=?=TRUE")
+    print("Using image: {}".format(cp.get('engine', 'singularity')))
+    print("Activating condor file transfers")
+
+# File transfers
+try:
+    cp.getboolean('condor', 'shared-filesystem')
+except:
+    cp.set('condor', 'shared-filesystem', str(opts.shared_filesystem))
+
+if not cp.getboolean('condor', 'shared-filesystem'):
+    try:
+        cp.getboolean('condor', 'transfer-files')
+    except:
+        cp.set('condor', 'transfer-files', str(opts.transfer_files))
+else:
+    cp.set('condor', 'transfer-files', str(False))
+
+#
+# Get Trigger Info
+#
+
+# Careful, there's nothing here to handle the non-exclusivity of these
+# options other than common sense
+if opts.trigger_time is not None and not \
+        cp.has_option('bayeswave_options', 'BW-inject'):
+    # Read trigger from commandline
+    trigger_list = pipe_utils.triggerList(cp, [opts.trigger_time])
+
+if opts.trigger_list is not None:
+    # Read triggers from ascii list 
+    trigger_list = pipe_utils.triggerList(cp, trigger_file=opts.trigger_list)
+
+if opts.cwb_trigger_list is not None:
+    # Read triggers from ascii list 
+    trigger_list = pipe_utils.triggerList(cp, cwb_trigger_file=opts.cwb_trigger_list)
+
+if injfile is not None:
+    # Read injection file
+    injfilename = os.path.join(workdir, injfile)
+
+    if opts.followup_injections is not None:
+        # Create trigger list from union of injections and those in
+        # followup_injections (overrides events= field)
+        trigger_list = pipe_utils.triggerList(cp, injection_file=injfilename,
+                                              followup_injections=opts.followup_injections)
+    else:
+        # Create trigger list from sim-inspiral table and events= field
+        trigger_list = pipe_utils.triggerList(cp, injection_file=injfilename)
+
+if cp.has_option('bayeswave_options', 'BW-inject'):
+    print("Found internal injection.")
+    # Check the option is valid:
+    if cp.get('bayeswave_options', 'BW-inject') not in ['signal', 'glitch']:
+        print("Error: BW-inject must be in ", ['signal', 'glitch'], file=sys.stderr)
+        sys.exit(1)
+    # Perform internal injections drawn from the signal or glitch model
+    # Check if there's a defined trigger list of GPS times
+    if opts.trigger_list is not None:
+        print("Found trigger list")
+        trigger_list = pipe_utils.triggerList(cp, trigger_file=opts.trigger_list,
+                                              internal_injections=True)
+    else:
+        if opts.trigger_time is None:
+            opts.trigger_time = 1126259462.392
+        print("Setting trigger time to %f" % opts.trigger_time, file=sys.stdout)
+        trigger_list = pipe_utils.triggerList(cp, gps_times=opts.trigger_time,
+                                              internal_injections=True)
+
+#    
+# GraceDB support
+#
+if opts.graceID is not None:
+    graceIDs = [opts.graceID]
+    trigger_list = pipe_utils.triggerList(cp, graceIDs=graceIDs, gdb_playground=opts.gdb_playground)
+
+if opts.graceID_list is not None:
+    graceIDs = np.loadtxt(opts.graceID_list)
+    trigger_list = pipe_utils.triggerList(cp, graceIDs=graceIDs, gdb_playground=opts.gdb_playground)
+
+if opts.submit_to_gracedb:
+    if opts.html_root is None:
+        html_root = cp.get('engine', 'html-root')
+    else:
+        html_root = opts.html_root
+    if html_root is None:
+        print("demanding submit to gdb but no html-root", file=sys.stder)
+        sys.exit()
+
+    if not os.path.exists(html_root):
+        os.makedirs(html_root)
+    else:
+        print("Warning: html-root %s exists" % html_root, file=sys.stderr)
+
+#
+# Check we have a trigger list.  If not, something's gone horribly wrong.
+#
+try:
+    if not isinstance(trigger_list, pipe_utils.triggerList):
+        print("I've made a huge mistake: trigger_list is not a triggerList.")
+        sys.exit(1)
+except NameError:
+    print("I've made a huge mistake: there are no triggers.")
+
+#
+# Extract trigger times for readability. Add a systematic offset if required
+#
+trigger_times = [trig.trigger_time + opts.trigger_time_delta for trig in trigger_list.triggers]
+
+hl_lag_times = [trig.hl_time_lag for trig in trigger_list.triggers]
+hv_lag_times = [trig.hv_time_lag for trig in trigger_list.triggers]
+
+#
+# Determine min/max times for data coverage
+#
+
+if not cp.has_option('input', 'PSDlength'):
+    cp.set('input', 'PSDlength', cp.get('input', 'seglen'))
+psdlen = cp.getfloat('input', 'PSDlength')
+
+if not cp.has_option('input', 'padding'):
+    cp.set('input', 'padding', "0.0")
+padding = cp.getfloat('input', 'padding')
+
+seglens = [trigger.seglen for trigger in trigger_list.triggers]
+
+if cp.has_option('input', 'gps-start-time'):
+    gps_start_time = cp.getint('input', 'gps-start-time')
+else:
+    trigtime = min(trigger_times) - (max(np.absolute(hl_lag_times)) + 25.0)
+    seg, _ = job_times(trigtime, max(seglens), psdlen, padding)
+    gps_start_time = seg[0]
+
+if cp.has_option('input', 'gps-end-time'):
+    gps_end_time = cp.getint('input', 'gps-end-time')
+else:
+    trigtime = max(trigger_times) + (max(np.absolute(hl_lag_times)) + 25.0)
+    seg, _ = job_times(trigtime, max(seglens), psdlen, padding)
+    gps_end_time = seg[1]
+
+# Update config parser
+cp.set('input', 'gps-start-time', str(int(gps_start_time)))
+cp.set('input', 'gps-end-time', str(int(gps_end_time)))
+
+#
+# Directory manipulation
+#
+topdir = os.getcwd()
+os.chdir(workdir)
+
+datafind_dir = 'datafind'
+if cp.has_option('injections', 'mdc-cache'):
+    shutil.copy(cp.get('injections', 'mdc-cache'),
+                os.path.join('datafind', 'MDC.cache'))
+
+#
+# Data aquisition (gw_data_find & segdb)
+#
+
+# Skip segment queries?
+print("Determining whether to do segment queries", file=sys.stdout)
+try:
+    skip_segment_queries = cp.getboolean('datafind', 'ignore-science-segments')
+except configparser.NoOptionError:
+    print("No ignore-science-segments in [datafind], skipping segdb by default", file=sys.stdout)
+    cp.set('datafind', 'ignore-science-segments', str(True))
+    skip_segment_queries = True
+
+if not skip_segment_queries: os.makedirs(os.path.join(workdir, 'segments'))
+
+#
+# datafind params from config file
+#
+ifo_list = ast.literal_eval(cp.get('input', 'ifo-list'))
+frtype_list = ast.literal_eval(cp.get('datafind', 'frtype-list'))
+
+# Decide whether simulating data
+if cp.has_option('datafind', 'sim-data'):
+    cp.set('datafind', 'sim-data', str(True))
+
+if not cp.has_option('datafind', 'sim-data'):
+    cp.set('datafind', 'sim-data', str(opts.sim_data))
+elif cp.has_option('datafind', 'sim-data') and opts.sim_data:
+    # Override the config file with the command line
+    cp.set('datafind', 'sim-data', str(opts.sim_data))
+
+if cp.has_option('bayeswave_options', '0noise'):
+    cp.set('datafind', 'sim-data', str(True))
+
+cache_files = {}
+segmentList = {}
+framePaths = {}
+frameSegs = {}
+
+#
+# Handle special cases for segdb
+#
+if (opts.cwb_trigger_list is not None) \
+        or (opts.trigger_list is not None) \
+        or (opts.graceID is not None) \
+        or (opts.graceID_list is not None):
+    # Assume triggers lie in analyzeable segments
+    skip_segment_queries = True
+
+for ifo in ifo_list:
+
+    if cp.getboolean('datafind', 'sim-data'):
+        if opts.bayeswave_clean_frame:
+            print("Cannot clean frame in simulated data")
+            opts.bayeswave_clean_frame = False
+        print("Simulating noise", file=sys.stdout)
+
+        if 'interp' in frtype_list[ifo]:
+            # Using an ASD ascii file
+            asd_path = frtype_list[ifo].replace('interp:', '')
+            print("Attempting to copy ASD file (%s) to datafind directory" %
+                  asd_path, file=sys.stdout)
+            asd_local_path = os.path.join(datafind_dir,
+                                          os.path.basename(asd_path))
+            try:
+                shutil.copy(asd_path, asd_local_path)
+            except IOError:
+                print("Failed to copy ASD file (%s) to datafind directory" %
+                      asd_path, file=sys.stdout)
+                sys.exit(1)
+
+            # Point to the local copy 
+            cache_files[ifo] = 'interp:' + asd_local_path
+        else:
+            # Using a lalsimulation spectrum
+            cache_files[ifo] = frtype_list[ifo]
+
+        # Set segment list to start/end time of simulated data
+        segmentList[ifo] = segments.segmentlist(
+            [segments.segment(gps_start_time, gps_end_time)])
+
+    else:
+        #
+        # Run DataFind query to produce cache files for frames
+        #
+        cachefilefmt = os.path.join(datafind_dir, '{0}.cache')
+        cache_files[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+
+        if opts.skip_datafind:
+            print("Copying cache files from [datafind], cache-files", file=sys.stdout)
+            manual_cache_files = ast.literal_eval(cp.get('datafind', 'cache-files'))
+            shutil.copy(manual_cache_files[ifo], cache_files[ifo])
+
+        else:
+
+            if opts.server is not None:
+                ldfcmd = "gw_data_find --observatory {o} --type {frtype} \
+    -s {gps_start_time} -e {gps_end_time} --lal-cache\
+    --server={server} -u {url_type} > {cachefile}".format(
+                    o=ifo[0], frtype=frtype_list[ifo],
+                    cachefile=cachefilefmt.format(ifo),
+                    gps_start_time=int(np.floor(gps_start_time)),
+                    gps_end_time=int(np.ceil(gps_end_time)), server=opts.server,
+                    url_type=cp.get('datafind', 'url-type'))
+            else:
+                ldfcmd = "gw_data_find --observatory {o} --type {frtype} -s \
+    {gps_start_time} -e {gps_end_time} --lal-cache -u {url_type} >\
+    {cachefile}".format(o=ifo[0], frtype=frtype_list[ifo],
+                        cachefile=cachefilefmt.format(ifo),
+                        gps_start_time=int(np.floor(gps_start_time)),
+                        gps_end_time=int(np.ceil(gps_end_time)), url_type=cp.get('datafind', 'url-type'))
+            print("Calling LIGO data find ...", file=sys.stdout)
+            print(ldfcmd, file=sys.stdout)
+
+            subprocess.call(ldfcmd, shell=True)
+
+            datafindscript = os.path.join(workdir, 'datafind', 'datafind.sh')
+            with open(datafindscript, 'a') as ldfcmd_file:
+                ldfcmd_file.writelines(ldfcmd + '\n\n')
+            os.chmod(datafindscript, 0o755)
+
+        # Record frame segments so we can identify frames for osg_deploy transfers
+        if opts.skip_datafind:
+            # XXX: if no datafind, assume frames include jobs.  But should
+            # change to take cache file locations
+            frameSegs[ifo] = \
+                segments.segmentlist([segments.segment(gps_start_time,
+                                                       gps_end_time)])
+        else:
+            frameSegs[ifo] = segments.utils.fromlalcache(open(cache_files[ifo]))
+
+            if not frameSegs[ifo]:
+                raise ValueError("No frame data found with: {}".format(ldfcmd))
+
+        if skip_segment_queries:
+            segmentList[ifo] = \
+                segments.segmentlist([segments.segment(gps_start_time,
+                                                       gps_end_time)])
+        else:
+
+            #
+            # Run segdb query
+            #
+            if cp.has_option('datafind', 'veto-categories'):
+                veto_categories = ast.literal_eval(cp.get('datafind', 'veto-categories'))
+            else:
+                veto_categories = []
+
+            curdir = os.getcwd()
+            segment_dir = os.path.join(workdir, 'segments')
+            os.chdir(segment_dir)
+
+            (segFileName, dqVetoes) = inspiralutils.findSegmentsToAnalyze(cp, ifo,
+                                                                          veto_categories, generate_segments=True,
+                                                                          use_available_data=False,
+                                                                          data_quality_vetoes=False)
+
+            segfile = open(segFileName)
+            segmentList[ifo] = segments.utils.fromsegwizard(segfile)
+            segmentList[ifo].coalesce()
+            segfile.close()
+
+            if segmentList[ifo] == []:
+                print("No matching segments for %s" % ifo, file=sys.stderr)
+                sys.exit()
+
+            os.chdir(curdir)
+
+        # Get the sampling rate of the frame
+        if opts.bayeswave_clean_frame and ifo in clean_frame_ifos:
+            try:
+                trigtime = int(trigger_list.triggers[0].trigger_time)
+                example_ts = fr.read_timeseries(cache_files[ifo], channel_names[ifo], trigtime - 1, 2.0)
+                clean_frame_srates[ifo] = 1. / example_ts.deltaT
+            except Exception as e:
+                clean_frame_srates[ifo] = 16384.0
+                print("Setting %s clean frame srate to default: %.2f" % (ifo, 16384.0))
+
+        # Set up cache files to point to local copies of frames in the working
+        # directory
+
+        if opts.copy_frames:
+            print("Setting up frame copying")
+
+            #
+            # Now we need to make a new, local cache file
+            # - do this by manipulating the path string in the cache file to be relative 
+            cache_file = os.path.join(datafind_dir,
+                                      '{ifo}.cache'.format(ifo=ifo))
+            shutil.copy(cache_file, cache_file.replace('cache', 'cache.bk'))
+
+            cache_entries = np.loadtxt(cache_file, dtype=str)
+            if cache_entries.ndim == 1: cache_entries = [cache_entries]
+
+            framePaths[ifo] = []
+            new_cache = open(cache_file, 'w')
+            for c, cache_entry in enumerate(cache_entries):
+                frame = cache_entry[-1].split('localhost')[-1]
+                framePaths[ifo].append(frame)
+
+                # local_path=os.path.join('datafind',cache_entry[4].split('/')[-1])
+                local_path = cache_entry[4].split('/')[-1]
+
+                new_cache.writelines('{ifo} {type} {gps} {length} {path}\n'.format(
+                    ifo=ifo, type=cache_entry[1], gps=cache_entry[2],
+                    length=cache_entry[3], path=local_path))
+
+            new_cache.close()
+
+#########################################################################
+# DAG Writing
+
+#
+# Initialise DAG and Jobs
+#
+
+# Create a dag to which we can add jobs.
+bayesline_medianpsd_dagname = os.path.join(workdir, os.path.basename(workdir) + '_bayesline')
+dagname = os.path.join(workdir, os.path.basename(workdir))
+postdagname = os.path.join(workdir, os.path.basename(workdir) + '_post')
+fpeakdagname = os.path.join(workdir, os.path.basename(workdir) + '_pfeak')
+cleanframedagname = os.path.join(workdir, os.path.basename(workdir) + '_cleanframe')
+
+bayesline_medianpsd_dag = pipeline.CondorDAG(log=bayesline_medianpsd_dagname + '.log')
+dag = pipeline.CondorDAG(log=dagname + '.log')
+postdag = pipeline.CondorDAG(log=postdagname + '.log')
+fpeakdag = pipeline.CondorDAG(log=fpeakdagname + '.log')
+cleanframedag = pipeline.CondorDAG(log=cleanframedagname + '.log')
+
+# Set the name of the file that will contain the DAG.
+bayesline_medianpsd_dag.set_dag_file(bayesline_medianpsd_dagname)
+dag.set_dag_file(dagname)
+postdag.set_dag_file(postdagname)
+fpeakdag.set_dag_file(fpeakdagname)
+cleanframedag.set_dag_file(cleanframedagname)
+
+# Create DAG jobs
+#   bayesline: median bayesline spectral estimation
+#   bayeswave: main bayeswave analysis
+#   bayeswave_post: normal post-processing
+#   bayeswave_fpeak: Spectral analysis post-processing (typically for BNS)
+#   bayeswave_clean_frame: Produce glitch cleaned frames
+#   megasky: skymap job
+#   megaplot: remaining plots & webpage generation
+#   submitToGraceDB: upload skymap & PE to graceDB (optional)
+
+
+if opts.bayesline_median_psd:
+
+    #  --- Read config file again
+
+    bayesline_cp = configparser.ConfigParser()
+    bayesline_cp.optionxform = str
+    bayesline_cp.read(os.path.join('config.ini'))
+    # Update to current vals of cp
+    for section in cp.sections():
+        for option in cp[section]:
+            bayesline_cp.set(section, option,
+                             cp.get(section, option))
+
+    # Modify configparser for median bayesline PSD estimation
+    bayesline_cp.set('bayeswave_options', 'bayesLine', '')
+    bayesline_cp.set('bayeswave_options', 'cleanOnly', '')
+    bayesline_cp.set('bayeswave_post_options', 'lite', '')
+
+    bayesline_cp.remove_option('bayeswave_options', 'signalOnly')
+    bayesline_cp.remove_option('bayeswave_options', 'glitchOnly')
+    bayesline_cp.remove_option('bayeswave_options', 'noiseOnly')
+    bayesline_cp.remove_option('bayeswave_options', 'fullOnly')
+
+    # The bayesline job is an instance of the standard bayeswave job with modified config parser
+    bayesline_medianpsd_job = pipe_utils.bayeswaveJob(bayesline_cp,
+                                                      cache_files,
+                                                      injfile=injfile,
+                                                      numrel_data=numrel_data)
+    bayesline_medianpsd_log = bayesline_medianpsd_job._CondorJob__log_file
+    bayesline_medianpsd_job.set_sub_file(os.path.join(workdir,
+                                                      'bayeswave_median_psd.sub'))
+
+    bayesline_post_median_psd_job = pipe_utils.bayeswave_postJob(bayesline_cp,
+                                                                 cache_files,
+                                                                 injfile=injfile,
+                                                                 numrel_data=numrel_data)
+    bayesline_post_median_psd_log = bayesline_post_median_psd_job._CondorJob__log_file
+    bayesline_post_median_psd_job.set_sub_file(os.path.join(workdir,
+                                                            'bayeswave_post_median_psd.sub'))
+
+    # Modify the original config parser and make sure:
+    # * bayesLine=False
+    cp.remove_option('bayeswave_options', 'bayesLine')
+    cp.remove_option('bayeswave_post_options', 'bayesLine')
+
+    # Add the median psds as extra files to the configparser
+    median_psds = \
+        ["$(macrooutputDir)_PSDs/post/clean/glitch_median_PSD_forLI_{ifo}.dat".format(ifo=ifo)
+         for ifo in ifo_list]
+    try:
+        extra_files = cp.get('condor', 'extra-files')
+    except configparser.NoOptionError as nooptex:
+        extra_files = ''
+    extra_files += ','.join(median_psds)
+    cp.set('condor', 'extra-files', extra_files)
+
+bayeswave_job = pipe_utils.bayeswaveJob(cp, cache_files, injfile=injfile,
+                                        numrel_data=numrel_data)
+bayeswave_log = bayeswave_job._CondorJob__log_file
+
+bayeswave_post_job = pipe_utils.bayeswave_postJob(cp, cache_files,
+                                                  injfile=injfile, numrel_data=numrel_data)
+bayeswave_post_log = bayeswave_post_job._CondorJob__log_file
+
+#
+# Setup any extra post-proc options
+#
+if cp.has_option('bayeswave_post_options', 'lite-dump'):
+    bayeswave_post_job.add_opt('lite-dump', cp.get('bayeswave_post_options',
+                                                   'lite-dump'))
+
+if cp.has_option('bayeswave_post_options', 'distance-samples'):
+    bayeswave_post_job.add_opt('distance-samples', cp.get('bayeswave_post_options',
+                                                          'distance-samples'))
+
+if cp.has_option('bayeswave_post_options', 'cosiota-samples'):
+    bayeswave_post_job.add_opt('cosiota-samples', cp.get('bayeswave_post_options',
+                                                         'cosiota-samples'))
+
+if opts.fpeak_analysis:
+    # The fpeak job is simply an instance of the standard post-proc job with a
+    # different executable 
+    bayeswave_fpeak_job = pipe_utils.bayeswave_fpeakJob(cp, cache_files,
+                                                        injfile=injfile, numrel_data=numrel_data)
+    bayeswave_fpeak_log = bayeswave_fpeak_job._CondorJob__log_file
+
+if opts.bayeswave_clean_frame:
+    # The clean frame job is an instance of the BayesWaveCleanFrame job
+    bayeswave_clean_frame_job = pipe_utils.bayeswave_clean_frameJob(cp, cache_files, injfile=injfile,
+                                                                    numrel_data=numrel_data)
+    bayeswave_clean_frame_log = bayeswave_clean_frame_job._CondorJob__log_file
+
+megasky_job = pipe_utils.megaskyJob(cp, injfile)
+megasky_log = megasky_job._CondorJob__log_file
+megaplot_job = pipe_utils.megaplotJob(cp)
+megaplot_log = megaplot_job._CondorJob__log_file
+
+if opts.submit_to_gracedb:
+    submitToGraceDB_job = pipe_utils.submitToGraceDB(cp)
+    submitToGraceDB_log = submitToGraceDB_job._CondorJob__log_file
+
+#
+# Build Nodes
+#
+try:
+    dataseed = cp.getint('input', 'dataseed')
+except configparser.NoOptionError:
+    print("[input] section requires dataseed for sim data", file=sys.stderr)
+    print(" (you need this in bayeswave_post, even if real data", file=sys.stderr)
+    print("...removing %s" % workdir, file=sys.stderr)
+    # os.chdir(topdir)
+    shutil.rmtree(workdir)
+    sys.exit()
+
+unanalyzeable_jobs = []
+
+transferFrames = {}
+totaltrigs = 0
+
+for t, trigger in enumerate(trigger_list.triggers):
+
+    #    print("---------------------------------------", end='\r')
+
+    # Add systematic offset
+    trigger.trigger_time += opts.trigger_time_delta
+
+    # ----------------------------------------
+    # Check job times fall within available data
+    job_segment, psd_start = job_times(trigger.trigger_time, trigger.seglen,
+                                       psdlen, padding)
+
+    for ifo in ifo_list:
+
+        job_in_segments = [seg.__contains__(job_segment) \
+                           for seg in segmentList[ifo]]
+
+        if not any(job_in_segments):
+            bad_job = {}
+            bad_job['ifo'] = ifo
+            bad_job['trigger_time'] = trigger.trigger_time
+            bad_job['seglen'] = trigger.seglen
+            bad_job['psdlen'] = psdlen
+            bad_job['padding'] = padding
+            bad_job['job_segment'] = job_segment
+            bad_job['data_segments'] = segmentList[ifo]
+
+            unanalyzeable_jobs.append(bad_job)
+
+            print("Warning: No matching %s segments for job %d of %d" % (
+                ifo, t + 1, len(trigger_times)), file=sys.stderr)
+            print(bad_job, file=sys.stderr)
+            break
+
+    else:
+
+        if 'H1' in ifo_list:
+            progstr = ("Adding node for GPS {0} ({1} of {2}) L1-timeslide {3},"
+                       " V-timeslide {4}".format(trigger.trigger_time, totaltrigs + 1,
+                                                 len(trigger_times), trigger.hl_time_lag,
+                                                 trigger.hv_time_lag))
+        else:
+            progstr = ("Adding node for GPS {0} ({1} of {2}) L1-timeslide {3},"
+                       " V-timeslide {4} ".format(trigger.trigger_time,
+                                                  totaltrigs + 1, len(trigger_times), trigger.hl_time_lag,
+                                                  trigger.lv_time_lag))
+        print(progstr, end='\r')
+
+        if not cp.getboolean('datafind', 'sim-data'):
+            #
+            # Identify frames associated with this job
+            if opts.copy_frames:
+                for ifo in ifo_list:
+                    frame_idx = [seg.intersects(job_segment) for seg in frameSegs[ifo]]
+                    transferFrames[ifo] = [frame for f, frame in
+                                           enumerate(framePaths[ifo]) if frame_idx[f]]
+
+                    # Make output directory for this trigger
+        outputDir = 'trigtime_' + str('%.9f' % trigger.trigger_time) + '_' + \
+                    str(float(trigger.hl_time_lag)) + '_' + \
+                    str(float(trigger.hv_time_lag)) + '_' + str(t)
+        # str(float(trigger.hv_time_lag)) #+ str(uuid.uuid4())
+        outputDir = os.path.join(outputDir)
+        if not os.path.exists(outputDir): os.makedirs(outputDir)
+        dump_job_info(outputDir, trigger)
+
+        # ------------------------------------------------------------------
+        # BAYESLINE MEDIAN PSD NODES
+        if opts.bayesline_median_psd:
+
+            outputDir_psd = outputDir + '_PSDs'
+            if not os.path.exists(outputDir_psd): os.makedirs(outputDir_psd)
+            dump_job_info(outputDir_psd, trigger)
+
+            bayeswave_psd_node = pipe_utils.bayeswaveNode(bayesline_medianpsd_job)
+            bayeswave_psd_post_node = pipe_utils.bayeswave_postNode(bayesline_post_median_psd_job)
+
+            #
+            # Add options for bayesline_psd node
+            #
+            bayeswave_psd_node.set_retry(opts.bayeswave_retries)
+            bayeswave_psd_node.set_trigtime(trigger.trigger_time)
+            if bayesline_cp.has_option('input', 'segment-start'):
+                segment_start = bayesline_cp.getfloat('input', 'segment-start')
+            else:
+                segment_start = trigger.trigger_time - trigger.seglen / 2
+            bayeswave_psd_node.set_segment_start(segment_start)
+            bayeswave_psd_node.set_srate(trigger.srate)
+            bayeswave_psd_node.set_seglen(trigger.seglen)
+            bayeswave_psd_node.set_window(trigger.window)
+            bayeswave_psd_node.set_flow(ifo_list, trigger.flow)
+            if bayesline_cp.has_option('input', 'PSDstart'):
+                psd_start = bayesline_cp.getfloat('input', 'PSDstart')
+            bayeswave_psd_node.set_PSDstart(psd_start)
+            if bayesline_cp.has_option('input', 'rolloff'):
+                bayeswave_psd_node.set_rolloff(bayesline_cp.getfloat('input', 'rolloff'))
+            bayeswave_psd_node.set_outputDir(outputDir_psd)
+            if transferFrames: bayeswave_psd_node.add_frame_transfer(transferFrames)
+
+            if bayesline_cp.get('datafind', 'sim-data'):
+                bayeswave_psd_node.set_dataseed(dataseed)
+
+            if bayesline_cp.has_option('bayeswave_options', 'BW-inject'):
+                bayeswave_psd_node.set_BW_event(trigger.BW_event)
+
+            #
+            # Add options for bayesline_psd_post node
+            #
+            bayeswave_psd_post_node.set_dataseed(dataseed)
+            bayeswave_psd_post_node.set_trigtime(trigger.trigger_time)
+            bayeswave_psd_post_node.set_segment_start(segment_start)
+            bayeswave_psd_post_node.set_srate(trigger.srate)
+            bayeswave_psd_post_node.set_seglen(trigger.seglen)
+            bayeswave_psd_post_node.set_window(trigger.window)
+            bayeswave_psd_post_node.set_flow(ifo_list, trigger.flow)
+            if bayesline_cp.has_option('input', 'PSDstart'):
+                psd_start = bayesline_cp.getfloat('input', 'PSDstart')
+            bayeswave_psd_post_node.set_PSDstart(psd_start)
+            if bayesline_cp.has_option('input', 'rolloff'):
+                bayeswave_psd_post_node.set_rolloff(bayesline_cp.getfloat('input', 'rolloff'))
+            bayeswave_psd_post_node.set_outputDir(ifo_list, outputDir_psd)
+
+            if injfile is not None:
+                bayeswave_psd_node.set_injevent(trigger.injevent)
+                bayeswave_psd_post_node.set_injevent(trigger.injevent)
+
+            if 'H1' in ifo_list:
+                if 'L1' in ifo_list:
+                    bayeswave_psd_node.set_L1_timeslide(trigger.hl_time_lag)
+                    bayeswave_psd_post_node.set_L1_timeslide(trigger.hl_time_lag)
+                if 'V1' in ifo_list:
+                    bayeswave_psd_node.set_V1_timeslide(trigger.hv_time_lag)
+                    bayeswave_psd_post_node.set_V1_timeslide(trigger.hv_time_lag)
+
+            elif 'L1' in ifo_list and 'V1' in ifo_list:
+                bayeswave_psd_node.set_V1_timeslide(trigger.lv_time_lag)
+                bayeswave_psd_post_node.set_V1_timeslide(trigger.lv_time_lag)
+
+            if bayesline_cp.has_option('bayeswave_options', 'BW-inject'):
+                bayeswave_psd_post_node.set_BW_event(trigger.BW_event)
+
+        # ------------------------------------------------------------------
+        # STANDARD BAYESWAVE NODES
+
+        bayeswave_node = pipe_utils.bayeswaveNode(bayeswave_job)
+        bayeswave_post_node = pipe_utils.bayeswave_postNode(bayeswave_post_job)
+
+        #
+        # Add options for bayeswave node
+        #
+        bayeswave_node.set_retry(opts.bayeswave_retries)
+        bayeswave_node.set_trigtime(trigger.trigger_time)
+        if cp.has_option('input', 'segment-start'):
+            segment_start = cp.getfloat('input', 'segment-start')
+        else:
+            segment_start = trigger.trigger_time - trigger.seglen / 2
+        bayeswave_node.set_segment_start(segment_start)
+        bayeswave_node.set_srate(trigger.srate)
+        bayeswave_node.set_seglen(trigger.seglen)
+        bayeswave_node.set_window(trigger.window)
+        bayeswave_node.set_flow(ifo_list, trigger.flow)
+        if cp.has_option('input', 'PSDstart'):
+            psd_start = cp.getfloat('input', 'PSDstart')
+        bayeswave_node.set_PSDstart(psd_start)
+        if cp.has_option('input', 'rolloff'):
+            bayeswave_node.set_rolloff(cp.getfloat('input', 'rolloff'))
+        bayeswave_node.set_outputDir(outputDir)
+        if transferFrames: bayeswave_node.add_frame_transfer(transferFrames)
+
+        if cp.get('datafind', 'sim-data'):
+            bayeswave_node.set_dataseed(dataseed)
+
+        if cp.has_option('bayeswave_options', 'BW-inject'):
+            bayeswave_node.set_BW_event(trigger.BW_event)
+
+        # If using bayesline median psd, set --{ifo}-psd
+        if opts.bayesline_median_psd:
+            for ifo in ifo_list:
+                # FIXME: Make sure glitch_median_PSD_forLI_H1.dat are in the working dir
+                bayeswave_node.add_var_opt('{ifo}-psd'.format(ifo=ifo),
+                                           'glitch_median_PSD_forLI_{ifo}.dat'.format(ifo=ifo))
+
+        #
+        # Add options for bayeswave_post node
+        #
+        bayeswave_post_node.set_dataseed(dataseed)
+        bayeswave_post_node.set_trigtime(trigger.trigger_time)
+        bayeswave_post_node.set_segment_start(segment_start)
+        bayeswave_post_node.set_srate(trigger.srate)
+        bayeswave_post_node.set_seglen(trigger.seglen)
+        bayeswave_post_node.set_window(trigger.window)
+        bayeswave_post_node.set_flow(ifo_list, trigger.flow)
+        if cp.has_option('input', 'PSDstart'):
+            psd_start = cp.getfloat('input', 'PSDstart')
+        bayeswave_post_node.set_PSDstart(psd_start)
+        if cp.has_option('input', 'rolloff'):
+            bayeswave_post_node.set_rolloff(cp.getfloat('input', 'rolloff'))
+        bayeswave_post_node.set_outputDir(ifo_list, outputDir)
+
+        if injfile is not None:
+            bayeswave_node.set_injevent(trigger.injevent)
+            bayeswave_post_node.set_injevent(trigger.injevent)
+
+        if 'H1' in ifo_list:
+            if 'L1' in ifo_list:
+                bayeswave_node.set_L1_timeslide(trigger.hl_time_lag)
+                bayeswave_post_node.set_L1_timeslide(trigger.hl_time_lag)
+            if 'V1' in ifo_list:
+                bayeswave_node.set_V1_timeslide(trigger.hv_time_lag)
+                bayeswave_post_node.set_V1_timeslide(trigger.hv_time_lag)
+
+        elif 'L1' in ifo_list and 'V1' in ifo_list:
+            bayeswave_node.set_V1_timeslide(trigger.lv_time_lag)
+            bayeswave_post_node.set_V1_timeslide(trigger.lv_time_lag)
+
+        if cp.has_option('bayeswave_options', 'BW-inject'):
+            bayeswave_post_node.set_BW_event(trigger.BW_event)
+
+        # ------------------------------------------------------------------
+        # FPEAK RECOVERY NODE
+
+        #
+        # Add options for bayeswave_fpeak node
+        #
+        if opts.fpeak_analysis:
+            bayeswave_fpeak_node = \
+                pipe_utils.bayeswave_fpeakNode(bayeswave_post_job,
+                                               bayeswave_fpeak_job)
+
+            bayeswave_fpeak_node.set_dataseed(dataseed)
+            bayeswave_fpeak_node.set_trigtime(trigger.trigger_time)
+            bayeswave_fpeak_node.set_segment_start(segment_start)
+            bayeswave_fpeak_node.set_srate(cp.getfloat('bayeswave_fpeak_options',
+                                                       'srate'))
+            bayeswave_fpeak_node.set_seglen(trigger.seglen)
+            bayeswave_fpeak_node.set_window(trigger.window)
+
+            bayeswave_fpeak_node.set_flow(ifo_list,
+                                          cp.getfloat('bayeswave_fpeak_options', 'flow'))
+            if cp.has_option('input', 'PSDstart'):
+                psd_start = cp.getfloat('input', 'PSDstart')
+            bayeswave_fpeak_node.set_PSDstart(psd_start)
+            if cp.has_option('input', 'rolloff'):
+                bayeswave_fpeak_node.set_rolloff(cp.getfloat('input', 'rolloff'))
+            bayeswave_fpeak_node.set_outputDir(ifo_list, outputDir)
+
+            if injfile is not None:
+                bayeswave_fpeak_node.set_injevent(trigger.injevent)
+
+            if 'L1' in ifo_list:
+                bayeswave_fpeak_node.set_L1_timeslide(trigger.hl_time_lag)
+            if 'V1' in ifo_list:
+                bayeswave_fpeak_node.set_V1_timeslide(trigger.hv_time_lag)
+
+            if cp.has_option('bayeswave_options', 'BW-inject'):
+                bayeswave_fpeak_node.set_BW_event(trigger.BW_event)
+
+        # ------------------------------------------------------------------
+        # BAYESWAVE CLEAN FRAME NODE
+
+        #
+        # Add options for bayeswave_clean_frame node
+        #
+        if opts.bayeswave_clean_frame:
+            bayeswave_clean_frame_nodes = []
+            if cp.has_option('bayeswave_options', 'fullOnly'):
+                model_type = 'full'
+            else:
+                model_type = 'glitch'
+            clean_frame_ifos = ast.literal_eval(cp.get('bayeswave_clean_frame_options', 'ifos'))
+            for ifo in clean_frame_ifos:
+                clean_frame_node = pipe_utils.bayeswave_clean_frameNode(bayeswave_clean_frame_job)
+                clean_frame_node.set_trigtime(trigger.trigger_time)
+                clean_frame_node.set_ifo(ifo)
+                clean_frame_node.set_segment_start(segment_start)
+
+                trigtime = int(trigger.trigger_time)
+                example_ts = fr.read_timeseries(cache_files[ifo], channel_names[ifo], trigtime - 1, 2.0)
+                clean_frame_srate = 1. / example_ts.deltaT
+
+                for seg in frameSegs[ifo]:
+                    if (trigger.trigger_time in seg):
+                        clean_frame_start_time = seg[0]
+                        clean_frame_length = seg[1] - seg[0]
+
+                clean_frame_node.set_frame_start(clean_frame_start_time)
+                clean_frame_node.set_frame_length(clean_frame_length)
+                clean_frame_node.set_cache_file(cache_files[ifo])
+                clean_frame_node.set_frame_srate(clean_frame_srate)
+                clean_frame_node.set_seglen(trigger.seglen)
+
+                glitch_param_file = os.path.join(outputDir, 'chains', '%s_params_%s.dat.0' % (model_type, ifo))
+                clean_frame_node.set_glitch_param_file(glitch_param_file)
+                clean_frame_node.set_outdir(outputDir)
+
+                clean_frame_node.set_channel_name(channel_names[ifo])
+                clean_frame_node.set_frame_type(frtype_list[ifo])
+
+                bayeswave_clean_frame_nodes.append(clean_frame_node)
+
+        # ------------------------------------------------------------------
+        # MEGAPY NODES
+
+        if not opts.skip_megapy:
+            megasky_node = pipe_utils.megaskyNode(megasky_job, outputDir)
+            megaplot_node = pipe_utils.megaplotNode(megaplot_job, outputDir)
+
+            #
+            # Add options for mega-scripts
+            #
+            megasky_node.set_outputDir(outputDir)
+            if injfile is not None:
+                megasky_node.set_injevent(trigger.injevent)
+            megaplot_node.set_outputDir(outputDir)
+
+        # ------------------------------------------------------------------
+        # GRACEDB NODE
+
+        if opts.submit_to_gracedb:
+            htmlDir = os.path.join(html_root, outputDir)
+            if not os.path.exists(htmlDir):
+                os.makedirs(htmlDir)
+            gracedb_node = pipe_utils.submitToGraceDBNode(submitToGraceDB_job,
+                                                          outputDir, htmlDir)
+
+        # Update counters and random seed
+        dataseed += 1
+        totaltrigs += 1
+
+        #
+        # Add parent/child relationships
+        #
+        if opts.bayesline_median_psd:
+            bayeswave_psd_post_node.add_parent(bayeswave_psd_node)
+            bayeswave_node.add_parent(bayeswave_psd_post_node)
+
+        if not opts.skip_post and not opts.separate_post_dag:
+            bayeswave_post_node.add_parent(bayeswave_node)
+            if opts.fpeak_analysis:
+                bayeswave_fpeak_node.add_parent(bayeswave_node)
+            if opts.bayeswave_clean_frame:
+                for clean_frame_node in bayeswave_clean_frame_nodes:
+                    clean_frame_node.add_parent(bayeswave_node)
+        if not opts.skip_megapy:
+            megasky_node.add_parent(bayeswave_node)
+            megaplot_node.add_parent(bayeswave_post_node)
+        if opts.submit_to_gracedb:
+            gracedb_node.add_parent(megaplot_node)
+            gracedb_node.add_parent(megasky_node)
+
+            # Add Nodes to DAG
+        if opts.bayesline_median_psd:
+            dag.add_node(bayeswave_psd_node)
+            dag.add_node(bayeswave_psd_post_node)
+
+        dag.add_node(bayeswave_node)
+        if opts.bayeswave_clean_frame:
+            for clean_frame_node in bayeswave_clean_frame_nodes:
+                dag.add_node(clean_frame_node)
+
+        if not opts.skip_post and not opts.separate_post_dag:
+            dag.add_node(bayeswave_post_node)
+            if opts.fpeak_analysis:
+                dag.add_node(bayeswave_fpeak_node)
+        elif not opts.skip_post and opts.separate_post_dag:
+            postdag.add_node(bayeswave_post_node)
+            if opts.fpeak_analysis:
+                fpeakdag.add_node(bayeswave_fpeak_node)
+        else:
+            continue
+
+        if not opts.skip_megapy and not opts.separate_post_dag:
+            dag.add_node(megasky_node)
+            dag.add_node(megaplot_node)
+        elif not opts.skip_megapy and opts.separate_post_dag:
+            postdag.add_node(megasky_node)
+            postdag.add_node(megaplot_node)
+            if opts.fpeak_analysis:
+                fpeakdag.add_node(megasky_node)
+                fpeakdag.add_node(megaplot_node)
+
+        if opts.submit_to_gracedb:
+            dag.add_node(gracedb_node)
+
+#
+# Correct log files
+#
+# FIXME: this is a horrendous hack.  glue.pipeline overrides nodes' job log file
+# paths.  Something to do with multiple inheritance in the job classes?
+if opts.bayesline_median_psd:
+    bayesline_medianpsd_job._CondorJob__log_file = bayesline_medianpsd_log
+    bayesline_post_median_psd_job._CondorJob__log_file = bayesline_post_median_psd_log
+bayeswave_job._CondorJob__log_file = bayeswave_log
+bayeswave_post_job._CondorJob__log_file = bayeswave_post_log
+if opts.fpeak_analysis:
+    bayeswave_fpeak_job._CondorJob__log_file = bayeswave_fpeak_log
+if opts.bayeswave_clean_frame:
+    bayeswave_clean_frame_job._CondorJob__log_file = bayeswave_clean_frame_log
+
+megasky_job._CondorJob__log_file = megasky_log
+megaplot_job._CondorJob__log_file = megaplot_log
+
+if opts.submit_to_gracedb:
+    submitToGraceDB_job._CondorJob__log_file = submitToGraceDB_log
+
+#
+# Finalise DAG
+#
+# Write out the submit files needed by condor.
+dag.write_sub_files()
+if opts.separate_post_dag:
+    postdag.write_sub_files()
+    if opts.fpeak_analysis:
+        fpeakdag.write_sub_files()
+
+# Write out the DAG itself.
+dag.write_dag()
+dag.write_script()
+if opts.separate_post_dag:
+    postdag.write_dag()
+    postdag.write_script()
+    if opts.fpeak_analysis:
+        fpeakdag.write_dag()
+        fpeakdag.write_script()
+
+# move back to the parent directory
+os.chdir(topdir)
+
+# print some summary info:
+if len(trigger_times) - len(unanalyzeable_jobs) > 0:
+    print("""
+    Total number of requested trigger times: {ntrigs_desired}
+    Number of triggers successfully added to DAG: {ntrigs_added}
+    Number of triggers failing data criteria: {ntrigs_failed}
+
+    To submit:
+        condor_submit_dag {dagfile}
+    """.format(ntrigs_desired=len(trigger_times),
+               ntrigs_added=len(trigger_times) - len(unanalyzeable_jobs),
+               ntrigs_failed=len(unanalyzeable_jobs),
+               workdir=workdir, dagfile=dag.get_dag_file()))
+else:
+    print("")
+    print("No analyzeable jobs in requested time")
+
+if opts.condor_submit:
+
+    print("Submitting DAG...")
+
+    x = subprocess.Popen(['condor_submit_dag', dag.get_dag_file()])
+    x.wait()
+    if x.returncode == 0:
+        print('Submitted DAG file: ', dag.get_dag_file())
+    else:
+        print('Unable to submit DAG file')

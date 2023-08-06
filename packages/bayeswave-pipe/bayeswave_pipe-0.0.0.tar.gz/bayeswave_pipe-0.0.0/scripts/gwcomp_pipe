@@ -1,0 +1,1587 @@
+#!/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2015-2016 James Clark <james.clark@ligo.org>
+#               2020 Sudarshan Ghonge <sudarshan.ghonge@ligo.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from __future__ import print_function
+
+import argparse
+import ast
+import copy
+import gzip
+import os
+import shutil
+import subprocess
+import sys
+
+from pesummary.gw.file.read import read
+
+try:
+    import configparser
+except ImportError:  # python < 3
+    import ConfigParser as configparser
+
+import numpy as np
+
+from glue import pipeline
+
+from ligo import segments
+from ligo.segments.utils import tosegwizard
+
+from bayeswave_pipe import bayeswave_pipe_utils as pipe_utils
+from bayeswave_pipe import gwcomp_pipe_utils as gwcomp_utils
+
+
+#############################################
+#
+# Local function defs
+
+def confirm(prompt=None, resp=False):
+    """Lifted from:
+    http://code.activestate.com/recipes/541096-prompt-the-user-for-confirmation/
+    Prompts for yes or no response from the user. Returns True for yes and
+    False for no.
+
+    'resp' should be set to the default value assumed by the caller when
+    user simply types ENTER.
+
+    >>> confirm(prompt='Proceed?', resp=True)
+    Create Directory? [y]|n: 
+    True
+    >>> confirm(prompt='Proceed?', resp=False)
+    Create Directory? [n]|y: 
+    False
+    >>> confirm(prompt='Proceed?', resp=False)
+    Create Directory? [n]|y: y
+    True
+
+    """
+
+    if prompt is None:
+        prompt = 'Confirm'
+
+    if resp:
+        prompt = '%s [%s]|%s: ' % (prompt, 'y', 'n')
+    else:
+        prompt = '%s [%s]|%s: ' % (prompt, 'n', 'y')
+
+    while True:
+        ans = input(prompt)
+        if not ans:
+            return resp
+        if ans not in ['y', 'Y', 'n', 'N']:
+            print('please enter y or n.')
+            continue
+        if ans == 'y' or ans == 'Y':
+            return True
+        if ans == 'n' or ans == 'N':
+            return False
+
+
+def localize_xml(xmlfile, old_path, new_path):
+    """
+    Modify absolute paths in xml files to relative paths
+    """
+
+    try:
+        with gzip.open(xmlfile, 'r') as oldxml:
+            filedata = oldxml.read()
+    except IOError:
+        with open(xmlfile, 'r') as oldxml:
+            filedata = oldxml.read()
+
+    # Search and replace on the abs path
+    newdata = filedata.replace(old_path, new_path)
+
+    # Backup the original xml file
+    shutil.move(xmlfile, xmlfile + '.bk')
+
+    if xmlfile.endswith('.gz'):
+        with gzip.open(xmlfile, 'w') as newxml:
+            newxml.write(newdata)
+    else:
+        with open(xmlfile, 'w') as newxml:
+            newxml.write(newdata)
+
+    return
+
+
+def job_times(trigtime, seglen, psdlen, padding):
+    """
+    Compute the gps times corresponding to a given trigger time
+
+    psdstart = trigtime - (psdlen + padding)
+    start = floor(min(psdstart, trigtime-0.5*seglen))
+    stop  = ceil(max(start+psdlen, trigtime+0.5*Sseglen))
+
+    returns segment(start,stop), psdstart
+
+    so that start can be used easily as a psd start
+    """
+
+    psdstart = trigtime - (0.5 * psdlen + padding)
+    start = np.floor(min(psdstart, trigtime - 0.5 * seglen))
+    stop = np.ceil(max(start + psdlen, trigtime + 0.5 * seglen))
+
+    return segments.segment(start, stop), psdstart
+
+
+def dump_job_info(job_dir, trigger):
+    """
+    Writes a text file with job info to outputDir:
+
+    GPS time, hl_lag or GraceID, frequency, and cWB’s rho
+    """
+    f = open(os.path.join(job_dir, 'job_info.txt'), 'w')
+
+    f.write('# rho gps hl_lag hv_lag freq veto1 veto2 graceID\n')
+    f.write('{rho} {gps_time} {hl_time_lag} {hv_time_lag} {trig_frequency} \
+            {veto1} {veto2} {graceID}\n'.format(
+        gps_time=trigger.trigger_time,
+        hl_time_lag=trigger.hl_time_lag,
+        hv_time_lag=trigger.hv_time_lag,
+        trig_frequency=trigger.trigger_frequency,
+        rho=trigger.rho,
+        veto1=trigger.veto1,
+        veto2=trigger.veto2,
+        graceID=trigger.graceID))
+    f.close()
+
+
+def parser():
+    """
+    Parser for gwcomp_pipe (command line and ini file)
+    """
+
+    # cmd line
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument("pesummaryfile", help="PE summary file to use for recostructions and residuals analysis")
+    parser.add_argument("configfile", help="gwcomp config file", )
+    parser.add_argument("-l", "--pesummarylabel", default=None,
+                        help="Label of the CBC. If not provide, I will print list of "
+                             "available labels and exit")
+    parser.add_argument("-r", "--workdir", type=str, default=None)
+    parser.add_argument("--onsource-trigger-time", type=float, default=None,
+                        help="The onsource trigger time. Pass here to override trigger time in the pe file")
+    parser.add_argument("--veto-definer-file", type=str, default=None)
+    parser.add_argument("--onsource-reconstruction", default=False, action="store_true")
+    parser.add_argument("--offsource-injections", default=False, action="store_true")
+    parser.add_argument("--onsource-residuals", default=False, action="store_true")
+    parser.add_argument("--offsource-background", default=False, action="store_true")
+    parser.add_argument("--osg-deploy", default=False, action="store_true")
+    parser.add_argument("--transfer-files", default=True, action="store_true")
+    parser.add_argument("--cbc-fref", default=None, type=float)
+    parser.add_argument("--cbc-amporder", default=None, type=float)
+    parser.add_argument("--cbc-pnorder", default=None, type=float)
+
+    opts = parser.parse_args()
+
+    if opts.workdir is None:
+        print("ERROR: must specify --workdir", file=sys.stderr)
+        sys.exit(1)
+
+    if not os.path.isfile(opts.pesummaryfile):
+        print("ERROR: pesummary file %s does not exist" % opts.pesummaryfile, file=sys.stderr)
+        sys.exit(1)
+
+    # Read PE file
+    pe_data = read(opts.pesummaryfile)
+
+    if not os.path.isfile(opts.configfile):
+        print("ERROR: config file %s does not exist" % opts.configfile, file=sys.stderr)
+        sys.exit(1)
+
+    if opts.pesummarylabel is None:
+        print("List of available labels: ")
+        print(pe_data.labels)
+        sys.exit(1)
+
+    #  --- Read config file
+    cp = configparser.ConfigParser()
+    cp.optionxform = str
+    cp.read(opts.configfile)
+
+    return opts, pe_data, cp
+
+
+#
+# Parse options, arguments and pe file
+#
+opts, pe_data, gwcomp_config = parser()
+
+try:
+    copy_frames = gwcomp_config['condor']['copy-frames']
+except:
+    gwcomp_config.set('condor', 'copy-frames', str(False))
+
+workdir = os.path.abspath(opts.workdir)
+if os.path.exists(workdir):
+    print("""
+    \nXXX DANGER XXX: path {} already exists.
+
+    Continuing workflow generation will OVERWRITE current workflow files
+    (configuration file, injection data, DAGMAN and Bash scripts).  This may
+    complicate book-keeping and is not recommended for production analyses.
+
+    """.format(
+        workdir), file=sys.stderr)
+
+    if not confirm(prompt='Proceed?', resp=False):
+        print("You chose wisely, exiting", file=sys.stderr)
+        sys.exit(1)
+
+else:
+    print("making work-directory: %s" % workdir, file=sys.stdout)
+    os.makedirs(workdir)
+
+    recon_workdir = workdir + "/onsource_reconstruction"
+    residuals_workdir = workdir + "/onsource_residuals"
+    injection_workdir = workdir + "/offsource_injections"
+    background_workdir = workdir + "/offsource_background"
+
+    os.makedirs(recon_workdir)
+    os.makedirs(residuals_workdir)
+    os.makedirs(injection_workdir)
+    os.makedirs(background_workdir)
+
+try:
+    gwcomp_config.getboolean('condor', 'osg-deploy')
+except:
+    gwcomp_config.set('condor', 'osg-deploy', str(opts.osg_deploy))
+
+try:
+    gwcomp_config.get('engine', 'singularity')
+except:
+    gwcomp_config.set('engine', 'singularity', str(None))
+
+if gwcomp_config.get('engine', 'singularity') == 'None':
+    print("NOT requiring HAS_SINGULARITY=?=TRUE")
+    gwcomp_config.set('engine', 'use-singularity', str(False))
+else:
+    gwcomp_config.set('engine', 'use-singularity', str(True))
+    gwcomp_config.set('condor', 'transfer-files', str(True))
+    print("Requiring HAS_SINGULARITY=?=TRUE")
+    print("Using image: {}".format(gwcomp_config.get('engine', 'singularity')))
+    print("Activating condor file transfers")
+
+try:
+    gwcomp_config.getboolean('condor', 'shared-filesystem')
+except:
+    gwcomp_config.set('condor', 'shared-filesystem', str(False))
+
+if not gwcomp_config.getboolean('condor', 'shared-filesystem'):
+    try:
+        gwcomp_config.getboolean('condor', 'transfer-files')
+    except:
+        gwcomp_config.set('condor', 'transfer-files', str(opts.transfer_files))
+else:
+    gwcomp_config.set('condor', 'transfer-files', str(False))
+
+try:
+    dataseed = gwcomp_config.getint('input', 'dataseed')
+except configparser.NoOptionError:
+    print("[input] section requires dataseed for sim data", file=sys.stderr)
+    print(" (you need this in bayeswave_post, even if real data", file=sys.stderr)
+    print("...removing %s" % workdir, file=sys.stderr)
+    # os.chdir(topdir)
+    shutil.rmtree(workdir)
+    sys.exit()
+
+pe_samples = pe_data.samples_dict[opts.pesummarylabel]
+pesummarylabel = opts.pesummarylabel
+pe_config = pe_data.config[pesummarylabel]
+pe_psd = pe_data.psd[pesummarylabel]
+trigtime = opts.onsource_trigger_time
+
+pe_seglen = float(pe_config["engine"]["seglen"])
+pe_srate = float(pe_config["engine"]["srate"])
+
+bayesline_median_psd_flag = False
+try:
+    seglen_max = float(gwcomp_config["gwcomp_options"]["seglen_max"])
+except:
+    seglen_max = 8.0
+    gwcomp_config.set("gwcomp_options", "seglen_max", str(seglen_max))
+
+if pe_seglen > seglen_max:
+    pe_seglen = seglen_max
+    bayesline_median_psd_flag = True
+
+try:
+    srate_max = float(gwcomp_config["gwcomp_options"]["srate_max"])
+except:
+    srate_max = 2048.0
+    gwcomp_config.set("gwcomp_options", "srate_max", str(srate_max))
+
+if pe_srate > srate_max:
+    pe_srate = srate_max
+    bayesline_median_psd_flag = True
+
+pe_seg_start = trigtime - (pe_seglen - 2)  # PE seglens always end 2 seconds after the trigtime
+
+pe_approx = pe_config["engine"]["approx"]
+pe_ifos = ast.literal_eval(pe_config["analysis"]["ifos"])
+
+pe_flows = ast.literal_eval(pe_config["lalinference"]["flow"])
+pe_flows = [float(pe_flows[ifo]) for ifo in pe_ifos]
+pe_flow = np.max(pe_flows)
+
+if opts.cbc_fref is not None:
+    pe_fref = opts.cbc_fref
+else:
+    try:
+        pe_fref = float(pe_config["engine"]["fref"])
+    except:
+        print("CBC reference frequency cannot be read and has not bee supplied via command line.", file=sys.stderr)
+        print("Defaulting to 20 Hz but recommend checking and retrying from command line.", file=sys.stderr)
+        pe_fref = 20
+
+if opts.cbc_amporder is not None:
+    pe_amporder = opts.cbc_amporder
+else:
+    try:
+        pe_amporder = int(pe_config["engine"]["amporder"])
+    except:
+        print("CBC amporder cannot be read and has not bee supplied via command line.", file=sys.stderr)
+        print("Defaulting to 0 but recommend checking and retrying from command line.", file=sys.stderr)
+        pe_amporder = 0
+
+if 'pseudoFourPN' in pe_approx:
+    pe_pnorder = 8
+    # pe_approx = pe_approx.strip('pseudoFourPN')
+elif 'threePointFivePN' in pe_approx:
+    pe_pnoder = 7
+    # pe_approx = pe_approx.strip('threePointFivePN')
+elif 'threePN' in pe_approx:
+    pe_pnorder = 6
+    # pe_approx = pe_approx.strip('threePN')
+elif 'twoPointFivePN' in pe_approx:
+    pe_pnorder = 5
+    # pe_approx = pe_approx.strip('twoPointFivePN')
+elif 'twoPN' in pe_approx:
+    pe_pnorder = 4
+    # pe_approx = pe_approx.strip('twoPN')
+
+if opts.cbc_pnorder is not None:
+    print("Setting pn order to %d" % opts.cbc_pnorder)
+    pe_pnorder = opts.cbc_pnorder
+
+pe_frames = ast.literal_eval(pe_config["datafind"]["types"])
+pe_channels = ast.literal_eval(pe_config["data"]["channels"])
+pe_channels = {ifo: pe_channels[ifo] for ifo in pe_ifos}
+pe_frames = {ifo: pe_frames[ifo] for ifo in pe_ifos}
+
+os.makedirs(os.path.join(workdir, "PE_dat"))
+filenames = {}
+filenames[opts.pesummarylabel] = os.path.join(workdir, "PE_dat",
+                                              "pesummary_{label}.dat".format(label=opts.pesummarylabel))
+pe_data.to_dat([opts.pesummarylabel], filenames=filenames)
+pe_file = filenames[opts.pesummarylabel]
+
+bw_window = float(gwcomp_config["input"]["window"])
+bw_dataseed = int(gwcomp_config["input"]["dataseed"])
+bw_retries = int(gwcomp_config["condor"]["bw-retries"])
+
+gw_data_find = gwcomp_config["engine"]["gw_data_find"]
+ligolw_segment_query_dqsegdb = gwcomp_config["engine"]["ligolw_segment_query_dqsegdb"]
+ligolw_segments_from_cats_dqsegdb = gwcomp_config["engine"]["ligolw_segments_from_cats_dqsegdb"]
+lwtprint = gwcomp_config["engine"]["lwtprint"]
+
+if opts.veto_definer_file is not None:
+    veto_definer_abs_path = os.path.abspath(opts.veto_definer_file)
+    veto_definer_file = os.path.basename(opts.veto_definer_file)
+parent_dir = os.getcwd()
+os.chdir(workdir)
+
+if opts.onsource_reconstruction:
+
+    # Setup data find directories and files
+    os.makedirs(recon_workdir + "/datafind")
+    os.makedirs(recon_workdir + "/logs")
+    topdir = os.getcwd()
+    os.chdir(recon_workdir)
+
+    datafind_dir = 'datafind'
+    onsource_cache = {}
+    onsource_frameSegs = {}
+    psd_files = {}
+    psd_file_names = {}
+    recon_framePaths = {}
+
+    cachefilefmt = os.path.join(datafind_dir, '{0}.cache')
+    for ifo in pe_ifos:
+        onsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+    gps_start_time = pe_seg_start - 32
+    gps_end_time = trigtime + 2 + 32
+
+    try:
+        gwcomp_nwaves = int(gwcomp_config["gwcomp_reclal"]["nwaves"])
+    except:
+        gwcomp_nwaves = 200  # Default
+
+    for ifo in pe_ifos:
+        onsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+        ldfcmd = "{gw_data_find} --observatory {o} --type {frtype} -s \
+        {gps_start_time} -e {gps_end_time} --lal-cache -u {url_type} >\
+        {cachefile}".format(gw_data_find=gw_data_find, o=ifo[0], frtype=pe_frames[ifo],
+                            cachefile=cachefilefmt.format(ifo),
+                            gps_start_time=int(np.floor(gps_start_time)),
+                            gps_end_time=int(np.ceil(gps_end_time)), url_type=gwcomp_config.get('datafind', 'url-type'))
+
+        print("Calling LIGO data find ...", file=sys.stdout)
+        print(ldfcmd, file=sys.stdout)
+        subprocess.call(ldfcmd, shell=True)
+
+        datafindscript = os.path.join(recon_workdir, 'datafind', 'datafind.sh')
+        with open(datafindscript, 'a') as ldfcmd_file:
+            ldfcmd_file.writelines(ldfcmd + '\n\n')
+        os.chmod(datafindscript, 0o755)
+
+        onsource_frameSegs[ifo] = segments.utils.fromlalcache(open(onsource_cache[ifo]))
+
+        if gwcomp_config.getboolean("condor", "copy-frames"):
+            print("Setting up frame copying")
+
+            #
+            # Now we need to make a new, local cache file
+            # - do this by manipulating the path string in the cache file to be relative 
+            cache_file = os.path.join(datafind_dir,
+                                      '{ifo}.cache'.format(ifo=ifo))
+            shutil.copy(cache_file, cache_file.replace('cache', 'cache.bk'))
+
+            cache_entries = np.loadtxt(cache_file, dtype=str)
+            if cache_entries.ndim == 1: cache_entries = [cache_entries]
+
+            recon_framePaths[ifo] = []
+            new_cache = open(cache_file, 'w')
+            for c, cache_entry in enumerate(cache_entries):
+                frame = cache_entry[-1].split('localhost')[-1]
+                recon_framePaths[ifo].append(frame)
+
+                # local_path=os.path.join('datafind',cache_entry[4].split('/')[-1])
+                local_path = cache_entry[4].split('/')[-1]
+
+                new_cache.writelines('{ifo} {type} {gps} {length} {path}\n'.format(
+                    ifo=ifo, type=cache_entry[1], gps=cache_entry[2],
+                    length=cache_entry[3], path=local_path))
+
+            new_cache.close()
+
+    # Setup onsource BW run
+    bw_recon_config = gwcomp_utils.bayeswaveConfigTemplate()
+    bw_recon_config.set("input", "seglen", str(pe_seglen))
+    bw_recon_config.set("input", "PSDlength", str(pe_seglen))
+    bw_recon_config.set("input", "srate", str(pe_srate))
+    bw_recon_config.set("input", "flow", str(pe_flow))
+    bw_recon_config.set("input", "ifo-list", str(pe_ifos))
+    bw_recon_config.set("engine", "bayeswave", gwcomp_config["engine"]["bayeswave"])
+    bw_recon_config.set("engine", "bayeswave_post", gwcomp_config["engine"]["bayeswave_post"])
+    bw_recon_config.set("engine", "megaplot", gwcomp_config["engine"]["megaplot"])
+    bw_recon_config.set("engine", "megasky", gwcomp_config["engine"]["megasky"])
+    bw_recon_config.set("datafind", "frtype-list", str(pe_frames))
+    bw_recon_config.set("datafind", "channel-list", str(pe_channels))
+    bw_recon_config.set("condor", "universe", gwcomp_config["condor"]["universe"])
+    bw_recon_config.set("condor", "bayeswave-request-memory",
+                        gwcomp_config["condor"]["bayeswave-request-memory"])  # config["bayeswave"]["request-memory"])
+    bw_recon_config.set("condor", "bayeswave_post-request-memory",
+                        gwcomp_config["condor"]["bayeswave_post-request-memory"])
+    bw_recon_config.set("condor", "osg-deploy", gwcomp_config["condor"]["osg-deploy"])
+    bw_recon_config.set("engine", "use-singularity", gwcomp_config["engine"]["use-singularity"])
+    bw_recon_config.set("condor", "transfer-files", gwcomp_config["condor"]["transfer-files"])
+    bw_recon_config.set("condor", "shared-filesystem", gwcomp_config["condor"]["shared-filesystem"])
+    bw_recon_config.set("condor", "copy-frames", gwcomp_config["condor"]["copy-frames"])
+    bw_recon_config.set("condor", "accounting-group", gwcomp_config["condor"]["accounting-group"])
+    bw_recon_config.set("datafind", "sim-data", str(False))
+
+    # DAG work
+    recon_dagname = os.path.join(recon_workdir, os.path.basename(recon_workdir))
+    recon_dag = pipeline.CondorDAG(log=recon_dagname + '.log')
+    recon_dag.set_dag_file(recon_dagname)
+
+    # If any of pe_seglen or pe_srate exceed their limits,
+    # recompute the PSD for the seglen, srate configuration we are using.
+    # This flag gets set above
+    # No need to keep the same trigtime_* output structure here but will keep it
+    # for consistency's sake
+    hl_time_lag = 0
+    hv_time_lag = 0
+    outputDir = 'trigtime_' + str('%.9f' % trigtime) + '_' + \
+                str(float(hl_time_lag)) + '_' + \
+                str(float(hv_time_lag)) + '_' + str(0)
+    if bayesline_median_psd_flag:
+        bl_recon_config = copy.deepcopy(bw_recon_config)
+        bl_recon_config.set('bayeswave_options', 'bayesLine', '')
+        bl_recon_config.set('bayeswave_options', 'cleanOnly', '')
+        bl_recon_config.set('bayeswave_post_options', 'lite', '')
+
+        bl_recon_config.remove_option('bayeswave_options', 'signalOnly')
+        bl_recon_config.remove_option('bayeswave_options', 'glitchOnly')
+        bl_recon_config.remove_option('bayeswave_options', 'noiseOnly')
+        bl_recon_config.remove_option('bayeswave_options', 'fullOnly')
+
+        recon_bayesline_medianpsd_job = pipe_utils.bayeswaveJob(bl_recon_config,
+                                                                onsource_cache,
+                                                                injfile=None,
+                                                                numrel_data=None)
+        recon_bayesline_medianpsd_log = recon_bayesline_medianpsd_job._CondorJob__log_file
+        recon_bayesline_medianpsd_job.set_sub_file(os.path.join(recon_workdir,
+                                                                'bayeswave_median_psd.sub'))
+
+        recon_bayesline_post_median_psd_job = pipe_utils.bayeswave_postJob(bl_recon_config,
+                                                                           onsource_cache,
+                                                                           injfile=None,
+                                                                           numrel_data=None)
+
+        recon_bayesline_post_median_psd_log = recon_bayesline_post_median_psd_job._CondorJob__log_file
+        recon_bayesline_post_median_psd_job.set_sub_file(os.path.join(recon_workdir,
+                                                                      'bayeswave_post_median_psd.sub'))
+
+        for ifo in pe_ifos:
+            psd_files[ifo] = os.path.join(recon_workdir, outputDir + '_PSDs', 'post', 'clean',
+                                          'glitch_median_PSD_forLI_{ifo}.dat'.format(ifo=ifo))
+            psd_file_names[ifo] = 'glitch_median_PSD_forLI_{ifo}.dat'.format(ifo=ifo)
+
+    else:
+        PSD_dir = os.path.join(recon_workdir, 'PSD')
+        os.makedirs(PSD_dir)
+        for ifo in pe_ifos:
+            np.savetxt(os.path.join(PSD_dir, '{ifo}_PSD.dat'.format(ifo=ifo)), pe_psd[ifo], fmt="%.3f %e")
+            psd_files[ifo] = os.path.join(PSD_dir, '{ifo}_PSD.dat'.format(ifo=ifo))
+            psd_file_names[ifo] = '{ifo}_PSD.dat'.format(ifo=ifo)
+
+    try:
+        extra_files = bw_recon_config.get('condor', 'extra-files')
+    except configparser.NoOptionError as nooptex:
+        extra_files = ''
+    extra_files += ','.join(list(psd_files.values()))
+    bw_recon_config.set('condor', 'extra-files', extra_files)
+
+    if not os.path.exists(outputDir): os.makedirs(outputDir)
+
+    bw_recon_config.set("datafind", "psd-files", str(psd_file_names))
+
+    recon_bayeswave_job = pipe_utils.bayeswaveJob(bw_recon_config, onsource_cache, injfile=None,
+                                                  numrel_data=None)
+    recon_bayeswave_log = recon_bayeswave_job._CondorJob__log_file
+
+    recon_bayeswave_post_job = pipe_utils.bayeswave_postJob(bw_recon_config, onsource_cache,
+                                                            injfile=None, numrel_data=None)
+    recon_bayeswave_post_log = recon_bayeswave_post_job._CondorJob__log_file
+
+    recon_megasky_job = pipe_utils.megaskyJob(bw_recon_config, None)
+    recon_megasky_log = recon_megasky_job._CondorJob__log_file
+    recon_megaplot_job = pipe_utils.megaplotJob(bw_recon_config)
+    recon_megaplot_log = recon_megaplot_job._CondorJob__log_file
+
+    gwcomp_reclal_job = gwcomp_utils.gwcomp_reclalJob(gwcomp_config, onsource_cache, psd_files, pe_file)
+    gwcomp_reclal_log = gwcomp_reclal_job._CondorJob__log_file
+
+    recon_gwcomp_bw_li_inj_job = gwcomp_utils.gwcomp_bw_li_injJob(gwcomp_config)
+    recon_gwcomp_bw_li_inj_log = recon_gwcomp_bw_li_inj_job._CondorJob__log_file
+
+    if bayesline_median_psd_flag:
+        outputDir_psd = outputDir + '_PSDs'
+        if not os.path.exists(outputDir_psd): os.makedirs(outputDir_psd)
+        recon_bayeswave_psd_node = pipe_utils.bayeswaveNode(recon_bayesline_medianpsd_job)
+        recon_bayeswave_psd_post_node = pipe_utils.bayeswave_postNode(recon_bayesline_post_median_psd_job)
+
+        ## Add options for median PSD job
+        recon_bayeswave_psd_node.set_retry(bw_retries)
+        recon_bayeswave_psd_node.set_trigtime(trigtime)
+        recon_bayeswave_psd_node.set_segment_start(pe_seg_start)
+        recon_bayeswave_psd_node.set_srate(pe_srate)
+        recon_bayeswave_psd_node.set_seglen(pe_seglen)
+        recon_bayeswave_psd_node.set_window(bw_window)
+        recon_bayeswave_psd_node.set_flow(pe_ifos, pe_flow)
+        recon_bayeswave_psd_node.set_PSDstart(pe_seg_start)
+        # if bayesline_cp.has_option('input','rolloff'):
+        #    bayeswave_psd_node.set_rolloff(bayesline_cp.getfloat('input','rolloff'))
+        recon_bayeswave_psd_node.set_outputDir(outputDir_psd)
+
+        ## FIXME: Put in logic for custom or glitch cleaned frame
+        ## in the off-chance they aren't available on gw_datafind
+        if recon_framePaths: recon_bayeswave_psd_node.add_frame_transfer(recon_framePaths)
+
+        #
+        # Add options for bayesline_psd_post node
+        #
+        recon_bayeswave_psd_post_node.set_dataseed(bw_dataseed)
+        bw_dataseed += 1
+        recon_bayeswave_psd_post_node.set_trigtime(trigtime)
+        recon_bayeswave_psd_post_node.set_segment_start(pe_seg_start)
+        recon_bayeswave_psd_post_node.set_srate(pe_srate)
+        recon_bayeswave_psd_post_node.set_seglen(pe_seglen)
+        recon_bayeswave_psd_post_node.set_window(bw_window)
+        recon_bayeswave_psd_post_node.set_flow(pe_ifos, pe_flow)
+        recon_bayeswave_psd_post_node.set_PSDstart(pe_seg_start)
+        # if bayesline_cp.has_option('input','rolloff'):
+        #    bayeswave_psd_post_node.set_rolloff(bayesline_cp.getfloat('input','rolloff'))
+        recon_bayeswave_psd_post_node.set_outputDir(pe_ifos, outputDir_psd)
+
+        #############################################################
+        #
+        #      Do we need timelag logic here? 
+        #
+        #############################################################
+
+    #
+    # Add options for bayeswave node
+    #
+
+    recon_bayeswave_node = pipe_utils.bayeswaveNode(recon_bayeswave_job)
+    recon_bayeswave_post_node = pipe_utils.bayeswave_postNode(recon_bayeswave_post_job)
+
+    recon_bayeswave_node.set_retry(bw_retries)
+    recon_bayeswave_node.set_trigtime(trigtime)
+
+    recon_bayeswave_node.set_segment_start(pe_seg_start)
+    recon_bayeswave_node.set_srate(pe_srate)
+    recon_bayeswave_node.set_seglen(pe_seglen)
+    recon_bayeswave_node.set_window(bw_window)
+    recon_bayeswave_node.set_flow(pe_ifos, pe_flow)
+    recon_bayeswave_node.set_PSDstart(pe_seg_start)
+    # if cp.has_option('input','rolloff'):
+    #     bayeswave_node.set_rolloff(cp.getfloat('input','rolloff'))
+    recon_bayeswave_node.set_outputDir(outputDir)
+    if recon_framePaths: recon_bayeswave_node.add_frame_transfer(recon_framePaths)
+    # FIXME: Transfer frame logic 
+    # if transferFrames: bayeswave_node.add_frame_transfer(transferFrames)
+
+    #
+    # if cp.get('datafind','sim-data'):
+    #        bayeswave_node.set_dataseed(dataseed)
+
+    #    if cp.has_option('bayeswave_options','BW-inject'):
+    #        bayeswave_node.set_BW_event(trigger.BW_event)
+
+    #
+    # Add options for bayeswave_post node
+    #
+    recon_bayeswave_post_node.set_dataseed(bw_dataseed)
+    bw_dataseed += 1
+    recon_bayeswave_post_node.set_trigtime(trigtime)
+    recon_bayeswave_post_node.set_segment_start(pe_seg_start)
+    recon_bayeswave_post_node.set_srate(pe_srate)
+    recon_bayeswave_post_node.set_seglen(pe_seglen)
+    recon_bayeswave_post_node.set_window(bw_window)
+    recon_bayeswave_post_node.set_flow(pe_ifos, pe_flow)
+    recon_bayeswave_post_node.set_PSDstart(pe_seg_start)
+    # if cp.has_option('input','rolloff'):
+    #    bayeswave_post_node.set_rolloff(cp.getfloat('input','rolloff'))
+    recon_bayeswave_post_node.set_outputDir(pe_ifos, outputDir)
+
+    #############################################################
+    #
+    #      Same as before, Do we need timelag logic here? 
+    #
+    #############################################################
+
+    recon_megasky_node = pipe_utils.megaskyNode(recon_megasky_job, outputDir)
+    recon_megaplot_node = pipe_utils.megaplotNode(recon_megaplot_job, outputDir)
+
+    recon_megasky_node.set_outputDir(outputDir)
+    recon_megaplot_node.set_outputDir(outputDir)
+
+    #
+    # Add options for gwcomp_reclal
+    #
+    gwcomp_reclal_node = gwcomp_utils.gwcomp_reclalNode(gwcomp_reclal_job)
+    gwcomp_reclal_node.set_li_samples_file(os.path.basename(pe_file))
+    gwcomp_reclal_node.set_psd_files(psd_file_names.values())
+    gwcomp_reclal_node.set_srate(pe_srate)
+    gwcomp_reclal_node.set_li_epoch(pe_seg_start)
+    gwcomp_reclal_node.set_trigtime(trigtime)
+    gwcomp_reclal_node.set_nwaves(gwcomp_nwaves)
+    gwcomp_reclal_node.set_approx(pe_approx)
+    gwcomp_reclal_node.set_duration(pe_seglen)
+    gwcomp_reclal_node.set_output_dir(outputDir)
+    gwcomp_reclal_node.set_make_plots_flag()
+    gwcomp_reclal_node.set_flow(pe_flow)
+    gwcomp_reclal_node.set_ifos(pe_ifos)
+    gwcomp_reclal_node.set_fref(pe_fref)
+    gwcomp_reclal_node.set_amp_order(pe_amporder)
+    gwcomp_reclal_node.set_phase_order(pe_pnorder)
+
+    #
+    # Add options for gwcomp_bw_li_inj
+    #
+    recon_gwcomp_bw_li_inj_node = gwcomp_utils.gwcomp_bw_li_injNode(recon_gwcomp_bw_li_inj_job)
+    recon_gwcomp_bw_li_inj_node.set_bw_dir(outputDir)
+    recon_gwcomp_bw_li_inj_node.set_li_dir(os.path.join(outputDir, 'LI_reconstruct'))
+    recon_gwcomp_bw_li_inj_node.set_flow(pe_flow)
+    recon_gwcomp_bw_li_inj_node.set_srate(pe_srate)
+    recon_gwcomp_bw_li_inj_node.set_ifos(pe_ifos)
+    recon_gwcomp_bw_li_inj_node.set_trigtime(trigtime)
+    recon_gwcomp_bw_li_inj_node.set_epoch(pe_seg_start)
+    recon_gwcomp_bw_li_inj_node.set_duration(pe_seglen)
+    recon_gwcomp_bw_li_inj_node.set_output_dir(outputDir)
+    recon_gwcomp_bw_li_inj_node.set_plot_flag()
+
+    ## Parent/Child DAG relationships
+
+    if bayesline_median_psd_flag:
+        recon_bayeswave_psd_post_node.add_parent(recon_bayeswave_psd_node)
+        recon_bayeswave_node.add_parent(recon_bayeswave_psd_post_node)
+        gwcomp_reclal_node.add_parent(recon_bayeswave_psd_post_node)
+
+    recon_bayeswave_post_node.add_parent(recon_bayeswave_node)
+    recon_megasky_node.add_parent(recon_bayeswave_node)
+    recon_megaplot_node.add_parent(recon_bayeswave_post_node)
+
+    recon_gwcomp_bw_li_inj_node.add_parent(gwcomp_reclal_node)
+    recon_gwcomp_bw_li_inj_node.add_parent(recon_bayeswave_post_node)
+
+    if bayesline_median_psd_flag:
+        recon_dag.add_node(recon_bayeswave_psd_node)
+        recon_dag.add_node(recon_bayeswave_psd_post_node)
+    recon_dag.add_node(recon_bayeswave_node)
+    recon_dag.add_node(recon_bayeswave_post_node)
+    recon_dag.add_node(gwcomp_reclal_node)
+    recon_dag.add_node(recon_megasky_node)
+    recon_dag.add_node(recon_megaplot_node)
+    recon_dag.add_node(recon_gwcomp_bw_li_inj_node)
+
+    #
+    # Correct log files
+    #
+    # James said in bayeswave_pipe:
+    # "FIXME: this is a horrendous hack.  glue.pipeline overrides nodes' job log file
+    # paths.  Something to do with multiple inheritance in the job classes?"
+    #
+    if bayesline_median_psd_flag:
+        recon_bayesline_medianpsd_job._CondorJob__log_file = recon_bayesline_medianpsd_log
+        recon_bayesline_post_median_psd_job._CondorJob__log_file = recon_bayesline_post_median_psd_log
+
+    recon_bayeswave_job._CondorJob__log_file = recon_bayeswave_log
+    recon_bayeswave_post_job._CondorJob__log_file = recon_bayeswave_post_log
+
+    gwcomp_reclal_job._CondorJob__log_file = gwcomp_reclal_log
+    recon_gwcomp_bw_li_inj_job._CondorJob__log_file = recon_gwcomp_bw_li_inj_log
+
+    recon_megasky_job._CondorJob__log_file = recon_megasky_log
+    recon_megaplot_job._CondorJob__log_file = recon_megaplot_log
+
+    recon_dag.write_sub_files()
+    recon_dag.write_dag()
+    recon_dag.write_script()
+
+    os.chdir(topdir)
+
+if opts.onsource_residuals:
+    os.makedirs(residuals_workdir + "/datafind")
+    os.makedirs(residuals_workdir + "/logs")
+    os.makedirs(residuals_workdir + "/residual_frame")
+    topdir = os.getcwd()
+    os.chdir(residuals_workdir)
+
+    datafind_dir = 'datafind'
+    onsource_cache = {}
+    onsource_frameSegs = {}
+    psd_files = {}
+    psd_file_names = {}
+
+    cachefilefmt = os.path.join(datafind_dir, '{0}.cache')
+    for ifo in pe_ifos:
+        onsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+    gps_start_time = pe_seg_start - 32
+    gps_end_time = trigtime + 2 + 32
+
+    res_frames = {}
+    res_channels = {}
+    res_cache = {}
+
+    for ifo in pe_ifos:
+        onsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+        ldfcmd = "{gw_data_find} --observatory {o} --type {frtype} -s \
+        {gps_start_time} -e {gps_end_time} --lal-cache -u {url_type} >\
+        {cachefile}".format(gw_data_find=gw_data_find, o=ifo[0], frtype=pe_frames[ifo],
+                            cachefile=cachefilefmt.format(ifo),
+                            gps_start_time=int(np.floor(gps_start_time)),
+                            gps_end_time=int(np.ceil(gps_end_time)), url_type=gwcomp_config.get('datafind', 'url-type'))
+
+        print("Calling LIGO data find ...", file=sys.stdout)
+        print(ldfcmd, file=sys.stdout)
+        subprocess.call(ldfcmd, shell=True)
+
+        datafindscript = os.path.join(residuals_workdir, 'datafind', 'datafind.sh')
+        with open(datafindscript, 'a') as ldfcmd_file:
+            ldfcmd_file.writelines(ldfcmd + '\n\n')
+        os.chmod(datafindscript, 0o755)
+
+        onsource_frameSegs[ifo] = segments.utils.fromlalcache(open(onsource_cache[ifo]))
+
+        res_channels[ifo] = pe_channels[ifo] + "_RES"
+        res_frames[ifo] = pe_frames[ifo] + "_RES"
+        res_cache[ifo] = os.path.join(datafind_dir, '{0}_res.cache'.format(ifo))
+
+    bw_residuals_config = gwcomp_utils.bayeswaveConfigTemplate()
+    bw_residuals_config.set("input", "seglen", str(pe_seglen))
+    bw_residuals_config.set("input", "PSDlength", str(pe_seglen))
+    bw_residuals_config.set("input", "srate", str(pe_srate))
+    bw_residuals_config.set("input", "flow", str(pe_flow))
+    bw_residuals_config.set("input", "ifo-list", str(pe_ifos))
+    bw_residuals_config.set("engine", "bayeswave", gwcomp_config["engine"]["bayeswave"])
+    bw_residuals_config.set("engine", "bayeswave_post", gwcomp_config["engine"]["bayeswave_post"])
+    bw_residuals_config.set("engine", "megaplot", gwcomp_config["engine"]["megaplot"])
+    bw_residuals_config.set("engine", "megasky", gwcomp_config["engine"]["megasky"])
+    bw_residuals_config.set("datafind", "frtype-list", str(res_frames))
+    bw_residuals_config.set("datafind", "channel-list", str(res_channels))
+    bw_residuals_config.set("bayeswave_options", "bayesLine", "")
+    bw_residuals_config.set("bayeswave_post_options", "bayesLine", "")
+    bw_residuals_config.set("condor", "universe", gwcomp_config["condor"]["universe"])
+    bw_residuals_config.set("condor", "bayeswave-request-memory", gwcomp_config["condor"][
+        "bayeswave-request-memory"])  # config["bayeswave"]["request-memory"])
+    bw_residuals_config.set("condor", "bayeswave_post-request-memory",
+                            gwcomp_config["condor"]["bayeswave_post-request-memory"])
+    bw_residuals_config.set("condor", "osg-deploy", gwcomp_config["condor"]["osg-deploy"])
+    bw_residuals_config.set("engine", "use-singularity", gwcomp_config["engine"]["use-singularity"])
+    bw_residuals_config.set("condor", "transfer-files", gwcomp_config["condor"]["transfer-files"])
+    bw_residuals_config.set("condor", "shared-filesystem", gwcomp_config["condor"]["shared-filesystem"])
+    bw_residuals_config.set("condor", "copy-frames", str(False))
+    bw_residuals_config.set("condor", "accounting-group", gwcomp_config["condor"]["accounting-group"])
+    bw_residuals_config.set("datafind", "sim-data", str(False))
+
+    # Setup the dag object
+    residuals_dagname = os.path.join(residuals_workdir, os.path.basename(residuals_workdir))
+    residuals_dag = pipeline.CondorDAG(log=residuals_dagname + '.log')
+    residuals_dag.set_dag_file(residuals_dagname)
+
+    PSD_dir = os.path.join(residuals_workdir, 'PSD')
+    os.makedirs(PSD_dir)
+    for ifo in pe_ifos:
+        np.savetxt(os.path.join(PSD_dir, '{ifo}_PSD.dat'.format(ifo=ifo)), pe_psd[ifo], fmt="%.3f %e")
+        psd_files[ifo] = os.path.join(PSD_dir, '{ifo}_PSD.dat'.format(ifo=ifo))
+        psd_file_names[ifo] = '{ifo}_PSD.dat'.format(ifo=ifo)
+
+    # No need to keep the same trigtime_* output structure here but will keep it
+    # for consistency's sake
+    hl_time_lag = 0
+    hv_time_lag = 0
+    outputDir = 'trigtime_' + str('%.9f' % trigtime) + '_' + \
+                str(float(hl_time_lag)) + '_' + \
+                str(float(hv_time_lag)) + '_' + str(0)
+
+    try:
+        extra_files = bw_residuals_config.get('condor', 'extra-files')
+    except configparser.NoOptionError as nooptex:
+        extra_files = ''
+    extra_files += 'residual_frame'
+    bw_residuals_config.set('condor', 'extra-files', extra_files)
+
+    if not os.path.exists(outputDir): os.makedirs(outputDir)
+
+    # Setup the job objects
+    residuals_bayeswave_job = pipe_utils.bayeswaveJob(bw_residuals_config, res_cache, injfile=None,
+                                                      numrel_data=None)
+    residuals_bayeswave_log = residuals_bayeswave_job._CondorJob__log_file
+
+    residuals_bayeswave_post_job = pipe_utils.bayeswave_postJob(bw_residuals_config, onsource_cache,
+                                                                injfile=None, numrel_data=None)
+    residuals_bayeswave_post_log = residuals_bayeswave_post_job._CondorJob__log_file
+
+    residuals_megasky_job = pipe_utils.megaskyJob(bw_residuals_config, None)
+    residuals_megasky_log = residuals_megasky_job._CondorJob__log_file
+    residuals_megaplot_job = pipe_utils.megaplotJob(bw_residuals_config)
+    residuals_megaplot_log = residuals_megaplot_job._CondorJob__log_file
+
+    gwcomp_residuals_job = gwcomp_utils.gwcomp_residualsJob(gwcomp_config, onsource_cache, psd_files, pe_file)
+    gwcomp_residuals_log = gwcomp_residuals_job._CondorJob__log_file
+
+    #
+    # Add options for bayeswave node
+    #
+    residuals_bayeswave_node = pipe_utils.bayeswaveNode(residuals_bayeswave_job)
+    residuals_bayeswave_post_node = pipe_utils.bayeswave_postNode(residuals_bayeswave_post_job)
+
+    residuals_bayeswave_node.set_retry(bw_retries)
+    residuals_bayeswave_node.set_trigtime(trigtime)
+
+    residuals_bayeswave_node.set_segment_start(pe_seg_start)
+    residuals_bayeswave_node.set_srate(pe_srate)
+    residuals_bayeswave_node.set_seglen(pe_seglen)
+    residuals_bayeswave_node.set_window(bw_window)
+    residuals_bayeswave_node.set_flow(pe_ifos, pe_flow)
+    residuals_bayeswave_node.set_PSDstart(pe_seg_start)
+    # if cp.has_option('input','rolloff'):
+    #     bayeswave_node.set_rolloff(cp.getfloat('input','rolloff'))
+    residuals_bayeswave_node.set_outputDir(outputDir)
+
+    #
+    # Add options for bayeswave_post node
+    #
+    residuals_bayeswave_post_node.set_dataseed(bw_dataseed)
+    bw_dataseed += 1
+    residuals_bayeswave_post_node.set_trigtime(trigtime)
+    residuals_bayeswave_post_node.set_segment_start(pe_seg_start)
+    residuals_bayeswave_post_node.set_srate(pe_srate)
+    residuals_bayeswave_post_node.set_seglen(pe_seglen)
+    residuals_bayeswave_post_node.set_window(bw_window)
+    residuals_bayeswave_post_node.set_flow(pe_ifos, pe_flow)
+    residuals_bayeswave_post_node.set_PSDstart(pe_seg_start)
+    # if cp.has_option('input','rolloff'):
+    #    bayeswave_post_node.set_rolloff(cp.getfloat('input','rolloff'))
+    residuals_bayeswave_post_node.set_outputDir(pe_ifos, outputDir)
+
+    residuals_megasky_node = pipe_utils.megaskyNode(residuals_megasky_job, outputDir)
+    residuals_megaplot_node = pipe_utils.megaplotNode(residuals_megaplot_job, outputDir)
+
+    residuals_megasky_node.set_outputDir(outputDir)
+    residuals_megaplot_node.set_outputDir(outputDir)
+
+    gwcomp_residuals_node = gwcomp_utils.gwcomp_residualsNode(gwcomp_residuals_job)
+    gwcomp_residuals_node.set_li_samples_file(os.path.basename(pe_file))
+    gwcomp_residuals_node.set_input_channel(pe_channels.values())
+    gwcomp_residuals_node.set_output_channel(res_channels.values())
+    gwcomp_residuals_node.set_output_frame(res_frames.values())
+    gwcomp_residuals_node.set_psd_files(psd_file_names.values())
+    # gwcomp_residuals_node.set_frame_cache_path(onsource_cache)
+    gwcomp_residuals_node.set_srate(pe_srate)
+    gwcomp_residuals_node.set_li_epoch(pe_seg_start)
+    gwcomp_residuals_node.set_trigtime(trigtime)
+    gwcomp_residuals_node.set_approx(pe_approx)
+    gwcomp_residuals_node.set_duration(pe_seglen)
+    gwcomp_residuals_node.set_output_dir('residual_frame')
+    gwcomp_residuals_node.set_make_plots_flag()
+    gwcomp_residuals_node.set_make_omega_scans_flag()
+    gwcomp_residuals_node.set_flow(pe_flow)
+    gwcomp_residuals_node.set_ifos(pe_ifos)
+    gwcomp_residuals_node.set_fref(pe_fref)
+    gwcomp_residuals_node.set_amp_order(pe_amporder)
+    gwcomp_residuals_node.set_phase_order(pe_pnorder)
+
+    residuals_bayeswave_node.add_parent(gwcomp_residuals_node)
+    residuals_bayeswave_post_node.add_parent(residuals_bayeswave_node)
+    residuals_megasky_node.add_parent(residuals_bayeswave_node)
+    residuals_megaplot_node.add_parent(residuals_bayeswave_post_node)
+
+    residuals_dag.add_node(gwcomp_residuals_node)
+    residuals_dag.add_node(residuals_bayeswave_node)
+    residuals_dag.add_node(residuals_bayeswave_post_node)
+    residuals_dag.add_node(residuals_megasky_node)
+    residuals_dag.add_node(residuals_megaplot_node)
+
+    #
+    # Correct log files
+    #
+    # James said in bayeswave_pipe:
+    # "FIXME: this is a horrendous hack.  glue.pipeline overrides nodes' job log file
+    # paths.  Something to do with multiple inheritance in the job classes?"
+    #
+
+    residuals_bayeswave_job._CondorJob__log_file = residuals_bayeswave_log
+    residuals_bayeswave_post_job._CondorJob__log_file = residuals_bayeswave_post_log
+
+    gwcomp_residuals_job._CondorJob__log_file = gwcomp_residuals_log
+
+    residuals_megasky_job._CondorJob__log_file = residuals_megasky_log
+    residuals_megaplot_job._CondorJob__log_file = residuals_megaplot_log
+
+    residuals_dag.write_sub_files()
+    residuals_dag.write_dag()
+    residuals_dag.write_script()
+
+    os.chdir(topdir)
+
+if opts.offsource_injections or opts.offsource_background:
+
+    veto_dir = workdir + "/veto_segments"
+    os.makedirs(veto_dir)
+
+    if opts.veto_definer_file is None:
+        print("Please provide veto definer file to make clean segments", file=sys.stderr)
+        sys.exit(1)
+    topdir = os.getcwd()
+    os.chdir(veto_dir)
+    shutil.copy(veto_definer_abs_path, veto_definer_file)
+
+    start_time = int(trigtime - 8192)
+    stop_time = int(trigtime + 8192)
+    analysis_flag = ast.literal_eval(gwcomp_config["segments"]["analyze-flag"])
+    segments_url = gwcomp_config["segments"]["segments-url"]
+    file_types = {}
+    file_types = {ifo: analysis_flag[ifo].replace(':', '_') for ifo in pe_ifos}
+
+    clean_segs = {}
+
+    cmd = '{ligolw_segments_from_cats_dqsegdb} -v {definer} -t {url} -c -C 4 -I {ifos} -s {start} -e {stop}'.format(
+        definer=veto_definer_file,
+        url=segments_url, ifos=','.join(pe_ifos), start=start_time, stop=stop_time,
+        ligolw_segments_from_cats_dqsegdb=ligolw_segments_from_cats_dqsegdb)
+    os.system(cmd)
+
+    for ifo in pe_ifos:
+        cmd = '{ligolw_segment_query_dqsegdb} -t {url} --query-segments -a {flag} -s {start} -e {stop} > {file}_{start}_{stop}.xml'.format(
+            url=segments_url,
+            flag=analysis_flag[ifo], start=start_time, stop=stop_time, file=file_types[ifo],
+            ligolw_segment_query_dqsegdb=ligolw_segment_query_dqsegdb)
+        os.system(cmd)
+
+        cmd = '{lwtprint} {file}_{start}_{stop}.xml -c start_time -c end_time -t segment -d " " > {file}_{start}_{stop}.txt'.format(
+            file=file_types[ifo],
+            start=start_time, stop=stop_time, lwtprint=lwtprint)
+        os.system(cmd)
+
+        cmd = '{lwtprint} {ifo}-VETOTIME_CAT4-{start}-{duration}.xml -c start_time -c end_time -t segment -d " " > {ifo}-VETOTIME_CAT4-{start}-{duration}.txt'.format(
+            start=start_time,
+            duration=stop_time - start_time, stop=stop_time, ifo=ifo, lwtprint=lwtprint)
+        os.system(cmd)
+
+        ready_segs = segments.segmentlist([segments.segment(x, y) for x, y in np.atleast_2d(
+            np.loadtxt('{file}_{start}_{stop}.txt'.format(file=file_types[ifo],
+                                                          start=start_time, stop=stop_time)))])
+        try:
+            veto_segs = segments.segmentlist([segments.segment(x, y) for x, y in np.atleast_2d(
+                np.loadtxt('{ifo}-VETOTIME_CAT4-{start}-{duration}.txt'.format(start=start_time,
+                                                                               duration=stop_time - start_time,
+                                                                               stop=stop_time, ifo=ifo)))])
+        except:
+            veto_segs = segments.segmentlist([])
+
+        clean_segs[ifo] = ready_segs - veto_segs
+
+    clean_segments = clean_segs[pe_ifos[0]]
+    if (len(pe_ifos) > 0):
+        for i in range(1, len(pe_ifos)):
+            clean_segments = clean_segments & clean_segs[pe_ifos[i]]
+
+    os.chdir(topdir)
+    trigtimes_file = "trigtimes.txt"
+    n_offsource = int(gwcomp_config["gwcomp_options"]["n_offsource"])
+    if (not os.path.exists(trigtimes_file)):
+        print("Background trigtimes do not exist. Creating new files...")
+        segment_list = segments.segmentlist([])
+        while len(segment_list) < n_offsource:
+            rand_time = np.random.uniform(start_time, stop_time, 1)
+            rand_seg = segments.segment(rand_time - pe_seglen + 2.0, rand_time + 2.0)
+            if (rand_seg in clean_segments) and (not segment_list.intersects_segment(rand_seg)):
+                segment_list.extend([rand_seg])
+        rand_trigtimes = np.array([seg[1][0] - 2.0 for seg in segment_list])
+        rand_trigtimes = np.sort(rand_trigtimes)
+        np.savetxt(trigtimes_file, rand_trigtimes, "%.6f")
+    else:
+        rand_trigtimes = np.loadtxt(trigtimes_file)
+
+    if opts.offsource_injections:
+        print("Making injection xml file")
+        injfile_name = "%s_injection.xml" % opts.workdir
+        gwcomp_utils.create_xml_table(pe_file, pe_config, rand_trigtimes, injfile_name)
+
+if opts.offsource_injections:
+    os.makedirs(injection_workdir + "/datafind")
+    os.makedirs(injection_workdir + "/logs")
+    topdir = os.getcwd()
+    os.chdir(injection_workdir)
+
+    datafind_dir = 'datafind'
+    offsource_cache = {}
+    offsource_frameSegs = {}
+    offsource_framePaths = {}
+    offsource_transferFrames = {}
+
+    # Setup BW config object
+    bw_inj_config = gwcomp_utils.bayeswaveConfigTemplate()
+    bw_inj_config.set("input", "seglen", str(pe_seglen))
+    bw_inj_config.set("input", "PSDlength", str(pe_seglen))
+    bw_inj_config.set("input", "srate", str(pe_srate))
+    bw_inj_config.set("input", "flow", str(pe_flow))
+    bw_inj_config.set("input", "ifo-list", str(pe_ifos))
+    bw_inj_config.set("bayeswave_options", "inj-fref", str(pe_fref))
+    bw_inj_config.set("bayeswave_post_options", "inj-fref", str(pe_fref))
+    bw_inj_config.set("bayeswave_post_options", "lite", "")
+    bw_inj_config.set("engine", "bayeswave", gwcomp_config["engine"]["bayeswave"])
+    bw_inj_config.set("engine", "bayeswave_post", gwcomp_config["engine"]["bayeswave_post"])
+    bw_inj_config.set("engine", "megaplot", gwcomp_config["engine"]["megaplot"])
+    bw_inj_config.set("engine", "megasky", gwcomp_config["engine"]["megasky"])
+    bw_inj_config.set("datafind", "frtype-list", str(pe_frames))
+    bw_inj_config.set("datafind", "channel-list", str(pe_channels))
+    bw_inj_config.set("condor", "universe", gwcomp_config["condor"]["universe"])
+    bw_inj_config.set("condor", "bayeswave-request-memory",
+                      gwcomp_config["condor"]["bayeswave-request-memory"])  # config["bayeswave"]["request-memory"])
+    bw_inj_config.set("condor", "bayeswave_post-request-memory",
+                      gwcomp_config["condor"]["bayeswave_post-request-memory"])
+    bw_inj_config.set("condor", "osg-deploy", gwcomp_config["condor"]["osg-deploy"])
+    bw_inj_config.set("engine", "use-singularity", gwcomp_config["engine"]["use-singularity"])
+    bw_inj_config.set("condor", "transfer-files", gwcomp_config["condor"]["transfer-files"])
+    bw_inj_config.set("condor", "shared-filesystem", gwcomp_config["condor"]["shared-filesystem"])
+    bw_inj_config.set("condor", "copy-frames", gwcomp_config["condor"]["copy-frames"])
+    bw_inj_config.set("condor", "accounting-group", gwcomp_config["condor"]["accounting-group"])
+    bw_inj_config.set("datafind", "sim-data", str(False))
+    bw_inj_config.add_section("injections")
+    bw_inj_config.set("injections", "events", "all")
+
+    # This is an offsource injection. So BL PSD has to be computed.
+    # Set BL config object
+    bl_inj_config = copy.deepcopy(bw_inj_config)
+    bl_inj_config.set('bayeswave_options', 'bayesLine', '')
+    bl_inj_config.set('bayeswave_options', 'cleanOnly', '')
+    bl_inj_config.set('bayeswave_post_options', 'lite', '')
+
+    bl_inj_config.remove_option('bayeswave_options', 'signalOnly')
+    bl_inj_config.remove_option('bayeswave_options', 'glitchOnly')
+    bl_inj_config.remove_option('bayeswave_options', 'noiseOnly')
+    bl_inj_config.remove_option('bayeswave_options', 'fullOnly')
+
+    # Parse the injection file created earlier
+    injfile_path = os.path.join(workdir, injfile_name)
+    trigger_list = pipe_utils.triggerList(bw_inj_config, injection_file=injfile_path,
+                                          followup_injections=None)
+
+    shutil.copy(injfile_path, injection_workdir)
+    injfile = os.path.basename(injfile_path)
+    try:
+        if not isinstance(trigger_list, pipe_utils.triggerList):
+            print("I've made a huge mistake: trigger_list is not a triggerList.")
+            sys.exit(1)
+    except NameError:
+        print("I've made a huge mistake: there are no triggers.")
+
+    trigger_times = [trig.trigger_time for trig in trigger_list.triggers]
+
+    gps_start_time = min(trigger_times) - 32
+    gps_end_time = max(trigger_times) + 32
+
+    cachefilefmt = os.path.join(datafind_dir, '{0}.cache')
+
+    # Datafind. We know we're doing injections on real data.
+    # FIXME: Add simulated data option
+    for ifo in pe_ifos:
+        offsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+        ldfcmd = "{gw_data_find} --observatory {o} --type {frtype} -s \
+        {gps_start_time} -e {gps_end_time} --lal-cache -u {url_type} >\
+        {cachefile}".format(gw_data_find=gw_data_find, o=ifo[0], frtype=pe_frames[ifo],
+                            cachefile=cachefilefmt.format(ifo),
+                            gps_start_time=int(np.floor(gps_start_time)),
+                            gps_end_time=int(np.ceil(gps_end_time)), url_type=gwcomp_config.get('datafind', 'url-type'))
+
+        print("Calling LIGO data find ...", file=sys.stdout)
+        print(ldfcmd, file=sys.stdout)
+        subprocess.call(ldfcmd, shell=True)
+
+        datafindscript = os.path.join(injection_workdir, 'datafind', 'datafind.sh')
+        with open(datafindscript, 'a') as ldfcmd_file:
+            ldfcmd_file.writelines(ldfcmd + '\n\n')
+        os.chmod(datafindscript, 0o755)
+
+        offsource_frameSegs[ifo] = segments.utils.fromlalcache(open(offsource_cache[ifo]))
+
+        if gwcomp_config.getboolean("condor", "copy-frames"):
+            print("Setting up frame copying")
+
+            #
+            # Now we need to make a new, local cache file
+            # - do this by manipulating the path string in the cache file to be relative 
+            cache_file = os.path.join(datafind_dir,
+                                      '{ifo}.cache'.format(ifo=ifo))
+            shutil.copy(cache_file, cache_file.replace('cache', 'cache.bk'))
+
+            cache_entries = np.loadtxt(cache_file, dtype=str)
+            if cache_entries.ndim == 1: cache_entries = [cache_entries]
+
+            offsource_framePaths[ifo] = []
+            new_cache = open(cache_file, 'w')
+            for c, cache_entry in enumerate(cache_entries):
+                frame = cache_entry[-1].split('localhost')[-1]
+                offsource_framePaths[ifo].append(frame)
+
+                # local_path=os.path.join('datafind',cache_entry[4].split('/')[-1])
+                local_path = cache_entry[4].split('/')[-1]
+
+                new_cache.writelines('{ifo} {type} {gps} {length} {path}\n'.format(
+                    ifo=ifo, type=cache_entry[1], gps=cache_entry[2],
+                    length=cache_entry[3], path=local_path))
+
+            new_cache.close()
+
+    # DAG work
+    inj_dagname = os.path.join(injection_workdir, os.path.basename(injection_workdir))
+    inj_dag = pipeline.CondorDAG(log=inj_dagname + '.log')
+    inj_dag.set_dag_file(inj_dagname)
+
+    inj_bayesline_medianpsd_job = pipe_utils.bayeswaveJob(bl_inj_config,
+                                                          offsource_cache,
+                                                          injfile=injfile,
+                                                          numrel_data=None)
+    inj_bayesline_medianpsd_log = inj_bayesline_medianpsd_job._CondorJob__log_file
+    inj_bayesline_medianpsd_job.set_sub_file(os.path.join(injection_workdir,
+                                                          'bayeswave_median_psd.sub'))
+
+    inj_bayesline_post_median_psd_job = pipe_utils.bayeswave_postJob(bl_inj_config,
+                                                                     offsource_cache,
+                                                                     injfile=injfile,
+                                                                     numrel_data=None)
+
+    inj_bayesline_post_median_psd_log = inj_bayesline_post_median_psd_job._CondorJob__log_file
+    inj_bayesline_post_median_psd_job.set_sub_file(os.path.join(injection_workdir,
+                                                                'bayeswave_post_median_psd.sub'))
+
+    median_psds = \
+        ["$(macrooutputDir)_PSDs/post/clean/glitch_median_PSD_forLI_{ifo}.dat".format(ifo=ifo)
+         for ifo in pe_ifos]
+    extra_files = ','.join(median_psds)
+    bw_inj_config.set('condor', 'extra-files', extra_files)
+
+    inj_bayeswave_job = pipe_utils.bayeswaveJob(bw_inj_config, offsource_cache, injfile=injfile,
+                                                numrel_data=None)
+    inj_bayeswave_log = inj_bayeswave_job._CondorJob__log_file
+
+    inj_bayeswave_post_job = pipe_utils.bayeswave_postJob(bw_inj_config, offsource_cache,
+                                                          injfile=injfile, numrel_data=None)
+    inj_bayeswave_post_log = inj_bayeswave_post_job._CondorJob__log_file
+
+    inj_gwcomp_bw_li_inj_job = gwcomp_utils.gwcomp_bw_li_injJob(gwcomp_config)
+    inj_gwcomp_bw_li_inj_log = inj_gwcomp_bw_li_inj_job._CondorJob__log_file
+
+    for t, trigger in enumerate(trigger_list.triggers):
+        job_segment = segments.segment(trigger.trigger_time - pe_seglen + 2, trigger.trigger_time + 2.0)
+        if gwcomp_config.getboolean("condor", "copy-frames"):
+            for ifo in pe_ifos:
+                frame_idx = [seg.intersects(job_segment) for seg in offsource_frameSegs[ifo]]
+                offsource_transferFrames[ifo] = [frame for f, frame in
+                                                 enumerate(offsource_framePaths[ifo]) if frame_idx[f]]
+
+        hl_time_lag = 0
+        hv_time_lag = 0
+        outputDir = 'trigtime_' + str('%.9f' % trigger.trigger_time) + '_' + \
+                    str(float(hl_time_lag)) + '_' + \
+                    str(float(hv_time_lag)) + '_' + str(0)
+        if not os.path.exists(outputDir): os.makedirs(outputDir)
+
+        outputDir_psd = outputDir + '_PSDs'
+        if not os.path.exists(outputDir_psd): os.makedirs(outputDir_psd)
+        inj_bayeswave_psd_node = pipe_utils.bayeswaveNode(inj_bayesline_medianpsd_job)
+        inj_bayeswave_psd_post_node = pipe_utils.bayeswave_postNode(inj_bayesline_post_median_psd_job)
+
+        ## Add options for median PSD job
+        inj_bayeswave_psd_node.set_retry(bw_retries)
+        inj_bayeswave_psd_node.set_trigtime(trigger.trigger_time)
+        inj_bayeswave_psd_node.set_segment_start(job_segment[0])
+        inj_bayeswave_psd_node.set_srate(pe_srate)
+        inj_bayeswave_psd_node.set_seglen(pe_seglen)
+        inj_bayeswave_psd_node.set_window(bw_window)
+        inj_bayeswave_psd_node.set_flow(pe_ifos, pe_flow)
+        inj_bayeswave_psd_node.set_PSDstart(job_segment[0])
+        # if bayesline_cp.has_option('input','rolloff'):
+        #    bayeswave_psd_node.set_rolloff(bayesline_cp.getfloat('input','rolloff'))
+        inj_bayeswave_psd_node.set_outputDir(outputDir_psd)
+
+        ## FIXME: Put in logic for custom or glitch cleaned frame
+        ## in the off-chance they aren't available on gw_datafind
+        if offsource_transferFrames: inj_bayeswave_psd_node.add_frame_transfer(offsource_transferFrames)
+
+        #
+        # Add options for bayesline_psd_post node
+        #
+        inj_bayeswave_psd_post_node.set_dataseed(bw_dataseed)
+        bw_dataseed += 1
+        inj_bayeswave_psd_post_node.set_trigtime(trigger.trigger_time)
+        inj_bayeswave_psd_post_node.set_segment_start(job_segment[0])
+        inj_bayeswave_psd_post_node.set_srate(pe_srate)
+        inj_bayeswave_psd_post_node.set_seglen(pe_seglen)
+        inj_bayeswave_psd_post_node.set_window(bw_window)
+        inj_bayeswave_psd_post_node.set_flow(pe_ifos, pe_flow)
+        inj_bayeswave_psd_post_node.set_PSDstart(job_segment[0])
+        # if bayesline_cp.has_option('input','rolloff'):
+        #    bayeswave_psd_post_node.set_rolloff(bayesline_cp.getfloat('input','rolloff'))
+        inj_bayeswave_psd_post_node.set_outputDir(pe_ifos, outputDir_psd)
+
+        inj_bayeswave_psd_node.set_injevent(trigger.injevent)
+        inj_bayeswave_psd_post_node.set_injevent(trigger.injevent)
+
+        #
+        # Add options here for main BW job
+        #
+        inj_bayeswave_node = pipe_utils.bayeswaveNode(inj_bayeswave_job)
+        inj_bayeswave_post_node = pipe_utils.bayeswave_postNode(inj_bayeswave_post_job)
+
+        inj_bayeswave_node.set_retry(bw_retries)
+        inj_bayeswave_node.set_trigtime(trigger.trigger_time)
+
+        inj_bayeswave_node.set_segment_start(job_segment[0])
+        inj_bayeswave_node.set_srate(pe_srate)
+        inj_bayeswave_node.set_seglen(pe_seglen)
+        inj_bayeswave_node.set_window(bw_window)
+        inj_bayeswave_node.set_flow(pe_ifos, pe_flow)
+        inj_bayeswave_node.set_PSDstart(job_segment[0])
+        # if cp.has_option('input','rolloff'):
+        #     bayeswave_node.set_rolloff(cp.getfloat('input','rolloff'))
+        inj_bayeswave_node.set_outputDir(outputDir)
+        if offsource_transferFrames: inj_bayeswave_node.add_frame_transfer(offsource_transferFrames)
+        # FIXME: Transfer frame logic 
+        # if transferFrames: bayeswave_node.add_frame_transfer(transferFrames)
+
+        #
+        # if cp.get('datafind','sim-data'):
+        #        bayeswave_node.set_dataseed(dataseed)
+
+        #    if cp.has_option('bayeswave_options','BW-inject'):
+        #        bayeswave_node.set_BW_event(trigger.BW_event)
+
+        #
+        # Add options for bayeswave_post node
+        #
+        inj_bayeswave_post_node.set_dataseed(bw_dataseed)
+        bw_dataseed += 1
+        inj_bayeswave_post_node.set_trigtime(trigger.trigger_time)
+        inj_bayeswave_post_node.set_segment_start(job_segment[0])
+        inj_bayeswave_post_node.set_srate(pe_srate)
+        inj_bayeswave_post_node.set_seglen(pe_seglen)
+        inj_bayeswave_post_node.set_window(bw_window)
+        inj_bayeswave_post_node.set_flow(pe_ifos, pe_flow)
+        inj_bayeswave_post_node.set_PSDstart(job_segment[0])
+        # if cp.has_option('input','rolloff'):
+        #    bayeswave_post_node.set_rolloff(cp.getfloat('input','rolloff'))
+        inj_bayeswave_post_node.set_outputDir(pe_ifos, outputDir)
+
+        #
+        # Add bw_li_inj node options
+        #
+        inj_gwcomp_bw_li_inj_node = gwcomp_utils.gwcomp_bw_li_injNode(inj_gwcomp_bw_li_inj_job)
+        inj_gwcomp_bw_li_inj_node.set_bw_dir(outputDir)
+        inj_gwcomp_bw_li_inj_node.set_flow(pe_flow)
+        inj_gwcomp_bw_li_inj_node.set_srate(pe_srate)
+        inj_gwcomp_bw_li_inj_node.set_ifos(pe_ifos)
+        inj_gwcomp_bw_li_inj_node.set_trigtime(trigger.trigger_time)
+        inj_gwcomp_bw_li_inj_node.set_epoch(job_segment[0])
+        inj_gwcomp_bw_li_inj_node.set_duration(pe_seglen)
+        inj_gwcomp_bw_li_inj_node.set_output_dir(outputDir)
+        inj_gwcomp_bw_li_inj_node.set_plot_flag()
+        inj_gwcomp_bw_li_inj_node.set_injection_flag()
+        inj_gwcomp_bw_li_inj_node.set_whitened_data_flag()
+
+        # Setup Parent/Child relationships
+        inj_bayeswave_psd_post_node.add_parent(inj_bayeswave_psd_node)
+        inj_bayeswave_node.add_parent(inj_bayeswave_psd_post_node)
+
+        inj_bayeswave_post_node.add_parent(inj_bayeswave_node)
+
+        inj_gwcomp_bw_li_inj_node.add_parent(inj_bayeswave_post_node)
+
+        # Add nodes to dag
+        inj_dag.add_node(inj_bayeswave_psd_node)
+        inj_dag.add_node(inj_bayeswave_psd_post_node)
+        inj_dag.add_node(inj_bayeswave_node)
+        inj_dag.add_node(inj_bayeswave_post_node)
+        inj_dag.add_node(inj_gwcomp_bw_li_inj_node)
+
+    inj_bayesline_medianpsd_job._CondorJob__log_file = inj_bayesline_medianpsd_log
+    inj_bayesline_post_median_psd_job._CondorJob__log_file = inj_bayesline_post_median_psd_log
+
+    inj_bayeswave_job._CondorJob__log_file = inj_bayeswave_log
+    inj_bayeswave_post_job._CondorJob__log_file = inj_bayeswave_post_log
+
+    inj_gwcomp_bw_li_inj_job._CondorJob__log_file = inj_gwcomp_bw_li_inj_log
+
+    inj_dag.write_sub_files()
+    inj_dag.write_dag()
+    inj_dag.write_script()
+
+    os.chdir(topdir)
+
+if opts.offsource_background:
+    os.makedirs(background_workdir + "/datafind")
+    os.makedirs(background_workdir + "/logs")
+    topdir = os.getcwd()
+    os.chdir(background_workdir)
+
+    datafind_dir = 'datafind'
+    offsource_cache = {}
+    offsource_frameSegs = {}
+    offsource_framePaths = {}
+    offsource_transferFrames = {}
+
+    bw_bgr_config = gwcomp_utils.bayeswaveConfigTemplate()
+    bw_bgr_config.set("input", "seglen", str(pe_seglen))
+    bw_bgr_config.set("input", "PSDlength", str(pe_seglen))
+    bw_bgr_config.set("input", "srate", str(pe_srate))
+    bw_bgr_config.set("input", "flow", str(pe_flow))
+    bw_bgr_config.set("input", "ifo-list", str(pe_ifos))
+    bw_bgr_config.set("bayeswave_post_options", "lite", "")
+    bw_bgr_config.set("engine", "bayeswave", gwcomp_config["engine"]["bayeswave"])
+    bw_bgr_config.set("engine", "bayeswave_post", gwcomp_config["engine"]["bayeswave_post"])
+    bw_bgr_config.set("engine", "megaplot", gwcomp_config["engine"]["megaplot"])
+    bw_bgr_config.set("engine", "megasky", gwcomp_config["engine"]["megasky"])
+    bw_bgr_config.set("datafind", "frtype-list", str(pe_frames))
+    bw_bgr_config.set("datafind", "channel-list", str(pe_channels))
+    bw_bgr_config.set("bayeswave_options", "bayesLine", "")
+    bw_bgr_config.set("bayeswave_post_options", "bayesLine", "")
+    bw_bgr_config.set("condor", "universe", gwcomp_config["condor"]["universe"])
+    bw_bgr_config.set("condor", "bayeswave-request-memory",
+                      gwcomp_config["condor"]["bayeswave-request-memory"])  # config["bayeswave"]["request-memory"])
+    bw_bgr_config.set("condor", "bayeswave_post-request-memory",
+                      gwcomp_config["condor"]["bayeswave_post-request-memory"])
+    bw_bgr_config.set("condor", "osg-deploy", gwcomp_config["condor"]["osg-deploy"])
+    bw_bgr_config.set("engine", "use-singularity", gwcomp_config["engine"]["use-singularity"])
+    bw_bgr_config.set("condor", "transfer-files", gwcomp_config["condor"]["transfer-files"])
+    bw_bgr_config.set("condor", "shared-filesystem", gwcomp_config["condor"]["shared-filesystem"])
+    bw_bgr_config.set("condor", "copy-frames", gwcomp_config["condor"]["copy-frames"])
+    bw_bgr_config.set("condor", "accounting-group", gwcomp_config["condor"]["accounting-group"])
+    bw_bgr_config.set("datafind", "sim-data", str(False))
+
+    trigtimes_path = os.path.join(workdir, trigtimes_file)
+    trigger_list = pipe_utils.triggerList(bw_bgr_config, trigger_file=trigtimes_path,
+                                          followup_injections=None)
+
+    try:
+        if not isinstance(trigger_list, pipe_utils.triggerList):
+            print("I've made a huge mistake: trigger_list is not a triggerList.")
+            sys.exit(1)
+    except NameError:
+        print("I've made a huge mistake: there are no triggers.")
+
+    trigger_times = [trig.trigger_time for trig in trigger_list.triggers]
+
+    gps_start_time = min(trigger_times) - 32
+    gps_end_time = max(trigger_times) + 32
+
+    cachefilefmt = os.path.join(datafind_dir, '{0}.cache')
+
+    # FIXME: Add simulated data option
+    for ifo in pe_ifos:
+        offsource_cache[ifo] = os.path.join(datafind_dir, '{0}.cache'.format(ifo))
+        ldfcmd = "{gw_data_find} --observatory {o} --type {frtype} -s \
+        {gps_start_time} -e {gps_end_time} --lal-cache -u {url_type} >\
+        {cachefile}".format(gw_data_find=gw_data_find, o=ifo[0], frtype=pe_frames[ifo],
+                            cachefile=cachefilefmt.format(ifo),
+                            gps_start_time=int(np.floor(gps_start_time)),
+                            gps_end_time=int(np.ceil(gps_end_time)), url_type=gwcomp_config.get('datafind', 'url-type'))
+
+        print("Calling LIGO data find ...", file=sys.stdout)
+        print(ldfcmd, file=sys.stdout)
+        subprocess.call(ldfcmd, shell=True)
+
+        datafindscript = os.path.join(background_workdir, 'datafind', 'datafind.sh')
+        with open(datafindscript, 'a') as ldfcmd_file:
+            ldfcmd_file.writelines(ldfcmd + '\n\n')
+        os.chmod(datafindscript, 0o755)
+
+        offsource_frameSegs[ifo] = segments.utils.fromlalcache(open(offsource_cache[ifo]))
+
+        if gwcomp_config.getboolean("condor", "copy-frames"):
+            print("Setting up frame copying")
+
+            #
+            # Now we need to make a new, local cache file
+            # - do this by manipulating the path string in the cache file to be relative 
+            cache_file = os.path.join(datafind_dir,
+                                      '{ifo}.cache'.format(ifo=ifo))
+            shutil.copy(cache_file, cache_file.replace('cache', 'cache.bk'))
+
+            cache_entries = np.loadtxt(cache_file, dtype=str)
+            if cache_entries.ndim == 1: cache_entries = [cache_entries]
+
+            offsource_framePaths[ifo] = []
+            new_cache = open(cache_file, 'w')
+            for c, cache_entry in enumerate(cache_entries):
+                frame = cache_entry[-1].split('localhost')[-1]
+                offsource_framePaths[ifo].append(frame)
+
+                # local_path=os.path.join('datafind',cache_entry[4].split('/')[-1])
+                local_path = cache_entry[4].split('/')[-1]
+
+                new_cache.writelines('{ifo} {type} {gps} {length} {path}\n'.format(
+                    ifo=ifo, type=cache_entry[1], gps=cache_entry[2],
+                    length=cache_entry[3], path=local_path))
+
+            new_cache.close()
+
+    bgr_dagname = os.path.join(background_workdir, os.path.basename(background_workdir))
+    bgr_dag = pipeline.CondorDAG(log=bgr_dagname + '.log')
+    bgr_dag.set_dag_file(bgr_dagname)
+
+    bgr_bayeswave_job = pipe_utils.bayeswaveJob(bw_bgr_config, offsource_cache, injfile=None,
+                                                numrel_data=None)
+    bgr_bayeswave_log = bgr_bayeswave_job._CondorJob__log_file
+
+    bgr_bayeswave_post_job = pipe_utils.bayeswave_postJob(bw_bgr_config, offsource_cache,
+                                                          injfile=None, numrel_data=None)
+    bgr_bayeswave_post_log = bgr_bayeswave_post_job._CondorJob__log_file
+
+    for t, trigger in enumerate(trigger_list.triggers):
+        job_segment = segments.segment(trigger.trigger_time - pe_seglen + 2, trigger.trigger_time + 2.0)
+        if gwcomp_config.getboolean("condor", "copy-frames"):
+            for ifo in pe_ifos:
+                frame_idx = [seg.intersects(job_segment) for seg in offsource_frameSegs[ifo]]
+                offsource_transferFrames[ifo] = [frame for f, frame in
+                                                 enumerate(offsource_framePaths[ifo]) if frame_idx[f]]
+
+        hl_time_lag = 0
+        hv_time_lag = 0
+        outputDir = 'trigtime_' + str('%.9f' % trigger.trigger_time) + '_' + \
+                    str(float(hl_time_lag)) + '_' + \
+                    str(float(hv_time_lag)) + '_' + str(0)
+        if not os.path.exists(outputDir): os.makedirs(outputDir)
+
+        #
+        # Add options here for main BW job
+        #
+        bgr_bayeswave_node = pipe_utils.bayeswaveNode(bgr_bayeswave_job)
+        bgr_bayeswave_post_node = pipe_utils.bayeswave_postNode(bgr_bayeswave_post_job)
+
+        bgr_bayeswave_node.set_retry(bw_retries)
+        bgr_bayeswave_node.set_trigtime(trigger.trigger_time)
+
+        bgr_bayeswave_node.set_segment_start(job_segment[0])
+        bgr_bayeswave_node.set_srate(pe_srate)
+        bgr_bayeswave_node.set_seglen(pe_seglen)
+        bgr_bayeswave_node.set_window(bw_window)
+        bgr_bayeswave_node.set_flow(pe_ifos, pe_flow)
+        bgr_bayeswave_node.set_PSDstart(job_segment[0])
+        # if cp.has_option('input','rolloff'):
+        #     bayeswave_node.set_rolloff(cp.getfloat('input','rolloff'))
+        bgr_bayeswave_node.set_outputDir(outputDir)
+        if offsource_transferFrames : bgr_bayeswave_node.add_frame_transfer(offsource_transferFrames)
+        # FIXME: Transfer frame logic 
+        # if transferFrames: bayeswave_node.add_frame_transfer(transferFrames)
+
+        #
+        # if cp.get('datafind','sim-data'):
+        #        bayeswave_node.set_dataseed(dataseed)
+
+        #    if cp.has_option('bayeswave_options','BW-inject'):
+        #        bayeswave_node.set_BW_event(trigger.BW_event)
+
+        #
+        # Add options for bayeswave_post node
+        #
+        bgr_bayeswave_post_node.set_dataseed(bw_dataseed)
+        bw_dataseed += 1
+        bgr_bayeswave_post_node.set_trigtime(trigger.trigger_time)
+        bgr_bayeswave_post_node.set_segment_start(job_segment[0])
+        bgr_bayeswave_post_node.set_srate(pe_srate)
+        bgr_bayeswave_post_node.set_seglen(pe_seglen)
+        bgr_bayeswave_post_node.set_window(bw_window)
+        bgr_bayeswave_post_node.set_flow(pe_ifos, pe_flow)
+        bgr_bayeswave_post_node.set_PSDstart(job_segment[0])
+        # if cp.has_option('input','rolloff'):
+        #    bayeswave_post_node.set_rolloff(cp.getfloat('input','rolloff'))
+        bgr_bayeswave_post_node.set_outputDir(pe_ifos, outputDir)
+
+        # Setup Parent/Child relationships
+        bgr_bayeswave_post_node.add_parent(bgr_bayeswave_node)
+
+        bgr_dag.add_node(bgr_bayeswave_node)
+        bgr_dag.add_node(bgr_bayeswave_post_node)
+
+    bgr_bayeswave_job._CondorJob__log_file = bgr_bayeswave_log
+    bgr_bayeswave_post_job._CondorJob__log_file = bgr_bayeswave_post_log
+
+    bgr_dag.write_sub_files()
+    bgr_dag.write_dag()
+    bgr_dag.write_script()
+
+    os.chdir(topdir)
