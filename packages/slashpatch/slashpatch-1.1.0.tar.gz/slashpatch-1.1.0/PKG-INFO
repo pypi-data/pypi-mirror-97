@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: slashpatch
+Version: 1.1.0
+Summary: A command handler/dispatcher webserver for Discord slash commands
+Home-page: https://github.com/vcokltfre/slashpatch
+Author: vcokltfre
+Author-email: vcokltfre@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/vcokltfre/slashpatch/issues
+Description: # vcokltfre/SlashPatch
+        
+        ## A command handler/dispatcher webserver for Discord slash commands
+        
+        Example:
+        ```py
+        from slashpatch import Server, Context, command, Cog
+        
+        app = Server('c293758d88bc26d54963f05676a8fa6c3404570169e350afd5c1f318bf52732a')
+        
+        class Example(Cog):
+            @command(name="example")
+            async def example(self, ctx: Context):
+                print(ctx.raw)
+                return ctx.respond("Hello, world!", ephemeral=True)
+        
+            @command(name="cases")
+            async def cases(self, ctx: Context):
+                return ctx.respond(embed={"description":"h"})
+        
+        app.add_cog(Example())
+        ```
+        
+        Then run:
+        
+        `uvicorn main:app --host 0.0.0.0`
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
