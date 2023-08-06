@@ -1,0 +1,107 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup
+
+packages = \
+['understory',
+ 'understory.mkdn',
+ 'understory.mkdn.block',
+ 'understory.mkdn.inline',
+ 'understory.mm',
+ 'understory.pkg',
+ 'understory.pkg.licensing',
+ 'understory.src',
+ 'understory.term',
+ 'understory.uri',
+ 'understory.web',
+ 'understory.web.framework',
+ 'understory.web.framework.templates',
+ 'understory.web.headers',
+ 'understory.web.indie',
+ 'understory.web.indie.indieauth',
+ 'understory.web.indie.indieauth.templates',
+ 'understory.web.indie.micropub',
+ 'understory.web.indie.micropub.templates',
+ 'understory.web.indie.microsub',
+ 'understory.web.indie.microsub.templates',
+ 'understory.web.response']
+
+package_data = \
+{'': ['*'], 'understory.web.framework': ['static/*']}
+
+install_requires = \
+['Pillow>=8.1.0,<9.0.0',
+ 'PySocks>=1.7.1,<2.0.0',
+ 'PyVirtualDisplay>=2.0,<3.0',
+ 'Unidecode>=1.2.0,<2.0.0',
+ 'acme-tiny>=4.1.0,<5.0.0',
+ 'argcomplete>=1.12.2,<2.0.0',
+ 'beautifulsoup4>=4.9.3,<5.0.0',
+ 'cryptography>=3.4.6,<4.0.0',
+ 'cssselect>=1.1.0,<2.0.0',
+ 'dnspython>=2.1.0,<3.0.0',
+ 'flake8-docstrings>=1.5.0,<2.0.0',
+ 'flake8>=3.8.4,<4.0.0',
+ 'gevent>=21.1.2,<22.0.0',
+ 'ghdiff>=0.4,<0.5',
+ 'gnupg>=2.3.1,<3.0.0',
+ 'gunicorn>=20.0.4,<21.0.0',
+ 'hiredis>=1.1.0,<2.0.0',
+ 'hstspreload>=2020.12.22,<2021.0.0',
+ 'html5lib>=1.1,<2.0',
+ 'httpagentparser>=1.9.1,<2.0.0',
+ 'ipython>=7.20.0,<8.0.0',
+ 'keyring>=22.0.1,<23.0.0',
+ 'lxml>=4.6.2,<5.0.0',
+ 'mf2py>=1.1.2,<2.0.0',
+ 'mf2util>=0.5.1,<0.6.0',
+ 'networkx>=2.5,<3.0',
+ 'pendulum>=2.1.2,<3.0.0',
+ 'pep8-naming>=0.11.1,<0.12.0',
+ 'pip>=21.0.1,<22.0.0',
+ 'pss>=1.43,<2.0',
+ 'pycryptodome>=3.10.1,<4.0.0',
+ 'pyparsing>=2.4.7,<3.0.0',
+ 'pyscreenshot>=2.3,<3.0',
+ 'pytest-cov>=2.11.1,<3.0.0',
+ 'pytest-pep8>=1.0.6,<2.0.0',
+ 'pytest>=6.2.2,<7.0.0',
+ 'python-mimeparse>=1.6.0,<2.0.0',
+ 'pyxdg>=0.27,<0.28',
+ 'redis>=3.5.3,<4.0.0',
+ 'regex>=2020.11.13,<2021.0.0',
+ 'requests>=2.25.1,<3.0.0',
+ 'scrypt>=0.8.17,<0.9.0',
+ 'selenium>=3.141.0,<4.0.0',
+ 'sh>=1.14.1,<2.0.0',
+ 'stem>=1.8.0,<2.0.0',
+ 'watchdog>=2.0.0,<3.0.0',
+ 'youtube_dl>=2021.2.10,<2022.0.0']
+
+entry_points = \
+{'web.apps': ['indieauth-client = web.indie.indieauth:client',
+              'indieauth-server = web.indie.indieauth:server',
+              'micropub-server = web.indie.micropub:server',
+              'microsub-server = web.indie.microsub:server',
+              'webmention = web.indie.webmention:receiver',
+              'websub-pub = web.indie.websub:pub',
+              'websub-sub = web.indie.websub:sub']}
+
+setup_kwargs = {
+    'name': 'understory',
+    'version': '0.0.1a100',
+    'description': 'The tools that power the canopy.',
+    'long_description': '# understory\nthe tools that power the canopy\n\n## web\ntools for metamodern web development\n\n    >>> import web\n\n### Browser\n\nuses Firefox via Selenium\n\n    >>> browser = web.browser()\n    >>> browser.go("en.wikipedia.org/wiki/Pasta")\n    >>> browser.shot("wikipedia-pasta.png")\n\n### Cache\n\nuses SQLite\n\n    >>> cache = web.cache()\n    >>> cache["indieweb.org/note"].entry["summary"]\n    "A note is a post that is typically short unstructured* plain text, written & posted quickly, that has its own permalink page."\n    >>> cache["indieweb.org/note"].entry["summary"]  # served from cache\n    "A note is a post that is typically short unstructured* plain text, written & posted quickly, that has its own permalink page."\n\n### Application\n\nWSGI-compatible\n\nIn `hello.py`:\n\n    import web\n\n    app = web.application("HelloWorld")\n\n    @app.route(r"")\n    class HelloWorld:\n        def _get(self):\n            return "Hello World!"\n\nIn `setup.py`:\n\n    ...\n    setup(install_requires=["web"],\n          entry_points={"web.apps": ["hello:app"]},\n          ...)\n\n### Templating\n\nFull Python inside string templates.\n\n    >>> web.template("$def with (name)\\n$name")("Alice")\n    "Alice"\n\n### Markdown\n\nStrict syntax subset (there should be one and only one way).\n\nPicoformat support eg. @person, @@org, #tag, %license\n\n    >>> str(web.mkdn("*lorem* ipsum."))\n    "<p><em>lorem</em> ipsum. </p>"\n\n### URL parsing\n\nDefaults to safe-mode and raises DangerousURL eagerly. Up-to-date public suffix and HSTS support.\n\n    >>> url = web.uri("example.cnpy.gdn/foo/bar?id=38")\n    >>> url.host\n    "example.cnpy.gdn"\n    >>> url.suffix\n    "cnpy.gdn"\n    >>> url.is_hsts()\n    True\n\n### IndieWeb\n\nSupported: IndieAuth client/server, Micropub client/server, Microsub :construction:, WebSub :construction:, Webmention :construction:\n\n    >>> app.mount(web.indieauth.server)\n    >>> app.mount(web.micropub.server)\n\n#### Microformats\n\nParse `mf2` from HTML. Analyze vocabularies for stability/interoperability.\n',
+    'author': 'Angelo Gladding',
+    'author_email': 'self@angelogladding.com',
+    'maintainer': None,
+    'maintainer_email': None,
+    'url': None,
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'entry_points': entry_points,
+    'python_requires': '>=3.9,<4.0',
+}
+
+
+setup(**setup_kwargs)
