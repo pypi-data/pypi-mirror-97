@@ -1,0 +1,61 @@
+{% load i18n cms_tags extra_tags static thumbnail %}{% spaceless %}
+{% comment %}Obviously, the context template variable "course" is required and must be a Course page extension{% endcomment %}
+
+{% with course_page=course.extended_object course_state=course.state main_org_title=course.get_main_organization.extended_object.get_title course_variant=course_variant|default:'glimpse' %}
+<a class="course-{{ course_variant }}{% if course_page.publisher_is_draft is True %} course-{{ course_variant }}--draft{% endif %}"
+    href="{{ course_page.get_absolute_url }}">
+    <div class="course-{{ course_variant }}__media">
+        {% get_page_plugins "course_cover" course_page as cover_plugins or %}
+            <p class="course-{{ course_variant }}--empty">{% trans "Cover" %}</p>
+        {% endget_page_plugins %}
+        {% blockplugin cover_plugins.0 %}
+            <img src="{% thumbnail instance.picture 300x170 crop upscale subject_location=instance.picture.subject_location %}"
+                srcset="
+                    {% thumbnail instance.picture 800x457 crop upscale subject_location=instance.picture.subject_location %} 300w
+                    {% if instance.picture.width >= 1600 %},{% thumbnail instance.picture 1600x914 crop upscale subject_location=instance.picture.subject_location %} 600w{% endif %}
+                    {% if instance.picture.width >= 2400 %},{% thumbnail instance.picture 2400x1371 crop upscale subject_location=instance.picture.subject_location %} 900w{% endif %}
+                "
+                sizes="300px"
+                {# alt forced to empty string for a11y because the image does not carry more information than the course title #}
+                alt=""
+            />
+        {% endblockplugin %}
+    </div>
+    <div class="course-{{ course_variant }}__content">
+        {% get_page_plugins "course_icons" course_page as icon_plugins %}
+        {% if icon_plugins %}
+        <div class="course-{{ course_variant }}__icon">
+            {% with category_variant="badge" has_link=False %}
+                {% render_plugin icon_plugins.0 %}
+            {% endwith %}
+        </div>
+        {% endif %}
+        <div class="course-{{ course_variant }}__wrapper">
+            <p class="course-{{ course_variant }}__title">{{ course_page.get_title }}</p>
+            {% if main_org_title %}
+            <div class="course-{{ course_variant }}__organization">
+                <svg role="img" aria-hidden="true" class="icon">
+                    <use href="#icon-pin" />
+                </svg>
+                <span>{{ main_org_title }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% block course_glimpse_footer %}
+        <div class="course-{{ course_variant }}-footer">
+            <div class="course-{{ course_variant }}-footer__date">
+                <svg role="img" aria-hidden="true" class="icon">
+                    <use href="#icon-calendar" />
+                </svg>
+                {{ course_state.text|capfirst }}
+                {% if course_state.datetime %}
+                    {{ course_state.datetime|date:"DATE_FORMAT" }}
+                {% endif %}
+            </div>
+        </div>
+        {% endblock course_glimpse_footer %}
+    </div>
+</a>
+{% endwith %}
+{% endspaceless %}
