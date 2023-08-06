@@ -1,0 +1,81 @@
+{% extends "page.html" %}
+{% block main %}
+<style>.marge_bottom{margin-bottom: 50px;}</style>
+<div class="container marge_bottom">
+    <h1>Authorization Area</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                {% if ask_email %}
+                <th>Email</th>
+                {% endif %}
+                <th>Is Authorized?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            {% if user.is_authorized %}
+            <tr class="bg-primary">
+                <td>{{ user.username }}</td>
+                {% if ask_email %}
+                <td>{{ user.email }}</td>
+                {% endif %}
+                <td>Yes</td>
+                <td>
+                    <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a>
+                </td>
+                <td>
+                    <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
+                </td>
+                <td>
+                    <a class="btn btn-danger" href="/hub/delete/{{ user.username }}" role="button">Delete</a>
+                </td>
+                {% else %}
+            <tr>
+                <td>{{ user.username }}</td>
+                {% if ask_email %}
+                <td>{{ user.email }}</td>
+                {% endif %}
+                <td>No</td>
+                <td>
+                    <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a>
+                </td>
+                <td>
+                    <a class="btn btn-info" href="/hub/change-password/{{ user.username }}" role="button">Change Pwd</a>
+                </td>
+                <td>
+                    <a class="btn btn-danger" href="/hub/delete/{{ user.username }}" role="button">Delete</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<style>
+
+    body {
+        font-family: Helvetica,sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        color: white;
+        background-color: #191b1d;
+    }
+
+    .btn-primary {
+        background-color: rgba(71, 221, 130, 1);
+        border-color: rgba(71, 221, 130, 1);
+    }
+
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary:hover,
+    .btn-primary:active.focus,
+    .btn-primary:active:focus,
+    .btn-primary:active:hover {
+        background-color: #38B068;
+        border-color: #38B068;
+    }
+</style>
+{% endblock %}
