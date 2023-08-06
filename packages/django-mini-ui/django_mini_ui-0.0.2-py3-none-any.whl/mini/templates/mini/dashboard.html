@@ -1,0 +1,58 @@
+{% extends 'mini/layout.html' %}
+{% load static %}
+{% block head %}
+<title>Dashboard - Mini</title>
+{% endblock head %}
+{% block body %}
+<div class="w3-container">
+	<div class="w3-row">
+		<div class="w3-col l3 s12 m5">
+			<form method="POST" action="{% url 'mini_dashboard' %}">
+				{% csrf_token %}
+				<input type="text" name="app_name" placeholder="App Name" class="w3-padding" required>
+				<input type="submit" name="submit" value="ok" class="w3-button w3-blue w3-padding w3-round">
+			</form>
+			<div class="w3-panel w3-white" id="list-of-files">
+			{% if files %}
+				{% for i in files %}
+					<div class="w3-panel w3-white">
+						..\{{i.root}}
+					</div>
+					<div>	
+						{% for file in i.files %}
+						<a href="{% url 'mini_IDE_file' file %}">
+							<div class="w3-hover-black">
+								<div class="w3-button w3-hover-black">
+									- {{file}}
+								</div>
+							</div>
+						</a>
+						{% endfor %}
+					</div>
+					 <br>
+					<div>
+						{% for dir in i.dirs %}
+							<div class="w3-button">
+								+ {{dir}}
+							</div>
+						{% endfor %}
+					</div>
+					<br><br>
+				{% endfor %}
+			{% else %}
+			<div>
+				<div class="w3-text-green">
+					Enter app name above..
+				</div>
+			</div>
+			{% endif %}
+			{% if error %}
+				<div class="w3-text-red">
+					{{error}}
+				</div>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock body %}
