@@ -1,0 +1,71 @@
+Metadata-Version: 2.1
+Name: rabbitqueues-beeflow
+Version: 0.0.7
+Summary: Application to manage RabbitMQ queues
+Home-page: https://github.com/beeflow/rabbit_queues.git
+Author: Rafal Przetakowski
+Author-email: office@beeflow.co.uk
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# Rabbit queues
+
+Application to manage RabbitMQ queues
+
+## Configuration
+
+Into the `setup.py` file add:
+
+```python
+INSTALLED_APPS = [
+    ...
+    "rabbitqueues",
+]
+```
+
+and add (i.e.):
+
+```python
+RABBITMQ_HOSTNAME = "localhost"
+RABBITMQ_PORT = 5672
+RABBITMQ_USERNAME = "rabbitusername"
+RABBITMQ_PASSWORD = "supersecretpassword"
+RABBITMQ_VHOST = "/"
+```
+
+### Own consumers
+
+To prepare own conumer you need to create `class` which will extend `AbstractManager`. and register it in
+dictionary `RABBITMQ_QUEUE_CONSUMERS = {"consumer_name": consumer_class}` in `setup.py`.
+
+## Publish to the queue example
+
+```python
+import json
+from django.conf import settings
+from rabbitqueues import RabbitQueue
+
+
+queue = RabbitQueue(settings.RABBITMQ_EMAIL_QUEUE)
+queue.basic_publish(
+    routing_key=settings.RABBITMQ_EMAIL_QUEUE,
+    body=json.dumps(
+        {
+            "subject": "some subject",
+            "email_from": settings.DEFAULT_FROM_EMAIL,
+            "recipient_list": ["test@test.com"],
+            "message": "This is the message for user.",
+        }
+    ),
+)
+queue.close()
+```
+
+
+
+
