@@ -1,0 +1,26 @@
+# SB412A-1-Python
+
+This package is used for human sensing with sb412a-1 on Rasberry Pi.
+
+# Installation
+To install, just run following:
+```
+pip3 install sb412a_1
+```
+
+# Usage
+1. Instantiate the `Sb412a_1` class with the pin number as constructor parameter.
+2. Call the `getData()` method to get the data: 1 for detection, 0 for no detection.
+
+```
+from sb412a_1 import Sb412a_1
+import time
+
+SENSOR_PIN = 15
+instance = Sb412a_1(SENSOR_PIN)
+
+while True:
+    print(instance.getData())
+    time.sleep(1)
+```
+For working example, see `example.py` (you probably need to adjust pin for your configuration).
