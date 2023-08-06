@@ -1,0 +1,2 @@
+class Stamen():
+    role = "stamen"
