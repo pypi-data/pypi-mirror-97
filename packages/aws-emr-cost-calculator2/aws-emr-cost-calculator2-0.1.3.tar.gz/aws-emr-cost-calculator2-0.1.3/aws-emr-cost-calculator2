@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+"""EMR cost calculator
+
+Usage:
+    aws-emr-cost-calculator total --created_after=<ca> --created_before=<cb>
+    [--profile=<profile>]
+    aws-emr-cost-calculator cluster --cluster_id=<ci> [--profile=<profile>]
+    aws-emr-cost-calculator -h | --help
+
+
+Options:
+    -h --help                     Show this screen
+    total                         Calculate the total EMR cost for a period of
+    time
+    cluster                       Calculate the cost of single cluster given
+    the cluster id
+    --profile=<profile>           Use a specific AWS profile from your
+    credential file instead of a default one.
+    --created_after=<ca>          The calculator will compute the cost for all
+    the cluster created after the created_after day
+    --created_before=<cb>         The calculator will compute the cost for all
+    the cluster created before the created_before day
+    --cluster_id=<ci>             The id of the cluster you want to calculate
+    the cost for
+"""
+from calculator.calculator import EmrCostCalculator, validate_date
+import boto3
+from docopt import docopt
+import sys
+
+if __name__ == '__main__':
+    args = docopt(__doc__)
+    profile = args.get('--profile')
+    if profile is not None:
+        boto3.setup_default_session(profile_name=profile)
+
+    if args.get('total'):
+        created_after_arg = validate_date(args.get('--created_after'))
+        created_before_arg = validate_date(args.get('--created_before'))
+        calc = EmrCostCalculator()
+        print("TOTAL COST: {:.2f}".format(calc.get_total_cost_by_dates(
+            created_after_arg, created_before_arg)))
+
+    elif args.get('cluster'):
+        calc = EmrCostCalculator()
+        calculated_prices = calc.get_cluster_cost(args.get('--cluster_id'))
+        for key in sorted(calculated_prices.keys()):
+            print("{:12s}: {:6.2f}".format(key, calculated_prices[key]))
+    else:
+        print('[ERROR] Invalid operation, please check usage again',
+              file=sys.stderr)
