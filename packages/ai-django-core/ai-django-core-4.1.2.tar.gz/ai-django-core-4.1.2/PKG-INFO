@@ -1,0 +1,138 @@
+Metadata-Version: 2.1
+Name: ai-django-core
+Version: 4.1.2
+Summary: Lots of helper functions and useful widgets.
+Home-page: https://ai-django-core.readthedocs.io/en/latest/index.html
+Author: Ambient Innovation: GmbH
+Author-email: hello@ambient-innovation.com
+License: The MIT License (MIT)
+Description: [![pypi](https://img.shields.io/pypi/v/ai-django-core.svg)](https://pypi.python.org/pypi/ai-django-core/)
+        [![Downloads](https://pepy.tech/badge/ai-django-core)](https://pepy.tech/project/ai-django-core)
+        
+        # Overview:
+        This package contains various useful helper functions. You can read up on all the fancy things at
+        [readthedocs.io](https://ai-django-core.readthedocs.io/en/latest/index.html).
+        
+        # Installation:
+        - Install the package via pip:
+        
+            `pip install ai-django-core`
+        
+           or via pipenv:
+        
+            `pipenv install ai-django-core`
+        
+        - Add module to `INSTALLED_APPS`:
+        
+            ````
+            INSTALLED_APPS = (
+                ...
+                'ai_django_core',
+            )
+             ````
+        
+        - Run migrations
+        
+        
+        # Contribute
+        
+        ## Add functionality
+        
+        - Clone the project locally
+        - Create a new branch for your feature
+        - Change the dependency in your requirements.txt to a local (editable) one that points to your local file system:
+            ```
+            -e /Users/awesome-developer/Documents/workspace/ai-django-core
+            ```
+        - Ensure the code passes the tests
+        - Run:
+        
+            `python setup.py develop`
+        
+        - Create a pull request
+        
+        ## Run tests
+        
+        - Check coverage
+        
+            `pytest --cov=.`
+        
+        - Run tests
+        
+            `pytest`
+        
+        ## Update documentation
+        
+        - To generate new auto-docs for new modules run: `sphinx-apidoc -o ./docs/modules/ ./ai_django_core/` (in the current setup an auto doc for the anti virus module is not supported due to installation and import problems. Since it might be removed in the future, that should be fine for now).
+        - To build the documentation run: `sphinx-build docs/ docs/_build/html/` or go into the **docs** folder and run: `make html`.
+          Open `docs/_build/html/index.html` to see the documentation.
+        
+        ## Publish to ReadTheDocs.io
+        
+        - Fetch the latest changes in github mirror and push them
+        - Trigger new build at ReadTheDocs.io (follow instructions in admin panel at RTD)
+        
+        ## Publish to PyPi
+        
+        - Update documentation about new/changed functionality
+        
+        - Update the `Changelog`
+        
+        - Increment version in main `__init__.py`
+        
+        - Create pull request / merge to master
+        
+        - Run:
+        
+            * Make sure you have all the required packages installed
+            `pip install twine wheel`
+            * Create a file in your home directory: `~/.pypirc`
+            ```
+            [distutils]
+            index-servers=
+                pypi
+                testpypi
+        
+            [pypi]
+            repository: https://upload.pypi.org/legacy/
+            username: ambient-innovation
+        
+            [testpypi]
+            repository: https://test.pypi.org/legacy/
+            username: ambient-innovation
+            ```
+            * Empty `dist` directory
+            * Create distribution
+            `python setup.py sdist bdist_wheel`
+            * Upload to Test-PyPi
+            `twine upload --repository testpypi dist/*`
+            * Check at Test-PyPi if it looks nice
+            * Upload to real PyPi
+            `twine upload dist/*`
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 2.0
+Classifier: Framework :: Django :: 2.1
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.0
+Classifier: Framework :: Django :: 3.1
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Utilities
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Provides-Extra: docs
+Provides-Extra: drf
+Provides-Extra: graphql
+Provides-Extra: view-layer
