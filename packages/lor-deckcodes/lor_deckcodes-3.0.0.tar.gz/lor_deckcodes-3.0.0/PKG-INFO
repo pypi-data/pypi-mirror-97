@@ -1,0 +1,61 @@
+Metadata-Version: 2.1
+Name: lor_deckcodes
+Version: 3.0.0
+Summary: Legends of Runeterra deck coder and decoder
+Home-page: https://github.com/Rafalonso/LoRDeckCodesPython
+Author: Rafael Alonso
+Maintainer: Rafael Alonso
+Maintainer-email: rafalonso.almeida@gmail.com
+License: MIT
+Description: # Python Implementation
+        
+        ## Install
+        
+        python >=3.5 required
+        pip >= 19.0.0
+        ```
+        pip install lor-deckcodes
+        ```
+        
+        ## Usage
+        
+        Ever expanding rich API with method to display cards conveniently
+        
+        ```python
+        from lor_deckcodes import LoRDeck, CardCodeAndCount
+        
+        
+        # Decoding
+        deck = LoRDeck.from_deckcode('CEBAIAIFB4WDANQIAEAQGDAUDAQSIJZUAIAQCBIFAEAQCBAA')
+        
+        # list all cards with card format 3:01SI001
+        list(deck)
+        
+        card = deck.cards[0] # instance of CardCodeAndCount
+        card.faction # SI/FR...
+        card.card_id # 111
+        card.set # 01
+        
+        
+        # Encoding
+        # These are equivalent
+        deck = LoRDeck(['3:01SI015', '3:01SI044'])
+        deck = LoRDeck([
+            CardCodeAndCount.from_card_string('3:01SI015'),
+            CardCodeAndCount('01SI015', 3)]
+        )
+        # returns encoded string
+        deck.encode()
+        ```
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.5
+Description-Content-Type: text/markdown
