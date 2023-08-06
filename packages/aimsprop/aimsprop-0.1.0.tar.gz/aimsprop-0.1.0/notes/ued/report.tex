@@ -1,0 +1,564 @@
+\documentclass[fleqn,oneside,12pt]{article}
+\date{}
+\newcommand{\up}[1]{a_{#1}^{\dagger}}
+\newcommand{\down}[1]{a_{#1}}
+\newcommand{\ud}{\mathrm{d}}
+\newcommand{\EE}{\mathrm{E}}
+\newcommand{\diff}[2]{\frac{\ud {#1}}{\ud {#2}}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\sqrtfrac}[2]{\sqrt{\frac{#1}{#2}}}
+\newcommand{\ui}{\mathbf{i}}
+\newcommand{\uj}{\mathbf{j}}
+\newcommand{\ua}{\mathbf{a}}
+\newcommand{\ub}{\mathbf{b}}
+\newcommand{\bi}{\bar{i}}
+\newcommand{\bj}{\bar{j}}
+\newcommand{\ba}{\bar{a}}
+\newcommand{\bb}{\bar{b}}
+\newcommand{\tb}{\phantom{}^{Q} \hat b}
+\newcommand{\erf}{\mathrm{erf}}
+\newcommand{\erfc}{\mathrm{erfc}}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\setlength{\parindent}{0pt}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{amsmath}
+\usepackage[super]{cite}
+\usepackage{amssymb}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\pagestyle{fancyplain}
+\begin{document}
+\lhead{Generalized Ultrafast Pump-Probe Scattering}
+\rhead{MtzGroup AIMSProp Team}
+
+\section{Development}
+
+\textbf{Literature:} 
+
+\textbf{Geometry:} Consider an ultrafast pump-probe scattering experiment (See
+Figure \ref{fig:schem} for an example and definitions of lab-frame coordinates).
+For today, we will take the pump to be an optical ultrafast pulse. This pump
+strikes an isotropic sample (e.g., provided by a gas jet) at $t=0$, and promotes
+a (hopefully) single-photon transition in some of the sample molecules from the
+stationary Frank-Condon state $S_{0}$ to an excited state $S_{N}$, setting up
+non-adiabatic dynamics. Single-photon absorption is not isotropic, but
+proportional to the square of the $\hat z$ component of the transition dipole
+moment at the Frank-Condon point. At time delay $t$, the scattering probe (x-ray
+or electrons, depending on the experiment) strikes the sample, and takes a
+snapshot of the current geometry of the sample in terms of the scattering
+pattern on the detector.  Typically, this signal is adjusted by subtracting the
+$t=-\infty$ signal, exposing changes in the geometry for the pumped molecule,
+and providing a ``molecular movie'' if a number of pump-probe time delays are
+sampled. Note that the subtraction of the $t=-\infty$ component of the signal
+serves to remove the scattering signal from the non-excited molecules (which
+remain in the time-independent steady-state FC wavepacket).
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=11cm]{figures/schem}
+\end{center}
+\caption{An illustration of ultrafast X-ray diffraction (along with UED, this is
+one of the main types of pump-probe scattering experiments that we consider).
+The X-ray probe arrives a delay of $t$ with respect to the optical pump. In the
+perpendicular experimental arrangement (shown here), the polarization vector
+$\vec E \propto \hat z$ of the optical pump pulse is perpendicular to the
+incident wave vector $\vec k_0 \equiv k \hat y$ of the X-ray probe pulse. The
+incident X-ray photons scatter at angle $\theta$ with respect to $\vec k_0$, and
+azimuthal angle $\eta$ with respect to $\vec E$. These two angles fully describe
+the scattering in the elastic regime, as $|\vec k_0|$ = $|\vec k_s|$. The
+scattering vector $\vec s$ is the difference between the incident and scattered
+wave vectors $\vec s \equiv \vec k_0 - \vec k_s$. The amplitude of the
+scattering vector is $s \equiv |\vec s| = 2 k \sin \theta / 2 = (4 \pi /
+\lambda) \sin \theta / 2$. Figure adapted to our notation from Kent Wilson's
+excellent 1998 ultrafast scattering paper in JPCA [Jianshu Cao and Kent R.
+Wilson, \emph{J. Phys. Chem. A} \textbf{102}, 9523 (1998)].}
+\label{fig:schem}
+\end{figure}
+
+\textbf{Objective:} As theorists, our objective is to perform a computational
+simulation of the non-adiabatic dynamics and time-resolved scattering signal
+observable of the ultrafast pump-probe experiment. To make things easy, let us
+assume that we have performed the non-adiabatic dynamics simulations, and have a
+representation for the density of the wavepacket in terms of a set of weighted
+trajectories $\{ r_{A}^{I} (t), w_{I} (t) \}$. Each density-matrix trajectory
+basis function (e.g., a pair of AIMS TBFs in the Mulliken or saddle-point
+approximation, or an adiabatic trajectory) has a set of time-dependent nuclear
+coordinates $r_{A}^{I} (t)$, a time-dependent weight factor $w_{A} (t)$, which
+accounts for the weight of the starting configuration in the Franck-Condon point
+(Wigner sampling provides even weights, but there may also be weights due to
+sampling from different conformers), the overall oscillator strength, and any
+changes in weights due to adiabatic state population changes over the dynamics,
+and an adiabatic electronic label often denoted as $|I\rangle$.
+
+We also apply one additional convention (not usually seen in AIMS) to our
+trajectories: we assert that the transition dipole moment of the $t=0$ frame is
+aligned to $\hat z$, and that all subsequent frames follow this lab frame
+alignment. This will allow for the efficient treatment of anisotropic absorption
+later, by ``reusing'' each trajectory many times with different orientations.
+Note that this convention can be applied \emph{after} running AIMS, by rotating
+all frames of a given trajectory tree by the rotation matrix to bring the $t=0$
+frame into the $\hat z$ axis.
+
+In particular, our job is to produce the time-dependent detector pattern $I
+(\theta, \eta, t)$, the detector moments $I_{l} (\theta, t)$, and the
+corresponding radial distribution functions $I_{l} (r, t)$.
+
+\textbf{Elastic Scattering:} We will assume we are working in the elastic
+scattering regime (no momentum transfer to the sample), which implies that
+$|\vec k_0| = |\vec k_s|$. This constraint reduces the dimensionality of the
+valid scattering space by 1.
+\[
+\vec s = 
+s 
+\{
+\cos \theta / 2 \sin \eta,
+\sin \theta / 2,
+\cos \theta / 2 \cos \eta
+\}
+\]
+Here $s = 2 k \sin \theta / 2 = (4 \pi / \lambda) \sin \theta / 2$. Because of
+this relationship, $s$ and $\theta$ are used interchangably in discussing the
+scattering.
+
+\textbf{IAM:} In the independent atom model (IAM), the scattering for a given
+molecular ``frame'' $I$, with known and fixed orientation, is,
+\[
+I_{I} (\vec s, t)
+=   
+\left |
+\sum_{A}
+f_{A} (s)
+e^{i \vec s \cdot \vec r_{A}^{I} (t)}
+\right |^2
+\]
+The spherically-isotropic atomic form factors are available for X-ray scattering
+and UED from considerations of the atomic electronic density (see below), or may
+be computed from scattering codes like ELSEPA (specialized for UED).
+
+The total scattering signal is computed as,
+\[
+I (\vec s, t)
+=
+\sum_{I}
+w_{I} (t)
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+\hat R_{zz}^2
+\left |
+\sum_{A}
+f_{A} (s)
+e^{i \vec s \cdot \hat R \vec r_{A}^{I} (t)}
+\right |^2
+/ 
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+\]
+Note the ``smearing'' over all sample orientations $\hat R$, with $\hat
+R_{zz}^2$ weight for the anisotropic absorption.
+
+Note that,
+\[
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+\hat R_{zz}^2
+/ 
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+=
+\frac{1}{3}
+\]
+
+\textbf{Detector Signals:} The detector signal can be expanded as,
+\[
+I (\vec s, t)
+=
+\sum_{I}
+w_{I} (t)
+\sum_{A, B}
+f_{A} (s)
+f_{B} (s)
+K_{AB} (\vec s, t)
+\]
+where,
+\[
+K_{AB} (\vec s, t)
+=
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+\hat R_{zz}^2
+e^{i \vec s^{\dagger} \hat R \vec r_{AB}^{I} (t)}
+/
+\int_{\mathrm{SO(3)}}
+\mathrm{d} \hat R \
+\]
+The rotation group integrals are worked out in A. H. Zewail and J.S. Baskin,
+\textit{Chem. Phys. Chem.}, \textbf{6}, 2261 (2015). For the perpendicular case
+(selection weight of $\hat R_{zz}^2$):
+\[
+K^{\perp} (\vec s)
+=
+\frac{J_{1} (s r)}{sr}
+-
+\left [
+\sin^2 \gamma
++
+(
+2 
+-
+3 
+\sin^2 \gamma
+)
+\cos^2 (\theta / 2)
+\cos^2 \eta
+\right ]
+\frac{J_{2} (s r)}{2}
+\]
+For the parallel case:
+(selection weight of $\hat R_{yy}^2$):
+\[
+K^{\parallel} (\vec s)
+=
+\frac{J_{1} (s r)}{sr}
+-
+\left [
+\sin^2 \gamma
++
+(
+2 
+-
+3 
+\sin^2 \gamma
+)
+\sin^2 (\theta / 2)
+\right ]
+\frac{J_{2} (s r)}{2}
+\]
+For the isotropic case,
+(selection weight of $1$):
+\[
+K^{\emptyset} (\vec s)
+=
+J_{0} (sr)
+\]
+In the above $\gamma = \cos^{-1} (\hat r \cdot \hat z)$ and $r = | \vec r |$.
+Note that $\sin^2 \gamma = 1 - (\hat r \cdot \hat z)^2 = 1 - r_{z}^2 / r^2$ =
+$(r_{x}^2 + r_{y}^2) / r^2$.
+
+The spherical Bessel functions are,
+\[
+J_{0} (s)
+=
+\frac{\sin x}{x}
+\
+:
+1
+\]
+\[
+J_{1} (x)
+=
+\frac{\sin x}{x^2}
+-
+\frac{\cos x}{x}
+\
+:
+0
+\]
+\[
+J_{2} (x)
+=
+\left (
+\frac{3}{x^2} - 1
+\right )
+\frac{\sin x}{x}
+-
+3
+\frac{\cos x}{x^2}
+\
+:
+0
+\]
+The limits at $x = 0$ are displayed. Also note that $\lim_{x \rightarrow 0} J_{1}
+(x) / x = 1 /3$.
+
+\textbf{Modified Diffraction Intensity:} Particularly for UED, the raw
+diffraction intensity above is too peaked near the origin. To facilitate
+analysis, a ``modified'' diffraction intensity is often defined as,
+\[
+s M(s)
+\equiv
+s
+\frac{I_{\mathrm{mol}} (s)}{I_{\mathrm{at}} (s)}
+\]
+Here, the atomic contribution of the scattering is,
+\[
+I_{\mathrm{at}} (s)
+\equiv
+\sum_{A} | f_{A} (s) |^2
+\]
+Note that this is time and structure invariant. The molecular scattering signal
+is,
+\[
+I_{\mathrm{mol}} (s)
+\equiv
+I (s)
+-
+F
+I_{\mathrm{at}} (s)
+\]
+Here $F = 1/3$ for perpendicular and parallel transitions, $F=1$ for isotropic
+transitions. 
+
+\textbf{Anisotropy:} For a perpendicular pump-probe arrangement, the scattering
+signal can be exactly decomposed into,\footnote{Note that everyone seems to be
+using Legendre polynomials in the literature. This doesn't make sense to me, and
+I have empirical evidence that the scattering signal exactly decomposes onto $1$
+and $\cos (2 \eta)$ azimuthal basis functions for $\hat R_{zz}^2$ anisotropy.}
+\[
+I (s, \eta, t)
+=
+I_{0} (s, t)
++
+I_{2} (s, t) \cos (2 \eta)
+\]
+This decomposition can be computed from two collocation points as,
+\[
+I_{0} (s, t)
+=
+\frac{1}{2}
+\left [
+I (s, \eta=0, t)
++
+I (s, \eta=\pi/2, t)
+\right ]
+\]
+\[
+I_{2} (s, t)
+=
+\frac{1}{2}
+\left [
+I (s, \eta=0, t)
+-
+I (s, \eta=\pi/2, t)
+\right ]
+\]
+
+\textbf{Pair Correlation Functions:} The distance pair correlation is computed
+from the UED detector signal as,
+\[
+M (r, t)
+\equiv
+\int_{0}^{s_{\mathrm{max}}}
+\mathrm{d} s \
+s M(s)
+\sin (sr)
+\exp(-\alpha s^2)
+\]
+Formally, $s_{\mathrm{max}} \rightarrow \infty$ for an exact sine transform. In
+practice, a cutoff must be used due to the outer limits of $s$ values that are
+scattered. The cutoff function $\exp(-\alpha s^2)$ is used to damp down noise
+from large $s$. Additionally, the detector signal is only available from
+$s_{\mathrm{min}}$ and up, so the signal is typically assumed to rise
+smoothly\footnote{Linearly?} from $s=0$ to the value at $s_{\mathrm{min}}$.
+
+Typically this analysis is applied to the isotropic difference signal $\Delta
+M_{0} (s, t) = M_{0} (s, t) - M_{0} (s, t = -\infty)$.
+
+\textbf{Specific Example I: UED at SLAC:} One of the main experiments we are
+trying to support is the UED-III endeavor at SLAC. A representative paper of the
+approach and setup is from the UED-I run: J. Yang et al, \emph{Nat. Comm.},
+\textbf{7}, 11232 (2016). Another good paper is on the instrument design: S.
+Weathersby et al, \emph{Rev. Sci. Instr.}, \textbf{86}, 073702. 
+
+In this experiment, 3.7 MeV electrons are used as the probe ($\lambda = 0.30$ pm
+$= 0.0030$ \AA{}). The detector is an Andor iXon ultra 888 electron multiplying
+charge-coupled device camera (EMCCD), which is positioned 3.1 m from the sample.
+The accessible range of $s$ is $3.5$ \AA{}$^{-1}$ to $12$ \AA{}$^{-1}$,
+corresponding to scattering angles $\theta$ of $0.0957^{\circ}$ to
+$0.328^{\circ}$, or a detector radius of $s_{z}$ of $0.52$ to $1.78$ cm. Large
+$s$ is limited by the size of the detector, small $s$ is limited by the $0.4$ cm
+diameter hole drilled in the EMCCD for the electron beam (thought this may be
+improved in later runs). Note that this is very small angle scattering, but
+permits rather high values of $s$ due to the small deBroglie wavelength of
+ultra-relativistic electrons. By contrast, x-rays typically scatter over much
+larger angles to reach similar values of $s$. For instance, $1.3$ \AA{}
+wavelength electrons reach only $s = 9.7$ \AA{}$^{-1}$ over the entire
+scattering sphere.
+
+In analysis, the UED team typically uses a cutoff of $\alpha = 7^{-2}$
+\AA{}$^{-2}$ in the sine transform above. 
+
+The entire instrument has a time resolution of roughly $100$ fs, and notably
+lacks an in-flight diagnostic clock (e.g., ``timestamping''), though a THz
+streaking experiment has recently been developed to provide an offline clock
+calibration. 
+
+A Ti:Sapphire laser serves as both pump and probe initiator. Part of the laser
+pulse initiates electron release from a copper photocathode (photoelectron
+release), which are subsequently accelerated to 3.7 MeV by a massive klystron.
+Tilting/tuning the klystron accelerates the back of the electron bunch more than
+the front, combating Coulomb spread in the probe electron bunch, but this can
+induce problems in determining the time delay. 
+
+\textbf{X-Ray Scattering vs. Electron Diffraction:} For ultrafast x-ray
+scattering, the form factors $f_{A} (s)$ are the Fourier transform of the
+electronic density of a spherical atom (possibly selected to reflect the density
+of the local chemical environment in the true molecule),
+\[
+f_{A} (s)
+\equiv
+\int_{\mathbb{R}^3}
+\mathrm{d} r_1
+\
+\rho_{A}^{\mathrm{e}} (\vec r_{1})
+e^{i \vec s \cdot \vec r_1}
+\]
+
+These form factors are tabulated for many common atoms at
+\begin{verbatim}
+http://lampx.tugraz.at/~hadley/ss1/crystaldiffraction/
+atomicformfactors/formfactors.php
+\end{verbatim}
+(accessed 01/18/2018). The specific parametrization is,
+\[
+f_{A} (s)
+\equiv
+\sum_{i=1}^{4}
+a_{i}
+\exp
+\left (
+-b_{i}
+\left (
+\frac{s}{4\pi}
+\right )^2
+\right )
++
+c
+\]
+With 9 parameters $a_{1-4}$ $b_{1-4}$, and $c$ per atom type. Units are
+\AA{}$^{-1}$.
+
+To switch to ultrafast electron diffraction, one must also account for
+scattering off of the nucleus and for a modified Jacobian element,
+\[
+f_{A}^{\mathrm{UED}}
+(s)
+\equiv
+\frac{1}{s^2}
+\left [
+Z_{A}
+-
+f_{A}^{\mathrm{XRAY}}
+(q)
+\right ]
+\]
+See M. Ben-Nunn, J. Cao, and K. Wilson, JPCA, 101, 8744 (1997) for details.
+
+\section{Example: Iodine}
+
+\textbf{Geometry:} As a key example, we consider a perpendicular pump-probe UED
+experiment wherein iodine molecule $I_{2}$ is excited to a hypothetical bound
+state via a parallel transition (transition dipole along the molecular
+axis).\footnote{Note that this toy problem is chosen for ease of
+setup/representative nature, not for rigorous physics.} The classical trajectory
+is,
+\[
+r (t)
+=
+2.66
++
+0.5 \sin (2 \pi t [\mbox{fs}]/ 600)
+[ \mbox{\AA{}} ]
+\]
+Using the techniques above, we compute the detector moments $I_0 (s, t)$ and
+$I_2 (s, t)$ for each of the frames in the trajectory (see Figure
+\ref{fig:I02}). We use the accessible range of $s \in [3.5, 12.0]$ \AA{}$^{-1}$
+for the UED experiment, and use a de Broglie wavelength of $\lambda = 0.0030$
+\AA{}, which corresponds to the 3.7 MeV electrons of the experiment.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.0in]{figures/i2/I0.png}
+\includegraphics[width=3.0in]{figures/i2/I2.png}
+\caption{Detector moments $I_{0} (s, t)$ and $I_{2} (s, t)$ for toy iodine
+problem. These moments are differences (as are all plots in this section), i.e.,
+$I (s, t) \leftarrow I(s, t) - I(s, t=0)$. These moments are of the flavor $s
+M(s, \eta, t)$ (as are all plots in this section).}
+\label{fig:I02}
+\end{center}
+\end{figure}
+
+At this point, we can easily compute the detector patterns from $I(s, \eta, t) =
+I_{0} (s, t) + I_{2} (s, t) \cos(2 \eta)$. E.g., an interesting frame is $t=132$
+fs, and the decomposition into isotropic/anisotropic parts is also shown. A
+complete 3D detector movie over $(s, \eta, t)$ is in \texttt{figs/i2-movie} in
+this TeX source dir.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.0in]{figures/i2/I033.png}
+\includegraphics[width=3.0in]{figures/i2/I033-0.png}
+\includegraphics[width=3.0in]{figures/i2/I033-2.png}
+\caption{Detector patterns $I (s, \eta)$, $I_{0} (s, \eta)$ and $I_{2} (s,
+\eta)$ for toy iodine problem ($t = 132$ fs).}
+\label{fig:Idet}
+\end{center}
+\end{figure}
+
+Starting from the moments, e.g., $I_{0} (s, t)$, we can compute the ``molecular
+movie'' $I_{0} (r, t)$ by sine transforming. This is done in Figures
+\ref{fig:IR} and \ref{fig:IR2} for our toy iodine problem, using a variety of
+$s_{\mathrm{min}}$ and $s_{\mathrm{max}}$ cutoffs, and without/with time
+blurring with a 100 fs FWHM Gaussian. The upper right figure in Figure
+\ref{fig:IR} shows roughly what can be expected with the current experimental
+setup. 
+
+Of particular note, the $s_{\mathrm{min}}$ limit due to the hole for the
+electron beam induces large ``fringes'' in the signal. It might be plausible
+that pushing $s_{\mathrm{min}}$ down could be just as useful as pushing
+$s_{\mathrm{max}}$ up in cleaning up these pictures. 
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3.0in]{figures/i2/R0.png}
+\includegraphics[width=3.0in]{figures/i2/R0blur.png}
+\includegraphics[width=3.0in]{figures/i2/R0_smin.png}
+\includegraphics[width=3.0in]{figures/i2/R0blur_smin.png}
+% \includegraphics[width=3.0in]{figures/i2/R0_smax.png}
+% \includegraphics[width=3.0in]{figures/i2/R0blur_smax.png}
+% \includegraphics[width=3.0in]{figures/i2/R0_smin_smax.png}
+% \includegraphics[width=3.0in]{figures/i2/R0blur_smin_smax.png}
+\caption{Molecular movies $I_0(r, t)$ for toy iodine problem.  On the left is the
+$~1$ fs resolution signal. On the right is the 100 fs FWHM time-blurred system
+(Gaussian blurring). On the top, the $s_{\mathrm{min}} = 3.5$ \AA{}$^{-1}$. On
+the bottom, $s_{\mathrm{min}} \sim 0.0$ \AA{}$^{-1}$. In all cases,
+$s_{\mathrm{max}} = 12.0$ \AA{}$^{-1}$.
+}
+\label{fig:IR}
+\end{center}
+\end{figure}
+
+\begin{figure}[h!]
+\begin{center}
+%\includegraphics[width=3.0in]{figures/i2/R0.png}
+%\includegraphics[width=3.0in]{figures/i2/R0blur.png}
+%\includegraphics[width=3.0in]{figures/i2/R0_smin.png}
+%\includegraphics[width=3.0in]{figures/i2/R0blur_smin.png}
+\includegraphics[width=3.0in]{figures/i2/R0_smax.png}
+\includegraphics[width=3.0in]{figures/i2/R0blur_smax.png}
+\includegraphics[width=3.0in]{figures/i2/R0_smin_smax.png}
+\includegraphics[width=3.0in]{figures/i2/R0blur_smin_smax.png}
+\caption{Molecular movies $I_0(r, t)$ for toy iodine problem.  On the left is the
+$~1$ fs resolution signal. On the right is the 100 fs FWHM time-blurred system
+(Gaussian blurring). On the top, the $s_{\mathrm{min}} = 3.5$ \AA{}$^{-1}$. On
+the bottom, $s_{\mathrm{min}} \sim 0.0$ \AA{}$^{-1}$. In all cases,
+$s_{\mathrm{max}} = 24.0$ \AA{}$^{-1}$. Note that $\alpha = 0$ in the sine
+transform in this case.
+}
+\label{fig:IR2}
+\end{center}
+\end{figure}
+
+\end{document}
