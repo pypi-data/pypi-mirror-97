@@ -1,0 +1,33 @@
+# Recipe will be run for every file
+name: Default recipe (latexmk!)
+author: Florian Sihler
+hooks:
+    pre: []
+    in: []
+    post: []
+
+cleanup_cmds: []
+# No cleanup commands!
+
+args: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode -outdir=\"{out_dir}\""
+extra_args:
+  - '-shell-escape'
+  - '-recorder'
+
+# Tools will be used to generate files if needed or to require intermediate steps
+# They extend the hooks and can use ifs
+# They will extend extra_args as well (bib for example will add -bibtex?)
+tools:
+  - glossary
+  - index
+
+# May contain 'glob'-Patterns
+wanted_files:
+  - "{out_dir}/{file_base_noext}.pdf"
+
+executable: latexmk
+
+# TODO: latexmk pretex
+# TODO latexmkrc if no ile is needed?
+run:
+    - "{executable} {args} {extra_args} {file}"
