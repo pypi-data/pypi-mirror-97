@@ -1,0 +1,33 @@
+$transition: opacity 300ms linear;
+
+.svg-trigger {
+  .svg-builder-basic {
+    g[id^='svg-basic-'] {
+      opacity: 0;
+    }
+
+    g[id*='-on-start'] {
+      opacity: 1;
+    }
+
+    g {
+      transition: $transition; /* vendorless fallback */
+      -o-transition: $transition; /* opera */
+      -ms-transition: $transition; /* IE 10 */
+      -moz-transition: $transition; /* Firefox */
+      -webkit-transition: $transition; /*safari and chrome */
+    }
+  }
+
+  &:hover {
+    .svg-builder-basic {
+      g[id^='svg-basic-'] {
+        opacity: 0;
+      }
+
+      g[id*='-on-hover'] {
+        opacity: 1;
+      }
+    }
+  }
+}
