@@ -1,0 +1,80 @@
+Metadata-Version: 2.1
+Name: cs.dateutils
+Version: 20210306
+Summary: A few conveniences to do with dates and times.
+Home-page: https://bitbucket.org/cameron_simpson/css/commits/all
+Author: Cameron Simpson
+Author-email: cs@cskk.id.au
+License: GNU General Public License v3 or later (GPLv3+)
+Description: A few conveniences to do with dates and times.
+        
+        *Latest release 20210306*:
+        Initial release, used by cs.sqltags.
+        
+        There are some other PyPI modules providing richer date handling
+        than the stdlib `datetime` module.
+        This module mostly contains conveniences used in my other code;
+        you're welcome to it, but it does not pretend to be large or complete.
+        
+        ## Function `datetime2unixtime(dt)`
+        
+        Convert a `datetime` to a UNIX timestamp.
+        
+        *Note*: unlike `datetime.timestamp`,
+        if the `datetime` is naive
+        it is presumed to be in UTC rather than the local timezone.
+        
+        ## Function `isodate(when=None, dashed=True)`
+        
+        Return a date in ISO8601 YYYY-MM-DD format, or YYYYMMDD if not `dashed`.
+        
+        Modern Pythons have a `datetime.isoformat` method, use that.
+        
+        ## Function `localdate2unixtime(d)`
+        
+        Convert a localtime `date` into a UNIX timestamp.
+        
+        ## Class `tzinfoHHMM(datetime.tzinfo)`
+        
+        tzinfo class based on +HHMM / -HHMM strings.
+        
+        ## Function `unixtime2datetime(unixtime, tz=None)`
+        
+        Convert a a UNIX timestamp to a `datetime`.
+        
+        *Note*: unlike `datetime.fromtimestamp`,
+        if `tz` is `None` the UTC timezone is used.
+        
+        ## Class `UNIXTimeMixin`
+        
+        A mixin for classes with a `.unixtime` attribute,
+        a `float` storing a UNIX timestamp.
+        
+        ### Method `UNIXTimeMixin.as_datetime(self, tz=None)`
+        
+        Return `self.unixtime` as a `datetime` with the timezone `tz`.
+        
+        *Note*: unlike `datetime.fromtimestamp`,
+        if `tz` is `None` the UTC timezone is used.
+        
+        ### Property `UNIXTimeMixin.datetime`
+        
+        The `unixtime` as a UTC `datetime`.
+        
+        # Release Log
+        
+        
+        
+        *Release 20210306*:
+        Initial release, used by cs.sqltags.
+Keywords: date,time,datetime,python,python3
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Description-Content-Type: text/markdown
