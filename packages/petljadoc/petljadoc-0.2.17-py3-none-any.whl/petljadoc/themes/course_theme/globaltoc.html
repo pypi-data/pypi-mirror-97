@@ -1,0 +1,31 @@
+<ul>
+    {% for lesson in course.active_lessons %}
+    <div class="lecture-div" id=lecture-{{lesson.folder_url}}>
+        <i class="fas fa-caret-right caret-position"></i>
+        <i class="fas fa-caret-down caret-position d-none"></i>
+        <h5>{{lesson.title}}</h5>
+    </div>
+
+    <div class="d-none">
+        {% for activity in lesson.active_activies %}
+        {% if pagename == 'index' %}
+        <a href=./{{lesson.folder_url}}/{{activity.toc_url}}.html>
+        {% else %}
+        <a href=../{{lesson.folder_url}}/{{activity.toc_url}}.html>
+        {% endif %}
+        <div class="activity-div" id=activity-{{activity.toc_url}}>
+            {% if "reading" == activity.activity_type %}
+            <i class="fas fa-file-alt activity-icon"></i>
+            {% elif "video" == activity.activity_type %}
+            <i class="fas fa-film activity-icon"></i>
+            {%else%}
+            <i class="far fa-question-circle activity-icon"></i>
+            {% endif %}
+            {{activity.title}}
+        </div>
+    </a>
+    {% endfor %}
+
+    </diV>
+    {% endfor %}
+</ul>
