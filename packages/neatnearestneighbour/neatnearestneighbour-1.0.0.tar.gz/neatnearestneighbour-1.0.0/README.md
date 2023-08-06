@@ -1,0 +1,27 @@
+A Nearest Neighbour algorithm written in pure python. The intention is
+to use this package with PyPy. The hot loop in the algorithm are perfect for PyPy's
+just-in-time compilation and results in fast performance.
+
+To run create an instance of NearestNeighbour and call run(). The output is a 
+generator of items in order by finding the next nearest neighbour of each item. The 
+starting item is randomized.
+
+The input items can be a list of anything, because the distance function also
+has to be provided. The distance function must be able to calculate the distance
+between any items in the input list.
+
+An example:
+```python
+from neatnearestneighbour import NearestNeighbour
+items = [10, 20, 15, 5, 100, 2, 30, 50]
+distance_fn = lambda a, b: abs(b - a)
+
+nn = NearestNeighbour(
+    items,
+    distance_fn,
+)
+neighbours = nn.run()
+print(list(neighbours))
+# [50, 30, 20, 15, 10, 5, 2, 100]
+```
+
