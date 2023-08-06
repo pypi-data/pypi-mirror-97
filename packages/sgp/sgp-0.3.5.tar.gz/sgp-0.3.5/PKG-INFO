@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: sgp
+Version: 0.3.5
+Summary: Sparse gaussian process regression
+Home-page: https://github.com/marnikitta/sgp
+Author: Nikita Marshalkin
+Author-email: marnikitta@gmail.com
+License: UNKNOWN
+Description: # SGP
+        
+        Simple gaussian process regression
+        
+        ## Installation
+        
+        `pip install sgp`
+        
+        ## Getting started
+        
+        ```python
+        from sgp.variational import VariationalGP as VGP
+        import numpy as np
+        
+        X_train = np.linspace(0, 5, 1000)
+        y_train = np.sin(X_train) * X_train
+        
+        model = VGP().fit(X_train.reshape(-1, 1), y_train)
+        X_test = np.linspace(0, 10, 100)
+        y_test, std_test = model.predict(X_test.reshape(-1, 1), return_std=True)
+        ```
+        
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
