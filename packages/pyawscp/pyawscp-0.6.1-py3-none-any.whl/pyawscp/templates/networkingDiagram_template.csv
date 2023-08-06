@@ -1,0 +1,149 @@
+##
+## Example CSV import. Use ## for comments and # for configuration. Paste CSV below.
+## The following names are reserved and should not be used (or ignored):
+## id, tooltip, placeholder(s), link and label (see below)
+##
+#
+## Node label with placeholders and HTML.
+## Default is '%name_of_first_column%'.
+#
+# label: <table cellpadding='3' collsapcing='0'><tr><td>%vpcid%</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>%name%</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><span style='color:black;font-family:Lucida Console;font-size:12px;'>%cdirblock%</span></td></tr></table>
+#
+## Node style (placeholders are replaced once).
+## Default is the current style for nodes.
+#
+## style:outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#248814;fillColor=#fff7e1;verticalAlign=top;align=left;spacingLeft=30;fontColor=#AAB7B8;dashed=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;connectable=1;noLabel=0;shadow=0;
+#
+## Parent style for nodes with child nodes (placeholders are replaced once).
+#
+# parentstyle: swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;fillColor=#ffe6cc;
+#
+## Optional column name that contains a reference to a named style in styles.
+## Default is the current style for nodes.
+#
+# stylename: type
+#
+## JSON for named styles of the form {"name": "style", "name": "style"} where style is a cell style with
+## placeholders that are replaced once.
+#
+# styles: {"vpc": "outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#248814;fillColor=#fff7e1;verticalAlign=top;align=left;spacingLeft=30;fontColor=#AAB7B8;dashed=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;connectable=1;noLabel=0;shadow=0;", \
+# "az": "outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_availability_zone;strokeColor=#545B64;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#545B64;dashed=1;horizontal=1;shadow=0;" , \
+# "publicsubnet": "outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#248814;fillColor=#E9F3E6;verticalAlign=top;align=left;spacingLeft=30;fontColor=#248814;dashed=0;shadow=1;" , \
+# "privatesubnet": "outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#147EBA;fillColor=#E6F2F8;verticalAlign=top;align=left;spacingLeft=30;fontColor=#147EBA;dashed=0;shadow=1;", \
+# "routetable": "outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#5A30B5;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.route_table;shadow=0;sketch=0;", \
+# "nacl": "outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#5A30B5;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.network_access_control_list;shadow=0;", \
+# "tgw": "outlineConnect=0;fontColor=#232F3E;gradientColor=#945DF2;gradientDirection=north;fillColor=#5A30B5;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.transit_gateway;", \ 
+# "tgw-attachments-container": "swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;fillColor=#ffe6cc;verticalAlign=top;", \
+# "tgw-attachments-table": "rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;autosize=1;", \
+# "tgw-route-table": "rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;strokeColor=none;fillColor=none;" }
+#
+## JSON for variables in styles of the form {"name": "value", "name": "value"} where name is a string
+## that will replace a placeholder in a style.
+#
+# vars: -
+#
+## Optional column name that contains a reference to a named label in labels.
+## Default is the current label.
+#
+# labelname: type
+#
+## JSON for named labels of the form {"name": "label", "name": "label"} where label is a cell label with
+## placeholders.
+#
+# labels: {"vpc": "<span><b>%resourceid%</b></span>&nbsp;&nbsp;&nbsp;<span>%name%</span><br style='line-height:%bottomvpc%px;'><br><div style='width:%width%px;text-align:center;'><span style='text-align:center;color:black;font-family:Lucida Console;font-size:12px;'>%cdirblock%</span></div>", \
+# "az": "<b>%az%</b>", \
+# "publicsubnet": "<span>%resourceid%<br>%name%</span><br style='line-height:%bottomsubnet%px;'><br><div style='text-align:center;'><span style='color:black;font-family:Lucida Console;font-size:12px;'>%cdirblock%</span></div>", \
+# "privatesubnet": "<span>%resourceid%<br>%name%</span><br style='line-height:%bottomsubnet%px;'><br><div style='text-align:center;'><span style='color:black;font-family:Lucida Console;font-size:12px;'>%cdirblock%</span></div>", \ 
+# "routetable": "<div style='height:18px;line-height:18px;margin-top:-5px;text-align:center;vertical-align:middle;background:blue;border-radius:5px;border:1px solid #110573;'><span style='color:white;font-family:Lucida Console;font-size:13px;'>&nbsp;<b>%resourceidshort%</b>&nbsp;</span></div>", \
+# "nacl": "<div style='height:18px;line-height:18px;margin-top:-5px;text-align:center;vertical-align:middle;background:blue;border-radius:5px;border:1px solid #110573;'><span style='color:white;font-family:Lucida Console;font-size:13px;'>&nbsp;<b>%resourceidshort%</b>&nbsp;</span></div>", \
+# "tgw": "<div style='height:32px;line-height:16px;margin-top:0px;text-align:center;vertical-align:middle;background:#ffffec;border-radius:5px;border:0.6px solid #D3D3D3;'><span style='color:black;font-family:Lucida Console;font-size:12px;'>&nbsp;<b>%resourceid%</b>&nbsp;</span><br><span style='color:black;font-family:Lucida Console;font-size:12px;'>&nbsp;<i>owner</i>: <b>%ownerid%</b>&nbsp;</span></div>", \
+# "tgw-attachments-container": "%name%", \
+# "tgw-attachments-table": "%tgwattachmenttable%", \
+# "tgw-route-table": "%tgwroutetable%" }
+#
+## Uses the given column name as the identity for cells (updates existing cells).
+## Default is no identity (empty value or -).
+#
+# identity: resourceid
+#
+## Uses the given column name as the parent reference for cells. Default is no parent (empty or -).
+## The identity above is used for resolving the reference so it must be specified.
+#
+# parent: resourceparent
+#
+## Adds a prefix to the identity of cells to make sure they do not collide with existing cells (whose
+## IDs are numbers from 0..n, sometimes with a GUID prefix in the context of realtime collaboration).
+## Default is csvimport-.
+#
+# namespace: aws-
+#
+## Connections between rows ("from": source colum, "to": target column).
+## Label, style and invert are optional. Defaults are '', current style and false.
+## If placeholders are used in the style, they are replaced with data from the source.
+## An optional placeholders can be set to target to use data from the target instead.
+## In addition to label, an optional fromlabel and tolabel can be used to name the column
+## that contains the text for the label in the edges source or target (invert ignored).
+## The label is concatenated in the form fromlabel + label + tolabel if all are defined.
+## Additional labels can be added by using an optional labels array with entries of the
+## form {"label": string, "x": number, "y": number, "dx": number, "dy": number} where
+## x is from -1 to 1 along the edge, y is orthogonal, and dx/dy are offsets in pixels.
+## The target column may contain a comma-separated list of values.
+## Multiple connect entries are allowed.
+#
+# connect: {"from": "manager", "to": "name", "invert": true, "label": "manages", \
+#          "style": "curved=1;endArrow=blockThin;endFill=1;fontSize=11;"}
+# connect: {"from": "refs", "to": "resourceid", "fromlabel": "resourceid", "tolabel": "resourceid", "label": "<br>","style": "html=1;fontSize=10;fillColor=#ffffec;labelBorderColor=#D3D3D3;labelBackgroundColor=#ffffec;fontColor=#6600CC;strokeColor=#000099;dashed=1;dashPattern=1 2;"}
+#
+## Node x-coordinate. Possible value is a column name. Default is empty. Layouts will
+## override this value.
+#
+# left: xcoord
+#
+## Node y-coordinate. Possible value is a column name. Default is empty. Layouts will
+## override this value.
+#
+# top: ycoord
+#
+## Node width. Possible value is a number (in px), auto or an @ sign followed by a column
+## name that contains the value for the width. Default is auto.
+#
+# width: @width
+#
+## Node height. Possible value is a number (in px), auto or an @ sign followed by a column
+## name that contains the value for the height. Default is auto.
+#
+# height: @height
+#
+## Padding for autosize. Default is 0.
+#
+# padding: -12
+#
+## Comma-separated list of ignored columns for metadata. (These can be
+## used for connections and styles but will not be added as metadata.)
+#
+# ignore: id,image,fill,stroke,refs,manager
+#
+## Column to be renamed to link attribute (used as link).
+#
+# link: url
+#
+## Spacing between nodes. Default is 40.
+#
+# nodespacing: 40
+#
+## Spacing between levels of hierarchical layouts. Default is 100.
+#
+# levelspacing: 100
+#
+## Spacing between parallel edges. Default is 40. Use 0 to disable.
+#
+# edgespacing: 40
+#
+## Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,
+## verticalflow, horizontalflow, organic, circle or a JSON string as used in Layout, Apply.
+## Default is auto.
+#
+# layout: none
+#
+## ---- CSV below this line. First line are column names. ----
+type,resourceid,resourceparent,refs,xcoord,ycoord,width,height,vpcid,subnetid,cdirblock,name,az,url,bottomvpc,bottomsubnet,resourceidshort,ownerid,tgwattachmenttable,tags,tgwroutetable
