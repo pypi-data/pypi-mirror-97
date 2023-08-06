@@ -1,0 +1,1 @@
+import{r as o}from"./p-15921644.js";const s=class{constructor(s){o(this,s)}componentWillLoad(){}componentDidUnload(){}};export{s as lwc_limepkg_scrive_loader};
