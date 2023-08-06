@@ -1,0 +1,312 @@
+#######################################################################
+# Midas Benchmark Scenario. Includes all possible simulators and
+# a full config description
+#######################################################################
+benchmark:
+  parent: 
+  modules: [powergrid, sbdata, sndata, comdata, weather, der, goa]
+  step_size: 15*60  # Default for all simulators 
+  start_date: 2017-01-01 00:00:00+0100
+  end: 0.25*24*60*60
+  cos_phi: 0.9  # Default
+  with_db: True  # Default
+  deny_rng: False  # Default
+  mosaik_params:
+    addr: ["127.0.0.1", 5566]
+  mosaikdb_params:
+    sim_name: MosaikDB  # Default
+    cmd: python  # Default
+    import_str: mosaik_hdf5:MosaikHdf5  # Default
+    step_size: 15*60  # Overwrites default
+    filename: midas_benchmark.hdf5
+  powergrid_params:
+    sim_name: Powergrid  # Default for all grids
+    cmd: python  # Default for all grids
+    import_str: midas.core:PandapowerSimulator  # Default for all grids
+    midasmv:
+      sim_name: Powergrid  # Overwrites default
+      cmd: python  # Overwrites default
+      import_str: midas.core:PandapowerSimulator  # Overwrites default
+      step_size: 15*60  # Overwrites default
+      gridfile: midasmv
+    midaslv:
+      sim_name: Powergrid
+      cmd: python
+      import_str: midas.core:PandapowerSimulator
+      step_size: 15*60
+      gridfile: midaslv
+    sbrural3:
+      sim_name: SimbenchGrid
+      cmd: python
+      import_str: midas.core:PandapowerSimulator
+      step_size: 15*60
+      gridfile: 1-LV-rural3--0-sw
+  sbdata_params:
+    sim_name: SimbenchData
+    cmd: python
+    import_str: midas.core:SimbenchDataSimulator
+    step_size: 15*60
+    # Should normally match the default
+    start_date: 2017-01-01 00:00:00+0100
+    # Datafile missing ?
+    cos_phi: 0.9
+    interpolate: False
+    randomize_data: False
+    randomize_cos_phi: False
+    sbrural3:
+      sim_name: SimbenchData
+      cmd: python
+      import_str: midas.core:SimbenchDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      cos_phi: 0.9
+      interpolate: False
+      randomize_data: False
+      randomize_cos_phi: False
+      mapping: default  # Default for simbench grid "sbrural3"
+  sndata_params:
+    sim_name: SmartNordData
+    cmd: python
+    import_str: midas.core:SmartNordDataSimulator
+    step_size: 15*60
+    # Should normally match the default
+    start_date: 2017-01-01 00:00:00+0100
+    # Datafile missing ?
+    cos_phi: 0.9
+    interpolate: False
+    randomize_data: False
+    randomize_cos_phi: False
+    midasmv:
+      sim_name: SmartNordData
+      cmd: python
+      import_str: midas.core:SmartNordDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      # Datafile missing ?
+      cos_phi: 0.9
+      interpolate: False
+      randomize_data: False
+      randomize_cos_phi: False
+      household_mapping: {}
+      land_mapping:
+        1: [[0, 1.0], [2, 1.0], [3, 3.0], [6, 2.0], [7, 1.0]]
+        3: [[0, 1.0], [2, 1.0], [3, 1.0], [6, 1.0], [7, 1.0]]
+        4: [[0, 3.0], [3, 2.0], [7, 1.0]]
+        5: [[3, 2.0], [7, 1.0]]
+        6: [[0, 1.0], [3, 2.0]]
+        7: [[0, 3.0], [2, 1.0], [3, 2.0], [7, 1.0]]
+        8: [[0, 2.0], [3, 1.0], [6, 1.0]]
+        9: [[2, 1.0], [3, 2.0], [6, 2.0], [7, 1.0]]
+        10: [[0, 2.0], [2, 1.0], [3, 2.0], [6, 2.0], [7, 1.0]]
+        11: [[0, 2.0], [2, 1.0], [3, 2.0], [6, 2.0], [7, 1.0]]
+    midaslv:
+      sim_name: SmartNordData
+      cmd: python
+      import_str: midas.core:SmartNordDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      # Datafile missing ?
+      cos_phi: 0.9
+      interpolate: False
+      randomize_data: False
+      randomize_cos_phi: False
+      household_mapping:
+        12: [[0, 1.0], [1, 1.0], [2, 1.0], [3, 1.0]]
+        16: [[4, 1.0], [5, 1.0], [6, 1.0], [7, 1.0], [8, 1.0], 
+            [9, 1.0], [10, 1.0], [11, 1.0], [12, 1.0], [13, 1.0],
+            [14, 1.0], [15, 1.0], [16, 1.0], [17, 1.0], [18, 1.0],
+            [19, 1.0], [20, 1.0], [21, 1.0], [22, 1.0], [22, 1.0]]
+        17: [[23, 1.0], [24, 1.0], [25, 1.0], [26, 1.0], [27, 1.0], 
+            [28, 1.0], [29, 1.0], [30, 1.0], [31, 1.0], [32, 1.0],
+            [33, 1.0], [34, 1.0], [35, 1.0]]
+        18: [[36, 1.0], [37, 1.0]]
+        19: [[38, 1.0], [39, 1.0], [40, 1.0], [45, 1.0], [46, 1.0], 
+            [47, 1.0], [48, 1.0], [49, 1.0], [50, 1.0], [51, 1.0],
+            [52, 1.0], [53, 1.0], [54, 1.0], [55, 1.0], [56, 1.0],
+            [57, 1.0]]
+      land_mapping: {}
+  comdata_params:
+    sim_name: CommercialData
+    cmd: python
+    import_str: midas.core:CommercialDataSimulator
+    step_size: 15*60
+    # Should normally match the default
+    start_date: 2017-01-01 00:00:00+0100
+    # Datafile missing ?
+    cos_phi: 0.9
+    interpolate: False
+    randomize_data: False
+    randomize_cos_phi: False
+    midasmv:
+      sim_name: CommercialData
+      cmd: python
+      import_str: midas.core:CommercialDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      # Datafile missing ?
+      cos_phi: 0.9
+      interpolate: False
+      randomize_data: False
+      randomize_cos_phi: False
+      mapping:
+        13: [[SuperMarket, 0.089]]
+        14: [[SmallHotel, 0.022]]
+    midaslv:
+      sim_name: CommercialData
+      cmd: python
+      import_str: midas.core:CommercialDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      # Datafile missing ?
+      cos_phi: 0.9
+      interpolate: False
+      randomize_data: False
+      randomize_cos_phi: False
+      mapping:
+        22: [[Hospital, 0.013]]  # industrial subgrid
+        35: [[StripMall, 0.18]]
+        36: [[Warehouse, 0.2]]
+        37: [[SmallHotel, 0.16]]
+        40: [[StandaloneRetail, 0.2]]
+        41: [[QuickServiceRestaurant, 0.2]]
+        42: [[MidriseApartment, 0.2]]
+        43: [[SmallOffice, 0.04]]
+  weather_params:
+    sim_name: WeatherData
+    cmd: python
+    import_str: midas.core:WeatherDataSimulator
+    step_size: 15*60
+    # Should normally match the default
+    start_date: 2017-01-01 00:00:00+0100
+    interpolate: False
+    randomize: False
+    bremen:
+      sim_name: WeatherData
+      cmd: python
+      import_str: midas.core:WeatherDataSimulator
+      step_size: 15*60
+      # Should normally match the default
+      start_date: 2017-01-01 00:00:00+0100
+      interpolate: False
+      randomize: False
+      weather_mapping:
+        WeatherCurrent:
+          - interpolate: False
+            randomize: False
+          - interpolate: True
+            randomize: True
+        WeatherForecast:
+          - interpolate: True
+            randomize: True
+            forecast_horizon_hours: 0.25
+            forecast_error: 0.05
+  der_params:
+    sim_name: Pysimmods
+    cmd: python
+    import_str: pysimmods.mosaik:PysimmodsSimulator
+    step_size: 15*60
+    start_date: 2017-01-01 00:00:00+0100
+    grid_name: midasmv
+    q_control: p_set
+    inverter_mode: inductive
+    midasmv_pv:
+      sim_name: Pysimmods
+      cmd: python
+      import_str: pysimmods.mosaik:PysimmodsSimulator
+      step_size: 15*60
+      start_date: 2017-01-01 00:00:00+0100
+      q_control: p_set
+      inverter_mode: inductive
+      grid_name: midasmv
+      mapping:
+        3: [[PV, 6], [PV, 1.279], [PV, 0.343]]
+        4: [[PV, 0.4], [PV, 0.343]]
+        8: [[PV, 0.4], [PV, 6]]
+        9: [[PV, 0.23], [PV, 0.08]]
+        11: [[PV, 1.95], [PV, 0.555], [PV, 6]]
+        13: [[PV, 0.23], [PV, 2.02]]
+        14: [[PV, 6], [PV, 1.279]]
+      weather_provider_mapping:
+        PV: [bremen, 0]
+      # weather_forecast_mapping:
+        # PV: [bremen, 0]
+  goa_params:
+    sim_name: GridOperator
+    cmd: python
+    import_str: midas.core:GridOperatorSimulator
+    step_size: 15*60
+    start_date: 2017-01-01 00:00:00+0100
+    grid_load_sensor: False
+    grid_sgen_sensor: False
+    grid_busvm_sensor: False
+    grid_busload_sensor: True
+    der_load_sensor: False
+    der_load_forecast_sensor: False
+    der_sgen_sensor: False
+    der_sgen_forecast_sensor: False
+    undervoltage_pu: 0.9
+    overvoltage_pu: 1.1
+    run_forecast: False
+    forecast_horizon_hours: 0.25
+    midasmv:
+      sim_name: GridOperator
+      cmd: python
+      import_str: midas.core:GridOperatorSimulator
+      step_size: 15*60
+      start_date: 2017-01-01 00:00:00+0100
+      gridfile: midasmv
+      grid_load_sensor: True
+      grid_sgen_sensor: True
+      grid_busvm_sensor: False
+      grid_busload_sensor: True
+      der_load_sensor: True
+      der_load_forecast_sensor: False
+      der_sgen_sensor: True
+      der_sgen_forecast_sensor: False
+      undervoltage_pu: 0.9
+      overvoltage_pu: 1.1
+      run_forecast: False
+      forecast_horizon_hours: 0.25
+    midaslv:
+      sim_name: GridOperator
+      cmd: python
+      import_str: midas.core:GridOperatorSimulator
+      step_size: 15*60
+      start_date: 2017-01-01 00:00:00+0100
+      gridfile: midaslv
+      grid_load_sensor: False
+      grid_sgen_sensor: False
+      grid_busvm_sensor: False
+      grid_busload_sensor: True
+      der_load_sensor: False
+      der_load_forecast_sensor: False
+      der_sgen_sensor: False
+      der_sgen_forecast_sensor: False
+      undervoltage_pu: 0.9
+      overvoltage_pu: 1.1
+      run_forecast: False
+      forecast_horizon_hours: 0.25
+    sbrural3:
+      sim_name: GridOperator
+      cmd: python
+      import_str: midas.core:GridOperatorSimulator
+      step_size: 15*60
+      start_date: 2017-01-01 00:00:00+0100
+      gridfile: 1-LV-rural3--0-sw
+      grid_load_sensor: False
+      grid_sgen_sensor: False
+      grid_busvm_sensor: False
+      grid_busload_sensor: True
+      der_load_sensor: False
+      der_load_forecast_sensor: False
+      der_sgen_sensor: False
+      der_sgen_forecast_sensor: False
+      undervoltage_pu: 0.9
+      overvoltage_pu: 1.1
+      run_forecast: False
+      forecast_horizon_hours: 0.25
