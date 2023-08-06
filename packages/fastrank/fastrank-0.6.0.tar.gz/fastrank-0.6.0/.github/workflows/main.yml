@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  create:
+  pull_request:
+  push: 
+  schedule:
+    # Runs every thursday at 23:23 GMT. This should make sure this syntax and rust dependencies do not rot for too long.
+    - cron:  '23 23 * * 4'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ ubuntu-latest, macOS-latest, windows-latest ]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: Setup Rust environment
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+      - name: Setup Python environment
+        uses: actions/setup-python@v2.1.4
+        with:
+          python-version: 3.6
+      - name: cargo test
+        run: |
+          cargo test --release
+      - name: maturin build
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install maturin
+          maturin build --release
+      - uses: actions/upload-artifact@v1
+        name: upload-wheel
+        with:
+          name: wheel-${{ matrix.platform }}
+          path: target/wheels/
+      - name: pip install fastrank
+        shell: bash
+        run: |
+          pip install target/wheels/fastrank-*.whl
+      - name: py-unittest
+        run: |
+          python -I -m unittest discover -s tests -v
+      - name: '[on-create] pypi-publish'
+        if: github.event_name == 'create'
+        shell: bash
+        env: 
+          MATURIN_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: maturin publish -b cffi --username __token__
+        
