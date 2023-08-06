@@ -1,0 +1,172 @@
+This project provides simple-to-use conversion tools to generate a CZModel file from a 
+[TensorFlow](https://www.tensorflow.org/) model that resides in memory or on disk to be usable in the 
+[ZEN Intellesis](https://www.zeiss.com/microscopy/int/products/microscope-software/zen-intellesis-image-segmentation-by-deep-learning.html) module starting with ZEN blue >=3.2 and ZEN Core >3.0.  
+
+This version of czmodel produces the following model version: 3.1.0
+
+Please check the following compatibility matrix for ZEN Blue/Core and the respective version of a czmodel file. Version compatibility is defined via the [Semantic Versioning Specification (SemVer)](https://semver.org/lang/de/).
+
+| Model        | ZEN Blue           | ZEN Core  |
+| ------------ |:------------------:| ---------:|
+| 3.1.0        | \> 3.3             | \> 3.2    |
+| 3.0.0        | \> 3.1             | \> 3.0    |
+
+If you encounter a version mismatch when importing a model into ZEN, please check for the correct version of this package.
+
+## System setup
+The current version of this toolbox only requires a fresh Python 3.x installation. 
+It was tested with Python 3.7 on Windows.
+
+## Model conversion
+The toolbox provides a `convert` module that features all supported conversion strategies. It currently supports 
+converting Keras models in memory or stored on disk with a corresponding metadata JSON file.
+
+### Keras models in memory
+The toolbox also provides functionality that can be imported e.g. in the training script used to fit a Keras model. The function is accessible by running: 
+```python
+from czmodel.convert import convert_from_model_spec
+```
+It accepts a `tensorflow.keras.Model` that will be exported to [ONNX](https://onnx.ai/) and in case of failure to [SavedModel](https://www.tensorflow.org/guide/saved_model) 
+format and at the same time wrapped into a CZModel file to be compatible with the Intellesis infrastructure.  
+To provide the meta data, the toolbox provides a ModelSpec class that must be filled with the model and a ModelMetadata 
+instance containing the required information described in the specification (see _Model Metadata_ below) 
+file. 
+
+A CZModel can be created from a Keras model with the following three steps.
+
+#### Creating a model meta data class
+To export a CZModel file several meta information is needed that must be provided through a `ModelMetadata` instance.
+```python
+from czmodel.model_metadata import ModelMetadata
+
+model_metadata = ModelMetadata.from_params(name='DNNModelFromKeras', 
+                         color_handling='ConvertToMonochrome',
+                         pixel_type='Gray16',
+                         classes=["Background", "Interesting Object", "Foreground"],
+                         border_size=90,
+                         license_file="C:\\some\\path\\to\\a\\LICENSE.txt")
+```
+
+#### Creating a model specification
+The model and its corresponding metadata are now wrapped into a ModelSpec object.
+```python
+from czmodel.model_metadata import ModelSpec
+
+model_spec = ModelSpec(model=model, model_metadata=model_metadata)
+```
+
+#### Converting the model
+The actual model conversion is finally performed with the ModelSpec object and the output path and name of the CZModel 
+file.
+```python
+from czmodel.convert import convert_from_model_spec
+
+convert_from_model_spec(model_spec=model_spec, output_path='some/path', output_name='some_file_name')
+```
+
+### Exported TensorFlow models
+To convert an exported TensorFlow model the model and the provided meta data need to comply with 
+(see _ANN Model Specification_ below).
+
+The actual conversion is triggered by either calling:
+```python
+from czmodel.convert import convert_from_json_spec
+
+convert_from_json_spec('Path to JSON file', 'Output path', 'Model Name')
+```
+or by using the command line interface of the `savedmodel2czmodel` script:
+```console
+savedmodel2czmodel path/to/model_spec.json output/path/ output_name
+```
+
+### Adding pre- and post-processing layers
+Both, `convert_from_json_spec` and `convert_from_model_spec` additionally allow specifying the following optional parameters:
+- `spatial_dims`: Set new spatial dimensions for the new input node of the model. This parameter is expected to contain the new height 
+and width in that order. **Note:** The spatial input dimensions can only be changed in ANN architectures that are invariant to the 
+spatial dimensions of the input, e.g. FCNs.
+- `preprocessing`: One or more pre-processing layers that will be prepended to the deployed model. A pre-processing 
+layer must be derived from the `tensorflow.keras.layers.Layer` class.
+- `postprocessing`: One or more post-processing layers that will be appended to the deployed model. A post-processing 
+layer must be derived from the `tensorflow.keras.layers.Layer` class.
+
+While ANN models are often trained on images in RGB(A) space, the ZEN infrastructure requires models inside a CZModel to 
+expect inputs in BGR(A) color space. This toolbox offers pre-processing layers to convert the color space before 
+passing the input to the model to be actually deployed. The following code shows how to add a RGB to BGR conversion layer 
+to a model and set its spatial input dimensions to 512x512.
+
+```python
+from czmodel.util.preprocessing import RgbToBgr
+
+# Define dimensions and pre-processing
+spatial_dims = 512, 512  # Optional: Target spatial dimensions of the model
+preprocessing = RgbToBgr()  # Optional: Pre-Processing layers to be prepended to the model. Can be a single layer, a list of layers or None.
+postprocessing = None  # Optional: Post-Processing layers to be appended to the model. Can be a single layer, a list of layers or None.
+
+# Perform conversion
+convert_from_model_spec(
+    model_spec=model_spec, 
+    output_path='some/path', 
+    output_name='some_file_name', 
+    spatial_dims=spatial_dims, 
+    preprocessing=preprocessing,
+    postprocessing=postprocessing
+)
+```
+
+Additionally, the toolbox offers a `SigmoidToSoftmaxScores` layer that can be appended through the `postprocessing` parameter to convert 
+the output of a model with sigmoid output activation to the output that would be produced by an equivalent model with softmax activation.
+
+## ANN Model Specification
+This section specifies the requirements for an artificial neural network (ANN) model and the additionally required metadata to enable execution of the model inside the ZEN Intellesis infrastructure starting with ZEN blue >=3.2 and ZEN Core >3.0.
+
+### Core network structure and file format
+To be usable in the SegmentationService infrastructure a neural network model must comply with the specified rules below.
+
+- The model must be provided in [ONNX](https://onnx.ai/) or [TensorFlow SavedModel](https://www.tensorflow.org/guide/saved_model) format.
+- All operations in the contained execution graph must be supported by TensorFlow 2.0.0 or ONNX runtime 1.4.0 with ONNX opset version 12.
+- The model currently must provide one input and one output node. Multiple inputs and outputs are not supported.
+- The shape of the input node must have 4 dimensions where the first dimension specifies the batch size, the second and third dimensions specify the width and height of the expected input image and the third dimension represents the number of color channels.
+- The batch dimension of the input node must be undefined or 1.
+- The spatial dimension of the input image implicitly defines the maximum tile size of the model. Our infrastructure will ensure that all input images exactly match the specified dimensions. The spatial dimensions of the input node must be such that the model can be evaluated on the minimum required hardware (currently 8GB GPU memory) without running out of memory.
+- The output node must have the same shape as the input node except for the last dimension that represents the class probabilities. The size of the last dimension of the output must be the number of classes. The values of the output tensor must represent the class probabilities for each pixel. I.e. values must lie in the [0...1] range and summing the output over the last dimension must produce an all-1 tensor (within numeric accuracy). Softmax activation can be used to turn logits into such probabilities.
+- All types of pre-processing and post-processing (except the currently supported Conditional Random Field post-processing) e.g. normalization, standardization, down-sampling etc. must be included in the provided TensorFlow model so that no further action by the inference engine is needed before or after inference to obtain the expected results.
+
+### Model Metadata
+Executing an ANN model within the Intellesis infrastructure requires additional meta information that needs to be provided along with the serialized model specified by the (see _Core network structure and file format_ above).
+Meta information for the ANN model must be provided in a separate JSON file adhering to [RFC8259](https://tools.ietf.org/html/rfc8259) that must contain the following attributes:
+
+- **BorderSize (Type: int)**: For Intellesis models this attribute defines the size of the border that needs to be added to an input image such that there are no border effects visible in the required area of the generated segmentation mask. For deep architectures this value can be infeasibly large so that the border size must be defined in a way that the border effects are "acceptable" in the ANN model creator's opinion.
+- **ColorHandling (Type: string)**: Specifies how color (RGB and RGBA) pixel data are converted to one or more channels of scalar pixel data. Possible values are:
+  - ConvertToMonochrome (Converts color to gray scale)
+  - SplitRgb (Keeps the pixel representation in RGB space)
+- **PixelType (Type: string)**: The expected input type of the model. Possible values are:
+  - **Gray8**: 8 bit unsigned
+  - **Gray16**: 16 bit unsigned
+  - **Gray32Float**: 4 byte IEEE float
+  - **Bgr24**: 8 bit triples, representing the color channels Blue, Green and Red
+  - **Bgr48**: 16 bit triples, representing the color channels Blue, Green and Red
+  - **Bgr96Float**: Triple of 4 byte IEEE float, representing the color channels Blue, Green and Red
+  - **Bgra32**: 8 bit triples followed by an alpha (transparency) channel
+- **Classes (Type: array, Value type: string)**: A list of class names corresponding to the output dimensions of the predicted segmentation mask. If the last dimension of the prediction has shape n the provided list must be of length n.
+- **ModelPath (Type: string)**: The path to the exported neural network model. Can be absolute or relative to the JSON file.
+
+The file may also contain the following optional attributes:
+
+- **TestImageFile (Type: string)**: The path to a test image in a format supported by ZEN. This image is used for basic validation of the converted model inside ZEN. Can be absolute or relative to the JSON file.
+- **LicenseFile (Type: string)**: The path to a license file that is added to the generated CZModel. Can be absolute or relative to the JSON file.
+
+Json files can contain escape sequences and \\-characters in paths must be escaped with \\\\.
+
+The following code snippet shows an example for a valid metadata file:
+
+```json
+{
+  "BorderSize": 90,
+  "ColorHandling": "ConvertToMonochrome",
+  "PixelType": "Gray16",
+  "Classes": ["Background", "Interesting Object", "Foreground"],
+  "ModelPath": "C:\\tf\\saved\\model\\folder\\",
+  "TestImageFile": "C:\\test-image.png",
+  "LicenseFile": "C:\\LICENSE.txt"
+}
+```
