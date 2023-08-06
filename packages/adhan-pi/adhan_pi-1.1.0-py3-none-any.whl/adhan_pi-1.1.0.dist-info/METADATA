@@ -1,0 +1,84 @@
+Metadata-Version: 2.1
+Name: adhan-pi
+Version: 1.1.0
+Summary: UNKNOWN
+Home-page: UNKNOWN
+Author: Salah Ahmed
+Author-email: salahs.email@pm.me
+License: UNKNOWN
+Keywords: python
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.7
+Description-Content-Type: text/x-rst
+Requires-Dist: attrs
+Requires-Dist: geopy
+Requires-Dist: requests
+Requires-Dist: automock
+Provides-Extra: cron
+Requires-Dist: python-crontab ; extra == 'cron'
+Requires-Dist: pydub ; extra == 'cron'
+Provides-Extra: dev
+Requires-Dist: pytest-cov ; extra == 'dev'
+Requires-Dist: pytest-freezegun ; extra == 'dev'
+Requires-Dist: coverage[toml] ; extra == 'dev'
+Requires-Dist: responses ; extra == 'dev'
+Requires-Dist: ipython ; extra == 'dev'
+Requires-Dist: jedi (==0.17.2) ; extra == 'dev'
+Requires-Dist: pdbpp ; extra == 'dev'
+Requires-Dist: black (==19.10b0) ; extra == 'dev'
+Requires-Dist: isort (==5.6.4) ; extra == 'dev'
+Requires-Dist: flake8 ; extra == 'dev'
+Requires-Dist: pre-commit ; extra == 'dev'
+Requires-Dist: tox ; extra == 'dev'
+Requires-Dist: python-crontab ; extra == 'dev'
+Requires-Dist: pydub ; extra == 'dev'
+Provides-Extra: test
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: pytest-freezegun ; extra == 'test'
+Requires-Dist: coverage[toml] ; extra == 'test'
+Requires-Dist: responses ; extra == 'test'
+Requires-Dist: python-crontab ; extra == 'test'
+Requires-Dist: pydub ; extra == 'test'
+
+adhan-pi
+=======================
+
+
+Developing
+----------
+
+.. -code-begin-
+
+.. code-block:: bash
+
+   >>> sudo dnf install ffmpeg # install ffmpeg on your system (if not installed)
+   >>> sudo ln -s ~/adhan-pi /opt/adhan-pi
+   >>> python3 -m venv /opt/adhan-pi/env
+   >>> source /opt/adhan-pi/env/bin/activate
+   >>> cd /opt/adhan-pi
+   >>> pip install -e '.[dev]'
+   >>> tox -e lint && tox
+
+
+Setting up Cron env
+-------------------
+
+   >>> source /opt/adhan-pi/env/bin/activate
+   >>> pip install -e '.[cron]'
+
+
+Setting up Cron
+---------------
+
+Add this to your cronjob (with your user) (crontab -e)
+
+    @daily /opt/adhan-pi/env/bin/schedule_prayer_cron --query "New York, NY" --user salah
+
+set up crons manually
+
+   >>> source /opt/adhan-pi/env/bin/activate
+   >>> /opt/adhan-pi/env/bin/schedule_prayer_cron --query "New York, NY" --user salah
+
+
