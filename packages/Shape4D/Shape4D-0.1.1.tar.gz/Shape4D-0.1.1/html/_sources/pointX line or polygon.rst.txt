@@ -1,0 +1,72 @@
+点与线面的关系
+=================
+
+点和线关系
+------------------
+
+对一个点是否在直线或线段上进行判断，点和直线的创建方式参考前文:
+:doc:`点，直线，多边形的创建 <点，直线，多边形的创建>`
+
+1.单个点和直线的关系              函数为PointInLine(P,P1,L1)  
+
+    >>> P =  np.array([0.5,0.5,0.5])              ##创建点
+    >>> P1= np.array([0,0,0])
+    >>> L1=np.array([1.1,1.1,1.1])                ##直线
+    >>> ret=PointInLine(P,P1,L1)                  ##调用函数判断
+
+ret的输出值为True
+
+2.单个点和线段关系              函数为PointInSegment(P,P1,P2)  
+
+    >>> P =  np.array([0.5,0.5,0.5])              ##创建点
+    >>> P1= np.array([0,0,0])
+    >>> P2=np.array([0.4,0.4,0.4])                ##线段两个点
+    >>> ret=PointInLine(P,P1,P2)                  ##调用函数判断
+
+ret的输出值为False
+
+点和面关系
+------------------
+
+本程序后续计划中该项目应用较多，因此功能比较丰富，输入点的格式可以为单点，多点（二维矩阵），多点（三维矩阵）
+
+1.单点和面的关系    函数为PointInPolygon(Point, polygon)
+
+    >>> Point =  np.array([0.5,0.5,0.5])               ##点
+    >>> vertices = [(0,0,0),(1,0,0),(1,1,1),(0,1,1)]
+    >>> polygon = np.array(vertices1)                   ##面
+    >>> ret = PointInPolygon(Point, polygon)           ##调用函数
+
+ret的输出值为True
+
+2.1多点和面的关系（二维）    函数为PointsInPolygon2D(Points, polygon)   
+
+    >>> Points = np.array([(0,0),(0.5,0),(1,0),(1.5,0),(2,0)])
+    >>> polygon = np.arraynp.array([(1,-1),(1,3),(2,1),(1.75,0)])
+    >>> ret = PointsInPolygon2D(Points, polygon) 
+
+ret的输出值为array([False, False,  True,  True, False])
+
+若设置点的格式为三维矩阵则ret输出格式也会相应变化
+
+    >>> Points = np.array([[(0,0),(0.5,0)],[(1,0),(1.5,0)],[(2,0),(2.5,0]])
+    >>> polygon = np.arraynp.array([(1,-1),(1,3),(2,1),(1.75,0)])
+    >>> ret = PointsInPolygon2D(Points, polygon) 
+
+ret的输出值为array([[False, False], [True,  True], [False,False]])
+
+.. image:: picture/pointsandpolygon.png
+
+2.2多点和面的关系(三维）    函数为PointsInPolygon(Points, polygon)   
+
+    >>> Points = np.array([(0,0,0),(0.5,0,0),(1,0,0),(1.5,0,0),(2,0,0)])
+    >>> polygon = np.arraynp.array([(1,-1,0),(1,3,0),(2,1,0),(1.75,0,0)])
+    >>> ret = PointsInPolygon(Points, polygon) 
+
+ret的输出值为array([False, False,  True,  True, False])
+
+
+程序内部结构
+
+.. image:: picture/PointEdge.png
+.. image:: picture/PointInPolygon.png
