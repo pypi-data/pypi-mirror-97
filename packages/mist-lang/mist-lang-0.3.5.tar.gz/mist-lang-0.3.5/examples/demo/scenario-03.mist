@@ -1,0 +1,10 @@
+include "searchDomains" "festin" "findOpenPorts" "filterRepeated" "kafkaProducer"
+
+searchDomains(%domain) => foundDomains
+festin(%domain, $DNS_SERVER, True) => foundDomains
+
+filterRepeated(:foundDomains, False) => nonRepeatedFoundDomains
+
+findOpenPorts(:nonRepeatedFoundDomains, "80,443") => openPortsFound
+
+kafkaProducer($KAFKA_SERVER, "domainsTopic", :openPortsFound)

@@ -1,0 +1,21 @@
+# Name: kafkaProducer
+# Version: 1.0.0
+# Concurrency: Sync and Async
+# Description: Write messages to a Kafka topic.
+# Tags: kafka, producer, topic.
+
+kafkaProducerQueue = False
+
+function kafkaProducer(servers, topic, message) {
+    if (NOT(kafkaProducerQueue)) {
+        kafkaProducerQueue = uuidStr()
+        r = exec("kafka-console-producer --broker-list {servers} --topic {topic}", False, True) {
+            kafkaProducerAux(::kafkaProducerQueue, process)
+        }
+    }
+    send(message, kafkaProducerQueue)    
+}
+
+function kafkaProducerAux(message, process) {
+    processWriteLine(process, message)
+}

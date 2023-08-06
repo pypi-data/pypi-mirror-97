@@ -1,0 +1,7 @@
+include "searchDomains" "findOpenPorts" "kafkaProducer"
+
+searchDomains(%domain) => foundDomains
+
+findOpenPorts(:foundDomains, "80,443") => openPortsFound
+
+kafkaProducer($KAFKA_SERVER, "domainsTopic", :openPortsFound)
