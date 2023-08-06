@@ -1,0 +1,157 @@
+{% load static %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        (function() {
+            const isEmbed = {{ is_embed|default:"false" }};
+            const config = {{ config|default:"false" }};
+            const newStoryTemplate = {
+                "type": "cascade",
+                "resources": [],
+                "settings": {
+                    "theme": {
+                        "general": {
+                            "color": "#333333",
+                            "backgroundColor": "#ffffff",
+                            "borderColor": "#e6e6e6"
+                        },
+                        "overlay": {
+                            "backgroundColor": "rgba(255, 255, 255, 0.75)",
+                            "borderColor": "#dddddd",
+                            "boxShadow": "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)",
+                            "color": "#333333"
+                        }
+                    }
+                },
+                "sections": [
+                    {
+                        "type": "title",
+                        "id": "section_id",
+                        "title": "Abstract",
+                        "cover": true,
+                        "contents": [
+                            {
+                                "id": "content_id",
+                                "type": "text",
+                                "size": "large",
+                                "align": "center",
+                                "theme": "",
+                                "html": "",
+                                "background": {
+                                    "fit": "cover",
+                                    "size": "full",
+                                    "align": "center"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            const geoStoryConfig = config || newStoryTemplate;
+            const username = "{{ user|default:"" }}" || null;
+            const token = "{{ access_token|default:"" }}" || null;
+            const permsList = {{ perms_list|default:'[]' }};
+            const isNewResource = config ? false : true;
+            const canEdit = !isEmbed && (isNewResource || permsList.indexOf('change_resourcebase') !== -1);
+            const canView = isNewResource || permsList.indexOf('view_resourcebase') !== -1;
+            const userDetails = username && token
+                && {
+                user: {
+                    name: username
+                },
+                token: token
+            };
+
+            const plugins = [
+                {
+                    "name": "OmniBar",
+                    "cfg": {
+                        "disablePluginIf": isEmbed
+                            ? true
+                            : "{!!(state('browser') && state('browser').mobile)}",
+                        "containerPosition": "header",
+                        "className": "navbar shadow navbar-home"
+                    }
+                },
+                { "name": "BurgerMenu" },
+                {
+                    "name": "GeoStory",
+                    "cfg": {
+                        "mediaEditorSettings": {
+                            "sourceId": "geostory",
+                            "mediaTypes": {
+                                "image": {
+                                    "defaultSource": "geostory",
+                                    "sources": ["geostory", "geonode"]
+                                },
+                                "video": {
+                                    "defaultSource": "geostory",
+                                    "sources": ["geostory", "geonode"]
+                                },
+                                "map": {
+                                    "defaultSource": "geostory",
+                                    "sources": ["geostory", "geonode"]
+                                }
+                            },
+                            "sources": {
+                                "geostory": {
+                                    "name": "geostory.storyResources",
+                                    "type": "geostory",
+                                    "addMediaEnabled": {
+                                        "image": true,
+                                        "video": true
+                                    },
+                                    "editMediaEnabled": {
+                                        "image": true,
+                                        "video": true
+                                    },
+                                    "removeMediaEnabled": {
+                                        "image": true,
+                                        "video": true,
+                                        "map": true
+                                    }
+                                },
+                                "geonode": {
+                                    "name": "geostory.geoNode",
+                                    "type": "geonode"
+                                }
+                            }
+                        }
+                    }
+                },
+                { "name": "MediaEditor" },
+                {
+                    "name": "GeoStoryEditor",
+                    "cfg": {
+                        "disablePluginIf": "{!!(state('browser') && state('browser').mobile)}",
+                        "containerPosition": "columns"
+                    }
+                },
+                {
+                    "name": "GeoStoryNavigation",
+                    "cfg": {
+                        "containerPosition": "header"
+                    }
+                },
+                { "name": "Notifications" },
+                { "name": "Save" },
+                { "name": "SaveAs" },
+                { "name": "Share" }
+            ];
+            // configuration used to initialize the application
+            window.initMapStore({
+                appId: {{ appId|default:"null" }},
+                permissions: {
+                    canEdit: canEdit,
+                    canView: canView
+                },
+                language: '{{ LANGUAGE_CODE }}',
+                userDetails: userDetails,
+                defaultConfig: defaultConfig, // see _config.html template
+                plugins,
+                isNewResource: isNewResource,
+                geoStoryConfig: geoStoryConfig
+            });
+        })();
+    });
+</script>
+<script id="ms2-api" src="{% static 'mapstore/dist/gn-geostory.js' %}"></script>
