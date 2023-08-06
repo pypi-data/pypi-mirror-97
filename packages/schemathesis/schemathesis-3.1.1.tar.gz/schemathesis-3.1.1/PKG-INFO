@@ -1,0 +1,178 @@
+Metadata-Version: 2.1
+Name: schemathesis
+Version: 3.1.1
+Summary: Property-based testing framework for Open API and GraphQL based apps
+Home-page: https://github.com/schemathesis/schemathesis
+License: MIT
+Keywords: pytest,hypothesis,openapi,swagger,graphql,testing
+Author: Dmitry Dygalo
+Author-email: dadygalo@gmail.com
+Maintainer: Dmitry Dygalo
+Maintainer-email: dadygalo@gmail.com
+Requires-Python: >=3.6,<4.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Framework :: Hypothesis
+Classifier: Framework :: Pytest
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Software Development :: Testing
+Requires-Dist: attrs (>=19.2)
+Requires-Dist: click (>=7.0,<8.0)
+Requires-Dist: curlify (>=2.2.1,<3.0.0)
+Requires-Dist: hypothesis (>=5.15,<6.0)
+Requires-Dist: hypothesis_graphql (>=0.3)
+Requires-Dist: hypothesis_jsonschema (>=0.19.0,<1.0)
+Requires-Dist: importlib_metadata (>=1.1); python_version < "3.8"
+Requires-Dist: jsonschema (>=3.0.0,<4.0.0)
+Requires-Dist: junit-xml (>=1.9,<2.0)
+Requires-Dist: pytest (>4.6.4)
+Requires-Dist: pytest-subtests (>=0.2.1,<1.0)
+Requires-Dist: pyyaml (>=5.1,<6.0)
+Requires-Dist: requests (>=2.22,<3.0)
+Requires-Dist: starlette (>=0.13.2,<0.14.0)
+Requires-Dist: typing-extensions (>=3.7.4,<4.0.0)
+Requires-Dist: werkzeug (>0.16.0)
+Requires-Dist: yarl (>=1.5,<2.0)
+Project-URL: Documentation, https://schemathesis.readthedocs.io/en/stable/
+Project-URL: Repository, https://github.com/schemathesis/schemathesis
+Description-Content-Type: text/x-rst
+
+Schemathesis
+============
+
+|Build| |Coverage| |Version| |Python versions| |Docs| |Chat| |License|
+
+Schemathesis is a modern API testing tool for web applications built with Open API and GraphQL specifications.
+
+It reads the application schema and generates test cases, which will ensure that your application is compliant with its schema.
+
+The application under test could be written in any language; the only thing you need is a valid API schema in a supported format.
+
+Simple to use and yet powerful to uncover hard-to-find errors thanks to the property-based testing approach backed by state-of-the-art `Hypothesis <http://hypothesis.works/>`_ library.
+
+📣 **Please fill out our** `quick survey <https://forms.gle/dv4s5SXAYWzvuwFWA>`_ so that we can learn how satisfied you are with Schemathesis, and what improvements we should make. Thank you!
+
+Features
+--------
+
+- Content-Type, schema, and status code conformance checks for Open API;
+- Testing of explicit examples from the input schema;
+- Stateful testing via Open API links;
+- Concurrent test execution;
+- Targeted testing;
+- Storing and replaying network requests;
+- Built-in ASGI / WSGI application support;
+- Ready-to-go Docker image;
+- Configurable with user-defined checks, string formats, hooks, and targets.
+
+Installation
+------------
+
+To install Schemathesis via ``pip`` run the following command:
+
+.. code:: bash
+
+    pip install schemathesis
+
+Usage
+-----
+
+You can use Schemathesis in the command line:
+
+.. code:: bash
+
+  schemathesis run --stateful=links --checks all http://0.0.0.0:8081/schema.yaml
+
+.. image:: https://raw.githubusercontent.com/schemathesis/schemathesis/master/img/schemathesis.gif
+
+Or in your Python tests:
+
+.. code:: python
+
+    import schemathesis
+
+    schema = schemathesis.from_uri("http://0.0.0.0:8081/schema.yaml")
+
+
+    @schema.parametrize()
+    def test_api(case):
+        case.call_and_validate()
+
+CLI is simple to use and requires no coding; the in-code approach gives more flexibility.
+
+Both examples above will run hundreds of requests against the API under test and report all found failures and inconsistencies along with instructions to reproduce them.
+
+💡 See a complete working example project in the ``/example`` directory. 💡
+
+Contributing
+------------
+
+Any contribution to development, testing, or any other area is highly appreciated and useful to the project.
+For guidance on how to contribute to Schemathesis, see the `contributing guidelines <https://github.com/schemathesis/schemathesis/blob/master/CONTRIBUTING.rst>`_.
+
+Support this project
+--------------------
+
+Hi, my name is Dmitry! I started this project during my work at `Kiwi.com <https://kiwi.com/>`_. I am grateful to them for all the support they
+provided to this project during its early days and for the opportunity to evolve Schemathesis independently.
+
+In order to grow the community of contributors and users, and allow me to devote more time to this project, please `donate today <https://github.com/sponsors/Stranger6667>`_.
+
+Also, I occasionally write posts about Schemathesis in `my blog <https://dygalo.dev/>`_ and offer consulting services for businesses.
+
+Commercial support
+------------------
+
+If you are interested in the effective integration of Schemathesis to your private project, you can `schedule an appointment <https://app.acuityscheduling.com/schedule.php?owner=21203869&appointmentType=18278663>`_ and I will help you do that.
+
+Links
+-----
+
+- **Documentation**: https://schemathesis.readthedocs.io/en/stable/
+- **Releases**: https://pypi.org/project/schemathesis/
+- **Code**: https://github.com/schemathesis/schemathesis
+- **Issue tracker**: https://github.com/schemathesis/schemathesis/issues
+- **Chat**: https://gitter.im/schemathesis/schemathesis
+
+Additional content:
+
+- `An article <https://dygalo.dev/blog/schemathesis-property-based-testing-for-api-schemas/>`_ about Schemathesis by **@Stranger6667**
+- `A video <https://www.youtube.com/watch?v=9FHRwrv-xuQ>`_ from EuroPython 2020 by **@hultner**
+- `Schemathesis tutorial <https://appdev.consulting.redhat.com/tracks/contract-first/automated-testing-with-schemathesis.html>`_  with an accompanying `video <https://www.youtube.com/watch?v=4r7OC-lBKMg>`_ by Red Hat
+- `Using Hypothesis and Schemathesis to Test FastAPI <https://testdriven.io/blog/fastapi-hypothesis/>`_ by **@amalshaji**
+
+License
+-------
+
+The code in this project is licensed under `MIT license`_.
+By contributing to Schemathesis, you agree that your contributions will be licensed under its MIT license.
+
+.. |Build| image:: https://github.com/schemathesis/schemathesis/workflows/build/badge.svg
+   :target: https://github.com/schemathesis/schemathesis/actions
+.. |Coverage| image:: https://codecov.io/gh/schemathesis/schemathesis/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/schemathesis/schemathesis/branch/master
+   :alt: codecov.io status for master branch
+.. |Version| image:: https://img.shields.io/pypi/v/schemathesis.svg
+   :target: https://pypi.org/project/schemathesis/
+.. |Python versions| image:: https://img.shields.io/pypi/pyversions/schemathesis.svg
+   :target: https://pypi.org/project/schemathesis/
+.. |License| image:: https://img.shields.io/pypi/l/schemathesis.svg
+   :target: https://opensource.org/licenses/MIT
+.. |Chat| image:: https://img.shields.io/gitter/room/schemathesis/schemathesis.svg
+   :target: https://gitter.im/schemathesis/schemathesis
+   :alt: Gitter
+.. |Docs| image:: https://readthedocs.org/projects/schemathesis/badge/?version=stable
+   :target: https://schemathesis.readthedocs.io/en/stable/?badge=stable
+   :alt: Documentation Status
+
+.. _MIT license: https://opensource.org/licenses/MIT
+
