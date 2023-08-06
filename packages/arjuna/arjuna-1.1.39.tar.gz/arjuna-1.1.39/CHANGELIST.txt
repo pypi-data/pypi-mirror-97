@@ -1,0 +1,1205 @@
+Following is the list of critical additions and updates for a given released version:
+
+Future Themes (In-Progress or Planned):
+    - System exit code for arjuna should be based on pytest exit codes across session group threads.
+    - Call Walkthroughs and Identify New Named Exceptions to be created.
+    - Auto screenshot name should consider session, stage and group name.
+    - Configuration:
+        - Provision for vars section in config files 
+        - Stage factory
+        - Group Factory
+            - single conf to all groups
+            - cycle confs over groups
+        - Stage level conf
+            - existing
+            - create new
+        - Group level conf
+            - existing: already there
+            - create new
+    Fixtures:
+        - for_session
+            - Look for thread safety.
+        - for_stage
+    - GUI Automation
+        - withx hook for programmatic identifiers.
+        - Support multiple entries for same locator type in YAML file.
+    - Dynamic session, stage and group:
+        - Provision for vars to create dyanmic Sessions, Stages and Groups.
+            : -var command line switch can parameterize session for run-session, stage for run-stage, group for run-group
+    - Stage to stage dependency.
+    - Group to group dependency.
+    - The report directory should contain a confs directory. Whenever a new configuration is created. All its parameters should be dumped in a file for reference.
+    - with cleanup.
+    - Better Logging
+        - Devise a way for the logger pre and post pytest runs.
+    - Report merging for HTML and XML files.
+    - From discussions with Stefan:
+        - Support for custom CSS for HTML reporting in Arjuna test projects.
+        - OAuth related requests to be available in a collapsible group.
+        - Tests with bugs should be marked as xfail automatically. (Configurable)
+        - -ip/im/-it switches should not accept blank string.
+        - ArjunaOption.REPORT_SORT_BY_NAME based on pytest-html option if available Or else auto execte an injected JavaScript to do this.
+        - See if a sortable reporting time column and group column can be introduced as well.
+        - --no-print-logs is removed in latest pytest. Needs to be removed from Arjuna as well (--show-capture is the option.)
+        - Docs:
+            - Rules usage in CLI
+            - Table: Coded Locators and GNS
+    - Discussion with Pierre
+        - Add container assertions to Asserter.
+
+1.1.39
+------
+ - Changed laxml dependency to lxml>=4.4.1
+
+1.1.38
+------
+    - Fixed new Arjuna test project creation
+
+1.1.37
+------
+    - Debug mode in VSCode works. Arjuna selection uses a uniform way of determining qual name for all situations.
+
+1.1.36
+------
+    - Added advanced assertions:
+        - approximate equality comparison: assert_approx_equal and assert_approx_not_equal
+        - asserting raised exceptions: assert_exceptions (callable or as context manager). Supports regex match for string repr of exception.
+    - --project accepts project path relative to current working directory. It also accepts '.'
+    - Internal improvements to cater to pytest's auto-disocvery mehchanism in situation of multiple projects.
+
+1.1.35
+------
+    - Arjuna header is shown when any command is executed.
+    - Updated copyright info.
+
+1.1.34
+------
+    - Added !join construct support in YAML files.
+    - Upgraded pytest and selenium versions. 
+    - Arjuna now needs Python 3.8+
+
+1.1.33
+------
+    - Arjuna acts as a pytest plugin for the purpose of test execution.
+    - CLI options are significantly updated. Old usage is deprecated. Refer the new docs.
+
+1.1.31
+------
+    - Support for axes locator
+    - Added axes locator and made minor doc edits for name of app in GuiAuto chapter.
+
+1.1.30
+------
+    - Support for OR relationship among different values of same locator type - coded as well as GNS.
+    - Support for Visual Relationships
+        - Coded - Added at App/Page level.
+        - GNS Support added - Can provide label from same GNS file.
+        - Coded - widget call can be used to provide as relationship rather than existing element.
+        - GNS supports chain of relation: label1 -> label2 -> label3
+        - When multiple locators are provided with an OR relationship, relations are applied to each one of them.
+        - In GNS the relationship labels can contain Arjuna placeholders and then the parent label can be formaated as usual using gns.formatter call.
+        - Nested element finding falls back to direct finding with WebDriver as JS execution support exists only at driver level in Selenium.
+    - with.JS and With.Point is supported at element level, however it does not do nested element finding, rather uses driver itself.
+    - The fallback mechanism for JS, Point and Relative locators has been added so that such locators can be defined without issues in GNS files or coded GuiSections which have root element set for them.
+    - 'pos' meta key in widget meta data:
+        - Supported in coded as well GNS format.
+        - Supported in nested element finding.
+        - Value can be an int, a list, an extractor string literal, an extractor specification dict or an extractor object.
+    - Docs added for additional OR support, Visual Relationships and position filters
+
+1.1.29
+------
+    - Rearranged locator docs to place coded and GNS entries next to each other.
+    - Added GuiWidgetDefinitionError as an exception to TPI.
+    - Added support for .local files for the following: (if present these files override the corresponding regular config files.)
+        - project.local.yaml
+        - data.local.yaml
+        - envs.local.yaml
+        - sessions.yaml, stages.yaml, groups.yaml
+    - Support for empty sessions.yaml, stages.yaml and groups.yaml. Named exception raised rather than NoneType exception.
+1.1.28
+------
+    - Fixed typo in setup
+
+1.1.27
+------
+    - Added explicit requirement for urllib3
+
+1.1.26
+------
+    - Support for bases in Data Entity - building a data entiry from other data entities.
+    - Added doc for YAML's handling of boolean strings.
+    - Added tests and docs for Data Spaces.
+
+1.1.25
+------
+    - Support for anonymous/positional $$ placeholders in withx extended locator definitions.
+    - attr() call now accepts a single key-value pair instead of two positional arguments. Conflicting Python name is prefixed with two underscores (__)
+    - node() call simplified. Conflicting Python name is prefixed with two underscores (__).
+    - Updated Locator Docs to reflect the above improvements.
+    - Fix in GuiDropDown logic - changed 'tag' to 'tags'.
+    - Added TPI exceptions to global import.
+
+1.1.24
+------
+    - Fix in attr locators used in withx
+
+1.1.23
+------
+    - node Locator
+        - Converts to Xpath or CSS Selector based on condition of text matching (text or star_text or dot_text)
+        - Added provision for star_text which converts to *//text() instead of text() for specified text. It can also be specified as *text.
+        - Added provision for dot_text which converts to . instead of text() for for specified text. It can also be specified as .text.
+        - tags support is added to define multiple tags which are treated as a relative sequence of tags. Either tag or tags should be used. tags can take a single tag, multiple space separated tags as well as a list of tag strings.
+        - classes support is added to define one or more classes as string or sequence. 
+    - tag locator changed to tags
+        - Is converted to CSS selectors
+        - The tags can be provided as space separated tags string or sequnce of tag strings.
+        - When more than one tag is supplied, the sequnce is assumed to be a descendant sequence (not immediate children)
+    - Docs updated and improved for locators.
+
+1.1.22
+------
+    - Support for 'node' as a valid selector (with type)
+        - Can be used programmatically in calls e.g. element(node=node(**kwargs))
+        - If the names of attrs conflict with python keywords (e.g. for), you can also provide an 'attrs' dict: element(node=node(a=b, attrs={'c' : 'd'}))
+        - The values in attrs dict are overriden by the direct kv paris supplied in node call.
+        - 'tag' is a special key and represents the tag name of the node and is not treated as an attribute.
+        - 'text' is a special key and represents the text content of the node and is used for matching.
+        - node represents partial match for attribute contents, bnode partial match at beginning of attributes contents and fnode represents full content of node attributes.
+        - There is an AND relationship among all attribute values supplied.
+        - You can use formatters to format the '$$' placeholders within keys and values of node, bnode and fnode.
+        - These selectors can be used in GNS files just like other selectors.
+    - Updates in Attribute related locators.
+        - Change in the way attr, fattr are specified in code and GNS. Breaks current usage.
+        - Rather than name and value arguments, direct value will be supplied as key value pair.
+        - Specifying tag in the definition will not be supported.
+        - node selectors will support tag and multiple attributes to bridge this gap and provide more advanced functionality.
+        - battr, eattr support
+        - attr related locators are converted to CSS Selectors instead of XPath.
+    - Withx Enhancements
+        - Withx can be used to define custom locators using node, bnode and fnode. Placeholders and kwargs work for attr names as well as values.
+        - Withx supports $$ placeholders like normal GNS.
+        - Withx suports C,L,R placeholders.
+    - Name changes: Attr -> attr, NVPairs -> nvpairs
+    - Comprehensive documentation of locators in coded and GNS formats along with withx documentation.
+
+1.1.21
+------
+    - More information in exceptions that are raised when linked projects represent wrong paths.
+
+1.1.20
+------
+    - Reverted traceback to default.
+
+1.1.19
+------
+    - Changed report exception pytest traceback type to line for terse output (experimental)
+
+1.1.18
+------
+    - Added datetime helper module in TPI
+        - Time, DateTime, DateTimeDelta, DateTimeDeltaBuilder, DateTimeStepper classes.
+
+1.1.17
+------
+    - Fix for non-existing central withx.yaml.
+    - Fix by Stefan for MySQL connector error.
+
+1.1.16
+------
+    - Added doc for project linking.
+    - Added doc for using selection rules in CLI and groups.yaml
+    - Doc comments for Text parsing module.
+    - Added documentation for Text parsing under Parsing section.
+    - Names of text parsers have been updated.
+    - Return type of headers in text file changed from list to tuple.
+    - DataRecord - indexed_values_as_json and named_values_as_json properties added.
+
+1.1.15
+------
+    - Added versions of dependencies in setup.py
+    - Arjuna version is included in the HTML report.
+    - Added Text parsing class with various File reading formats to TPI.
+
+1.1.14
+------
+- Added support to ignore insecure SSL certificate in Web Gui Automation.
+- ArjunaOption.ALLOW_INSECURE_SSL_CERT can be set to False to switch this off (True by default). The browser should support this capability.
+
+1.1.13
+------
+- Concept of Linked Arjuna Projects introduced. An Arjuna Project can be linked to other Arjuna Projects (only one level of relationship allowed).
+    - -l/--link-project CLI option added.
+    - Support for auto-merger of default ref configuration for parent project with all linked projects (including default data & env options merger with ref.)
+    - Support for auto-merger of data and environment configurations. The combinations are also included. However, combinations are created only project-wise (i.e. linked project data or env is not combined with data/env of top or other linked projects.)
+    - Support for auto-import of test resources defined in linked projects in the parent project (conftest.py auto-generation is improved to cater to this.)
+    - Support for fallback lookup of DBAuto SQL files from top project to linked projects in reversed order.
+    - Support for auto-merger of data references. If data references have same names, then preference order is top project and then linked projects in reverse order.
+
+1.1.12
+------
+- Rudimentary support for DB Automation (experimental)
+    - Added DBAUTO_DIR and DBAUTO_SQL_DIR Arjuna options.
+    - DB.mysql factory.
+
+
+1.1.11
+------
+- --rename-report option added to run-group CLI. Reports are generated without session and stage prefix for this option.
+
+1.1.10
+------
+- Support for double click in GuiElement.
+
+1.1.9
+-----
+- HTML report name changed.
+- Added more project meta data to HTML report as well as Arjuna & pytest command line, reference configuration name.
+- DEPS_DIR can be a path relative to the root of an Arjuna Test Project.
+
+1.1.8
+-----
+- run-group option works even if sessions.yaml and stages.yaml are empty.
+
+1.1.7
+-----
+- Fix in token logic for Client Grant in HTTP.
+
+1.1.6
+-----
+- Added support for Dependency directory (ArjunaOption.DEPS_DIR). Defaults to <project>/dependency. Can be overriden in reference conf.
+
+1.1.5
+-----
+- Fixed sesssion level header addition in Http Session.
+- Support for Python list as content in Http methods.
+
+1.1.2
+-----
+- Added support for hard refresh.
+
+1.1.1
+-----
+- The pytest command on Windows has been changed w.r.t. capturing of console output/logs as it causes errors.
+
+1.1.0
+-----
+Docs
+    - Updated format of various docs
+    - Included third party library info in index.rst
+    - Updated license and notice files.
+
+1.0.19
+------
+Docs
+    - Data reference TPI docs.
+    - Added Test Reporting section.
+    - Docs for Screenshooter and Network recorder protocols.
+    - Stage level list of overridable configuration options.
+    - Logging and Tracking
+- Multiprocessing for parallelism reverted to multithreading. Needs to be explored in future versions.
+- register_configs hook name changed to register_ref_confs for clarity.
+
+1.0.18
+------
+Docs
+    - Updated HTTP Auto docs to include Http Facade class.
+HTTP Auto
+    - Http.content.json implements custom JSON encoder to handle nested structures containing Yaml or Json custom objects.
+Fixes
+    - Fixed oauth_implicit_grant_session in http.py.
+
+1.0.17
+------
+Http Automation
+    - Http Facade class added. Sessions are created using this class. Also supports quick sender methods with temp session creation.
+    - Support for basic and digest authentication.
+    - The session module is split into multiple modules for better maintenance as the code became large for single file.
+    - Added support for HEAD, PATCH, OPTIONS methods.
+    - Request headers property added for inquiry.
+    - is_redirect property added to HttpResponse
+    - Header assertions added.
+    - Support for pretty URL format for query params
+    - Support for query_params as a dict, for use when names are not valid python names.
+    - Added new named exceptions: HttpSendError, HttpConnectError, HttpRequestCreationError
+    - `content` as an alias for `text` for request and response objects.
+    - Redirections: max_redirects at session level (default 30), allow_redirects at individual send request level (default is True).
+    - Cookies can be added/overriden at request level.
+    - HttpResponse.cookies property added.
+    - Provision for request timeout.
+    - Support for setting proxy at session level.
+    - Support for utf8, bytes, file and multipart content type.
+Configuration
+    - Added ArjunaOption.DATA_FILE_DIR to contain files that are supposed to be used as file data.
+    - create-project command creates project/data/file directory with a placeholder.
+Data References
+    - Moved IndexedDataReference and ContextualDataReference classes to TPI.
+NodeLocator
+    - Now available as Xml.node_locator
+
+1.0.16
+------
+- Fixed run-session/run-stage/run-group commands as per changes in YAML.
+- Parallel execution uses multiprocessing instead of multithreading now.
+- Different Reference configs can be provided for different groups.
+- GuiMultiElement now inherits from IterableAsserterMixin to support size-related assertions.
+
+1.0.15
+------
+- Internal logging clean-up.
+- Network recording support for Firefox
+- Contextual Logging
+    - Improved logic to allow setting contexts in a reference config.
+    - A logging call marked with contexts does not get logged by default unless it has an intersection of atleast one context with ArjunaOption.LOG_ALLOWED_CONTEXTS in the reference config for the run.
+    - Introduced 3 built-in contexts: report, resource, request.
+    - More contextual logs will be introduced.
+
+1.0.14
+------
+Network packet capture in Web UI tests
+    - BrowserMob Proxy integration
+    - Reference Config level options:
+        - ArjunaOption.BROWSER_NETWORK_RECORDER_ENABLED enables network recording. Default is False. 
+    - Any config level options:
+        - ArjunaOption.BROWSER_NETWORK_RECORDER_AUTOMATIC instructs to GuiApp to start recording after browser is launched. Also, each GuiPage sets current title to its name. Default is False. 
+    - The packets are captured and shown in HTML Reports just like Web service network packets.
+Reporting
+    - Reference Config level options:
+        - ArjunaOption.REPORT_NETWORK_ALWAYS - Network info will be included even for passed tests.
+        - ArjunaOption.REPORT_SCREENSHOTS_ALWAYS - Screenshots will be included even for passed tests.
+    - Any config level options:
+        - ArjunaOption.REPORT_NETWORK_FILTER - Only requests with responses with content with html/json/xml are included in report.
+Configuration
+    - Configuration stages defined as Default/Reference/CLI/Coded.
+    - DisallowedArjunaOptionError exception is raised if one attempts to set a config option at a level where it is not allowed.
+Network Recorder Protocol
+    - request spaces can contain `network_recorder` attribute.
+    - A Network Recorder should have record/register methods. For Web UI automation, it can be set to `<app_object>.network_recorder`.
+    - The recorded traffic is automatically registered in case of errors in fixture/test.
+    - A `record` call also registers existing recording if any.
+Data References
+    - Support bucket query which is equivalent to Arjuna.get_data_ref(bucket_name)
+    - Support for iterality in Contextual and Indexed References.
+    - Support for context/index based value retrieval like a dict/list syntax.
+    - Added documentation for these feature enhancements.
+    - Added example/test code.
+CIStringDict
+    - Retains case-insensitive inquiries
+    - When all keys or items or raw object is retrieved, original casing of keys is retained.
+DataRecord
+    - .named_values retains original casing of keys.
+HTML Reporting
+    - JS/HTML now in res files.
+    - Collapsible redirected network packets based on Stefan's sample code submission.
+
+1.0.13
+------
+Yaml
+    - Implemented iter logic in YamlList and YamlDict
+    - YamlDict and YamlList support == operator.
+    - Simplified Yaml API as aligned with other format parsers for consistency.
+HTML Reporting
+    - Log height changed to 500px.
+    - Modal window dimensions chnaged to smaller.
+Data References
+    - Added support for Yaml based contextual as well as indexed data references.
+Docs
+    - Added doc comments for yaml module as it is in TPI.
+    - Added docs for indexed data references. Improved doc for contextual data references.
+    - Added doc for YAML in text parsing.
+- @track within Arjuna uses `trace` level for most classes.
+
+1.0.12
+------
+- Data Generation and Data Entities
+    - Added generator, processor, composite and composer classes.
+    - data_entity supports setting an attr to a function, generator or composite. These are called at the time of object initilization with facility for dynamic data generation every time.
+    - A single generated data object is processed using the processor provided in generator.
+    - Multiple generated data objects can be clubbed into with composite and composer constructs.
+- Doc Comments
+    - data_entity
+    - generator, processor, composite and composer classes
+- Docs added:
+    - Random class and Data Entity.
+    - Usage of generator, processor, composite and composer classes
+- Json
+    - Added JsonSchemaBuilder class
+    - Added more methods to JsonSchema class
+    - JsonList supports JsonPath based find and findall.
+- Repackaging
+    - json, html and xml modules moved to `tpi.parser`.
+    - data modules moved to `tpi.data`
+- Arjex - New Examples/Tests
+    - Data Entity
+    - JsonPath-RW
+    - JsonPath-RW-EXT
+    - Genson-Schema-Creation
+    - Genson-Schema-Extraction
+- Simplified Project Structure
+    - Cross-project resource importing
+        - Existing way unncessarily complex for beginners and too simplistic for advanced users.
+        - By default, all resource creators present in `lib/resource.py` are imported.
+        - For advanced usage, change it from module to package and add importable names to __all__ in __init__.py. Check arjex project for example.
+    - Removed Row Data Reference for Excel. Column ref is the default. /data/reference/excel contains such files. Doc and example code updated
+    - L10n files go directly in l10n directory.
+- Data References
+    - Added support for Indexed Data References.
+    - Enhanced Query support allows for a blank query, thereby returning a DataRecord object for more involved coding.
+    - The string representing of such Data Record Shows data reference name and context/index used.
+- Yaml module added to TPI's parser package.
+- FIX:
+    - XmlNode's `text` and `texts` methods. lxml returned empty text for some HTML structures. Arjuna now uses .texts for both. Also changed "//text()" to ".//text()" in texts call.
+
+1.0.11
+------
+- Added more parsing and building capabilities to Xml and Html objects.
+    - Cleaned up GuiSource code to use these capabilities.
+- Added missing doc comments for Xml and Html classes.
+- Doc comments for all Json classes.
+- Added IterableAsserterMixin, separating commong assertions in JsonDict and JsonList classes.
+- Added docs:
+    - HTTP Automation
+    - Json Parsing
+    - XML Parsing
+    - HTML Parsing
+
+
+1.0.10
+------
+- User defined test attrs based selection fixed.
+
+1.0.9
+-----
+- Minor changes in OAuth interface.
+- Doc comments added for OAuth classes.
+
+1.0.8
+-----
+- Fixed generated conftest.py to be lenient w.r.t. missing project structure for resource imports.
+
+1.0.7
+-----
+- Doc Comments added:
+    - HttpSession, HttpRequest, HttpResponse
+- Http Auto
+    - Added cusstom headers support for get, delete and put. Post support already existed.
+- Data Entity
+    - Allows namedtuple style of multiple attr names in a single string.
+    - Clean string representation.
+- Module based test selection
+    - Allows name with .py in -im, -em, as well as -ir/-er if rule string target is module.
+
+
+1.0.6
+-----
+- Removed last_request from HttpResponse. `.request` is the last request.
+
+1.0.5
+-----
+- Auto-generated conftest.py now does a basic if ModuleNotFoundError was for corresponding resource module.
+- HTTP Level Test Automation (Work In Progress, Alpha Quality)
+    - Added basic support for HttpSession along with HttpRequest and HttpResponse classes.
+    - Added support for OAuth2 using Implicit Grant and Client Grant.
+- JSON
+    - Added JsonDict and JsonList support
+    - Support for JsonDict and JsonList assertions of different types.
+    - Support for auto-extraction of schema from a json string or object.
+    - Support for basic schema validation of Json.
+- New Named exceptions:
+    - HttpUnexpectedStatusCode
+- Data Entity
+    - Is not an alias of namedtuple
+    - DataEntity is an alias of Arjuna's data_entity call.
+    - Allows setting defaults for entity attributes.
+- Test Report Meta Data
+    - Introduced Test-wise report meta data container.
+    - Arjuna.get_report_metadata() can used anywhere in the project to access it.
+    - In test functions and @for_test resource functions, it can also be got using request.report_metadata
+    - Added an auto-fixture to add and clean entry for current test.
+    - Currently contains images and network packets.
+- HTML Reporting
+    - Screenshots and Images:
+        - Take screenshshot adds the images to current test container.
+        - HTML report can include all screenshots.
+        - Rather than opening an image in a new window, it is opened in a modal window in the same tab.
+        - The modal window uses the same base64 embedded image.
+    - Network Traffic
+        - Arjuna Http request sending logic adds network packets to current test container.
+        - In case of redirects, all directs are captured.
+        - HTML report can includes all these packets.
+        - Method and URL are shown as a clickable button.
+        - Request/Response detail is shown in a modal window. 
+- Logging
+    - Added Trace level along with log_trace method.
+    - Newlines are removed from message.
+- Track
+    - Long args are truncated to size 100.
+    - Long return vals are truncated to size 200.
+    - Allows `trace` level.
+
+1.0.4
+-----
+- Fix in create-project: lib/fixture -> lib/resource
+- Cleanup for extraneous Logging errors caused by pytest in stderr entry in reports. 
+
+1.0.3
+-----
+- Extraneous log message cleanup.
+
+1.0.2
+-----
+- Windows 10 logging handle related exception happens unexpectedly. Log message will not be written in such a case. Execution continues.
+
+1.0.1
+-----
+FIX: Dispatcher issue in MultiElement when created using filters.
+
+1.0.0
+-----
+- Docs added for:
+    - Test Functions
+    - Test Resources
+    - Test Sessions, Stages and Groups
+- PytestHooks made a private API.
+
+
+0.9.26
+------
+- New CLI switches -ip, -ep for package based selection added.
+- Support for ir (inclusion rules) and er (exclusion rules)
+    - Exclusion rules are evaluated. If a test function meets any of the rules, it is removed from collection.
+    - If the test function meeting any of the inclusion rules, it is included in the collection.
+    - --rule changed to -ir and -er to add provision for include and exclude rules via CLI. Used for magic group creation.
+    - ir and er sections can be added in a group definition in groups.yaml file.
+    - Internally, the ip/ep/im/em/it/et are converted to to ir/er rules. This means Arjuna is not using pytest markers for test selection. All selection is done based on Arjuna rule set.
+    - There is an AND condition between package, module and test rules.
+    - PytestHooks.select_tests hook created to select tests based on Arjuna rules. Called in `pytest_collection_modifyitems` pytest hook in conftest.py.
+    - Rules are also supported for user defined attributes.
+- New symbols for rule creation:
+    - For string targets:  !~= for does not match and !*= does not partially match.
+- Arjuna built-in `group` fixture is now a default fixture. Group information is directly available in `request.group`. `request.group.space` can be used to store any objects.
+- GuiApp's GuiNamespace acts a common namespace across pages, sections and dialogs.
+- FIX: --dry-run switch.
+- All run options work with the rule-based approach.
+- Support for minimalistic project structure for simple use of Arjuna. 
+- Test Fixtures --> Referred as Test Resources. Have an option setting as default using `default` keyword argument.
+- Support for `xfail` and `skip` keyword arguments in `@test` decorator. `xfail()` and `skip()` helper functions added.
+- New Exceptions:
+    - TestDecoratorError
+    - TestSessionsFileNotFoundError
+    - TestStagesFileNotFoundError
+    - TestGroupsFileNotFoundError
+
+0.9.25
+------
+- Selection Rules:
+    - Added Selection grammar for info, tags and boolean info types.
+    - Each rule can return True/False for an object which has these containers.
+- Test function default info, tags, bugs, envs get created for inquiry using `request`.
+- Fix in updating options from non-default `env` entry in envs.yaml.
+- Fix to allow a user option name as an Enum constant.
+- Fix in auto screenshot in case of failure in HTML report.
+
+0.9.24
+------
+- Critical Fixes:
+    - dry_run and report format CLI defaults.
+- create-project command changed and fixed as per new project structure for config yamls.
+- CLI Updates
+    - Logging switches -dl and -ll moved inside the commands.
+    - -o and --dray-run show the allowed enum constants as choices.
+- Doc updates:
+    - CLI doc.
+    - Configuration doc.
+    - Test Project doc.
+
+
+0.9.23
+------
+- Test Groups
+    - are defined in groups.yaml file.
+    - A group can be run from the command line.
+- Test Stages 
+    - are defined in stages.yaml file.
+    - use **include:** and provide list of group names.
+    - A stage can be run from command line.
+- Test Sessions 
+    - are defined in sessions.yaml file.
+    - use **include:** and provide list of stage names.
+    - A session can be run from command line.
+- CLI enhancements:
+    - **run-stage** command added. Using it you can directly run a defined test stage.
+    - **run-group** command added. Using it you can directly run a defined test group.
+- New Named Exceptions:
+    - UndefinedTestStageError, InvalidTestStageDefError
+    - UndefinedTestGroupError
+- CLI update
+    -o, -im, -em, -it, -et switches changed from plural switches expecting nargs to multi-switch method. This means these switches are single-arg switches and can be used in command line any number of times.
+
+
+0.9.22
+------
+- Moved all types of configurations to YAML.
+- Simplified internal configuration process.
+- Single file for each of the following:
+    - Data configurations
+    - Environment Configurations
+    - Session Configurations
+- New Named Exceptions:
+    - UndefinedTestSessionError
+    - InvalidTestSessionDefError
+
+0.9.21
+------
+- Data Conf and  Env conf concepts updated
+    - In a test project, you can define any number of data confs and/or env confs. These are auto-loaded.
+    - The configuration name for them are the file names (minus the .conf extension.)
+    - Arjuna looks for data.conf and env.conf and updates the reference configuration, if these files exist.
+    - Arjuna also generates confs for all combinations of run confs and env confs when it loads. For each combination:
+        - Ref config is taken as base
+        - data conf is superimposed
+        - env conf is superimposed
+        - CLI options are superimposed
+    - The config name is set to **runconfname_envconfname** e.g. **data1_env1**.
+    - The name can be used in the **magic C function** query or as the cname argument.
+- Fixtures now allow drive_with argument.
+- **-c** / **--conf** switch added. It becomes the conf object mapped to conf.
+- Arjuna Session, Stage and Test Grouping concept added:
+    - run-project and run-selected represent a default session, stage and group as per the CLI switches. It always executes in a single thread.
+    - Built-in fixture **group** can be included in a test signature or fixture signature. It yields group parameters including name of group, thread name and configuration.
+    - pytest_generate_tests hook added to test project conftest.py, its Arjuna template and added PytestHooks.configure_group_for_test
+        - Auto-parameteries "group" built-in Arjuna fixture. The fixture can be added to a test function signature or any of its fixtures. Configuration passed with -c switch is used to parameterize the **group** fixture mentioned above.
+        - It is optional to use this fixture. However, if group related information (e.g. thread name, group name) is needed run time in fixture functions and test functions, then it can be used.
+    - run-session switch added to run a named session.
+    - Basic session.yaml support added. Supports stages and groups.
+        - A session can have multiple stages.
+        - Stages are always executed sequentially.
+        - A stage can have any number of groups.
+        - Stage can have groups run in parallel with its threads setting. Default is 1.
+        - A group has a unqiue and it defines pickers. It also can have a conf associated with it.
+        - Each group is run in a thread.
+        - If conf is defined for a group, the reference configuration is changed to this conf for this group run.
+        - Each group is reported separately in a .html and .xml file.
+- Dry Run Major enhancement
+    - Not a boolen switch any more
+    - Takes SHOW_TESTS/SHOW_PLAN/RUN_FIXTURES arguments.
+- Arjuna Hooks concept added
+    - **hook** directory in project root directory will contain various Arjuna hook modules and corresponding hook calls.
+    - **arjuna_config.py** is the name for configuration hooks.
+        - **register_configs(configurator)** is the first Arjuna hook created
+        - One can programmatically register any number of configurations by taking existing or these newly created configuration objects as basis.
+        - The hook is executed before sessions file is processed or test execution starts for a non-session run.
+        - The configurations created here can be used with -c / --conf command line switch. They can also be used as group config in session files. 
+- CLI Changes: CLI interface heavily updated for simpler names of switches along with more information in help.
+
+0.9.20
+------
+- Implemented ScreenShooter protocol. Created ScreenShooter base class. **GuiApp** and **GuiPage** support the protocol in Arjuna.
+- Added Image helper class.
+- Added doc strings for:
+    - Gui, GuiAppContent, GuiApp, GuiPage, GuiSection, GuiDialog
+    - SingleGuiWidget, Locatable, GuiElement. GuiMultiElement, GuiDropDown, GuiRadioGroup
+    - Gui Locator Formatter, GuiWidgetDefinition, Dictable
+    - GNS, GNS Formtter
+    - GuiSource, SingleEntityGuiSource, GuiPageSource, GuiElementSource, GuiMultiElementSource
+    - Image
+    - AsserterMixin
+    - ScreenShooter
+    - All Arjuna Types in helper.arjtype
+- GuiDialog is a class of its own now. Selector to follow. Separated in its own module.
+- GuiAppContent separated in its own module.
+- GNS rules have been indicated in the API doc. Coded restrictions need to be done yet for a more closely controlled GNS namespace structure.
+- Log output (from display) is captured in the HTML report. Not displayed on the screen.
+- GuiSource concept materialized as a hierarchy. Still work to do.
+
+
+0.9.19
+------
+- Moved private enums and exceptions to arjuna.core module.
+- Added doc strings for:
+    - DDT Classes
+    - Enums
+    - Exceptions
+    - Magic Functions
+    - Test Engine
+        - @test
+        - Fixtures
+        - Relation
+        - Asserter
+        - PytestHooks.enhance_reports
+    - @track
+    - Json
+    - xml: NodeLocator and XmlNode
+- Elements in Gui are now referred as widgets (taking a cue from wxPython)
+- **template** in GNS is changed to **type** for easy understandability (stands for widget type, default is element.)
+- (Internal) Locator Meta Data concept has evolved. It now contains meta data about the widget beyond locating it. Its now referred as Gui Widget Meta Data. Reflected in internal class names, messages and exception names.
+
+0.9.18
+------
+- Major change in internal packaging to aid in controlled API doc generation.
+- License info changed from doc string to line-wise comments.
+- Sphinx is now used for docs instead of markdown.
+- Integration of docs with readthedocs.org: https://arjuna-taf.readthedocs.io
+- Google Doc Style for Python has been identified for Arjuna API documentation.
+    - Tried for Configuration, ConfigurationBuilder and logging functions. Works well.
+
+
+0.9.17
+------
+- Added **TRACE** level to log. 
+    - **log_trace** is a direct call.
+    - By default trace messages are not included in display or log.
+    - Is configurable from command line, project.conf, --run_env and --run-conf.
+- Added support for Contextual Logging
+    - All log messages are of **default** context
+    - You can mark a log message as belonging to one or more contexts.
+    - You can allow contexts by controlling the **ArjunaOption.LOG_ALLOWED_CONTEXTS** which is configurable from command line, project.conf, --run_env and --run-conf.
+- Added **track** decorator. 
+    - It logs begin with args, finish with return and exceptions for Classes, Methods and Functions.
+    - It also supports tracking **@classmethod**s and **@staticmethod**s automatically with class level track or individual track decorating.
+    - Properties can be decorated with **track** as well:
+        - Class level decorating does not cover properties.
+        - Decorating a setter automatically covers the getter.
+    - Default log level associating with tracking is **debug**. Can be controlled in each **track** decorator by providing the **level** argument.
+- --run-conf can be provided wihtout .conf extension.
+
+
+0.9.16
+------
+- Added doc for CLI.
+- @for_group fixture support added.
+
+0.9.15
+------
+- Major internal re-architecuring to support meta-data in GNS definition and direct coded locator calls.
+- max_wait argument support in
+    - gui.wait_until_absent, gui.element.wait_until_absent
+    - gui.gns.wait_until_absent(label), gui.gns.label.gns.wait_until_absent(label), gui.gns.label.wait_until_absent
+    - gui.contains, gui.element.contains
+    - gui.gns.contains(label), gui.gns.label.gns.contains(label), gui.gns.label.contains
+
+0.9.14
+------
+- Documents updated for a more manageable format instead of tight coupling with example code.
+- **WebApp**, **Page**, **Section** class names are changed to **GuiApp**, **GuiPage** and **GuiSection** for future compatibility.
+
+0.9.13
+------
+- wait_until_absent call supported
+    - Can be called with **Gui** as well as **GuiElement** as **.wait_until_absent(**locator_kwargs)**
+        - Raises GuiElementForLabelPresentError exception on failure.
+    - Can be called with **Gui** as well as **GuiElement** as **.wait_until_absent(**labels)**
+        - Raises GuiElementPresentError exception on failure.
+- contains call supported
+    - Returns True/False.
+    - Can be called with **Gui** as well as **GuiElement** as **.contains(**locator_kwargs)**
+    - Can be called with **Gui** as well as **GuiElement** as **.contains(**labels)**
+- FIX: Import bug in emd.py
+
+0.9.12
+------
+- Added locate/element/multi_element/dropdown/radio_group factories to Gui and element/multi_element factories to GuiElement.
+- The factories provide a more Pythonic syntax than using tuples or factories for every locator type in user API.
+- withx works with the revised factory methods. One can provide **<withx_name>=Params([arg1=val1, arg2=val2, ... argN=valN])** argument to factory methods for identification.
+- Locator and Formatter class added for providing complex identification constructs as a single argument. **.locate** method added to Gui and GuiElement.
+- Formatted identifiers
+    - Identifiers can contain formatter placeholers with the syntax $xyz$ where xyz is a name which you want to replace with a value.
+    - For using formatted identifiers in code, you can use **gui.format(xyz=<value>).element(locator="$xyz$")** syntax.
+    - For using formatted identifiers in GNS, you can use **gui.format(xyz=<value>).label** syntax.
+    - Auto-loaded placeholder values: (query syntax is same as that for the magic **C**, **R** and **L** functions.)
+        - Configuration - Specified as **C.<query>**
+        - Contextual Data Reference - Specified as **R.<query>**
+        - Localized Strings - Specified as **L.<query>**
+- Example code and documentation updates in progress.
+- With and WithType are now completely internal to Arjuna.
+- XmlSource class added with comprehensive node finding and inquiry support. xfinder name changed to NodeLocator to make it similar to Locator for Gui element finding.
+
+
+0.9.11
+------
+- Direct log msg calls added: log_debug, log_info, log_warning, log_error, log_fatal. Implentation method used could be extended for contextual logging in Arjuna in future.
+- Introduced GNS class. Gui and nested element access for labels defined in GNS can be done as **gui.gns.label** and **element.gns.label** respectively.
+- root and anchor elements code optimized to work with direct reference to original element.
+- withx supports attr and fattr with named args support for both name and value arguments.
+- basic .locate factory added. Needs to be enhanced to support any advanced non-GNS implementations one might find a need for.
+- Typo fixed in CLI help for -im.
+- All example code has been moved to a single project **arjex**. Code and docs need a fix.
+
+0.9.10
+------
+- Externalization of Guis is mandatory for element access. Direct use of With.x not allowed. It's an internal concept now.
+- Creation of an App/Page can happen without a corresponding GNS file. The Gui definition will be empty in this case.
+- Element Label must be an arjuna name.
+- Elements can be directly access using **. (dot)** operator. from aby Gui.
+- **template** keyword can be used in GNS files to define non-GuiElement object types.
+- All example code updated.
+- All docs updated as per the revised features.
+
+0.9.9
+-----
+- Fix: Handling of Root and Anchor elements in GNS.
+- Fix: An Empty Yaml GNS file is NOT a problem.
+- Fix: Overlap of named parameters for withx in GNS don't conflict with internal arguments passed by Arjuna.
+
+0.9.8
+-----
+- Firefox driver uses Service object as per Selenium 4. Chrome was updated to use Service earlier.
+- You can now use an existing Driver service URL. ArjunaOption.SELENIUM_SERVICE_URL is used for the purpose. Works with docker-selenium. /wd/hub is appended automatically to the URL.
+- Arjuna automatically downloads driver for Chrome/Firefox using webdriver_manager package. Added setup.py dependency. Set to True by default. Can be controlled using ArjunaOption.SELENIUM_DRIVER_DOWNLOAD option.
+- Browser headless mode can be controlled with ArjunaOption.BROWSER_HEADLESS option. False by default.
+- BrowserName enum has been changed to contain only Chrome and Firefox as these are the current supported browsers.
+- withx in GNS files supports string, list and dictionary entries in YAML and maps them to vargs and kwargs in formatting the value of withx entry referred by a label.
+- Separated current Yaml parsing as Yaml and YamlFile classes in arjuna.tpi.parser.yaml module.
+- Introduced WithX class to handle WithX parsing and processing.
+- Provision to add Withx identifiers which can be referred to from any GNS file. These are included in the **<Project Root>/guiauto/withx/withx.yaml** file.
+- A WithX identifier defined in **withx.yaml** can be used programmatically. It can be thought of as a method which Arjuna defines at run-time with the signature **With.locator(*args, **kwargs)** and can be called from any part of your code.
+
+0.9.7
+-----
+Minor update. All l10 references are changed to l10n.
+
+0.9.6
+-----
+- Localizer
+    - Added built-in support for JSON based localization.
+    - Excel and JSON Localizers are automatically loaded and merged into a single Contextual Data Reference
+    - Change **ArjunaOption.LOCALE** to **ArjunaOption.L10_LOCALE**.
+    - Added **ArjunaOption.L10_STRICT** property. By default it is set to False. It means for references with no localization data, no error is raised and reference itself is returned by **L** function.
+    - bucket can be provided as an argument or as a prefix **bucket.**
+- Json class
+    - Added Json class with jsonpath support.
+    - Added jsonpath-rw and jsonpath-rw-ext as dependencies.
+- Easy Aliases (L/R/C)
+    - The **L** function is alias for Arjuna.get_localized_str.
+    - The **C** function is alias for Arjuna.get_config_value.
+    - The **R** function is alias for Arjuna.get_dataref_value
+- Config Simplification
+    - Arjuna automatically looks up Arjuna options and then user options for a name. This does away with the need for **config.arjuna_options.value** and **config.user_options.value**. Relaced with **config.value** call.
+    - New config creation made simpler. RunContext is now an internal concept.
+    - Docs updated.
+    - . and [] retrieval mechanisms added to config object. For a given name, one can use **config.name** or **config[name]** or config.value(name)** calls interchangeably.
+    - All arjuna options and user options become automatically available with . and [] lookup.
+    - Arjuna.get_config gives reference config by default. If conf name is passed, then that named config object is returned.
+    - The **C** function supports config query format i.e. a.b.c will attempt to treat **a** as a configuration name.
+    - Many ArjunaOptions have been renamed to simpler, shorter names.
+- request object enhanced
+    - request.config is by default set to reference config at the top level. Can be retrieved at any child layer.
+    - request.get_config without name as argument is same as request.config
+    - request.get_config(name) gets any configuration registered with that name from anywhere in the run including environment configurations.
+- RunContext and ConfigCreator Concept
+    - RunContext as a concept is deprecated.
+    - _ConfigCreator Name changed to ConfigBuilder
+    - ConfigBuilder is directly associated with a Config object, which is automatically treated as the source/parent config.
+    - One can not create a configuration with same name again.
+    - Builder has the provision to add config options from any conf file which has arjuna_options and/or user_options
+    - creator.register without a name creates a unique config name using uuid4. As it returns the config object it has its use case when direct dealing with config object is needed.
+    - create.register(name) is useful if the name is to be controlled and used by test author.
+- Configuration Layer-wise auto-update:
+    - Reference Config is updated as per following sequence:
+        - Arjuna central config
+        - Project conf
+        - Named env conf if provided
+        - Run Conf if provided
+        - CLI Options
+    - Any new custom configuration is updated as per following sequence:
+        - Parent Conf (by default it is the Reference Configuration)
+        - Programmatic additions
+        - Named env conf if provided
+        - Run Conf if provided
+        - CLI Options
+- Data References
+    - Arjuna.get_dataref_value method added for easy and simplified value retrieval for a context from a data reference.
+    - Simple query format created. Query can be a refname or context.refname or bucket.context.refname.
+- Environment Config
+    - Any number of configurations for named environments can be created.
+    - The configurations are loaded by Arjuna automatically.
+    - Programmatically any config can be referred any time.
+    - One can provide --run-env CLI switch which picks up the env config. This superimposes this env config on the reference config itself.
+    - Doc added.
+- New CLI Configuration Switches
+    - Added -ao/--arjuna-option and -uo/--user-option. These switches can be supplied multiple times to add any number of Arjuna options or user options. These will override all options set by any other means in Arjuna.
+    - --run-env switch as mentioned above.
+    - --run-conf: Any configuration file's absolute path can be provided. This is is superimposed on the reference config.
+- Example projects and Docs
+    - All example code and projects verified.
+    - Split the core project into arjuna_start, arjuna_config, arjuna_data and arjuna_l10 projects.
+    - Reorganized docs into smaller, focused contents.
+
+0.9.5
+-----
+- Data References
+    - Introduced concept of Contextual Data References.
+    - Built-in Support for Column and Row Excel Data References.
+    - The Excel data references are automatically loaded by Arjuna during init().
+    - The references are easily accessible using the **request** object in test/fixture functions.
+    - Added example code and doc.
+- Localizer
+    - Introduced concept of localization
+    - Built-in support for Excel based localization files
+    - Excel localizers are automatically loaded and merged into a single Contextual Data Reference
+    - The **L** function is a special function to easily localize a string as per **Locale**.
+    - Introduced **Locale** enum and ArjunaOption.LOCALE to control configured Locale.
+- Chrome driver creation uses the Service object as the previous signature was deprecated.
+- Arjuna uses sys.exit with the same code as returned by pytest.main
+
+0.9.4
+-----
+- create-project command added to CLI.
+- conftest.py is generated as per project_name.lib.fixture structure.
+- Fixed example codes across projects.
+- Data Driven Testing
+    - Fixed indexed values in Data Record.
+    - Data Record keys/names are now case-insensitive.
+    - Support for **records** markup.
+    - Support for **data_function** markup.
+    - Support for **data_class** markup.
+    - Support for **data_file** markup (Out of the box support for XLS, TSV/CSV and INI formats.)
+    - Support for record filtering in data files.
+    - Support for **many_data_sources** builder.
+    - Added example code and docs for data driven testing.
+
+0.9.3
+-----
+- Added Linux to enum.
+
+0.9.2
+-----
+- Bug fix: attr and related With factory methods had a bug post refactoring. Fixed.
+- Bug fix: screenshot path in HTML report hook.
+- Entity -> DataEntity for clarity of purpose.
+- BrowserConditions class added with DocumentReadyState condition automatically called for browser methods.
+
+0.9.1
+------
+- In test or test scope fixture, item can be added to module scope.
+- GNS default format changed to YAML. Added PyYAML to setup.py as dependency.
+- root and anchor element checking refer to existing element labels. Avoids duplicating same locator information.
+- Introduction of "withx" (With Extended) in GNS for cleaner identifiers which share same pattern.
+- Added mimesis as a dependency in setup.py. Arjuna will use its facilties for faking/generating commonly used data.
+- Introduction of basic Data Generator wrapper class on top of Mimesis.
+- Value class is an overhang of Java version of Arjuna. It is completely removed from Arjuna as object wrapper.
+    - DataRecord or Configuration values are not Value objects any more.
+    - Value class remains to provide any conversion class methods, which can be a useful feature to retain.
+- Added SourceNode class. 
+    - element.source.node gives an object of this. 
+    - Provides finder methods for directly finding content in element source rather than browser based selenium commands.
+    - Added xfinder in arjuna.tpi.helper.xml to define finding strategy.
+- Singular names for all directories.
+- config.get_arjuna_option_value and config.get_user_option_value -> config.arjuna_options.value, config.user_options.value
+
+0.8.17
+------
+- Widget class renamed to GuiSection. Widget and Dialog are synonyms for GuiSection.
+- Concept of my is removed. pytest does not allow multi-scope fixtures. request fixture is used the same way in fixtures and tests now.
+- For data driven test, one needs add 'data' as an arg to the test.
+- Common fixtures can be placed in lib.fixtures.
+- HTML report screenshots related changes:
+    - add_screenshot_for_failed_result now enhance_reports
+    - Behavior can be controlled by passing ignore_passed (on by default) or ignore_fixtures (off by default) arguments.
+    - Expects a screen_shooter in Function or Module space. Any object with take_screenshot(prefix) is a screen shooter. 
+    - Usage is very simple. Include the following in conftest.py:
+        @pytest.mark.hookwrapper
+        def pytest_runtest_makereport(item, call):
+            result = yield
+            PytestHooks.enhance_reports(item, result)
+    - Screenshots are now taken for failures in fixtures as well. Arjuna now does not depend on presence of request fixture in item.funcargs.
+
+0.8.16
+------
+- Fixed name typo and arg bug in browser api.
+- GuiMultiElement gives interface just like GuiElement for source inquiry.
+- GuiMultiElement has many assertions available now: assert_size, assert_min_size, assert_max_size, assert_empty, assert_not_empty
+- Asserter methods have simpler interface. Goal now is to add higher level assertions in objects themselves.
+
+0.8.15
+------
+- Introduce __state__ special label in GNS. This element can be automatically checked as a part of Gui Loading Protocol. Avoids the need for writing a validate_readiness method for simple single element loading need.
+- Module space bug fix.
+
+0.8.14
+------
+Minor - Doc links in main README.md made absolute because for PyPi.
+
+0.8.13
+------
+- Added arjex_internals examples project to create example code that reflects/tests internal workings of Arjuna.
+- CLI changes based on community discussion
+    - c/consider prefix changed to i/include
+    - i/ignore prefix changed to e/exclude
+    - --enumerate-only change to --dry-run
+- My.repr method is used for including test data in test name. No more of the staple 'my0' in the names.
+- Fix in PyTestHooks. Still need to look for a better solution. request object is not retrievable when error happens in fixture.
+- To support nested element finding across all With locators that use XPath, "." is automatically pre-fixed if not present.
+- New named exceptions introduced for better information: GuiNotLoadedError, GuiLabelNotPresentError, GuiNamespaceLoadingError
+- Concept of root element introduced for Widget. 
+    - Widget takes a keyword argument 'root_element_locators' in its __init__method.
+    - You can specify a single locator (With object) or a list of locators.
+    - You can also specifiy it in corresponding GNS file with a special label: __root__
+    - If both are specified, then one passed in init overrides the GNS entry.
+    - If root element is specified in any of the above manner, it is used to find elements when factory methods of Widget are used (e.g. .element())
+    - If root element is NOT specified, automator is used as the finder.
+- Test Object Space (earlier called Shared Spaces)
+    - my.modules_shared_space is changed to my.module.space for better code structure.
+    - request.space in test refers to the current test's scope.
+    - In fixtures, request.space refers to the scope as per the fixture scope.
+    - With request.space, and request.space, storing is done for scope, retrieval is from current test object up the parent chain.
+
+0.8.12
+------
+- arjuna_launcher.py moved to scripts directory and updated to support new structure.
+- archives directory is not created now.
+- Cleanup of arjuna central conf and description files.
+- Examples:
+    - Web UI Automation Basics
+        - DropDown and RadioGroup
+    - GUI abstraction
+        - Gui Namespace
+        - Creating an App Class
+        - Gui Loading Logic
+        - App Model
+        - App-Page Object Model
+        - App-Page-Widget Object Model
+- Added 'fail', 'assert_not_equal', 'assert_true', 'assert_false methods to Asserter.
+- Dropdown bug fix as per With.tag instead of With.tag_name
+- Name changes for consistency:
+    ns_dir -> gns_dir
+    def_file_name -> gns_file_name
+- Formalized Gui Loading Model and implemented GuiConditions, GuiReady condition and GuiNotLoadedError exception.
+
+
+0.8.11
+------
+
+- With.meta -> changed to With.label
+- Fix for GNS for attr based identification.
+- Support for static RunID when --static-rid switch is passed. Useful during script development. Default is dynamic timestamped runid.
+
+
+0.8.10
+------
+Primary Goal: Document Usage of Key Features. Make code changes to support doc flow and intuitive names/usage.
+
+- Added asserter object to 'my'
+- Split Example Project to represent documentation sections.
+- Examples are now tracked based on transformation to @test and doc written.
+- Examples:
+    - Core Features
+        - Writing First Test
+        - Value abstraction
+        - Configuration - Arjuna Options and User Defined Options
+    - Web UI Automation Basics
+        - Getting Started with WebApp
+        - GuiElement - Selenium By's Equivalent, Arjuna Extensions, Basic Interactions
+        - Creating a Self-Contained App Class
+        - GuiMultiElement
+- Added non-coding documentation:
+    - Project Structure
+- CLI Changes
+    - cm/im switches removed based on new test structure.
+    - cf/if changed to ct/it (--consider-tests, --ignore-tests).
+    - run-pickers changed to run-selected.
+- Simplification of With
+    - class_name, class_names, compound_class -> With.classes
+    - css_selector -> selector
+    - tag_name -> tag
+    - link_text -> flink (Full text of link)
+    - link_ptext -> link (Default match in Arjuna is Partial)
+    - javascript -> js
+    - attr_value -> fattr (Full attribute)
+    - attr_pvalue -> attr (Default match in Arjuna is Partial)
+- WebApp Interface Improvements
+    - delegates all calls which it does not contain to its 'ui' obj. It simplifies the App abstraction code in tests.
+    - title is a direct inquirable attribute
+    - go_to_url is a direct call.
+- Name and importing changes
+    - AnyRefValue changed to Value. It is now a direct arjuna import.
+    - DefaultTestContext -> RunContext
+    - guiauto_max_wait property method -> guiauto_max_wait
+- With.attr* now take two arguments and simple strings rather than [attr][value] string.
+- test.my and Gui have Arjuna's asserter object. More assertions to be added. AsserterMixIn moved to asserter module.
+- Current working directory is changed to project directory before pytest is launched.
+- pytest.ini now present inside arjuna deployment.
+- conftest.py now resides inside tests directory.
+- Basic proof of concept done w.r.t. creating session level fixtures outside of conftest. Will build on this in upcoming versions.
+
+0.8.9
+-----
+- (Critical Fix) Support for @test decorator withour any args for simple tests.
+- Support for module level shared space.
+
+0.8.8
+-----
+- _wait_until_element_absent method support in Gui.
+- Element filtering support for multi-element. (Example 34).
+- Support for loadable page and widget via overridable prepare, reach_until and validate_readiness methods.
+- Support for browser level screenshot.
+- Support for automatic screenshot on failure in test and inclusion in HTML report.
+- Support for -cm -im -cc -ic -cf -if test filtering switches added.
+- Support for -e --enumerate-only switch added to check display picked tests without running.
+- Added @test decorator for Arjuna test function.
+- Added support for defining dependencies by provide id and exclude_if args to @test
+- Data Driven Testing support using drive_with argument to @test
+- Support for a single data record source using record argument.
+- Added support for data store, shared objects and basic data pipeline.
+- Support for 'my' as a single argument containing info and data about test func.
+- Support for module level and test level fixtures using @for_module and @for_test decorators.
+- Support for lookup of a resource in the the reverse order of function, class, module and session.
+- Fixtures take request as arg. Tests take my and request as args.
+- Dictionary as well . supported for setting and retrieval of resources.
+
+0.8.7
+-----
+- Arjuna now uses pytest as its engine instead of unittest. It supports unittest style tests as well.
+- Added pytest and pytest-html as dependencies in setup.py.
+- Reporting: Added support for XML and HTML reporting simultaneously. Both are switched on by default.
+- CLI: Added -rf switch to which one or more of the ReportFormat allowed names can be supplied.
+- Concept of Run ID representing a given run introduced.
+- CLI: Support for specifying Run ID added. Default is 'mrun'.
+- Logging functionality is fixed. Extraneous logs removed.
+- CLI: Support for -dl (console display level) and -ll (log level) CLI switches.
+- Log and screenshots directory is within Run report directory for a run id.
+- RunID is clubbed with timestamp to form the final run id to avoid any overwriting of reports.
+
+0.8.6
+-----
+- Automator is created in the context of an App.
+- Elements are created in the context of a GUI (App/Page/Widget)
+- Nested Element Finding.
+- Partial Element can be used to find elements as well.
+- Drodown and radiogroup components fixed.
+- OR relationship bug fixed for multiple With identifiers.
+- Introduced FrameIsPresent and WindowIsPresent Conditions.
+- Max wait time has been made configurable for some contexts at call level.
+- Window logic works. Improved window waits. All wait is constrained by Gui max wait.
+- Frame logic works. Improved window waits. All wait is constrained by Gui max wait.
+- Conditions raise ArjunaTimeoutError which is a WaitableError.
+- Exception message contains more string representation of Locator information. 
+- Basic unittest integration to run all tests in the tests directory of a project.
+- Element names in GNS files are validated as Arjuna names (Valid Python names, 3-50 length)
+- Importing from arjuna has been heavily simplified. from arjuna import * provides all public names.
+
+
+Future Possibilities and Targeted Fixes
+---------------------------------------
+- Simplify nodeid access. request.raw_request.node.nodeid -> request.node_name
+    - optonal request object
+- Can Selenium disable certificate trust checking - Chrome/Firefox.
+- Or how to a certificate to trusted certificates.
+- Web Services
+- Run last failed tests
+
+- Diffing two pages on 2 URLs. Comparison of HTML.
+
+PytestDeprecationWarning: --no-print-logs is deprecated and scheduled for removal in pytest 6.0.
+  Please use --show-capture instead.
+    _issue_warning_captured(NO_PRINT_LOGS, self._config.hook, stacklevel=2)
+
+
+Create a doc section on basic YAML.
+
+    & use a variable
+    !join to join.
+    hostname : &HOST portal.exampl.com
+    portal_url : !join [https://, *HOST]
+    callback_URL : !join [https://, *HOST, /index.html]
