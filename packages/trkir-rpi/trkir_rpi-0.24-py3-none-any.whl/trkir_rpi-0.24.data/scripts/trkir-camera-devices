@@ -1,0 +1,60 @@
+#!python
+
+"""
+    Get camera devices by type (PT and IR)
+"""
+
+import subprocess
+import pprint
+
+DEVICE_TYPES = ['PureThermal', 'USB 2.0 Camera']
+
+
+def get_usb_part(line):
+    # example: TODO
+    return line.split(' ')[-1][1:-2]
+
+
+def get_usb_hub(line):
+    return line.split('-')[1].split('.')[0]
+
+
+def get_usb_port(line):
+    return line.split('-')[-1]
+
+
+def get_camera_device(line):
+    return line.replace('\t', '').replace('/dev/video', '')
+
+
+def get_camera_devices():
+    result = subprocess\
+        .run(['v4l2-ctl', '--list-devices'], stdout=subprocess.PIPE)\
+        .stdout\
+        .decode('utf-8')\
+        .split('\n')
+
+    groupped_by_device = {
+        device: []
+        for device in DEVICE_TYPES
+    }
+    for index, line in enumerate(result[:-1]):
+        for device in DEVICE_TYPES:
+            if device in line:
+                groupped_by_device[device].append({
+                        'usb-hub': get_usb_hub(get_usb_part(line)),
+                        'usb-port': get_usb_port(get_usb_part(line)),
+                        'camera-device': get_camera_device(result[index + 1]),
+                })
+
+    for device in DEVICE_TYPES:
+        groupped_by_device[device] = sorted(
+            groupped_by_device[device],
+            key=lambda item: (item['usb-hub'], item['usb-port']),
+        )
+
+    pprint.pprint(groupped_by_device, indent=4)
+
+
+if __name__ == '__main__':
+    get_camera_devices()
