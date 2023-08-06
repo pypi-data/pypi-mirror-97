@@ -1,0 +1,106 @@
+Metadata-Version: 2.1
+Name: prntscraper
+Version: 2.4.4.2
+Summary: Pulls random images from https://prnt.sc
+Home-page: https://github.com/ItzBlinkzy/prnt.sc-scraper
+Author: Itz Blinkzy
+Author-email: legendarystone12@gmail.com
+License: GNU
+Keywords: scraper prnt.sc prntscraper fuskering
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: bs4
+Requires-Dist: tqdm
+Requires-Dist: selenium
+
+# prntscraper
+
+* *prntscraper* will allow you to scrape images from the prnt.sc website as they have predictable subheadings we can freely attempt to get random images or images in a sequential order from a specified amount to a max limit and download them into a folder. This process is also known as [Fuskering](https://en.wikipedia.org/wiki/Fusker)  This is a security issue from their end as It's highly common people store sensitive information that could easily be stolen if these images are found by the wrong people.
+
+* **DISCLAIMER** I am not responsible for the information that may be found with this package.
+# Installation
+***This module is compatible with Python3+.***
+
+- Install latest version from git repository using pip:
+```bash
+$ pip install git+https://github.com/ItzBlinkzy/prntscraper.git
+```
+
+- Install from PyPI:
+```bash
+$ pip install prntscraper
+```
+
+## **How to use**
+  * When setting this up make sure you have a folder called **"images"** in the same directory as the file importing the module.
+
+```py
+from prntscraper.scraper import PrntScraper
+
+# Gets random images and store them in ./images folder
+my_scraper = PrntScraper()
+result = my_scraper.get_random_images()
+print(result)
+
+# Gets the newest images and stores them in ./images folder  || MUST HAVE CHROMEDRIVER INSTALLED TO WORK || 
+my_scraper = PrntScraper()
+result = my_scraper.get_random_images(newest=True)
+print(result)
+
+# Takes inputted images and stores them in ./images folder.
+my_scraper = PrntScraper()
+result = my_scraper.get_input_images()
+print(result)
+
+# Gets the count of all the images in the ./images folder.
+my_scraper = PrntScraper()
+result = my_scraper.folder_size()
+print(result)
+```
+
+# Outputs:
+**get_random_images()`**
+```py
+How many images would you like?: 5
+Completed: 100%|██████████████████████████████████████████████████| 6/6 [00:09<00:00,  1.58s/images]
+Successfully downloaded 5 images. Look at ./images folder. 
+```
+`get_random_images(newest=True)`
+*  To use the "**newest**" parameter you must have **Chromedriver** installed and inserted into **PATH** `(C:\Program Files (x86)`
+     The version of **Chromedriver** must be less than or equal to your current Chrome browser version. 
+    * To find your version type `chrome://version` in the search bar
+
+**get_input_images()**
+```py
+Enter any two random letters in the alphabet. Example [gy]: vk
+Enter a Point below 9999 to start from: 100
+Enter an End Point (inclusive) below 9999 to end: 109
+Completed: 100%|██████████████████████████████████████████████████| 10/10 [00:13<00:00,  1.31s/images]
+Successfully downloaded 10 images. Look at ./images folder.
+```
+**folder_size()**
+```py
+There are currently 15 images in the folder.
+```
+
+Pretty simple right?
+
+## Issues
+Feel free to open an issue or make a pull request if you have any problems using this module.
+
+## Credits
+ * [ItzBlinkzy](https://github.com/ItzBlinkzy/)
+      * You can be here too if you'd like to contribute.
+
+
+## Repo
+    * https://github.com/ItzBlinkzy/prntscraper/
+
+## License
+GNU General Public License v3
+
