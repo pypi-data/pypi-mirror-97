@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package calixa.domain.account;
+
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+import "common.proto";
+import "account.proto";
+import "entity.proto";
+
+option java_package = "io.calixa.domain.account";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+// ---------------------- gRPCs
+
+service AccountService {
+    rpc CreateAccount (CreateAccountRequest) returns (Account) {
+    }
+    rpc SaveAccount (CreateAccountRequest) returns (Account) {
+    }
+    rpc CreateAccountUser (CreateAccountUserRequest) returns (AccountUser) {
+    }
+    rpc SaveAccountUser (CreateAccountUserRequest) returns (AccountUser) {
+    }
+    rpc UpdateAccount (UpdateAccountRequest) returns (Account) {
+    }
+    rpc UpdateAccountUser (UpdateAccountUserRequest) returns (AccountUser) {
+    }
+    rpc AddUserToAccount (UpdateAccountUserAssociationRequest) returns (google.protobuf.Empty) {
+    }
+    rpc RemoveUserFromAccount (RemoveAccountUserAssociationRequest) returns (google.protobuf.Empty) {
+    }
+
+    rpc CreateAccountUserRole (CreateAccountUserRoleRequest) returns (AccountUserRole) {
+    }
+
+    rpc GetAccountUserRole (GetAccountUserRoleRequest) returns (AccountUserRole) {
+    }
+
+    rpc GetAccountUserRoles (GetAccountUsersRoleRequest) returns (stream AccountUserRole) {
+    }
+
+    rpc UpdateAccountUserRole (UpdateAccountUserRoleRequest) returns (AccountUserRole) {
+    }
+
+    rpc SaveOpportunityEntity (SaveOpportunityEntityRequest) returns (calixa.domain.entity.Entity);
+
+    rpc GetOpportunityEntities (GetOpportunityEntitiesRequest) returns (stream calixa.domain.entity.Entity);
+
+    rpc SaveExternalAccountEntity(SaveExternalAccountEntityRequest) returns (calixa.domain.entity.Entity);
+    rpc SaveExternalAccountUserEntity(SaveExternalAccountUserEntityRequest) returns (calixa.domain.entity.Entity);
+}
+
+message CreateAccountRequest {
+
+    // Decision: Replace "Account" with "GraphEntity" and update all call sites
+    // to call this new signature.
+
+    Account account = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message CreateAccountUserRequest {
+    // Decision: Replace "Account" with "GraphEntity" and update all call sites
+    // to call this new signature.
+    AccountUser accountUser = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message CreateAccountUserRoleRequest {
+    // Decision: Replace "Account" with "GraphEntity" and update all call sites
+    // to call this new signature.
+    AccountUserRole accountUserRole = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message GetAccountUserRoleRequest {
+    string organization_id = 1;
+    oneof keys {
+        string role_id = 2;
+        string name = 3;
+    };
+}
+
+message GetAccountUsersRoleRequest {
+    string organization_id = 1;
+}
+
+message UpdateAccountUserRoleRequest {
+    AccountUserRole role = 1;
+    google.protobuf.FieldMask update_mask = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message RemoveAccountUserAssociationRequest {
+    string organization_id = 1;
+    oneof account {
+        string account_id = 2;
+        string canonical_account_id = 5;
+    }
+    // cannot have one of field of repeated?
+    repeated string account_user_ids = 3;
+    repeated string canonical_account_user_ids = 6;
+    calixa.domain.common.RequestContext request_context = 4;
+}
+
+message UpdateAccountUserAssociationRequest {
+    string organization_id = 1;
+    oneof account {
+        string account_id = 2;
+        string canonical_account_id = 5;
+    }
+    repeated AccountUserAssociation associations = 3;
+    calixa.domain.common.RequestContext request_context = 4;
+}
+
+message UpdateAccountRequest {
+    Account account = 1;
+    google.protobuf.FieldMask update_mask = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message UpdateAccountUserRequest {
+    AccountUser accountUser = 1;
+    google.protobuf.FieldMask update_mask = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message SaveOpportunityEntityRequest {
+    calixa.domain.common.RequestContext request_context = 1;
+    calixa.domain.entity.Entity opportunity_entity = 3;
+}
+
+message GetOpportunityEntitiesRequest {
+    string organization_id = 1;
+    string canonical_opportunity_id = 2; // optional field
+}
+
+message SaveExternalAccountEntityRequest {
+    calixa.domain.common.RequestContext request_context = 1;
+    calixa.domain.entity.Entity external_entity = 2;
+    repeated calixa.domain.common.ExternalId related_external_entity_ids = 3;
+}
+
+message SaveExternalAccountUserEntityRequest {
+    calixa.domain.common.RequestContext request_context = 1;
+    calixa.domain.entity.Entity external_entity = 2;
+    repeated calixa.domain.common.ExternalId related_external_entity_ids = 3;
+}

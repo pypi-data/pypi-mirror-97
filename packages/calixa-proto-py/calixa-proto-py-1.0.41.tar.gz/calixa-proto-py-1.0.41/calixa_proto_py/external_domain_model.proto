@@ -1,0 +1,275 @@
+syntax = "proto3";
+
+package calixa.domain.external;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "account.proto";
+
+option java_package = "io.calixa.domain.external";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+message IntercomCompany {
+    // https://developers.intercom.com/intercom-api-reference/reference#company-model
+    string id = 1;
+    google.protobuf.Timestamp remote_created_at = 2;
+    google.protobuf.Timestamp last_request_at = 3;
+    string company_id = 4;
+    string name = 5;
+    int32 session_count = 6;
+    int32 monthly_spend = 7;
+    int32 user_count = 8;
+    string plan_id = 9;
+    string plan_name = 10;
+    int32 size = 11;
+    string website = 12;
+    string industry = 13;
+}
+
+
+message IntercomContact {
+    // https://developers.intercom.com/intercom-api-reference/reference#contacts-model
+    string id = 1;
+    string workspace_id = 2;
+    string external_id = 3;
+    string role = 4;
+    string email = 5;
+    string phone = 6;
+    string name = 7;
+    string avatar = 8;
+    string owner_id = 9;
+    bool has_hard_bounced = 10;
+    bool marked_email_as_spam = 11;
+    bool unsubscribed_from_emails = 12;
+    google.protobuf.Timestamp signed_up_at = 13;
+    google.protobuf.Timestamp last_seen_at = 14;
+    google.protobuf.Timestamp last_replied_at = 15;
+    google.protobuf.Timestamp last_contacted_at = 16;
+    google.protobuf.Timestamp last_email_opened_at = 17;
+    google.protobuf.Timestamp last_email_clicked_at = 18;
+    string language_override = 19;
+    repeated string company_ids = 20;
+    repeated string tags = 21;
+}
+
+message SalesforceAccount {
+    // https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_account.htm
+    string id = 1;
+    bool is_deleted = 2;
+    string master_record_id = 3;
+    string name = 4;
+    string parent_id = 5;
+    string billing_street = 6;
+    string billing_city = 7;
+    string billing_state = 8;
+    string billing_postal_code = 9;
+    string billing_country = 10;
+    string phone = 11;
+    string fax = 12;
+    string account_number = 13;
+    string website = 14;
+    string owner_id = 15;
+    string created_by_id = 16;
+}
+
+message SalesforceContact {
+    // https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_contact.htm
+    string id = 1;
+    bool is_deleted = 2;
+    string master_record_id = 3;
+    string account_id = 4;
+    string first_name = 5;
+    string last_name = 6;
+    string name = 7;
+    string mailing_street = 8;
+    string mailing_city = 9;
+    string mailing_state = 10;
+    string mailing_postal_code = 11;
+    string mailing_country = 12;
+    string other_street = 13;
+    string other_city = 14;
+    string other_state = 15;
+    string other_postal_code = 16;
+    string other_country = 17;
+    string phone = 18;
+    string fax = 19;
+    string mobile_phone = 20;
+    string home_phone = 21;
+    string other_phone = 22;
+    string assistant_phone = 23;
+    string email = 24;
+    string owner_id = 25;
+    string created_by_id = 26;
+}
+
+message ZendeskOrganization {
+    // https://developer.zendesk.com/rest_api/docs/support/organizations
+    string id = 1;
+    string external_id = 2;
+    string name = 3;
+    repeated string domain_names = 4;
+    string details = 5;
+    string notes = 6;
+    int64 group_id = 7;
+    bool shared_tickets = 8;
+    bool shared_comments = 9;
+    repeated string tags = 10;
+}
+
+message ZendeskUser {
+    // https://developer.zendesk.com/rest_api/docs/support/users
+    string id = 1;
+    string email = 2;
+    string name = 3;
+    string alias = 4;
+    bool chat_only = 5;
+    int32 custom_role_id = 6;
+    int32 role_type = 7;
+    string details = 8;
+    string external_id = 9;
+    google.protobuf.Timestamp last_login_at = 10;
+    string locale = 11;
+    int32 locale_id = 12;
+    bool moderator = 13;
+    string notes = 14;
+    bool only_private_comments = 15;
+    string organization_id = 16;
+    int64 default_group_id = 17;
+    string phone = 18;
+    bool shared_phone_number = 19;
+    string role = 20;
+    repeated string tags = 21;
+    bool verified = 22;
+}
+
+message StripeCustomer {
+    // https://stripe.com/docs/api/customers/object
+    string id = 1;
+    string email = 2;
+    string name = 3;
+    string description = 4;
+    string phone = 5;
+    string customer_street = 6;
+    string customer_city = 7;
+    string customer_state = 8;
+    string customer_postal_code = 9;
+    string customer_country = 10;
+    string shipping_street = 11;
+    string shipping_city = 12;
+    string shipping_state = 13;
+    string shipping_postal_code = 14;
+    string shipping_country = 15;
+    int32 balance = 16;
+    string currency = 17;
+    string default_source = 18;
+    bool delinquent = 19;
+    string invoice_prefix = 20;
+    int32 next_invoice_sequence = 21;
+    string tax_exempt = 22;
+}
+
+enum CognitoUserStatusType {
+    COGNITO_USER_STATUS_TYPE_UNSPECIFIED = 0;
+    COGNITO_USER_STATUS_TYPE_UNCONFIRMED = 1;
+    COGNITO_USER_STATUS_TYPE_CONFIRMED = 2;
+    COGNITO_USER_STATUS_TYPE_ARCHIVED = 3;
+    COGNITO_USER_STATUS_TYPE_COMPROMISED = 4;
+    COGNITO_USER_STATUS_TYPE_UNKNOWN = 5;
+    COGNITO_USER_STATUS_TYPE_RESET_REQUIRED = 6;
+    COGNITO_USER_STATUS_TYPE_FORCE_CHANGE_PASSWORD = 7;
+    COGNITO_USER_STATUS_TYPE_UNKNOWN_TO_SDK_VERSION = 8;
+}
+
+message CognitoUser {
+    // https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-attributes.html
+    string username = 1; // This is really the user_id. AWS names this poorly.
+
+    google.protobuf.Timestamp created_at = 2;
+    google.protobuf.Timestamp last_modified_at = 3;
+    bool enabled = 4;
+    string email = 5;
+    string name = 8;
+
+    CognitoUserStatusType status = 6;
+
+    // The "UserType" object supplied by AWS uses a Map of name-value pairs to
+    // store the remaining attributes. Contained in here, is the email address
+    // and name of the user. We do not pull this up in the top level fields,
+    // however to keep our persistence simple.
+    google.protobuf.Struct attributes = 7;
+}
+
+message ApiUser {
+    // https://readme.calixa.io/reference#create-a-user
+    string id = 1;
+    string email = 2; // No validation. These are sometimes totally broken.
+    string first_name = 3;
+    string last_name = 4;
+    calixa.domain.account.AccountUserStatus status = 5;
+    google.protobuf.Timestamp last_login_at = 6;
+    google.protobuf.Timestamp last_seen_at = 8;
+    google.protobuf.Struct properties = 7;
+}
+
+message ApiAccount {
+    // https://readme.calixa.io/reference#create-account
+    string id = 1;
+    string name = 2;
+    string domain_name = 3;
+    calixa.domain.account.AccountStatus status = 4;
+    google.protobuf.Struct properties = 5;
+}
+
+enum HubSpotCompanyType {
+    HUBSPOT_COMPANY_TYPE_UNSPECIFIED = 0;
+    HUBSPOT_COMPANY_TYPE_PROSPECT = 1;
+    HUBSPOT_COMPANY_TYPE_PARTNER = 2;
+    HUBSPOT_COMPANY_TYPE_RESELLER = 3;
+    HUBSPOT_COMPANY_TYPE_VENDOR = 4;
+    HUBSPOT_COMPANY_TYPE_OTHER = 5;
+}
+
+message HubSpotCompany {
+    // https://knowledge.hubspot.com/companies/hubspot-crm-default-company-properties
+    string id = 1;
+    string name = 2;
+    string owner_email = 3;
+    string owner_name = 4;
+    string phone = 5;
+    string address = 6;
+    string address2 = 7;
+    string city = 8;
+    string state = 9;
+    string zip = 10;
+    string country = 11;
+    string owner_id = 12;
+    string team_id = 13;
+    string website = 14;
+    string domain = 15;
+    HubSpotCompanyType type = 16;
+    google.protobuf.Timestamp created_at = 17;
+    google.protobuf.Timestamp last_modified_at = 18;
+}
+
+message HubSpotContact {
+    // https://knowledge.hubspot.com/contacts/hubspots-default-contact-properties
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string work_email = 5;
+    string mobile_phone = 6;
+    string phone = 7;
+    string city = 8;
+    string state = 9;
+    string zip = 10;
+    string country = 11;
+    string job_title = 12;
+    string company = 13;
+    string owner_id = 14;
+    string associated_company_id = 15;
+    google.protobuf.Timestamp created_at = 16;
+    google.protobuf.Timestamp last_modified_at = 17;
+}

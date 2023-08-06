@@ -1,0 +1,321 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+import "common.proto";
+import "integration_source.proto";
+
+option java_package = "io.calixa.domain.billing";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.billing;
+
+message Product {
+    string product_id = 1 [deprecated = true];
+    string organization_id = 2 [deprecated = true];
+    bool active = 3;
+    string name = 4;
+    string description = 5;
+    string type = 6;
+    string triggering_event_id = 7;
+    string canonical_id = 8 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 9;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+message InvoiceLineItem {
+    string organization_id = 1 [deprecated = true];
+    string invoice_id = 2; // should be considered as external_id - for creating an edge
+    string invoice_line_item_id = 4 [deprecated = true];
+    string invoice_item_id = 5;
+    string subscription_id = 6 [deprecated = true];
+    string plan_id = 7 [deprecated = true];
+    string description = 8;
+    google.protobuf.Struct properties = 9;
+    google.protobuf.Timestamp period_start = 10;
+    google.protobuf.Timestamp period_end = 11;
+    calixa.domain.common.Amount total_amount = 12;
+    int32 quantity = 13;
+    string canonical_id = 14 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 15;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+message SubscriptionItem {
+    string subscription_id = 1; // should be considered as external_id - for creating an edge
+    string organization_id = 3 [deprecated = true];
+    string subscription_item_id = 4 [deprecated = true];
+    string plan_id = 5; // should be considered as external_id - for creating an edge
+    google.protobuf.Struct properties = 6;
+    string canonical_id = 7 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 8;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+message Subscription {
+    reserved 200;
+    string subscription_id = 1 [deprecated = true];
+    string organization_id = 3 [deprecated = true];
+    bool cancel_at_period_end = 4;
+    SubscriptionStatus status = 5;
+    google.protobuf.Struct properties = 6;
+    google.protobuf.Timestamp period_start = 7;
+    google.protobuf.Timestamp period_end = 8;
+    string triggering_event_id = 9;
+    string canonical_id = 10 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 11;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+enum SubscriptionStatus {
+    SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+    INCOMPLETE = 1;
+    INCOMPLETE_EXPIRED = 2;
+    TRIALING = 3;
+    ACTIVE = 4;
+    PAST_DUE = 5;
+    CANCELED = 6;
+    UNPAID = 7;
+}
+
+enum InvoiceStatus {
+    INVOICE_STATUS_UNSPECIFIED = 0;
+    DRAFT = 1;
+    DELETED = 2;
+    OPEN = 3;
+    PAID = 4;
+    UNCOLLECTIBLE = 5;
+    VOID = 6;
+}
+
+message Invoice {
+
+    reserved 200;
+    string organization_id = 1 [deprecated = true];
+    string invoice_id = 2 [deprecated = true];
+    bool auto_advance = 4;
+    string charge_id = 5 [deprecated = true];
+    string subscription_id = 6; // should be considered as external_id - for creating an edge
+    string description = 7;
+    string hosted_invoice_url = 8;
+    google.protobuf.Struct properties = 9;
+    google.protobuf.Timestamp period_start = 10;
+    google.protobuf.Timestamp period_end = 11;
+    calixa.domain.common.Amount total_amount = 12;
+    InvoiceStatus status = 13;
+    string number = 14;
+    string address_id = 15; //TODO - not sure what to do with this yet
+    string triggering_event_id = 16;
+    string canonical_id = 17 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 18;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+message Plan {
+    string product_id = 1 [deprecated = true];
+    string organization_id = 2 [deprecated = true];
+    string plan_id = 3 [deprecated = true];
+    bool active = 4;
+    string interval = 5;
+    int32 interval_count = 6;
+    calixa.domain.common.Amount amount = 7;
+    google.protobuf.Struct properties = 8;
+    string billing_scheme = 9;
+    string usage_type = 10;
+    string name = 11;
+    string triggering_event_id = 12;
+    string canonical_id = 13 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 14;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+    google.protobuf.Timestamp external_created_at = 510; // temporary until we move to entity save
+    google.protobuf.Timestamp external_updated_at = 511; // temporary until we move to entity save
+}
+
+enum PaymentMethodType {
+    PAYMENT_METHOD_TYPE_UNSPECIFIED = 0;
+    PAYMENT_METHOD_TYPE_CARD = 1;
+}
+
+enum ChargeStatus {
+    CHARGE_STATUS_UNSPECIFIED = 0;
+    CHARGE_STATUS_CREATED = 1;
+    CHARGE_STATUS_EXPIRED = 2;
+    CHARGE_STATUS_FAILED = 3;
+    CHARGE_STATUS_PENDING = 4;
+    CHARGE_STATUS_REFUNDED = 5;
+    CHARGE_STATUS_PARTIALLY_REFUNDED = 6;
+    CHARGE_STATUS_SUCCEEDED = 7;
+}
+
+enum ChargeRefundStatus {
+    CHARGE_REFUND_STATUS_UNSPECIFIED = 0;
+    CHARGE_REFUND_STATUS_SUCCEEDED = 1;
+    CHARGE_REFUND_STATUS_FAILED = 2;
+    CHARGE_REFUND_STATUS_PENDING = 3;
+}
+
+message SavedPaymentMethod {
+    string organization_id = 1 [deprecated = true];
+    string saved_payment_method_id = 2 [deprecated = true];
+    // TODO(pras): charge should not be part of payment method
+    string charge_id = 3 [deprecated = true];
+    PaymentMethodType type = 4;
+    google.protobuf.Struct saved_payment_method_details = 5;
+    string canonical_id = 6 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 7;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+
+    google.protobuf.Timestamp external_created_at = 510 [deprecated = true];
+    google.protobuf.Timestamp external_updated_at = 511 [deprecated = true];
+}
+
+message Charge {
+    reserved 200;
+    string organization_id = 1 [deprecated = true];
+    string charge_id = 2 [deprecated = true];
+    string invoice_id = 4; // should be considered as external_id - for creating an edge
+    calixa.domain.common.Amount amount = 5;
+    calixa.domain.common.Amount amount_refunded = 6;
+    ChargeStatus status = 7;
+    string saved_payment_method_id = 8; // should be considered as external_id - for creating an edge
+    string billing_address_id = 9; // should be considered as external_id - for creating an edge
+    google.protobuf.Struct properties = 10;
+    calixa.domain.integration.IntegrationSource integration_source = 11;
+    string triggering_event_id = 12;
+    string canonical_id = 13 [deprecated = true];
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+
+    google.protobuf.Timestamp external_created_at = 510 [deprecated = true];
+    google.protobuf.Timestamp external_updated_at = 511 [deprecated = true];
+}
+
+message Refund {
+    string organization_id = 1 [deprecated = true];
+    string refund_id = 2 [deprecated = true];
+    string charge_id = 3; // should be considered as external_id - for creating an edge
+    calixa.domain.common.Amount amount = 4;
+    ChargeRefundStatus status = 5;
+    string canonical_id = 7 [deprecated = true];
+    calixa.domain.integration.IntegrationSource integration_source = 8;
+
+    google.protobuf.Timestamp created_at = 500 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 501 [deprecated = true];
+
+    google.protobuf.Timestamp external_created_at = 510 [deprecated = true];
+    google.protobuf.Timestamp external_updated_at = 511 [deprecated = true];
+}
+
+// ---------------------- gRPCs
+service BillingService {
+    rpc SaveInvoice (SaveInvoiceRequest) returns (Invoice) {
+    }
+    rpc SaveProduct (SaveProductRequest) returns (Product) {
+    }
+    rpc SavePlan (SavePlanRequest) returns (Plan) {
+    }
+    rpc SaveSubscription (SaveSubscriptionRequest) returns (Subscription) {
+    }
+    rpc SaveInvoiceLineItem (SaveInvoiceLineItemRequest) returns (InvoiceLineItem) {
+    }
+    rpc SaveSubscriptionItem (SaveSubscriptionItemRequest) returns (SubscriptionItem) {
+    }
+    rpc SaveCharge (SaveChargeRequest) returns (Charge) {
+    }
+    rpc SaveSavedPaymentMethod (SaveSavedPaymentMethodRequest) returns (SavedPaymentMethod) {
+    }
+    rpc SaveRefund (SaveRefundRequest) returns (Refund) {
+    }
+}
+
+message SaveSubscriptionItemRequest {
+    SubscriptionItem subscriptionItem = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
+
+message SaveInvoiceLineItemRequest {
+    InvoiceLineItem invoiceLineItem = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
+
+message SaveSubscriptionRequest {
+    Subscription subscription = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 5;
+    repeated calixa.domain.common.ExternalId relationship_ids = 6;
+}
+
+message SavePlanRequest {
+    Plan plan = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
+
+message SaveProductRequest {
+    Product product = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
+
+message SaveInvoiceRequest {
+    Invoice invoice = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 5;
+    repeated calixa.domain.common.ExternalId relationship_ids = 6;
+}
+
+message SaveChargeRequest {
+    Charge charge = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 5;
+    repeated calixa.domain.common.ExternalId relationship_ids = 6;
+}
+
+message SaveSavedPaymentMethodRequest {
+    SavedPaymentMethod savedPaymentMethod = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
+
+message SaveRefundRequest {
+    Refund refund = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+    calixa.domain.common.ExternalId primary_id = 3;
+    repeated calixa.domain.common.ExternalId relationship_ids = 4;
+}
