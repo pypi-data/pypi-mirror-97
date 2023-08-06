@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -ex
+
+days=${1:-{{ backup_retention_days }}}
+docker run -v $HOME/.enough:/root/.enough --rm enoughcommunity/enough:latest --domain {{ domain }} backup create
+docker run -v $HOME/.enough:/root/.enough --rm enoughcommunity/enough:latest --domain {{ domain }} backup prune $days

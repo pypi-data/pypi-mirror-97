@@ -1,0 +1,74 @@
+---
+
+- name: setup DNS master
+  hosts: bind-service-group
+  become: true
+
+  roles:
+
+    - role: bind
+      bind_zone_name: "{{ domain }}"
+      bind_master:
+        - |
+          options {
+            directory "/var/cache/bind";
+            filter-aaaa-on-v4 yes;
+            auth-nxdomain no;    # conform to RFC1035
+            listen-on { any; };
+            allow-query { any; };
+            recursion yes;
+            allow-transfer  {
+              {{ bind_allow_transfer }}
+              {% if 'external-host' in hostvars and 'ansible_host' in hostvars['external-host'] %}
+              {{ hostvars['external-host'].ansible_host }};
+              {% endif %}
+            };
+            include "/etc/bind/named.conf.allow-recursion";
+          };
+
+          include "/etc/bind/named.conf.default-zones";
+
+          zone "{{ domain }}" IN {
+            type master;
+            file "{{ domain }}";
+            notify yes;
+            allow-update { localhost; };
+          };
+
+          zone "test.{{ domain }}" IN {
+            type master;
+            file "test.{{ domain }}";
+            allow-update { localhost; };
+            allow-transfer { "none"; };
+          };
+
+          zone "d.{{ domain }}" IN {
+            type master;
+            file "d.{{ domain }}";
+            allow-update { localhost; };
+            allow-transfer { "none"; };
+          };
+
+      bind_zone:
+        - |
+          $ORIGIN {{ domain }}.
+          $TTL 1W
+
+          @ IN SOA {{ bind_ns_host }}.{{ domain }}. hostmaster.{{ domain }}. (
+          {{ bind_timestamp.stdout }}
+          1D
+          1H
+          1W
+          1D )
+
+                     IN  NS     {{ bind_ns_host }}.{{ domain }}.
+                     {{ bind_ns }}
+
+          {{ bind_ns_host }} 1800 IN A {{ ansible_host }}
+
+          test 1800 IN NS {{ bind_ns_host }}.{{ domain }}.
+          d    1800 IN NS {{ bind_ns_host }}.{{ domain }}.
+
+          {{ bind_zone_records }}
+
+          @ IN CAA 0 issue "letsencrypt.org"

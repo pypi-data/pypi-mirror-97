@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o nounset -o pipefail -o errexit
+
+jane notify info "Sending test mail message to vagrant..."
+printf "Hello, world!\\n\\nThis is a test message from Jane.\\n" \
+    | mail -a "Content-Type: text/plain; charset=utf-8" \
+           -s "Test message" "vagrant@$(hostname -f)"
+
+jane notify info "Displaying vagrant mailbox..."
+cat /var/mail/vagrant

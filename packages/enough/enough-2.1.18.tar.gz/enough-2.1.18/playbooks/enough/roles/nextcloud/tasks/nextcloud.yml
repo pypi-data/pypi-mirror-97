@@ -1,0 +1,337 @@
+---
+
+- name: apt-get install git curl
+  apt:
+    name: [ git, curl ]
+    state: present
+
+- name: chown debian /srv
+  file:
+    path: /srv
+    owner: debian
+
+- name: mkdir -p /srv/nextcloud/apache/web
+  file:
+    path: /srv/nextcloud/apache/web
+    state: directory
+    owner: debian
+    group: debian
+    mode: 0755
+
+- name: set_fact app_sh & app_dir
+  set_fact:
+    app_dir: "/srv/nextcloud/apache"
+    app_sh: "docker-compose exec -T -u www-data app"
+
+- name: Copy docker files templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ app_dir }}/{{ item }}"
+    owner: debian
+    mode: "0644"
+  become: False
+  loop:
+    - db.env
+    - Dockerfile
+    - supervisord.conf
+
+- name: Copy docker files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ app_dir }}/{{ item }}"
+    owner: debian
+    mode: "0644"
+  become: False
+  loop:
+    - web/Dockerfile
+    - web/nginx.conf
+
+- name: Copy docker-compose.yml
+  template:
+    src: "docker-compose-{{ enough_nextcloud_database }}.yml.j2"
+    dest: "{{ app_dir }}/docker-compose.yml"
+    owner: debian
+    mode: "0644"
+  become: False
+
+- name: cleanup docker leftovers
+  shell: docker system prune --force
+
+- name: docker build fpm-cron
+  shell: |
+    docker build --pull -t nextcloud:{{ enough_nextcloud_version }}-fpm-cron .
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: (re)create nextcloud
+  shell: |
+    docker-compose up -d
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: wait for {{ vhost_fqdn }} to be ready
+  shell: |
+    set $(curl -k -L -s --head https://{{ vhost_fqdn }} | grep HTTP | tail -1)
+    # 400 is because vhost_fqdn may not yet been set as a trusted domain
+    if test "$2" = 200 -o "$2" = 400 ; then
+      exit 0
+    else
+      exit 1
+    fi
+  register: nextcloud_get
+  until: nextcloud_get is success
+  # this may seem a very large number of retries but sometimes upgrades take really long
+  retries: 60
+  delay: 5
+
+- name: test -f config/config.php
+  shell: |
+    {{ app_sh }} grep installed config/config.php
+  args:
+    chdir: "{{ app_dir }}"
+  register: nextcloud_config
+  ignore_errors: True
+
+- name: occ maintenance:install
+  shell: |
+    {{ app_sh }} bash -c 'php -f occ maintenance:install \
+                                    --database {{ enough_nextcloud_database }} --database-host=$DB_HOST --database-name=nextcloud --database-user=$DB_USER --database-pass=$DB_PASSWORD \
+                                    --admin-user="{{ nextcloud_admin_user }}" --admin-pass="{{ nextcloud_admin_pass }}"'
+  args:
+    chdir: "{{ app_dir }}"
+  when: nextcloud_config.rc == 1
+  # when I/O lags the database may not be ready and retry is necessary
+  register: nextcloud_install
+  until: nextcloud_install is success
+  retries: 10
+  delay: 5
+
+- name: occ config:system:set trusted_proxies local ip ranges
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ config:system:set trusted_proxies 0 --value 172.16.0.0/12
+    {{ app_sh }} php -f occ config:system:set trusted_proxies 1 --value 10.0.0.0/8
+    {{ app_sh }} php -f occ config:system:set trusted_proxies 2 --value 192.168.0.0/16
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ config:system:set trusted_domains {{ vhost_fqdn }}
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ config:system:set trusted_domains 0 --value {{ vhost_fqdn }}
+    {{ app_sh }} php -f occ config:system:set trusted_domains 1 --value {{ ansible_host }} # for test purposes only
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ config:system:set overwriteprotocol --value=https
+  shell: |
+    {{ app_sh }} php -f occ config:system:set overwriteprotocol --value=https
+  args:
+    chdir: "{{ app_dir }}"
+
+# cron jobs rely on overwrite.cli.url to set the URL
+- name: occ config:system:set config:system:set overwrite.cli.url --value=https://{{ vhost_fqdn }}
+  shell: |
+    {{ app_sh }} php -f occ config:system:set overwrite.cli.url --value=https://{{ vhost_fqdn }}
+  args:
+    chdir: "{{ app_dir }}"
+
+# needed when upgrading because it is not done by the upgrade
+- name: occ db:add-missing-indices
+  shell: |
+    {{ app_sh }} php -f occ db:add-missing-indices
+  args:
+    chdir: "{{ app_dir }}"
+
+# needed when upgrading because it is not done by the upgrade
+- name: occ db:add-missing-columns
+  shell: |
+    if {{ app_sh }} php -f occ list | grep -q db:add-missing-columns ; then
+      {{ app_sh }} php -f occ db:add-missing-columns
+    fi
+  args:
+    chdir: "{{ app_dir }}"
+
+# needed when installing 15
+- name: occ db:convert-filecache-bigint
+  shell: |
+    {{ app_sh }} php -f occ db:convert-filecache-bigint
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ app:update --all
+  shell: |
+    {{ app_sh }} php -f occ app:update --all
+    {{ app_sh }} php -f occ upgrade
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ app:{install,enable} twofactor_totp
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ app:install twofactor_totp || true
+    {{ app_sh }} php -f occ app:enable twofactor_totp
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ app:enable encryption
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ app:enable encryption
+    {{ app_sh }} php -f occ config:app:set --value=yes core encryption_enabled
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ config:system:set mail
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ config:system:set mail_domain --value={{ domain }} --type string
+    {{ app_sh }} php -f occ config:system:set mail_from_address --value=noreply --type string
+    {{ app_sh }} php -f occ config:system:delete mail_smtpauth
+    {{ app_sh }} php -f occ config:system:set mail_smtphost --value={{ inventory_hostname }}.{{ domain }} --type string
+    {{ app_sh }} php -f occ config:system:set mail_smtpmode --value=smtp --type string
+    {{ app_sh }} php -f occ config:system:delete mail_smtpsecure
+    {{ app_sh }} php -f occ config:system:set mail_smtpport --value=25 --type int
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: occ app:enable activity
+  shell: |
+    set -e
+    {{ app_sh }} php -f occ app:enable activity
+    {{ app_sh }} php -f occ config:app:set --value=1 activity notify_email_file_created
+  args:
+    chdir: "{{ app_dir }}"
+
+- when: enough_nextcloud_onlyoffice
+  block:
+
+  - name: occ app:enable onlyoffice
+    shell: |
+      set -e
+      {{ app_sh }} php -f occ app:install onlyoffice || true
+      {{ app_sh }} php -f occ app:enable onlyoffice
+    args:
+      chdir: "{{ app_dir }}"
+
+  - name: occ app:enable documentserver_community
+    shell: |
+      set -e
+      {{ app_sh }} php -f occ app:install documentserver_community || true
+      {{ app_sh }} php -f occ app:enable documentserver_community
+      {{ app_sh }} php -f occ config:app:set --value='https://{{ vhost_fqdn }}/apps/documentserver_community/' onlyoffice DocumentServerUrl
+    args:
+      chdir: "{{ app_dir }}"
+
+- when: enough_nextcloud_registration
+  block:
+
+  - name: git clone https://lab.enough.community/main/registration/
+    git:
+      repo: "https://lab.enough.community/main/registration/"
+      force: yes
+      dest: /var/lib/docker/volumes/apache_nextcloud/_data/apps/registration
+
+  - name: occ app:enable registration
+    shell: |
+      {{ app_sh }} php -f occ app:enable registration
+    args:
+      chdir: "{{ app_dir }}"
+
+- when: enough_nextcloud_enough
+  block:
+
+  - name: git clone https://lab.enough.community/main/app/
+    git:
+      repo: "https://lab.enough.community/main/app/"
+      force: yes
+      dest: /var/lib/docker/volumes/apache_nextcloud/_data/apps/enough
+
+  - name: apt-get install rsync
+    apt:
+      name: rsync
+      state: present
+
+  - name: install Enough theme
+    shell: |
+      rsync -av --chown www-data:www-data --delete apps/enough/theme/ themes/enough/
+    args:
+      chdir: /var/lib/docker/volumes/apache_nextcloud/_data
+
+  - name: occ config:app:set theming
+    shell: |
+      set -e
+      {{ app_sh }} php -f occ config:app:set --value='communicate securely and privately' theming slogan
+      {{ app_sh }} php -f occ config:app:set --value=http://enough.community theming url
+      {{ app_sh }} php -f occ config:app:set --value=Enough theming name
+      {{ app_sh }} php -f occ config:app:set --value=image/png theming logoMime
+      {{ app_sh }} php -f occ config:system:set theme --value=enough --type string
+      {{ app_sh }} php -f occ maintenance:theme:update
+    args:
+      chdir: "{{ app_dir }}"
+
+  - name: occ app:enable enough
+    shell: |
+      {{ app_sh }} php -f occ app:enable enough
+    args:
+      chdir: "{{ app_dir }}"
+
+- name: apt-get install tor and torsocks
+  apt:
+    name: [ tor, torsocks ]
+    state: present
+
+- name: mkdir /var/lib/tor/services
+  file:
+    state: directory
+    dest: /var/lib/tor/services
+    owner: debian-tor
+    group: debian-tor
+    mode: "0700"
+
+- name: mkdir /var/lib/tor/services/cloud
+  file:
+    state: directory
+    dest: /var/lib/tor/services/cloud
+    owner: debian-tor
+    group: debian-tor
+    mode: "0700"
+
+- name: Copy /etc/tor/torrc
+  template:
+    src: torrc.j2
+    dest: /etc/tor/torrc
+    mode: "0644"
+
+- name: restart tor
+  service:
+    name: tor
+    enabled: True
+    state: restarted
+
+- name: wait for nextcloud .onion to be ready
+  shell: |
+    set -e
+    url=$(cat /var/lib/tor/services/cloud/hostname)
+    torsocks curl --silent http://$url/login > /dev/null
+  register: tor_nextcloud_curl
+  until: tor_nextcloud_curl is success
+  retries: 30
+  delay: 10
+
+- name: get the .onion URL
+  shell: |
+    echo -n $(cat /var/lib/tor/services/cloud/hostname)
+  register: nextcloud_onion
+
+- name: occ config:system:set trusted_domains *.onion
+  shell: |
+    {{ app_sh }} php -f occ config:system:set trusted_domains 2 --value {{ nextcloud_onion.stdout }}
+  args:
+    chdir: "{{ app_dir }}"
+
+- name: (re)create nextcloud
+  shell: |
+    docker-compose up -d
+  args:
+    chdir: "{{ app_dir }}"

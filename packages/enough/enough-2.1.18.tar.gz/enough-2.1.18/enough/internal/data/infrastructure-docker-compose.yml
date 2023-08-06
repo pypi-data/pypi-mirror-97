@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  {{ this.name }}:
+    logging:
+      driver: json-file
+    entrypoint: /sbin/init
+    healthcheck:
+      test: ["CMD", "systemctl", "status"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    command: ''
+    hostname: {{ this.name }}
+    domainname: {{ this.domain }}
+    dns_search: {{ this.domain }}
+    image: {{ this.get_image_name('') }}
+    working_dir: /opt
+    labels:
+      enough: {{ this.domain }}
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/enough/{{ this.domain }}:/opt/enough/{{ this.domain }}
+      - {{ this.config_dir }}/{{ this.name }}/opt:/opt
+#      - {{ this.config_dir }}/{{ this.name }}/etc/ssl/certs:/etc/ssl/certs
+      - {{ this.config_dir }}/{{ this.name }}/usr/local/share/ca-certificates/infrastructure:/usr/local/share/ca-certificates/infrastructure
+    security_opt:
+      - seccomp=unconfined
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "{{ this.port }}:22"
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: {{ this.domain }}
