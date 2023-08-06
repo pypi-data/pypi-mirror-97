@@ -1,0 +1,53 @@
+<!-- wp:heading  -->
+<h2 id="packages">Packages</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+
+<ul>{% for pkg_type, pkg_url in distributions.items() %}
+{% if pkg_type == 's3' %}<li> <strong>{{pkg_type}}</strong> {{pkg_url}}</li>
+{%- elif pkg_type != 'fs' -%}<li> <strong>{{pkg_type}}</strong> <a href="{{pkg_url}}">{{pkg_url}}</a></li>{% endif %}
+{%- endfor %}</ul>
+
+<!-- /wp:list -->
+
+{% if distributions.zip  or distributions.csv %}
+<!-- wp:heading  {"level":3} -->
+<h3 id="metapack">Accessing Data in Vanilla Pandas</h3>
+<!-- /wp:heading -->
+<!-- wp:code -->
+<pre class="wp-block-code"><code>import pandas as pd
+
+{% for term_name, terms in resources.items() %}
+{%- for resource in terms %}
+{{resource.name}}_df =  pd.read_csv('{{resource.url}}')
+{%- endfor -%}
+{%- endfor -%}
+
+</code></pre>
+<!-- /wp:code -->
+<!-- wp:heading  {"level":3} -->
+<h3 id="metapack">Accessing Package in Metapack</h3>
+<!-- /wp:heading -->
+<!-- wp:code -->
+<pre class="wp-block-code"><code>import metapack as mp
+{% if distributions.zip -%}
+pkg = mp.open_package('{{distributions.zip}}')
+{%- elif distributions.csv -%}
+pkg = mp.open_package('{{distributions.csv}}')
+{%- endif %}
+
+# Create Dataframes
+{% for term_name, terms in resources.items() %}
+{%- for resource in terms %}
+{%- if resource.isgeo -%}
+{{resource.name}}_gdf = pkg.resource('{{resource.name}}').geoframe()
+{% else -%}
+{{resource.name}}_df = pkg.resource('{{resource.name}}').dataframe()
+{% endif -%}
+{%- endfor -%}
+{%- endfor -%}
+
+</code></pre>
+<!-- /wp:code -->
+{%- endif %}

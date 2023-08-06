@@ -1,0 +1,25 @@
+
+<!-- wp:heading -->
+<h2 id="data_dictionary">Data Dictionary</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+{% for table_name, columns in schema.items() -%}
+<a href="#data_dictionary_{{table_name}}">{{table_name}}</a> {{ "| " if not loop.last }}
+{%- endfor %}<br/>
+<!-- /wp:list -->
+
+{% for table_name, columns in schema.items() -%}
+
+<!-- wp:heading {"level":3} -->
+<h3 id="data_dictionary_{{table_name}}">{{table_name}}</h3>
+<!-- /wp:heading -->
+
+<!-- wp:table {"backgroundColor":"subtle-light-gray"} -->
+<table class="wp-block-table has-subtle-light-gray-background-color has-background schema-table"><tbody>
+<thead><tr><th>Column Name</th><th>Data Type</th><th>Description</th></tr></thead>
+{%- for column in columns -%}<tr><td>{{column.name}}</td><td>{{column.datatype}}</td><td>{{column.description}}</td></tr>{%- endfor -%}
+</tbody></table>
+<!-- /wp:table -->
+
+{% endfor %}
