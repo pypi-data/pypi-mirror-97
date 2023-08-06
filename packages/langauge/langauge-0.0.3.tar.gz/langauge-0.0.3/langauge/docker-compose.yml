@@ -1,0 +1,80 @@
+version: "3.4"
+
+services:
+
+  ui:
+    build: ui
+    tty: true
+    network_mode: "host"
+    volumes:
+      - /src/node_modules
+      - ./ui:/src
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
+  service:
+    build: core/service
+    network_mode: "host"
+    restart: always
+    volumes:
+      - file-uploads:/upload
+      - file-output:/output
+      - ./core/service:/service
+    env_file:
+      - .env
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - redis
+      - database
+
+  redis:
+    build: core/queue
+    network_mode: "host"
+    env_file:
+      - .env
+
+  database:
+    build: core/database
+    network_mode: "host"
+    restart: always
+    volumes:
+      - ./core/database/data:/data/db #Helps to store MongoDB data in ./database/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: celery
+
+  worker:
+    build: core/dispatcher
+    network_mode: "host"
+    volumes:
+      - file-uploads:/upload
+      - file-output:/output
+      - file-models:/models
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - database
+
+  monitor:
+    build: core/dispatcher
+    network_mode: "host"
+    entrypoint: flower
+    command: -A langauge.core.dispatcher.task.tasks --port=5555 --broker=redis://localhost:6379/0
+    depends_on:
+      - redis
+
+  runner:
+    build: runner
+    network_mode: "host"
+    volumes:
+      - file-uploads:/upload
+      - file-output:/output
+
+
+volumes:
+  file-uploads:
+  file-output:
+  file-models:

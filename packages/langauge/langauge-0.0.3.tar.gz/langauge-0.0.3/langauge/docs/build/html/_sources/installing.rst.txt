@@ -1,0 +1,103 @@
+How To Install LanGauge
+=======================
+LanGauge currently only supports Linux usage locally.
+
+Using Pip
+#########
+
+`Need Pip? <https://pip.pypa.io/en/stable/installing/>`_
+
+1.) Create (or navigate to) a folder you would like to use with LanGauge and create a virtual environment
+
+.. code-block::
+
+    python3 -m venv env
+
+
+2.) Activate the virtual environment
+
+.. code-block::
+
+    source env/bin/activate
+
+
+3.) Install the application
+
+.. code-block::
+
+    pip install langauge
+
+    
+4.) Starting the frontend
+
+.. code-block::
+
+    langauge ui [OPTIONS]
+
+    Options:
+    -h, --host TEXT          The network address to listen on (default:
+                             127.0.0.1). Use 0.0.0.0 to bind to all addresses if
+                             you want to access the tracking server from other
+                             machines.
+    
+    -p, --port INTEGER       The UI port to configure on (default:8080)
+    
+    -b --backend TEXT        The backend address & port to listen on
+                             requests (default: 127.0.0.1:5000).
+                             
+    --help                   Show this message and exit.
+
+
+5.) Starting the backend
+
+.. code-block::
+    
+    langauge backend [OPTIONS]
+    
+    Options:
+    -bp, --backendport INTEGER  The backend port to configure on (default:5000)
+
+
+
+Using docker-compose
+####################
+
+`Need docker-compose? <https://docs.docker.com/compose/install/>`_
+
+1.) Clone the repository
+
+.. code-block::
+
+    git clone https://github.com/flapmx/LanGauge-INTERNAL.git
+
+2.) Move to langauge directory ( the one with the docker-compose.yml ) 
+
+.. code-block::
+
+    cd langauge
+
+3.) Build and launch the project
+
+.. code-block::
+
+    docker-compose up --build -d
+
+4.) When you want to stop the project
+
+.. code-block::
+
+    docker-compose down
+
+Accessing the application
+#########################
+.. code-block::
+   
+    http://localhost:8080 for the React frontend
+
+.. code-block::
+ 
+    http://localhost:5000 for the Flask backend
+
+.. code-block::
+
+    http://localhost:5555 for the monitoring Celery
