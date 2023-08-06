@@ -1,0 +1,56 @@
+Metadata-Version: 2.1
+Name: fw-http-metrics
+Version: 0.1.0
+Summary: FastAPI middleware for collecting and exposing Prometheus metrics.
+Home-page: https://gitlab.com/flywheel-io/tools/lib/fw-http-metrics
+License: MIT
+Keywords: Flywheel,FastAPI,Prometheus,metrics
+Author: Flywheel
+Author-email: support@flywheel.io
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: fastapi (>=0.63.0,<0.64.0)
+Requires-Dist: prometheus-client (>=0.9.0,<0.10.0)
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-http-metrics
+Description-Content-Type: text/markdown
+
+# fw-http-metrics
+
+FastAPI middleware for collecting and exposing Prometheus metrics.
+
+## Installation
+
+Add as a `poetry` dependency to your project:
+
+```bash
+poetry add fw-http-metrics
+```
+
+## Usage
+
+```python
+from fastapi import FastAPI
+from fw_http_metrics import MetricsMiddleware, get_metrics
+
+app = FastAPI()
+app.add_middleware(MetricsMiddleware)
+app.add_route("/metrics", get_metrics)
+```
+
+## Development
+
+Install the project using `poetry` and enable `pre-commit`:
+
+```bash
+poetry install
+pre-commit install
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
