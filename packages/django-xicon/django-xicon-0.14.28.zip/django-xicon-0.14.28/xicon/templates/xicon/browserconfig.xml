@@ -1,0 +1,15 @@
+{% load static %}<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            {% block tiles %}
+            {% for tile in XICON_MSAPPLICATION_TILES %}
+            <{{ tile.name }} src="{% static tile.src %}"/>
+            {% endfor %}
+            {% endblock %}
+            {% block tile-color %}
+            {% if XICON_MSAPPLICATION_TILE_COLOR %}<TileColor>{{ XICON_MSAPPLICATION_TILE_COLOR }}</TileColor>{% endif %}
+            {% endblock %}
+        </tile>
+    </msapplication>
+</browserconfig>
