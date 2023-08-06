@@ -1,0 +1,143 @@
+schedule:
+  type: dict
+  required: false
+  require_all: false
+  schema:
+    cronExpression:
+      type: string
+      required: false
+      empty: false
+    runEveryMinute:
+      type: integer
+      required: false
+      empty: false
+      max: 59
+      min: 0
+    runEveryHour:
+      type: integer
+      required: false
+      empty: false
+      max: 23
+      min: 0
+modelDescription:
+  type: dict
+  required: true
+  schema:
+    frontEndName:
+      type: string
+      required: true
+      empty: false
+    description:
+      type: string
+      required: true
+      empty: false
+    longDescription:
+      type: string
+      required: true
+      empty: false
+modelSettings:
+  type: dict
+  required: true
+  schema:
+    modelVersion:
+      type: string
+      required: true
+      empty: false
+      regex: '^\d+\.\d+\.\d+$'
+    sendAlerts:
+      type: boolean
+      required: true
+      empty: false
+    displayInFrontEnd:
+      type: boolean
+      required: true
+      empty: false
+    backfill:
+      type: boolean
+      required: true
+      empty: false
+    dependencies:
+      type: list
+      required: false
+      empty: false
+      schema:
+        type: string
+      regex: '^[a-z]+==\d+\.\d+\.\d+$'
+    secrets:
+      type: list
+      required: false
+      empty: false
+      schema:
+        type: string
+airInfra:
+  type: boolean
+  required: false
+  empty: true
+loadBalancer:
+  type: boolean
+  required: false
+  empty: true
+fields:
+  type: dict
+  required: false
+  require_all: false
+  empty: true
+  valueschema:
+    type: dict
+    required: false
+    empty: true
+    schema:
+      name:
+        type: string
+        required: false
+        empty: true
+      description:
+        type: string
+        required: false
+        empty: true
+      type:
+        type: string
+        required: true
+        allowed: ["bool", "str", "float", "Asset", "TimeSeries"]
+      multiple:
+        type: boolean
+        required: false
+        empty: true
+        dependencies:
+          type: ["Asset", "TimeSeries"]
+      units:
+        type: list
+        required: false
+        empty: true
+        dependencies:
+          type: ["TimeSeries"]
+visualization:
+  type: dict
+  required: false
+  require_all: false
+  empty: true
+  schema:
+    timeSeries:
+      type: dict
+      required: false
+      empty: true
+      schema:
+        fields:
+          type: list
+          required: false
+          empty: true
+          schema:
+            type: string
+    thresholds:
+      type: dict
+      required: false
+      empty: true
+      schema:
+        fields:
+          type: list
+          required: false
+          empty: true
+          schema:
+            type: string
+
+
