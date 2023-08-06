@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block block_title %}
+<title>下载列表 - 局域网文件传输工具</title>
+{% endblock %}
+
+{% block extend_script %}
+<script src="/static/js/clipboard.min.js"></script>
+<script src="/static/js/list.js"></script>
+{% endblock %}
+
+{% block block_body %}
+<div class="row height-full">
+    <div class="col-lg-12 height-full">
+        <div id="file_list">
+            <ul>
+                <li>
+                    <p>
+                        <span class="glyphicon glyphicon-folder-open"></span>
+                        <span>{{ path }}</span>
+                        <a class="glyphicon glyphicon-copy float-right" id="copy_path" style="margin-right: 10px"></a>
+                    </p>
+                    <ul>
+                        {% if upload_path != path %}
+                            <li class="bottom-line">
+                                <p>
+                                    <span class="glyphicon glyphicon-folder-close"></span>
+                                    <span>
+                                        <a href="{{ url_for('file_list')}}?pre_folder={{ path }}">../</a>
+                                    </span>
+                                </p>
+                            </li>
+                        {% endif %}
+                        {% for file in files %}
+                        <li class="bottom-line">
+                            <p>
+                                <span class="glyphicon {% if file.is_folder %}glyphicon-folder-close{% else %}glyphicon-file{% endif %}"></span>
+                                <span>{{ file.name }}</span>
+                                <a class="glyphicon float-right {% if file.is_folder %}glyphicon-folder-open{% else %}glyphicon-cloud-download{% endif %}" href="{% if file.is_folder %}{{ url_for('file_list')}}?folder={% if folder %}{{ folder }}/{% endif %}{{ file.name }}{% else %}{{ url_for('file_download', filename=file.name)}}{% endif %}"></a>
+                                {% if not file.is_folder %}
+                                    <span class="float-right">{{ file.size }}</span>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <span>{{ file.update_date }}</span>
+                            </p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
