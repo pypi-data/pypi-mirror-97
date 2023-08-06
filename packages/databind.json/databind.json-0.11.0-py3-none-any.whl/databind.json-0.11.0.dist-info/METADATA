@@ -1,0 +1,54 @@
+Metadata-Version: 2.1
+Name: databind.json
+Version: 0.11.0
+Summary: Bind object-oriented data models to JSON data.
+Home-page: https://github.com/NiklasRosenstein/python-databind
+Author: Niklas Rosenstein
+Author-email: rosensteinniklas@gmail.com
+License: MIT
+Platform: UNKNOWN
+Requires-Python: >=3.6.0,<4.0.0
+Description-Content-Type: text/markdown
+Requires-Dist: databind.core (<1.0.0,>=0.10.0)
+Requires-Dist: nr.parsing.date (<1.0.0,>=0.3.0)
+
+# databind.json
+
+Databind is a library inspired by Jackson-databind to describe and bind data models for
+object-oriented programming. The `databind.json` package provides converters for JSON data
+types, data models and union types to serialize and deserialize JSON payloads.
+
+## Quickstart
+
+```python
+from typing import Optional
+from databind.core import datamodel
+from databind.json import from_json
+
+@datamodel
+class Geolocation:
+  latitude: float
+  longitude: float
+  altitude: Optional[float] = None
+
+@datamodel
+class ResolvedLocation:
+  query: str
+  location: Geolocation
+
+london = from_json(ResolvedLocation, {
+  "query": "London",
+  "location": {
+    "latitude": 51.507351,
+    "longitude": -0.127758,
+  },
+})
+
+assert london == ResolvedLocation("London", Geolocation(51.507351, -0.127758))
+```
+
+---
+
+<p align="center">Copyright &copy; 2020 &ndash; Niklas Rosenstein</p>
+
+
