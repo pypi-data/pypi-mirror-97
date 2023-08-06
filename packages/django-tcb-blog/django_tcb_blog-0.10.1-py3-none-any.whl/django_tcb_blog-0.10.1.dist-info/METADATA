@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: django-tcb-blog
+Version: 0.10.1
+Summary: A Django backend based on DRF for blogging from TheCodeBlogs
+Home-page: https://www.thecodeblogs.com/
+Author: Brent Jameson
+Author-email: admin@thecodeblogs.com
+License: MIT
+Platform: UNKNOWN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+
+==========================
+TheCodeBlogs Blog Backend
+==========================
+
+Blogging made easy
+
+Settings
+-----------
+
+These should go into your settings.py file.
+
+.. code-block:: python
+
+    TCB_BLOG_SETTINGS = {
+        'RSS_FEED_TITLE': 'Title of the blog',
+        'RSS_FEED_LINK': '/blog/',
+        'RSS_FEED_ITEM_DESC_TEMPLATE': 'feed/entries.html'
+    }
+
+
+Quick start
+-----------
+
+1. Add "blog" to your INSTALLED_APPS setting like this
+
+.. code-block:: python
+
+   INSTALLED_APPS = [
+   ...
+   'blog',
+   ]
+
+2. Include the polls URLconf in your project urls.py like this
+
+.. code-block:: python
+
+   path('blog_api/', include('blog.urls')),
+
+3. Setup a module named 'backend'
+
+4. Using celery.py.sample as a guide, setup celery do that tasks will work
+
+5. Run ``python manage.py migrate`` to create the blog models.
+
+6. Start the development server and visit http://127.0.0.1:8000/admin/
+     to create a poll (you'll need the Admin app enabled).
+
+7. Visit http://127.0.0.1:8000/blog_api/ to see something.
+
+
+
