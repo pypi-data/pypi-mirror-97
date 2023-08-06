@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% set title = "Riego - Bewässerungskreise" %}
+{% set active_menu = "valves" %}
+
+
+{% block content %}
+<h1>Items</h1>
+<p>
+  <ul>
+    {% for item in items %}
+    <li>
+      <a href="{{url('valves_item_view', item_id=item['id']) }}">{{ item['name'] }}</a> {{ item['topic'] }} {{ item['box_name'] }} {{ item['channel_nr']}}
+    </li>
+    {% endfor %}
+  </ul>
+</p>
+<hr>
+<p>
+  <a href="{{url('valves_new')}}">New</a> 
+</p>
+
+{% endblock %}
