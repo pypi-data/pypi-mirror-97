@@ -1,0 +1,34 @@
+200,204c227,231
+<         filter_key_up: function(event, field_id) {
+<             var from = document.getElementById(field_id + '_from');
+<             var temp = from.selectedIndex;
+<             SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
+<             from.selectedIndex = temp;
+---
+>         filter_key_up: function(event, field_id, type) {
+>             var fld = document.getElementById(field_id + (type=='avail' ? '_from' : '_to'));
+>             var temp = fld.selectedIndex;
+>             SelectBox.filter(field_id + (type=='avail' ? '_from' : '_to'), document.getElementById(field_id + (type=='avail' ? '_input' : '_chosen_input')).value);
+>             fld.selectedIndex = temp;
+207,208c234,235
+<         filter_key_down: function(event, field_id) {
+<             var from = document.getElementById(field_id + '_from');
+---
+>         filter_key_down: function(event, field_id, type) {
+>             var fld = document.getElementById(field_id + (type=='avail' ? '_from' : '_to'));
+211,213c238,240
+<                 var old_index = from.selectedIndex;
+<                 SelectBox.move(field_id + '_from', field_id + '_to');
+<                 from.selectedIndex = (old_index === from.length) ? from.length - 1 : old_index;
+---
+>                 var old_index = fld.selectedIndex;
+>                 SelectBox.move(field_id + (type=='avail' ? '_from' : '_to'), field_id + (type=='avail' ? '_to' : '_from'));
+>                 fld.selectedIndex = (old_index === fld.length) ? fld.length - 1 : old_index;
+218c245
+<                 from.selectedIndex = (from.length === from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
+---
+>                 fld.selectedIndex = (fld.length === fld.selectedIndex + 1) ? 0 : fld.selectedIndex + 1;
+222c249
+<                 from.selectedIndex = (from.selectedIndex === 0) ? from.length - 1 : from.selectedIndex - 1;
+---
+>                 fld.selectedIndex = (fld.selectedIndex === 0) ? fld.length - 1 : fld.selectedIndex - 1;
