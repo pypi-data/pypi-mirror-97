@@ -1,0 +1,43 @@
+{% load staticfiles %}
+{% load i18n %}
+<h2 class="title_lead">
+    {% trans  "Notification from your collaborative Coopedia Knowledge Base" %}
+</h2>
+
+<p>
+    {% trans  "Hello"%} {{user.name}} !
+</p>
+
+<p>
+    {{contributor.user.name|safe}} ({{contributor.user.email}}) {% trans  "just completed his profile as a contributor on Coopedia" %} !<br>
+    <ul>
+        <li>
+            {% trans  "Phone number:" %} {{contributor.phone}}
+        </li>
+        <li>
+            {% trans  "Biography:" %} {{contributor.biography}}
+        </li>
+        <li>
+            {% trans  "Skills:" %} {{contributor.skills}}
+        </li>
+        {% if contributor.organisationName %}
+        <li>
+            {% trans  "Organisation contact:" %} {{contributor.organisationName}}
+        </li>
+        {% endif %}
+        {% if contributor.organisationContact %}
+        <li>
+            {% trans  "Organisation contact:" %} {{contributor.organisationContact}}
+        </li>
+        {% endif %}
+    </ul>
+    {% trans  "Please connect to the Knowledge Base to review its account information." %}
+</p>
+
+
+<footer style="margin-top:10px;font-size:small;color:#777">
+    {% blocktranslate %}
+    Have a nice day,<br>
+    The Coopedia Knowledge Base Team.
+    {% endblocktrans  %}
+</footer>

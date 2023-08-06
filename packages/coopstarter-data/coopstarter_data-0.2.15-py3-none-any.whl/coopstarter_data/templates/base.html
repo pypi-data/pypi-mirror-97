@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    {% load i18n %}
+    <title>{% block title %}Coopedia{% endblock %}</title>
+    <script src="https://kit.fontawesome.com/48014d2af3.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500&display=swap" rel="stylesheet"></link>
+    <style>
+        /* Reset*/
+        /* http://meyerweb.com/eric/tools/css/reset/ 
+        v2.0 | 20110126
+        License: none (public domain)
+        */
+    
+        html, body, div, span, applet, object, iframe,
+        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+        a, abbr, acronym, address, big, cite, code,
+        del, dfn, em, img, ins, kbd, q, s, samp,
+        small, strike, strong, sub, sup, tt, var,
+        b, u, i, center,
+        dl, dt, dd, ol, ul, li,
+        fieldset, form, label, legend,
+        table, caption, tbody, tfoot, thead, tr, th, td,
+        article, aside, canvas, details, embed, 
+        figure, figcaption, footer, header, hgroup, 
+        menu, nav, output, ruby, section, summary,
+        time, mark, audio, video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+        /* HTML5 display-role reset for older browsers */
+        article, aside, details, figcaption, figure, 
+        footer, header, hgroup, menu, nav, section {
+            display: block;
+        }
+        body {
+            line-height: 1;
+        }
+        ol, ul {
+            list-style: none;
+        }
+        blockquote, q {
+            quotes: none;
+        }
+        blockquote:before, blockquote:after,
+        q:before, q:after {
+            content: '';
+            content: none;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        /* XXXXXXXXXXXXXXXXXXXXXXXX FIN RESET XXXXXXXXXXXXXXXXXXXXX*/
+    
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX GLOBAUX XXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+        /* XXXXXXXXXXXXXXXXXXXXXXXX variables XXXXXXXXXXXXXXXXXXXXXX */
+    
+        :root {
+            --typo: 'Cabin';
+            --typo-btn: 'Cabin';
+            --bg-page: #f5f6fa;
+            --clr-typo-base : #7A8789;
+            --bg-block:#FFFFFF;
+            --bg-form : rgba(236,241,251,1);
+            --bg-form-focus : rgba(236,241,251,0.5);
+            --marge-base: 4.5rem;
+            --marge-petit: 3rem;
+            --marge-base-750: 1rem;
+            --bg-btn-base: #58AB05;
+            --clr-roll-black:#444C4D;
+            --orange: #E55D0A;
+            --blue: #0E79B2;
+            --black: #191923;
+            --white: #FBFEF9;
+            --green: #58AB05;
+        }
+    
+        html{
+            font-size: 62.5%; /* definition du rem 1rem=10px*/
+            box-sizing: border-box; /* redefinition du modèle de boite*/
+        }
+    
+        *,*:before,*:after{
+            box-sizing: inherit;
+        }
+    
+        img{
+            max-width: 100%;
+        }
+    
+        .pull-right{
+            float: right;
+            width: auto;
+        }
+        .pull-left{
+            float: left;
+            width: auto;
+        }
+    
+        .flex{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    
+        .flex_espace{
+            justify-content: space-between;
+        }
+    
+        .flex_item_center{
+            align-items: center;
+        }
+    
+        .container{
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+    
+        .w_50{
+            width: 50%;
+        }
+    
+        .w_33{
+            width: 33%;
+        }
+    
+        .w_66{
+            width: 66%;
+        }
+        /* XXXXXXXXXXXXXXXXXXXXXXXX visuels XXXXXXXXXXXXXXXXXXXXXX */
+    
+        body{
+            font-family: 'Cabin';
+            background: var(--bg-page);
+        }
+    
+        .title_lead{
+            width: 50%;
+            margin: 0 25% var(--marge-base) 25%;
+            font-size: 2.2rem;
+            line-height: 1.4;
+            text-align: center;
+	        font-family: 'Cabin';
+        }
+    
+        .title_lead_avenir{
+            font-size: 2.4rem;
+            text-align: center;
+            margin: 2rem;
+            font-weight: 900;
+	        font-family: 'Cabin';
+        }
+    
+        .block_log{
+            width: 33%;
+            background: var(--bg-block);
+            text-align: center;
+            margin: 1rem;
+            padding: var(--marge-base);
+            -webkit-box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.13);
+            -moz-box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.13);
+            box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.13);
+        }
+    
+        .button_base{
+            transition: all .3s ease-in-out;
+            background-color: var(--bg-btn-base);
+            color: var(--bg-block);
+            text-transform: uppercase;
+            font-size: 1.4rem;
+            padding: 1.5rem 1.9rem 1.5rem 1.9rem;
+            margin-bottom: 1rem;
+            font-family: var(--typo-btn);
+            border: 2px solid var(--bg-btn-base);
+            box-shadow: none;
+            border-radius: 20px;
+        }
+        .button_base:hover{
+            background-color: var(--bg-block);
+            color: var(--bg-btn-base);
+        }
+    
+        .button_dark{
+            transition: all .3s ease-in-out;
+            background-color: #444C4D;
+            color: var(--bg-block);
+            text-transform: uppercase;
+            font-size: 1.4rem;
+            padding: 1.5rem 1.9rem 1.5rem 1.9rem;
+            margin: 3rem 0 1rem 0;
+            font-family: var(--typo-btn);
+            border: 2px solid #444C4D;
+            box-shadow: none;
+            width: auto;
+        }
+        .button_dark:hover{
+            background-color: var(--bg-block);
+            color: #444C4D;
+        }
+        p, ul{
+            font-size: 1.6rem;
+            color: var(--clr-typo-base);
+            font-family: var(--typo-btn);
+            text-align: left;
+            margin: 0 0 var(--marge-petit) 0;
+        }
+    
+        .p_entete{
+            text-align: center;
+            font-size: 1.8rem;
+        }
+    
+        .backlink{
+            display: inline-block;
+            color: var(--clr-typo-base);
+            font-size: 1.4rem;
+            text-decoration: underline;
+            font-family: var(--typo-btn);
+            transition: all .3s ease-in-out;
+            margin: 3rem;
+        }
+    
+        .backlink:hover{
+            color: var(--bg-btn-base);
+        }
+    
+        .add_browse{
+            font-family: var(--typo-btn);
+            min-width: 10rem;
+            font-size: 1.4rem;
+            color: var(--bg-block);	
+            border-radius: 16.5px;
+            padding: .8rem 2rem;	
+            background: #5B6374;
+            border: 2px solid #5B6374;
+            transition: all .3s ease-in-out;
+            margin: 2rem;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+    
+        .add_browse:hover{
+            color: #5B6374;		
+            background: var(--bg-block);
+        }
+    
+        .btn_filtre{
+            border-radius: 15.5px;	
+            background-color: #818998;
+            padding: .5rem 3.5rem .5rem 1.5rem;
+            font-family: var(--typo-btn);
+            color: var(--bg-block);
+            text-decoration: none;
+            text-align: center;
+            font-size: 1.4rem;
+            border:none;
+            position: relative;
+        }
+        .btn_filtre:after{
+            font-family: "Font Awesome 5 pro";
+            font-weight: 900;
+            content: "\f00d";
+            position: absolute;
+            right: 1.2rem;
+            top: 30%;
+        }
+        /* XXXXXXXXXXXXXXXXXXXXXXXX formulaires XXXXXXXXXXXXXXXXXXXXXX */
+    
+        .block_creat_count{
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--marge-petit);
+            overflow: hidden;
+        }
+    
+        sib-form-label-text, sib-multiple-select,
+        cs-form-password {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        sib-set-default, cs-section_header, 
+        sib-form-textarea {
+            display: block;
+            width: 100%;
+        }
+    
+        textarea{
+            height: 9.5rem;
+            transition: all .3s ease-in-out; 
+            resize: none;
+        }
+    
+        label div{
+            text-align: left;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 1rem 0;
+            font-family: var(--typo-btn);
+        }
+    
+        input, textarea, select{
+            background: var(--bg-form);
+            color: #7A8789;
+            font-size: 1.4rem;
+            padding: 1rem 2rem 1rem 2rem;
+            width: 100%;
+            border:none;
+            font-weight: lighter;
+            font-family: var(--typo-btn);
+            outline: none;
+            transition: all .3s ease-in-out; 
+        }
+    
+        input:focus, textarea:focus{
+            background: var(--bg-form-focus);
+        }
+
+        .title_form{
+            font-family: 'var(--typo)';
+            font-size: 2.2rem;
+            text-align: left;
+            width: 100%;
+            color: #444C4D;
+            border-bottom: 1px solid #DBE2ED;
+            padding: 0 0 1.5rem 0;
+            margin: 2rem 0 2rem 0;
+        }
+    
+        .title_form_avenir{
+            font-family: var(--typo-btn);
+            color: #3D424A;
+            border-bottom: 1px solid #C5CCD9;
+            padding: 0 0 1.5rem 0;
+            margin: 2rem 0 2rem 0;
+            text-align: left;
+            font-size: 1.8rem;
+            width: 100%;
+            font-weight: 900;
+        }
+    
+        .input_big{
+            width: 100%;
+        }
+    
+        .input_photo label{
+            position: relative;
+        }
+    
+        .input_photo label div{
+            position: absolute;
+            left: 25%;
+            margin-top: 3rem;
+        }
+        .input_photo label input{
+            width: 10rem;
+            height: 10rem;
+            border-radius: 50%;
+            margin: 0 3rem 0 0;
+            background: url(../images/telecharger.png) no-repeat 52% 67% var(--bg-form);
+        }
+    
+        sib-form-label-text[name="iframe_link"] div{
+            position:relative;
+        }
+    
+        sib-form-label-text[name="iframe_link"] div:before{
+            content: "";
+            display: block;
+            width: 19px;
+            height: 19px;
+            background: url(../images/bulle_quest.png) no-repeat;
+            top: 0.4rem;
+            left: 24%;
+            position: absolute;
+        }
+    
+        select{
+            padding: 0;
+        }
+    
+        option{
+            border-bottom: 1px solid #DBE2ED;
+            padding: 1rem;
+        }
+    
+        button{
+            outline: none;
+        }
+
+        .helptext {
+            margin-bottom: 20px;
+            margin-top: -10px;
+        }
+    
+        /* ----------------- CHECKBOX ---------------------------*/
+        
+        .checkbox {
+            color: #818998;
+            font-weight: lighter;
+            font-family: var(--typo-btn);
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .checkbox input[type="checkbox"]{
+            width: auto;
+        }
+        
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX MENU LOGUE XXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+        #header{
+            background: #152935;
+            height: 5rem;
+        }
+    
+        #header img{
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+        }
+    
+        #header .flex, #header>div{
+            height: 100%;
+        }
+    
+        #header .flex a{
+            display: inline-block;
+            font-size: 1.8rem;
+            font-family: var(--typo-btn);
+            color: white;
+            margin: 0 0 0 5rem;
+            text-decoration: none;
+        }
+    
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX PAGE LOG XXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+        .logo{
+            text-align: center;
+            margin: 10rem 0 var(--marge-base) 0;
+            width: 100%;
+        }
+    
+        #splash .block_log{
+            max-width: 50rem;
+            margin-bottom: var(--marge-base);
+        }
+    
+        .img_log{
+            margin: 0 0 4rem 0;
+        }
+
+        p.error {
+            margin: 0;
+            font-size: 1.2rem;
+            color: red;
+        }
+
+        .helptext {
+            font-size: 1.2rem;
+            color: grey;
+        }
+    
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX UPLOAD RESSOURCE XXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+    
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX MEDIA QUERIES XXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+        @media screen and (max-width: 750px) {
+            .block_log {
+                padding:var(--marge-base-750);
+            }
+        }
+        /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXX FOOTER XXXXXXXXXXXXXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+    
+        #footer{
+            background: #FFFFFF;
+            height: auto;
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.14);
+            padding-top: 2rem;
+            bottom: 0;
+            width: 100%;
+        }
+        #footer .margin_bord_ecran {
+            margin: 0 0 0 var(--marge-base);
+            display: block;
+        }
+        #footer .textMore {
+            width: 40%;
+        }
+        #footer a {
+            text-align: center;
+            color: #7A8789;
+        }
+        #footer .logo_footer {
+            width: 22rem;
+            text-decoration: none;
+        }
+        #footer .logo_footer div {
+            margin-left: 13px;
+        }
+        #footer .logo_footer p {
+            margin: 1px;
+            font-weight: bolder;
+            color: black;
+            font-size: small;
+        }
+
+
+        #footer .footer_warning{
+            padding: 20px;
+            text-align: center;
+            margin: 0 auto;
+            line-height: 3rem;
+            width: 70%;
+        }
+        #footer .contact{
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="splash" class='no-sidebar container'>
+        <figure class="logo">
+            <img src="{% static 'coopstarter/img/logo.png' %}" alt="logo de la société Coopstarter">
+        </figure>
+
+        <h2 class="title_lead">
+            {% blocktrans %}
+            Welcome to your international index of resources for cooperative contributors and searchers
+            {% endblocktrans %}
+        </h2>
+    
+        {% block content %}{% endblock %}
+    </div>
+    <div id="footer"class="container">
+        <div class="flex flex_espace flex_item_center">
+            <a href="#" class="logo_footer">
+                <figure class="margin_bord_ecran">
+                    <img src="{% static 'coopstarter/img/logo_CE.png' %}" alt="Cooperatives Europe">
+                </figure>
+            </a>
+            
+            <a href="#" class="logo_footer">
+                <figure class="margin_bord_ecran">
+                    <img src="{% static 'coopstarter/img/logo_coops4dev.jpg' %}" alt="Cooperatives Europe">
+                </figure>
+            </a>
+            <a href="#" class="logo_footer">
+                <figure class="flex flex_item_center">
+                    <img class="textMore" src="{% static 'coopstarter/img/ica_logo.png' %}" alt="Cooperatives Europe">
+                    <div>
+                        <p>
+                            {%trans 'International'%}
+                        </p>
+                        <p>
+                            {%trans 'Co-operative'%}
+                        </p>
+                        <p>
+                            {%trans 'Alliance'%}
+                        </p>
+                    </div>
+                </figure>
+            </a>
+            <a href="#" class="logo_footer">
+                <figure class="flex flex_item_center">
+                    <img class="textMore" src="{% static 'coopstarter/img/logo_UE.jpg' %}" alt="Cooperatives Europe">
+                    <div>
+                        <p>
+                            {%trans 'Co-funded '%}
+                        </p>
+                        <p>
+                            {%trans 'by the'%}
+                        </p>
+                        <p>
+                            {%trans 'European Union'%}
+                        </p>
+                    </div>
+                </figure>
+            </a>
+        </div>
+        <div>
+            <p class="footer_warning flex_item_center">
+                {% blocktrans %}
+                This software has been co-funded by the European Union. The contents of this software are the sole responsibility of Cooperatives Europe and can in no way be taken to reflect the views of the European Union.
+                {% endblocktrans %}
+            </p>
+            <p class="contact">
+                <a href="mailto:coopedia@coopseurope.coop">
+                    {%trans 'Contact us' %}
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+</body>
+</html>
+

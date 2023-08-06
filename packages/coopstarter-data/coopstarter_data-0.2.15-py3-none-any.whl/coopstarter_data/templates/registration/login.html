@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="no-sidebar container" id="splash">
+    {% if next %}
+        {% if user.is_authenticated %}
+            <p class="flex">
+                Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.
+            </p>
+        {% endif %}
+    {% endif %}
+
+    <div class="flex" id="splash-index">
+        <div class="block_log">
+            <figure class="img_log">
+                <img src="{% static 'coopstarter/img/contributor.png' %}" alt="Connect to the knowledge base">
+            </figure>
+            <form class="block_creat_count" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <p class="error">
+                    Your username and password didn't match. Please try again.
+                </p>
+                {% endif %}
+                <sib-form-label-text>
+                    <label>
+                        <div>
+                            Username or e-mail:
+                        </div>
+                    </label>
+                    {{ form.username }}
+                </sib-form-label-text>
+                <sib-form-label-text>
+                    <label>
+                        <div>
+                            {{ form.password.label_tag }}
+                        </div>
+                    </label>
+                    {{ form.password }}
+                </sib-form-label-text>
+                
+                <input class="button_base" type="submit" value="login" />
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+        </div>            
+    </div>
+
+    <p class="flex">
+        <a href="/auth/register/">
+            Don't have an account ? Register here
+        </a>
+    </p>
+
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p class="flex">
+        <a href="{% url 'password_reset' %}">
+            Lost password?
+        </a>
+    </p>
+
+    <div>
+        <p class="flex">
+            or login using another authentification provider
+        </p>
+
+        <form method="post" class="block_creat_count" action="{% url 'oidc_login' %}">
+            {% csrf_token %}
+            <sib-form-label-text>
+                <label for="id_subject">
+                    <div>
+                        Email, WebID, or provider url:
+                    </div>
+                </label>
+                <input type="text" name="subject" required id="id_subject"/>
+            </sib-form-label-text>
+
+            <input class="button_base" type="submit" value="login" />
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+    </div>
+</div>
+{% endblock %}

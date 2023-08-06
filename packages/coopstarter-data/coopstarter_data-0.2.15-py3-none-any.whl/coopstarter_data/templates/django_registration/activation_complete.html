@@ -1,0 +1,33 @@
+{% extends "django_registration/registration_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Activation complete" %}{% endblock %}
+{% block content %}
+{% url 'login' as auth_login_url %}
+
+<script type="text/javascript">
+  setTimeout(function() {
+    var redirectURL = "{{settings.INSTANCE_DEFAULT_CLIENT}}";
+    window.location.replace(redirectURL);
+  }, 5000);
+</script>
+<div>
+  <p class="flex">
+    {% blocktrans %}
+      Thanks, activation complete!
+    {% endblocktrans %}
+  </p>
+  <p class="flex">
+    {% blocktrans %}
+      You may now return or be automatically redirected to the Coopedia knowledge base instance you were creating an account for, and login from there !
+    {% endblocktrans %}
+  </p>
+  <p class="flex">
+      {% blocktrans %}
+        It is probably 
+      {% endblocktrans %}&nbsp;
+      <a href="{{settings.INSTANCE_DEFAULT_CLIENT}}" target="_blank">
+        {{settings.INSTANCE_DEFAULT_CLIENT}}
+      </a>
+    </p>
+</div>
+{% endblock %}

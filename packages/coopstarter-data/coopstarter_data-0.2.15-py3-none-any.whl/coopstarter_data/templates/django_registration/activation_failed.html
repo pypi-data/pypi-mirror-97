@@ -1,0 +1,29 @@
+{% extends "django_registration/registration_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Activation failed" %}{% endblock %}
+{% block content %}
+{% url 'login' as auth_login_url %}
+
+<script type="text/javascript">
+  setTimeout(function() {
+    var redirectURL = "{{settings.INSTANCE_DEFAULT_CLIENT}}";
+    window.location.replace(redirectURL);
+  }, 5000);
+</script>
+<div>
+  <p class="flex">
+    {% blocktrans %}
+        Activation encountered an issue.
+    {% endblocktrans %}
+    <br>
+    {% blocktrans %}
+        You will be soon redirected to the homepage of the application
+    {% endblocktrans %}
+  </p>
+  <p class="flex">
+    {% blocktrans %}
+      You may contact your system administrator.
+    {% endblocktrans %}
+  </p>
+</div>
+{% endblock %}
