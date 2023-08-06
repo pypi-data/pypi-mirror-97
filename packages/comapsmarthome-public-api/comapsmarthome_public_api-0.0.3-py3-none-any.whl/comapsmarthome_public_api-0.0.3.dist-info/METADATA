@@ -1,0 +1,61 @@
+Metadata-Version: 2.1
+Name: comapsmarthome-public-api
+Version: 0.0.3
+Summary: Comap Smart Home public API python module
+Home-page: https://gitlab.com/comapsmartlab/sdks/comapsmarthome_public_api_python
+Author: Melec Petit-Pierre
+Author-email: melec.petit-pierre@comap.eu
+License: MIT
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: python-dateutil
+
+# COMAP Smart Home public API
+
+Python 3 API to control and retrieve data for COMAP Smart Home products.
+
+## Install
+
+To install `comapsmarthome-prublic-api` run :
+
+    pip install comapsmarthome-public-api --extra-index-url https://__token__:$GITLAB_PERSONAL_TOKEN@gitlab.com/api/v4/projects/22205893/packages/pypi/simple
+
+Your Gitlab personal access token needs to be saved under the environment variable `GITLAB_PERSONAL_TOKEN` and have the `read_api` scope.
+To create a personal access token you can follow this __[guide](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)__.
+
+On Windows, replace `$GITLAB_PERSONAL_TOKEN` with `%GITLAB_PERSONAL_TOKEN%`.
+
+## Usage example
+
+```python
+from comapsmarthome_public_api.client_auth import ClientAuth
+from comapsmarthome_public_api.measurement_service import MeasurementsService
+
+auth = ClientAuth()
+measurements = MeasurementsService(auth)
+
+dt_from = '2020-10-01T09:30+01:00'
+dt_to = '2020-10-01T10:30+01:00'
+serial_number = 'aa**********'
+data = measurements.get_measurements(dt_from, dt_to, serial_number=serial_number, measurements=['inside_temperature'])
+dates = [d['time'] for d in data]
+temperatures = [d['inside_temperature'] for d in data]
+```
+
+## Credentials
+
+To access COMAP Smart Home product through the API, `username` and `password` need to be saved under the environment variables `COMAP_SMART_HOME_USERNAME` and `COMAP_SMART_HOME_PASSWORD`.
+- `COMAP_SMART_HOME_USERNAME`: COMAP Smart Home user email address
+- `COMAP_SMART_HOME_PASSWORD`: COMAP Smart Home user password
+
+## Requirements
+
+- Python >=3.6
+- requests and dateutil modules
+- COMAP Smart Home user account
+
