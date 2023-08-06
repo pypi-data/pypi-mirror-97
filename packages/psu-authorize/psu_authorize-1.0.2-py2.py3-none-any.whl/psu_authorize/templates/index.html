@@ -1,0 +1,24 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Application Menu{%endblock%}}</title>
+    {% block scripts %}
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Manage Application Permissions</h1>
+    <b>Select an application for which you would like to manage permissions</b><br />
+    <div class="list-group">
+        {%for app in allowed_apps%}
+        <a href="app/{{app.code}}" class="list-group-item list-group-item-action">{{app.title}}</a>
+        {%endfor%}
+    </div>
+    {% endblock %}
+</body>
+</html>
