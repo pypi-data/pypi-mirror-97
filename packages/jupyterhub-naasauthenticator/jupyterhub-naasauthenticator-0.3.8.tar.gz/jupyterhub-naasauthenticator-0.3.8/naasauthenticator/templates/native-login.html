@@ -1,0 +1,121 @@
+{% extends "page.html" %}
+{% if announcement_login %}
+{% set announcement = announcement_login %}
+{% endif %}
+{% block main %}
+<style tyle="text/css">
+body {
+    font-family: Helvetica,sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    --title-scale: 1;
+    background-color: #181A1C;
+    color: #FFFFFF;
+}
+a {
+    color: rgba(71, 221, 130, 1);
+}
+.btn-primary {
+    background-color: rgba(71, 221, 130, 1);
+    border-color: rgba(71, 221, 130, 1);
+}
+.btn-primary:active, .btn-primary:focus, .btn-primary:hover, .btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover {
+    background-color: #38B068;
+    border-color: #38B068;
+}
+.warning {
+    background-color: #24272A !important;
+}
+.auth-form-body {
+    border-top: thin silver solid !important;
+}
+.naas-logo {
+    width: 100% !important;
+    height: 15rem;
+}
+</style>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        let button = document.getElementById('eye');
+        button.addEventListener("click", function (e) {
+            let pwd = document.getElementById("password_input");
+            if (pwd.getAttribute("type") === "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁"
+            }
+        });
+    });
+</script>
+
+{% block nav_bar %}
+{% endblock %}
+
+{% block login %}
+<div id="login-main" class="container">
+    <form action="{{login_url}}?next={{next}}" method="post" role="form">
+        <div>
+            <a href="{{base_url}}">
+                <img src='{{base_url}}logo' alt='Naas' class='naas-logo' title='Home'/>
+            </a>
+        </div>
+        <div class='auth-form-body'>
+            <p id='insecure-login-warning' class='hidden warning'>
+                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
+                We strongly recommend enabling HTTPS for JupyterHub.
+            </p>
+            {% if login_error %}
+            <p class="login_error">
+                {{login_error}}
+            </p>
+            {% endif %}
+            <label for="username_input">Username:</label>
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control"
+                name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <p></p>
+            <label for='password_input'>Password:</label>
+            {% if crisp_website_id %}
+            <a style="float: right" id="forget-password" href="{{base_url}}reset-password">
+                <small>Forgot Password?</small>
+            </a>
+            {% endif %}
+            <span class="input-group">
+                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye">
+                        👁
+                    </button>
+                </span>
+            </span>
+            <input type="submit" id="login_submit" class="btn btn-primary" value="Login" tabindex="3" />
+            {% if landing_url %}
+            <div style="padding-top: 25px">
+                <p style="text-align: center;">
+                    No account? <a href="{{ landing_url }}" target="_blank">Create one</a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock login %}
+{% endblock %}
+{% block script %}
+{{ super() }}
+{% if crisp_website_id %}
+    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="{{ crisp_website_id }}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+{% endif %}
+<script>
+    if (window.location.protocol === "http:") {
+        // unhide http warning
+        let warning = document.getElementById('insecure-login-warning');
+        warning.className = warning.className.replace(/\bhidden\b/, '');
+    }
+    function openCrips (ev) {
+        $crisp.do("chat:open");
+    };
+</script>
+{% endblock %}
