@@ -1,0 +1,40 @@
+<nav class='navbar navbar-expand-lg navbar-light bg-secondary'>
+    <div class='container-fluid'>
+        <a href='{{ url('/') }}' class='navbar-brand'>
+            <img src='{{ url('/static/white-logo.svg') }}' height='40px' width='auto' alt='Mitama' id='logo'/>
+        </a>
+        <button class='navbar-toggler' data-bs-toggle='collapse' data-bs-target='#navList' aria-controls='navList'>
+            <span class='navbar-toggler-icon'></span>
+        </button>
+        <div class='collapse navbar-collapse' id='navList'>
+            <ul class='navbar-nav ms-auto mb-2 mb-lg-0'>
+                <li class='nav-item'>
+                    <a class='nav-link text-white' href='{{ url('/users/' + request.user.screen_name) }}'>
+                        <i class='bi-person'></i>
+                        マイページ
+                    </a>
+                </li>
+                <li class='nav-item'>
+                    <a class='nav-link text-white' href='{{ url('/users/' + request.user.screen_name + "/settings") }}'>
+                        <i class='bi-person-circle'></i>
+                        プロフィール変更
+                    </a>
+                </li>
+                {% if permission("admin", request.user) %}
+                <li class='nav-item'>
+                    <a class='nav-link text-white' href='{{ url('/settings') }}'>
+                        <i class='bi-gear'></i>
+                        設定
+                    </a>
+                </li>
+                {% endif %}
+                <li class='nav-item'>
+                    <a class='nav-link text-white' href='/logout'>
+                        <i class='bi-box-arrow-left'></i>
+                        ログアウト
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
