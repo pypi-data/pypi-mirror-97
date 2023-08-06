@@ -1,0 +1,13 @@
+import array
+from typing import Optional
+
+class AudioSegment(object):
+    def __init__(self, data: Optional[array.array[str]] = None) -> None: ...
+    @classmethod
+    def _from_safe_wav(cls, file_path: str) -> AudioSegment: ...
+    @classmethod
+    def from_file(
+        cls, file_path: str, format: Optional[str] = None
+    ) -> AudioSegment: ...
+    @classmethod
+    def from_mp3(cls, file_path: str) -> AudioSegment: ...
