@@ -1,0 +1,613 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "DEBOPS.DHCPD" "5" "Mar 03, 2021" "v2.1.4" "DebOps"
+.SH NAME
+debops.dhcpd \- manage ISC DHCP Server using Ansible
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBdebops service/dhcpd\fP [\fB\-\-limit\fP \fIgroup,host,\fP\&...] [\fB\-\-diff\fP] [\fB\-\-check\fP] [\fB\-\-tags\fP \fItag1,tag2,\fP\&...] [\fB\-\-skip\-tags\fP \fItag1,tag2,\fP\&...] [<\fBansible\-playbook\fP options>] ...
+.SH DESCRIPTION
+.sp
+\fBdebops.dhcpd\fP role can be used to configure an \fI\%ISC DHCP Server\fP <\fBhttps://www.isc.org/downloads/dhcp/\fP> as
+standalone or in a 2\-host failover configuration. Alternatively, you can
+configure an DHCP relay on a host connected to multiple networks which will
+relay DHCP/BOOTP messages to your DHCP server.
+.SH GETTING STARTED
+.sp
+By default \fBdebops.dhcpd\fP installs a DHCP server with some default
+configuration. Server will not be authoritative, and will have a default subnet
+configuration taken from \fBansible_default_ipv4\fP network configuration.
+.sp
+An example playbook which uses \fBdebops.dhcpd\fP role:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-\-\-
+
+\- name: Manage DHCP server
+  hosts: debops_dhcpd
+
+  roles:
+    \- role: debops.dhcpd
+      tags: dhcpd
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH DEFAULT VARIABLES: CONFIGURATION
+.sp
+Some of \fBdebops.dhcpd\fP default variables have more extensive configuration
+than simple strings or lists, here you can find documentation and examples for
+them.
+.SS dhcpd_keys
+.sp
+This list lets you define symmetric keys used to update dynamic DNS with
+information configured using DHCP.
+.INDENT 0.0
+.TP
+.B \fBkey\fP
+Name of the key used to select it in specific scope
+.TP
+.B \fBalgorithm\fP
+Name of the algorithm to use for key encryption
+.TP
+.B \fBsecret\fP
+Encrypted symmetric key shared between DHCP and DNS servers
+.TP
+.B \fBcomment\fP
+An optional comment added in the configuration file
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# Read the secret key from an external file
+dhcpd_secret_secure_key: \(aq{{ lookup("password",
+                             secret + "/" + ansible_domain +
+                             "/shared/ddns/keys/secure\-key") }}\(aq
+
+dhcpd_keys:
+  \- key: "secure\-key"
+    algorithm: "hmac\-md5"
+    secret: "{{ dhcpd_secret_secure_key }}"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_zones
+.sp
+This list lets you define DNS zones used to update dynamic DNS with information
+configured using DHCP.
+.INDENT 0.0
+.TP
+.B \fBzone\fP
+DNS domain name of a zone, needs to end with a dot (\fB\&.\fP)
+.TP
+.B \fBprimary\fP
+Address of the primary DNS server serving the specified zone
+.TP
+.B \fBkey\fP
+Name of the symmetric key used to authorize Dynamic DNS updates of the
+specified zone
+.TP
+.B \fBcomment\fP
+An optional comment added in the configuration file
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_zones:
+  \- zone: "example.org."
+    primary: "127.0.0.1"
+    key: "secure\-key"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_classes
+.sp
+Here you can define host classes and custom options for each class.
+.INDENT 0.0
+.TP
+.B \fBclass\fP
+Name of the host class
+.TP
+.B \fBcomment\fP
+Optional comment added in the configuration file
+.TP
+.B \fBoptions\fP
+Text block with options for a particular class scope
+.TP
+.B \fBinclude\fP
+Include an external file
+.TP
+.B \fBsubclass\fP
+Dict. You can specify matches for a class in two ways:
+.INDENT 7.0
+.IP \(bu 2
+a dict key without a value will create a simple match for that host. You
+need to specify dict key with colon (\fB:\fP) at the end to indicate that
+this is a dict key, see examples below
+.IP \(bu 2
+a dict with a text block as a value will create an extended match scope
+with options specified in the text block inside that scope
+.UNINDENT
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_classes:
+
+  \- class: \(aqempty\-class\(aq
+
+  \- class: \(aqallocation\-class\-1\(aq
+
+    options: |
+      match pick\-first\-value (option dhcp\-client\-identifier, hardware);
+
+    subclass:
+      # Simple match
+      \(aq00:11:22:33:44:55\(aq:
+
+      # Extended match
+      \(aq00:11:22:33:22:11\(aq: |
+        option root\-path "samsara:/var/diskless/alphapc";
+        filename "/tftpboot/netbsd.alphapc\-diskless";
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_groups
+.sp
+Group related configuration together.
+.INDENT 0.0
+.TP
+.B \fBcomment\fP
+Optional comment added in the configuration file
+.TP
+.B \fBoptions\fP
+Text block with options for a particular group
+.TP
+.B \fBinclude\fP
+Include an external file
+.TP
+.B \fBgroups\fP
+Include another group definition of the group in this group. Child group
+should be defined in a separate YAML dict. Recursion is not allowed.
+.TP
+.B \fBhosts\fP
+List of hosts included in this group. Use the same format as the
+\fBdhcpd_hosts\fP list.
+.TP
+.B \fBsubnets\fP
+List of subnets included in this group. Use the same format as the
+\fBdhcpd_subnets\fP list.
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_groups:
+  \- comment: \(aqFirst group\(aq
+    hosts: \(aq/etc/dhcp/dhcpd\-group1\-hosts.conf\(aq
+    groups: \(aq{{ dhcpd_group_second }}\(aq
+
+# An example of group nesting
+dhcpd_group_second:
+  \- comment: \(aqSecond group\(aq
+    hosts: \(aq/etc/dhcp/dhcpd\-group2\-hosts.conf\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_shared_networks
+.sp
+List of shared networks which combine specified subnets together.
+.INDENT 0.0
+.TP
+.B \fBname\fP
+Name of a shared network
+.TP
+.B \fBcomment\fP
+A comment added to this shared network in the configuration
+.TP
+.B \fBoptions\fP
+Custom options in the text block format for this shared network
+.TP
+.B \fBinclude\fP
+Include an external file in this shared network scope
+.TP
+.B \fBsubnets\fP
+List of subnets included in this shared network. Use the same format as the
+\fBdhcpd_subnets\fP list.
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_shared_networks:
+  \- name: \(aqshared\-net\(aq
+    comment: "Local shared network"
+    subnets: \(aq{{ dhcpd_subnets_local }}\(aq
+    options: |
+      default\-lease\-time 600;
+      max\-lease\-time 900;
+
+dhcpd_subnets_local:
+  \- subnet: \(aq10.0.30.0\(aq
+    netmask: \(aq255.255.255.0\(aq
+    routers: [ \(aq10.0.30.1\(aq, \(aq10.0.30.2\(aq ]
+
+  \- subnet: \(aq10.0.40.0\(aq
+    netmask: \(aq255.255.255.0\(aq
+    routers: \(aq19.0.40.1\(aq
+    options: |
+      default\-lease\-time 300;
+      max\-lease\-time 7200;
+    pools:
+      \- comment: "A pool in a subnet"
+        range: \(aq10.0.30.10 10.0.30.20\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_subnets
+.sp
+List of subnets included in a specified group.
+.INDENT 0.0
+.TP
+.B \fBsubnet\fP
+IP address of the subnet. If it\(aqs IPv4, it should be the first IP address in
+the subnet, if it\(aqs IPv6, it should be specified as the IPv6\-prefix.
+.TP
+.B \fBnetmask\fP
+If the subnet is IPv4, specify it\(aqs netmask in "normal" IP address form, not
+the CIDR form.
+.TP
+.B \fBipv6\fP
+Set to \fBTrue\fP if managed subnet is IPv6.
+.TP
+.B \fBrouters\fP
+String (if just one), or list (if many) of IP addresses of the routers for
+this subnet
+.TP
+.B \fBcomment\fP
+A comment added to this subnet in the configuration
+.TP
+.B \fBoptions\fP
+Custom options in the text block format for this subnet
+.TP
+.B \fBinclude\fP
+Include an external file in this subnet scope
+.TP
+.B \fBpools\fP
+List of different address pools within specified subnet. Each pool should be
+specified as a dict, following keys are recognized:
+.INDENT 7.0
+.IP \(bu 2
+\fBrange\fP: a string which defines the range of the specific pool, with IP
+addresses of the start and end delimited by space
+.IP \(bu 2
+\fBcomment\fP: a comment added to this host in the configuration
+.IP \(bu 2
+\fBoptions\fP: custom options in the text block format for this host
+.IP \(bu 2
+\fBinclude\fP: include an external file in this pool
+.UNINDENT
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# List of subnets
+dhcpd_subnets: [ \(aq{{ dhcpd_subnet_default }}\(aq ]
+
+dhcpd_subnet_default:
+  subnet: \(aq{{ ansible_default_ipv4.network }}\(aq
+  netmask: \(aq{{ ansible_default_ipv4.netmask }}\(aq
+  comment: \(aqGenerated automatically by Ansible\(aq
+
+# An IPv6 subnet
+example_ipv6_subnet:
+  subnet: \(aqdead:be:ef::/64\(aq
+  ipv6: True
+  routers: \(aqdead:be:ef::1\(aq
+  comment: "Example IPv6 subnet"
+  options: |
+    default\-lease\-time 300;
+    max\-lease\-time 7200;
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_hosts
+.sp
+String or list. If string, include an external file with host list in this
+place of the configuration. If list, specify a list of dicts describing the
+hosts. Each dict can have following keys:
+.INDENT 0.0
+.TP
+.B \fBhostname\fP
+Name of the host
+.TP
+.B \fBethernet\fP
+Ethernet address of this host, if host has multiple aggregated(bonded) links
+you may specify their ethernet addresses as a list.
+.TP
+.B \fBaddress\fP
+IP address of this host
+.TP
+.B \fBcomment\fP
+A comment added to this host in the configuration
+.TP
+.B \fBoptions\fP
+Custom options in the text block format for this host
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# External file with list of hosts
+dhcpd_hosts: \(aq/etc/dhcp/dhcp\-hosts.conf\(aq
+
+# List of hosts
+dhcpd_hosts:
+  \- hostname: \(aqexamplehost\(aq
+    address: \(aq10.0.10.1\(aq
+    ethernet: \(aq00:00:00:00:00:00\(aq
+  \- hostname: \(aqbondedhost\(aq
+    address: \(aq10.0.10.2\(aq
+    ethernet:
+      \- \(aq00:00:00:00:00:01\(aq
+      \- \(aq00:00:00:00:00:02\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_includes
+.sp
+List of external files to include in DHCP configuration. Use absolute paths for
+the files.
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_includes:
+  \- \(aq/etc/dhcp/other\-options.conf\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS dhcpd_failovers
+.sp
+Each \(aqfailover pair\(aq declaration consists of primary and secondary host,
+no more than two nodes failover is currently allowed by \fBisc\-dhcpd\fP\&.
+.sp
+You must specify which failover pair each pool should use by specifying
+a \(aqfailover peer\(aq statement under an \fBoptions\fP block in each pool
+declaration. e.g:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+dhcpd_failovers:
+  \- failover: "my\-failover"
+    primary: \(aq10.0.30.1\(aq
+    secondary: \(aq10.0.30.2\(aq
+    ...
+
+dhcpd_subnets:
+  \- subnet: ...
+    ...
+    pools:
+      \- comment: "My pool with failover"
+        range: \(aq10.0.30.10 10.0.30.20\(aq
+        options: |
+          failover peer "my\-failover";
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Each failover declaration has a set of mandatory fields, which is:
+.INDENT 0.0
+.TP
+.B \fBprimary\fP
+Ansible inventory name of a primary DHCP host, if you need failover to work
+on different IP, see \fBprimary_fo_addr\fP option below.
+.TP
+.B \fBsecondary\fP
+Ansible inventory name of a secondary DHCP host, if you need failover to work
+on different IP, see secondary_fo_addr option below.
+.UNINDENT
+.sp
+Ansible inventory name is either IP or hostname specified in inventory file.
+.INDENT 0.0
+.TP
+.B \fBmclt\fP
+Max Client Lead Time. The maximum amount of time that one server can extend
+a lease for a DHCP client beyond the time known by the partner server.
+.sp
+Default value: \fB3600\fP
+.UNINDENT
+.sp
+Split configuration between two failover DHCP servers:
+.INDENT 0.0
+.TP
+.B \fBsplit\fP
+Percentage value between \fB0\fP and \fB255\fP\&.
+.sp
+Specifies the split between the primary and secondary servers for the
+purposes of load balancing. Whenever a client makes a DHCP request, the DHCP
+server runs a hash on the client identification, resulting in value from 0 to
+255. This is used as an index into a 256 bit field. If the bit at that index
+is set, the primary is responsible. If the bit at that index is not set, the
+secondary is responsible. Instead of \fBsplit\fP, you can use \fBhba\fP\&.
+.TP
+.B \fBhba\fP
+32 character string in the regexp: \fB([0\-9a\-f]{2}:){32}\fP
+.sp
+Specifies the split between the primary and secondary as a bitmap rather than
+a cutoff, which theoretically allows for finer\-grained control. In practice,
+there is probably no need for such fine\-grained control, however.
+.UNINDENT
+.sp
+You must use either \(aqsplit\(aq or \(aqhba\(aq statement. Split has a preference, so
+if it\(aqs defined, \(aqhba\(aq will be omitted by configuration template.
+.INDENT 0.0
+.TP
+.B \fBmax_response_delay\fP
+Tells the DHCP server how many seconds may pass without receiving a message
+from its failover peer before it assumes that connection has failed. This is
+mandatory according to \fBdhcpd.conf\fP man page.
+.sp
+Default value: \fB5\fP
+.TP
+.B \fBmax_unacked_updates\fP
+Tells the remote DHCP server how many \fBBNDUPD\fP messages it can send before
+it receives a \fBBNDACK\fP from the local system. This is mandatory according
+to \fBdhcpd.conf\fP man page.
+.sp
+Default value: \fB10\fP
+.UNINDENT
+.sp
+Optional fields are mostly described in \fBdhcpd.conf\fP man page:
+.INDENT 0.0
+.TP
+.B \fBport\fP
+Specifies port on which primary and secondary nodes will listen for failover
+connection. Different ports for primary and secondary are currently
+unsupported.
+.sp
+Default value: \fB647\fP
+.TP
+.B \fBprimary_fo_addr\fP
+IP/Hostname of a primary DHCP host. This option is used if you need the
+failover address to be different from ansible inventory IP/hostname. If
+omitted, then \fBprimary\fP is used.
+.TP
+.B \fBsecondary_fo_addr\fP
+IP/Hostname of a secondary DHCP host. This option is used if you need the
+failover address to be different from ansible inventory IP/hostname. If
+omitted, then \fBsecondary\fP is used.
+.TP
+.B \fBauto_partner_down\fP
+Number of seconds to start serving partners IPs after the partner\(aqs failure.
+.UNINDENT
+.sp
+Other parameters:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+load_balance_max_seconds: 5
+max_lease_misbalance: 15
+max_lease_ownership: 10
+min_balance: 60
+max_balance: 3600
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# Full cluster configuration
+dhcpd_failovers:
+\- failover: \(aqfailover\-localsubnet\(aq
+  primary: \(aq10.0.10.1\(aq
+  primary_fo_addr: \(aq10.5.10.1\(aq
+  secondary: \(aq10.0.10.2\(aq
+  secondary_fo_addr: \(aq10.5.10.2\(aq
+  port: 1337
+  split: 128
+  hba: aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa
+  max_response_delay: 5
+  max_unacked_updates: 10
+  load_balance_max_seconds: 5
+  auto_partner_down: 0
+  max_lease_misbalance: 15
+  max_lease_ownership: 10
+  min_balance: 60
+  max_balance: 3600
+
+# Minimal cluster configuration
+dhcpd_failovers:
+\- failover: \(aqfailover\-san\(aq
+  primary: \(aq10.0.10.1\(aq
+  secondary: \(aq10.0.10.2\(aq
+  mclt: 3600
+  split: 128
+  max_response_delay: 5
+  max_unacked_updates: 10
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Maciej Delmanowski
+.SH COPYRIGHT
+2014-2021, Maciej Delmanowski, Nick Janetakis, Robin Schneider and others
+.\" Generated by docutils manpage writer.
+.
