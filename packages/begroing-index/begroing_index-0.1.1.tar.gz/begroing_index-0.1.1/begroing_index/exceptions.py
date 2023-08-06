@@ -1,0 +1,2 @@
+class UncertainIndexException(Exception):
+    pass
