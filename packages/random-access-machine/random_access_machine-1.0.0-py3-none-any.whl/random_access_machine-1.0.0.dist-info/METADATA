@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: random-access-machine
+Version: 1.0.0
+Summary: Random Access Machine implemented in python.
+Home-page: https://github.com/GabrieleMaurina/random-access-machine
+Author: Gabriele Maurina
+Author-email: gabrielemaurina95@gmail.com
+License: MIT
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# random-access-machine
+Random Access Machine implemented in python.
+
+RAM is an abstract machine that is turing complete and can compute any partial recursive function. Find out more here https://en.wikipedia.org/wiki/Random-access_machine
+
+### Install
+
+Run inside terminal:
+
+```python -m pip install random-access-machine```
+
+### Usage
+
+To execute a ram source file:
+
+```python -m ram <ram source file> <integer input>```
+
+To import it in your script:
+
+```python
+from ram import RAM
+
+data = 4
+program = 'inc 0'
+
+ram = RAM()
+result = ram.compute(program, data)
+
+print(result) # 1
+```
+
+### How it works
+
+A ram machine has infinite registers numbered from 0, 1, 2..., the input is loaded on register 1 before the execution starts, the output is taken from register 0 when the execution ends.
+
+### Instructions:
+
+ A ram machine supports only 3 basic instructions:
+
+Increment register k by 1:
+
+```inc k```
+
+Decrement register k by 1:
+
+```dec k```
+
+Jump to instruction i if register k is zero:
+
+```jz k i```
+
+### Example
+
+An example program that will double whatever input you give to the machine:
+
+```
+jz 1 6
+inc 0
+inc 0
+dec 1
+jz 2 1
+dec 1
+```
+
+
+
