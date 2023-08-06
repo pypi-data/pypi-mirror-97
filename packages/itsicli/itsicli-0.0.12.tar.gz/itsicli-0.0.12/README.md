@@ -1,0 +1,88 @@
+# The ITSI Command Line Interface (CLI)
+
+## Setup Virtualenv
+
+
+```
+python3 -m venv /path/to/new/virtual/environment
+
+source /path/to/new/virtual/environment/bin/activate
+```
+
+## Install the Python package
+
+```
+pip install --upgrade itsicli
+```
+
+
+## Using "itsi-content-pack"
+
+The `itsi-content-pack` command that is shipped with the Python package assists in creating and managing ITSI Content Packs.
+
+The general end-to-end workflow is as follows:
+1. Initialize a Content Pack workspace
+1. Create a Content Pack (or optionally import from an ITSI backup file)
+1. Continue to add, remove, or edit content from the Content Pack
+1. Add any supporting Splunk knowledge objects (lookups, transforms, props, etc.)
+1. Validate the Content Pack through the `validate` command 
+1. Submit the Content Pack to either:
+    - Splunkbase (must first run the `build` command)
+    - The ITSI Content Library via a pull request on Github
+
+
+### An example of creating a Content Pack
+
+### Initialize content pack
+Update PATH and PYTHON path to include `itsi-cli/bin` and `itsi-cli` folders
+```
+export PYTHONPATH=<path to itsi-cli>
+export PATH=$PATH$:<path to itsi-cli/bin>
+```
+
+Create a directory to hold content pack files. This folder will be referred to as `CP_BASE_DIR`
+```
+mkdir DA-ITSI-CP-mycontentpack
+cd DA-ITSI-CP-mycontentpack
+```
+
+Invoke **itsi-content-pack** with `init`
+```
+itsi-content-pack init
+```
+
+Follow the prompt to provide a content pack id and title. Please prefix id with `DA-ITSI-CP-`. Once complete, three directories will be created
+- itsi
+- default
+- appserver
+
+Each folder will contain some scaffolding files/directories. Please examine them and update as needed.
+
+
+## Build the distribution archive
+
+Install the build dependencies:
+```
+pip install --upgrade setuptools wheel
+```
+
+### Generate the Python package
+
+Run this command to generate the Python distribution archive:
+```
+make
+```
+
+### Upload to the Python Package Index
+
+Install the dependencies required for uploading to the index:
+
+```
+pip install --upgrade twine
+```
+
+Upload to PyPI:
+
+```
+make upload
+```

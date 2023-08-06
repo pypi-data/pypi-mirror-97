@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import argparse
+import logging
+
+from collections import OrderedDict
+
+from itsicli.content_packs.commands.base import InvalidWorkspace
+from itsicli.content_packs.commands.importbackup import ImportBackupCommand
+from itsicli.content_packs.commands.init import InitCommand
+from itsicli.content_packs.commands.tidyup import TidyUpCommand
+from itsicli.content_packs.commands.validate import ValidateCommand
+
+
+COMMAND = 'command'
+COMMANDS = OrderedDict([
+    (InitCommand.NAME, InitCommand),
+    (ImportBackupCommand.NAME, ImportBackupCommand),
+    (TidyUpCommand.NAME, TidyUpCommand),
+    (ValidateCommand.NAME, ValidateCommand)
+])
+
+
+def main():
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
+
+    parser = argparse.ArgumentParser(
+        description="Welcome to ITSI's Command Line Interface (CLI) for working with Content Packs"
+    )
+    subparsers = parser.add_subparsers(dest=COMMAND)
+
+    for name, Command in COMMANDS.items():
+        Command.add_to_parser(subparsers)
+
+    args = parser.parse_args()
+
+    command_name = getattr(args, COMMAND)
+    if command_name:
+
+        try:
+            command = COMMANDS[command_name]()
+            command.run(args)
+        except InvalidWorkspace as exc:
+            logging.error(exc)
+    else:
+        parser.print_help()
+
+
+if __name__ == '__main__':
+    main()
