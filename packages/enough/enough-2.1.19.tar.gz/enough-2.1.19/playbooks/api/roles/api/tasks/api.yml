@@ -1,0 +1,77 @@
+---
+- name: apt-get install git virtualenv python-pip and python-setuptools, python-backports.ssl-match-hostname
+  apt:
+    name: [ git, virtualenv, python-pip, python-setuptools, python-backports.ssl-match-hostname ]
+    state: present
+
+- name: pip install docker
+  pip:
+    name: [ docker ]
+
+- name: apt-get install git
+  apt:
+    name:
+      - git
+    state: present
+
+- name: get the api-host public key
+  command: cat /etc/ssh/ssh_host_rsa_key.pub
+  register: ssh_host_rsa_key_pub
+  changed_when: False
+
+- name: Set up API ssh key to BIND authorized keys
+  authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ ssh_host_rsa_key_pub.stdout }}"
+  delegate_to: "{{groups['bind-service-group'][0]}}"
+
+- name: mkdir /root/.enough
+  file:
+    path: "/root/.enough"
+    state: directory
+    mode: 0750
+
+- name: mkdir /root/.enough/{{ domain }}
+  file:
+    path: "/root/.enough/{{ domain }}"
+    state: directory
+    mode: 0750
+
+- name: cp /etc/ssh/ssh_host_rsa_key ~/.enough/{{ domain }}/infrastructure_key
+  copy:
+    remote_src: yes
+    src: /etc/ssh/ssh_host_rsa_key
+    dest: "/root/.enough/{{ domain }}/infrastructure_key"
+    owner: "{{ ansible_user }}"
+    mode: 0444
+
+- name: cp /etc/ssh/ssh_host_rsa_key.pub ~/.enough/{{ domain }}/infrastructure_key.pub
+  copy:
+    remote_src: yes
+    src: /etc/ssh/ssh_host_rsa_key.pub
+    dest: "/root/.enough/{{ domain }}/infrastructure_key.pub"
+    owner: "{{ ansible_user }}"
+    mode: 0444
+
+- name: enough manage migrate
+  shell: enough --domain {{ domain }} manage migrate
+  register: result
+  changed_when: '"Applying " in result.stdout'
+
+- name: enough manage enough_api
+  shell: |
+    enough --debug --domain {{ domain }} manage enough_api {{ domain }} root '{{ gitlab_password }}'
+  register: result
+  changed_when: '"Changed" in result.stdout'
+  until: result is success
+  retries: 5
+  delay: 5
+
+- name: enough create service
+  shell: |
+    docker run \
+       --rm \
+       -v /root/.enough:/root/.enough \
+       -v /var/run/docker.sock:/var/run/docker.sock \
+       enough --domain {{ domain }} create service

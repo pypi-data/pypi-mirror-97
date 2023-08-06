@@ -1,0 +1,69 @@
+---
+- name: get gitlab-runner installation script
+  get_url:
+    url: https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
+    dest: ~/script.deb.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: setup gitlab-runner repository
+  shell: |
+    bash -x ~/script.deb.sh
+
+- name: apt-get install gitlab-runner
+  apt:
+    name: gitlab-runner=13.6.0
+    # we want --allow-change-held-packages but all we have is --force
+    force: yes # Corresponds to the --force-yes to apt-get and implies allow_unauthenticated: yes
+    state: present
+
+- name: hold gitlab-runner
+  command: apt-mark hold gitlab-runner
+
+- name: wait for the gitlab API to be ready, in case we reached this point and GitLab is not finished bootstraping itself
+  uri:
+    url: "https://gitlab.{{ domain }}/api/v4/projects"
+    method: GET
+    status_code: 200
+  register: api_projects
+  until: api_projects is success
+  retries: 20
+  delay: 30
+  delegate_to: gitlab-host
+
+- name: grep sd-runner /etc/gitlab-runner/config.toml
+  command: grep -q sd-runner /etc/gitlab-runner/config.toml
+  register: result
+  ignore_errors: True
+
+- name: apt-get install python-openstackclient
+  apt:
+    name: python-openstackclient
+    state: present
+
+- name: daily-cron docker system prune --all --force --volumes
+  copy:
+    src: docker-cleanup
+    dest: /etc/cron.daily/docker-cleanup
+    mode: 0755
+
+- name: register the runner
+  shell: |
+    gitlab-runner register \
+        --non-interactive \
+        --registration-token '{{ gitlab_shared_runners_registration_token }}' \
+        --name 'sd-runner' \
+        --url https://gitlab.{{ domain }} \
+        --executor docker \
+        --docker-image debian:buster \
+        --docker-devices /dev/kvm \
+        --docker-volumes /run/libvirt/libvirt-sock:/run/libvirt/libvirt-sock \
+        --docker-volumes /srv:/srv \
+        --docker-volumes /etc/ssl/certs:/etc/ssl/certs:ro \
+        --docker-volumes /usr/local/share/ca-certificates/infrastructure:/usr/local/share/ca-certificates/infrastructure:ro \
+        --docker-volumes /var/run/docker.sock:/run/docker.sock \
+        --docker-volumes /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7 \
+        --docker-volumes $(which docker):/bin/docker \
+        --docker-pull-policy if-not-present
+  when: result is failed
