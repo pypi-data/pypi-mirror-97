@@ -1,0 +1,99 @@
+Metadata-Version: 2.1
+Name: sklearndf
+Version: 1.0.2rc0
+Summary: DataFrame support and feature traceability for scikit-learn.
+Home-page: https://github.com/BCG-Gamma/sklearndf
+License: Apache Software License v2.0
+Author: Boston Consulting Group (BCG)
+Requires-Python: >=3.6,<4
+Description-Content-Type: text/x-rst
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Scientific/Engineering
+Requires-Dist: boruta         >= 0.3
+Requires-Dist: gamma-pytools  >=1.0.2rc0,<2
+Requires-Dist: lightgbm       >= 3.0
+Requires-Dist: numpy          >=1.16,<1.21
+Requires-Dist: packaging      >=20
+Requires-Dist: pandas         >=0.24,<1.3
+Requires-Dist: scikit-learn   >=0.21,<0.24
+Requires-Dist: joblib         >=0.13,<1.1
+Requires-Dist: matplotlib     >=3.0,<3.4
+Requires-Dist: scipy          >=1.2,<1.6
+Requires-Dist: typing_inspect >=0.4,<0.7
+Requires-Dist: sphinx == 3.4.* ; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints == 1.11.* ; extra == "docs"
+Requires-Dist: pydata-sphinx-theme == 0.4.* ; extra == "docs"
+Requires-Dist: nbsphinx == 0.7.* ; extra == "docs"
+Requires-Dist: jupyter >= 1.0 ; extra == "docs"
+Requires-Dist: docutils ; extra == "docs"
+Requires-Dist: xlrd == 1.2.* ; extra == "docs"
+Requires-Dist: m2r == 0.2.* ; extra == "docs"
+Requires-Dist: pytest >= 5.2.* ; extra == "testing"
+Requires-Dist: pytest-cov == 2.8.* ; extra == "testing"
+Requires-Dist: flake8 == 3.8.* ; extra == "testing"
+Requires-Dist: flake8-comprehensions == 3.2.* ; extra == "testing"
+Requires-Dist: isort == 5.5.* ; extra == "testing"
+Project-URL: Documentation, https://bcg-gamma.github.io/sklearndf/
+Project-URL: Repository, https://github.com/BCG-Gamma/sklearndf
+Provides-Extra: docs
+Provides-Extra: testing
+
+*sklearndf* is an open source library designed to address a common need with
+`scikit-learn <https://github.com/scikit-learn/scikit-learn>`__: the outputs of
+transformers are numpy arrays, even when the input is a
+data frame. However, to inspect a model it is essential to keep track of the
+feature names.
+
+To this end, *sklearndf* enhances scikit-learn's estimators as follows:
+
+- **Preserve data frame structure**:
+    Return data frames as results of transformations, preserving feature names as the column index.
+- **Feature name tracing**:
+    Add additional estimator properties to enable tracing a feature name back to its original input feature; this is especially useful for transformers that create new features (e.g., one-hot encode), and for pipelines that include such transformers.
+- **Easy use**:
+    Simply append DF at the end of your usual scikit-learn class names to get enhanced data frame support!
+
+.. Begin-Badges
+
+|pypi| |conda| |python_versions| |code_style| |made_with_sphinx_doc| |License_badge|
+
+.. End-Badges
+
+License
+---------------------------
+
+*sklearndf* is licensed under Apache 2.0 as described in the
+`LICENSE <https://github.com/BCG-Gamma/sklearndf/blob/develop/LICENSE>`_ file.
+
+.. Begin-Badges
+
+.. |conda| image:: https://anaconda.org/bcg_gamma/sklearndf/badges/version.svg
+    :target: https://anaconda.org/BCG_Gamma/sklearndf
+
+.. |pypi| image:: https://badge.fury.io/py/sklearndf.svg
+    :target: https://pypi.org/project/sklearndf/
+
+.. |python_versions| image:: https://img.shields.io/badge/python-3.6|3.7|3.8-blue.svg
+    :target: https://www.python.org/downloads/release/python-380/
+
+.. |code_style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+.. |made_with_sphinx_doc| image:: https://img.shields.io/badge/Made%20with-Sphinx-1f425f.svg
+    :target: https://bcg-gamma.github.io/sklearndf/index.html
+
+.. |license_badge| image:: https://img.shields.io/badge/License-Apache%202.0-olivegreen.svg
+    :target: https://opensource.org/licenses/Apache-2.0
+
+.. End-Badges
