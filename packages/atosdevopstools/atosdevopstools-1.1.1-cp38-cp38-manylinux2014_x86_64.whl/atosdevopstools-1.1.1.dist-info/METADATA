@@ -1,0 +1,257 @@
+Metadata-Version: 2.1
+Name: atosdevopstools
+Version: 1.1.1
+Summary: DevOps utils
+Home-page: https://scm.atosresearch.eu/ari/smartnet/pylib/atos-devops-tools
+Author: 2020, ATOS Research and Innovation
+Author-email: smartnet@atosresearh.eu
+Maintainer: Guillermo Gomez
+License: OSI Approved :: Apache Software License
+Platform: UNKNOWN
+Requires-Python: ~=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click (~=7.1.2)
+Requires-Dist: requests (~=2.25.0)
+Requires-Dist: pytest (~=6.2.1)
+Requires-Dist: pytest-bdd (~=4.0.2)
+Requires-Dist: pytest-cov (~=2.8.1)
+Requires-Dist: pylint (~=2.6.0)
+Requires-Dist: sphinx (==3.3.1)
+Requires-Dist: sphinx-rtd-theme (==0.4.3)
+
+# DevOps Tools 
+This project consists on a collection of utility classes and modules in the context of DevOps and CICD
+
+
+## Gitlab Wrapper
+
+This class provides a wrapper for the Gitlab API and initially aims to help send outputs to project badges
+```
+Usage: gitlab_wrapper setup-badges [OPTIONS]
+
+  Utility CLI to initialize a gitlab repository with default badges;
+  Version, Coverage and Code Quality
+
+Options:
+  --project-id TEXT  Id of the target project under the given host
+  --api-token TEXT   Private key to gain access to the said host->Personal
+                     Access Token
+
+  --url TEXT         Base url of the Gitlab Host
+  --help             Show this message and exit.
+
+Usage: gitlab_wrapper update-badge [OPTIONS]
+
+  Utility CLI to modify Gitlab badges based on https://shields.io. Currently
+  supporting version, coverage and code quality
+
+  Coverage value will have a different color based on its value; [0, 30] =
+  red; (30, 50] = yellow; (50, 70] =  light-green; (70, 100] = green
+
+  Code Quality value will have a different color based on its value; [0, 5]
+  = red; (5, 6] = yellow; (6, 7] = light-green; (7, 10] = green
+
+Options:
+  --project-id TEXT     Id of the target project under the given host
+  --api-token TEXT      Private key to gain access to the said host->Personal
+                        Access Token
+
+  --url TEXT            Base url of the Gitlab Host
+  --pipeline-id TEXT    Id of the current pipeline
+  --test-job-name TEXT  Name of the job from which to extract coverage
+  --version TEXT        Version identifier
+  --qa-value TEXT       Code quality score as string
+  --help                Show this message and exit.
+```
+## Pylint Wrapper
+
+This class provides a wrapper for the Pylint quality report and initially aims to help send outputs to project badges
+```
+Usage: pylint_wrapper [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --pylint-report-path TEXT  QA report txt file based on Pylint
+  --help                     Show this message and exit.
+
+Commands:
+  get-qa-value    Returns the code's quality as a score
+  raise-for-code  Validate a pylint report looking for Failures or Errors
+```
+## Pypi Wrapper
+
+This class provides a wrapper for common practices of building Pypi-compatible wheels.
+```
+Usage: pypi_wrapper build [OPTIONS]
+
+  Builds a Python Package taking care of Cython compilation if indicated
+
+Options:
+  --cython      Flag to indicate that it is a Cython package and requires
+                compilation
+
+  --clean-dist  Flag to indicate that dist/ folder should be deleted first
+  --help        Show this message and exit.
+
+
+Usage: pypi_wrapper upload [OPTIONS]
+
+  Uploads all wheels found under dist/ folder.
+
+Options:
+  --user TEXT                     Pypi Account user
+  --password TEXT                 Pypi Account PAT
+  --log-level [DEBUG|INFO|WARNING|ERROR]
+                                  Global log level that will be picked up by
+                                  the app  [default: INFO]
+
+  --pypi [pypi|testpypi|custom]   Target Pypi repository.
+  --repository-url TEXT           Provide full repository URL for custom Pypi
+  --help                          Show this message and exit.
+
+```
+
+## Usage via Gitlab-ci
+
+```yaml
+variables:
+  PACKAGE: <package>
+  JOB_WITH_COVERAGE: test_functional  # Job name which includes the "coverage" keyword in the main gitlab-ci.yaml
+  GITLAB_URL: <URL>
+
+before_script:
+  - pip install atosdevopstools
+
+qa:
+  stage: tests
+  dependencies:
+    - <BUILD WHEEL JOB>
+  only:
+    - develop
+    - master
+    - merge_requests
+  script:
+    - pip install dist/*  # Install from distribution
+    # pylint will fail return non-zero even if only warnings are found
+    - pylint $PACKAGE tests --exit-zero --reports y >> qa_report.txt
+    - cat qa_report.txt
+    - pylint_wrapper --pylint-report-path qa_report.txt raise-for-code
+    - mkdir reports/
+    - cp qa_report.txt reports/
+  artifacts:
+    paths:
+      - reports/qa_report.txt
+
+test_release:
+  stage: tests
+  dependencies:
+    - <BUILD WHEEL JOB>
+  only:
+    - develop
+    - master
+    - merge_requests
+  when: manual
+  script:
+    - echo "Uploading to test_pypi"
+    - pip install dist/*
+    - pypi_wrapper upload --user $TESTPYPI_USER --password "$TESTPYPI_PAT" --is-test
+    - sleep 30s
+    - echo "Trying to install latest upload to test-pypi"
+    - pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple $PACKAGE
+
+make_badges: # Only update when merged to main branches
+  stage: release
+  dependencies:
+    - <BUILD WHEEL JOB>
+    - qa
+  only:
+    - develop
+    - master
+  script:
+    - pip install dist/*  # Install from distribution
+    - QA=$(pylint_wrapper --pylint-report-path reports/qa_report.txt get-qa-value | tail -1)
+    - echo ${QA}
+    - VERSION=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('$PACKAGE').version)")
+    - echo ${VERSION}
+    - gitlab_wrapper update-badge --url $GITLAB_URL --api-token ${API_TOKEN}
+      --project-id ${CI_PROJECT_ID} --pipeline-id ${CI_PIPELINE_ID} --version ${VERSION} --test-job-name $JOB_WITH_COVERAGE --qa-value ${QA}
+
+upload_release:
+  stage: release
+  dependencies:
+    - <BUILD WHEEL JOB>
+  only:
+    - develop
+    - master
+  when: manual
+  script:
+    - echo "Uploading to pypi"
+    - pip install dist/*
+    - pypi_wrapper upload --user $PYPI_USER --password "$PYPI_PAT"
+    - sleep 30s
+    - echo "Trying to install latest upload to pypi"
+    - pip install $PACKAGE
+
+```
+
+## ARI QA
+
+| Documentation  | Yes | No   | N/A | 
+|----------------|---------------|---------------|----------------|
+| **Readme file using markdown**  | [x]  | [ ]  | [ ] | 
+| Installation/configuration guides  | [x]  | [ ]  | [ ] |
+| User/admin guides  | [ ]  | [ ]  | [x] |
+| **License file**  | [x]  | [ ]  | [ ] |
+| License Headers  | []  | [x]  | [ ] |
+| Documentation of interface and usage  | [x]  | [ ]  | [ ] |
+| Usage of tools to autogenerate documentation from source code  | [ ]  | [x]  | [ ] |
+
+| Source Code Lifecycle Management  | Yes | No   | N/A | 
+|----------------|---------------|---------------|----------------|
+| **Use of source code management system**  | [x]  | [ ]  | [ ] |
+| **Use of build management system**  | [x]  | [ ]  | [ ] |
+| SW artefacts upload to a repository (Nexus) | [ ]  | [x] (Pypi) | [ ] |
+| Are the required support system containerized? (Docker) | [ ]  | [x]  | [ ] |
+
+| Full Software Release Automation  | Yes | No   | N/A | 
+|----------------|---------------|---------------|----------------|
+| **Use of continuous integration system** | [x]  | [ ]  | [ ] |
+| Use of configuration management system | [x]  | [ ]  | [ ] |
+| Provision scripts | [ ]  | [ ]  | [x] |
+
+| Demo & Showcase  | Yes | No   | N/A | 
+|----------------|---------------|---------------|----------------|
+| Dashboard | [ ]  | [ ]  | [x] |
+| Demo video (installation and configuration) | [ ]  | [x]  | [ ] |
+| Demo video (usage) | [ ]  | [x]  | [ ] |
+
+
+| Quality Assurance  | Yes | No   | N/A | 
+|----------------|---------------|---------------|----------------|
+| **Unit and End-to-End testing** | [x]  | [ ]  | [ ] |
+| Code coverage up to 70% | [ ]  | [x]  | [ ] |
+| 'A' and technical debt bellow 5 days (Sonar) | [ ]  | [ ]  | [x] |
+
+
+
+## Release Notes:
+
+Since atosdevopstools is intended to be publicly available under pypi to facilitate its usage on any other project and
+regarless of the consortium setup, the source code here is obfuscated into a Cython package and distributed (**Will be distributed**)
+for Windows and Ubuntu and which are named automatically using the format {distribution}-{version}(-{build tag})?-{python tag}-{abi tag}-{platform tag}.whl
+
+E.g Local dev environment shows the following package being created: **atosdevopstools-1.0.1-cp38-cp38-win_amd64.whl**
+
+Windows platform is yet to be automatically uploaded since CI environment can only produce linux wheels
+This approach has some limitations and implies coding in a module-based way instead of a fully OOP approach. This is the reason
+why **atosdevopstools does not contain a __init__.py file**. When installed from a different project, imports should point 
+at the individual modules rather than at the atosdevopstools package:
+```
+pip install atosdevopstools  # The latest release for your Host will be downloaded and installed
+```
+```python
+from gitlab_wrapper import GitlabWrapper
+from pylint_wrapper import PylintWrapper
+from pypi_wrapper import PyPiWrapper
+```
+
+
