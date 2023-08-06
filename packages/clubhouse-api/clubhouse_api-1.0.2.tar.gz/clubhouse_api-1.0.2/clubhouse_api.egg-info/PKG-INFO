@@ -1,0 +1,115 @@
+Metadata-Version: 2.1
+Name: clubhouse-api
+Version: 1.0.2
+Summary: Python module for writing scripts for project management platform Club House (clubhouse.io API wrapper)
+Home-page: https://github.com/Peopl3s/club-house-api
+Author: Peopl3s
+Author-email: peoplesdreamer@gmail.ru
+License: Apache License, Version 2.0, see LICENSE file
+Download-URL: https://github.com/Peopl3s/club-house-api/archive/main.zip
+Description: # club_house_api
+        
+        ![PyPI](https://img.shields.io/pypi/v/clubhouse_api?color=orange) ![Python 3.6, 3.7, 3.8](https://img.shields.io/pypi/pyversions/clubhouse?color=blueviolet) ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/peopl3s/club-house-api?color=blueviolet) ![License](https://img.shields.io/pypi/l/clubhouse-api?color=blueviolet) ![Forks](https://img.shields.io/github/forks/peopl3s/club-house-api?style=social)
+        
+        **club_house_api** - this module is a Python client library for The ClubHouse project management platform API (ClubHouse API wrapper)
+        
+        
+        **Clubhouse** is collaborative project management that streamlines and refines your existing workflow. The intuitive and powerful project management platform loved by software teams of all sizes. [Clubhouse](https://clubhouse.io) is here.
+        
+        
+        **API documentation** [https://clubhouse.io/api/rest/v3/](https://clubhouse.io/api/rest/v3/)
+        
+        ## Installation
+        
+        Install the current version with PyPI:
+        
+        ```python
+        pip install clubhouse_api
+        ```
+        
+        Or from Github:
+        ```python
+        pip install https://github.com/Peopl3s/club-house-api/archive/main.zip
+        ```
+        
+        ## Usage
+        
+        You can generate a token for clubhouse by going to the account section and generating a new token
+        
+        ```python
+        TOKEN = os.getenv('TOKEN')
+        
+        club_house_session = ClubHouse(TOKEN, 'v3')
+        club_house = club_house_session.get_api()
+        ```
+        
+        ## Example
+        
+        Create a new Story in the first Project that is returned from the API in the all projects list.
+        
+        *If you installed a module from PyPi, you should to import it like this: ``` from clubhouse_api import ClubHouse ```*
+        
+        *If from GitHub or source: ``` from club_house_api import ClubHouse ```*
+        
+        ```python
+        from club_house_api import ClubHouse
+        import asyncio
+        import os
+        
+        TOKEN = os.getenv('API_TOKEN')
+        
+        club_house_session = ClubHouse(TOKEN, 'v3')
+        club_house = club_house_session.get_api()
+        
+        async def main():
+        
+            all_projects = await club_house.projects()
+            first_project_id = all_projects[0]['id']
+        
+            new_story = {'name': 'My new story', 'project_id': first_project_id}
+            story = await club_house.stories.create(**new_story)
+            print(story)
+        
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        ```
+        
+        You can check out all the docs with examples [here](https://github.com/Peopl3s/club-house-api/tree/main/docs)
+        
+        * [Epics](https://github.com/Peopl3s/club-house-api/tree/main/docs/epics.md)
+        * [Files](https://github.com/Peopl3s/club-house-api/tree/main/docs/files.md)
+        * [Labels](https://github.com/Peopl3s/club-house-api/tree/main/docs/labels.md)
+        * [Linked-Files](https://github.com/Peopl3s/club-house-api/tree/main/docs/linked_files.md)
+        * [Projects](https://github.com/Peopl3s/club-house-api/tree/main/docs/projects.md)
+        * [Story-Links](https://github.com/Peopl3s/club-house-api/tree/main/docs/story_links.md)
+        * [Stories](https://github.com/Peopl3s/club-house-api/tree/main/docs/stories.md)
+          * [Comments](https://github.com/Peopl3s/club-house-api/tree/main/docs/comments.md)
+          * [Tasks](https://github.com/Peopl3s/club-house-api/tree/main/docs/tasks.md)
+        * [Users](https://github.com/Peopl3s/club-house-api/tree/main/docs/users.md)
+        * [Workflows](https://github.com/Peopl3s/club-house-api/tree/main/docs/workflows.md)
+        
+        
+        ## Contributing
+        
+        Bug reports and/or pull requests are welcome
+        
+        
+        ## License
+        
+        The module is available as open source under the terms of the [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
+        
+        
+        
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Description-Content-Type: text/markdown
