@@ -1,0 +1,124 @@
+Metadata-Version: 2.1
+Name: xepmts
+Version: 0.4.13
+Summary: Python client for accessing the XENON experiment PMT data.
+Home-page: https://github.com/jmosbacher/xepmts
+License: MIT
+Author: Yossi Mosbacher
+Author-email: joe.mosbacher@gmail.com
+Requires-Python: >=3.7.1
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Provides-Extra: dask
+Provides-Extra: full
+Provides-Extra: plotting
+Provides-Extra: server
+Provides-Extra: webclient
+Requires-Dist: altair (>=4.1.0,<5.0.0)
+Requires-Dist: awesome-panel-extensions (>=20210124.1,<20210125.0); extra == "webclient" or extra == "full"
+Requires-Dist: bokeh (==2.2.3)
+Requires-Dist: bqplot (>=0.12.23,<0.13.0)
+Requires-Dist: click
+Requires-Dist: dask[dataframe] (>=2021.2.0,<2022.0.0); extra == "dask" or extra == "full"
+Requires-Dist: eve-jwt (>=0.1.9,<0.2.0); extra == "server" or extra == "full"
+Requires-Dist: eve-panel (==0.3.12)
+Requires-Dist: flask_swagger_ui (>=3.36.0,<4.0.0); extra == "server" or extra == "full"
+Requires-Dist: holoviews (>=1.14.2,<2.0.0)
+Requires-Dist: hvplot (>=0.7.0,<0.8.0); extra == "plotting" or extra == "full"
+Requires-Dist: invoke (>=1.5.0,<2.0.0)
+Requires-Dist: ipyleaflet (>=0.13.6,<0.14.0)
+Requires-Dist: ipyvolume (>=0.5.2,<0.6.0)
+Requires-Dist: ipywidgets (>=7.6.3,<8.0.0); extra == "full"
+Requires-Dist: ipywidgets_bokeh (>=1.0.2,<2.0.0); extra == "full"
+Requires-Dist: pandas (>=1.2.3,<2.0.0)
+Requires-Dist: pandas-profiling (>=2.11.0,<3.0.0)
+Requires-Dist: plotly (>=4.14.3,<5.0.0)
+Requires-Dist: prometheus_flask_exporter (>=0.18.1,<0.19.0); extra == "server" or extra == "full"
+Requires-Dist: streamz (>=0.6.2,<0.7.0)
+Requires-Dist: toml (>=0.10.2,<0.11.0)
+Requires-Dist: xeauth (==0.1.2)
+Project-URL: Documentation, https://xepmts.readthedocs.io/
+Description-Content-Type: text/x-rst
+
+======
+xepmts
+======
+
+
+.. image:: https://img.shields.io/pypi/v/xepmts.svg
+        :target: https://pypi.python.org/pypi/xepmts
+
+.. image:: https://img.shields.io/travis/jmosbacher/xepmts.svg
+        :target: https://travis-ci.com/jmosbacher/xepmts
+
+.. image:: https://readthedocs.org/projects/xepmts/badge/?version=latest
+        :target: https://xepmts.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+Basic Usage
+-----------
+
+.. code-block:: python
+
+    import xepmts
+
+    # If you are using a notebook:
+    xepmts.notebook()
+
+    db = xepmts.default_client()
+    db.set_token('YOUR-API-TOKEN')
+
+    # set the number of items to pull per page
+    db.tpc.installs.items_per_page = 25
+    
+    # get the next page 
+    page = db.tpc.installs.next_page()
+
+    # iterate over pages:
+    for page in db.tpc.installs.pages():
+        df = page.df
+        # do something with data
+
+    # select only top array
+    top_array = db.tpc.installs.filter(array="top")
+
+    # iterate over top array pages
+    for page in top_array.pages():
+        df = page.df
+        # do something with data
+
+    query = dict(pmt_index=4)
+    # get the first page of results for this query as a list of dictionaries
+    docs = db.tpc.installs.find(query, max_results=25, page_number=1)
+
+    # same as find, but returns a dataframe 
+    df = db.tpc.installs.find_df(query)
+
+
+    # insert documents into the database
+    docs = [{"pmt_index": 1, "position_x": 0, "position_y": 0}]
+    db.tpc.installs.insert_documents(docs)
+    
+* Free software: MIT
+* Documentation: https://xepmts.readthedocs.io/
+
+
+Features
+--------
+
+* TODO
+
+Credits
+-------
+
+This package was created with Cookiecutter_ and the `briggySmalls/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`briggySmalls/cookiecutter-pypackage`: https://github.com/briggySmalls/cookiecutter-pypackage
+
