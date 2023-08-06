@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "vak"
+version = "0.4.0b1"
+description = "a neural network toolbox for animal vocalizations and bioacoustics"
+authors = ["David Nicholson <nickledave@users.noreply.github.com>"]
+license = "BSD"
+classifiers = [
+        'License :: OSI Approved :: BSD License',
+        'Development Status :: 5 - Production/Stable',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: Implementation :: CPython'
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6.2"
+attrs = ">=19.3.0"
+crowsetta = ">=3.1.1"
+dask = {extras = ["bag"], version = ">=2.10.1"}
+evfuncs = ">=0.3.2"
+joblib = ">=0.14.1"
+matplotlib = ">=3.3.3"
+numpy = ">=1.18.1"
+scipy = ">=1.4.1"
+SoundFile = ">=0.10.3"
+pandas = ">=1.0.1"
+tensorboard = ">=2.2.0"
+toml = ">=0.10.2"
+torch = ">=1.4.0, !=1.8.0"
+torchvision = ">=0.5.0"
+tqdm = ">=4.42.1"
+
+[tool.poetry.dev-dependencies]
+twine = ">=3.3.0"
+pytest = ">=6.2.1"
+tweetynet = ">=0.5.0"
+sphinx = ">=3.4.1"
+ipython = ">=7.0"
+
+[tool.poetry.scripts]
+vak = 'vak.__main__:main'
+
+[tool.poetry.plugins]
+
+[tool.poetry.plugins."vak.models"]
+
+[tool.poetry.plugins."vak.metrics"]
+Accuracy = 'vak.metrics.Accuracy'
+Levenshtein = 'vak.metrics.Levenshtein'
+SegmentErrorRate = 'vak.metrics.SegmentErrorRate'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
