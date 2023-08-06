@@ -1,0 +1,126 @@
+[[tool.poetry.source]]
+name = "ali"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+#default = true
+secondary = true
+
+[tool.poetry]
+name = "zillionare-omega"
+packages = [
+  {include = "omega"}
+]
+
+description = "高速分布式行情服务器"
+authors = ["jieyu <code@jieyu.ai>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://zillionare-omega.readthedocs.io"
+repository = "https://github.com/zillionare/omega"
+documentation = "https://zillionare-omega.readthedocs.io"
+keywords = ["AI", "quant", "trade", "stock"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+]
+
+include = [
+    "LICENSE",
+    "README.md",
+    "HISTORY.md",
+    "AUTHORS.md",
+    "docs/*",
+    "tests/*"
+]
+
+version = "1.0.0-alpha.1"
+
+[tool.poetry.dependencies]
+python=">=3.8,<3.9"
+zillionare_omega_adaptors_jq=">=0.3.5"
+zillionare_omicron=">=1.0.0.a0"
+aiohttp = "^3.7.3"
+pyemit = "^0.4.0"
+arrow = "^0.15"
+numpy = "^1.18"
+aioredis = "^1.3.1"
+asyncpg = "^0.21"
+gino = "^1.0"
+SQLAlchemy = "^1.3.20"
+sh = "^1.14.1"
+aiocache = "^0.11.1"
+APScheduler = "^3.6"
+xxhash = "^2.0.0"
+sanic = "^20.9.1"
+cfg4py = "^0.9.0"
+psutil  = "^5.7.3"
+fire = "^0.3.1"
+pyarrow = "^2.0.0"
+rlog = "0.3"
+pandas = "^1.2.0"
+
+black  = { version = "20.8b1", optional = true}
+isort  = { version = "5.6.4", optional = true}
+doc8  = { version = "0.8.1", optional = true}
+flake8  = { version = "3.8.4", optional = true}
+pre-commit  = { version = "2.8.2", optional = true}
+pytest  = { version = "6.1.2", optional = true}
+pytest-cov  = { version = "2.10.1", optional = true}
+tox  = { version = "^3.20.1", optional = true}
+virtualenv  = { version = "^20.2.2", optional = true}
+pip  = { version = "^20.3.1", optional = true}
+mkdocs  = { version = "^1.1.2", optional = true}
+mkdocs-include-markdown-plugin  = { version = "^1.0.0", optional = true}
+mkdocs-material  = { version = "^6.1.7", optional = true}
+mkdocstrings  = { version = "^0.13.6", optional = true}
+mkdocs-material-extensions  = { version = "^1.0.1", optional = true}
+twine  = { version = "^3.3.0", optional = true}
+idna = "2.5"
+
+[tool.poetry.extras]
+test = [
+    "pytest",
+    "black",
+    "isort",
+    "doc8",
+    "flake8",
+    "pytest-cov"
+    ]
+
+dev = ["tox", "pre-commit", "virtualenv", "pip", "twine"]
+
+doc = [
+    "mkdocs",
+    "mkdocs-include-markdown-plugin",
+    "mkdocs-material",
+    "mkdocstrings",
+    "mkdocs-material-extension"
+    ]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+omega = 'omega.cli:main'
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | tests/.*/setup.py
+)/
+'''
