@@ -1,0 +1,83 @@
+[tool.poetry]
+name = "outcome-devkit-api"
+version = "0.3.1"
+description = "Development tools for APIs."
+authors = ["Outcome Engineering <engineering@outcome.co>"]
+packages = [
+  { include = "outcome", from = "src" }
+]
+homepage = "https://github.com/outcome-co/devkit-api-py"
+repository = "https://github.com/outcome-co/devkit-api-py"
+documentation = "https://github.com/outcome-co/devkit-api-py#README"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.6"
+outcome-devkit = "^6.3.0"
+outcome-utils = "^5.0.3"
+fastapi = "^0.63.0"
+pactman = "^2.28.0"
+requests = "^2.25.1"
+PyJWT = {version = "^2.0.1", extras = ["crypto"]}
+
+[tool.poetry.dev-dependencies]
+
+
+[tool.coverage.run]
+branch = true
+data_file = 'coverage/data'
+source = ['src/outcome/devkit_api']
+omit = [
+   "test/*",
+   "src/outcome/devkit_api/fixtures/*"
+]
+
+[tool.coverage.report]
+fail_under = 100
+skip_empty = true
+
+[tool.coverage.html]
+show_contexts = true
+directory = 'coverage/html'
+
+[tool.black]
+line-length = 130
+include = '\.pyi?$'
+# This stops black from rewriting quotes
+skip-string-normalization = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.cache
+)/
+'''
+
+[tool.isort]
+skip_glob = "*/.cache/**/*"
+line_length = 130
+include_trailing_comma = true
+multi_line_output = 3
+
+[[tool.poetry.source]]
+name = "otc"
+url = "https://pypi.pkg.outcome.co/simple/"
+
+[build-system]
+requires = ["poetry==1.1.4"]
+build-backend = "poetry.masonry.api"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.3.1"
+tag_format = "v$version"
+bump_message = "chore(version): $current_version → $new_version"
+version_files = ["README.md:version-badge", "pyproject.toml:version"]
+
