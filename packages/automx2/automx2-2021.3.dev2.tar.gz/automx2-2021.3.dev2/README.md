@@ -1,0 +1,27 @@
+# automx2: Email client configuration made easy
+
+automx2 makes configuring email accounts easy. It unites methods for automated mailbox configuration from Apple's
+[Mobileconfig](https://support.apple.com/de-de/guide/profile-manager/pmdbd71ebc9/mac), Microsoft's
+[Autodiscover](https://docs.microsoft.com/de-de/exchange/architecture/client-access/autodiscover?view=exchserver-2019)
+and Mozilla's [Autoconfig](https://developer.mozilla.org/de/docs/Mozilla/Thunderbird/Autokonfiguration) in one tool.
+automx2 is successor to automx. It has been designed to be easier to setup, easier to configure and easier to use.
+
+## Copyright
+
+automx2 is Copyright © 2019-2021 Ralph Seichter. Parts of the initial documentation were written by Patrick Ben Koetter,
+Copyright © sys4 AG. automx2 is licensed under the GNU General Public License V3 or later. The project is hosted on
+GitHub in the [rseichter/automx2](https://github.com/rseichter/automx2) repository.
+
+## Documentation
+
+Detailed documentation is available in [HTML](https://rseichter.github.io/automx2/),
+[PDF](https://github.com/rseichter/automx2/blob/master/docs/automx2.pdf) and
+[other formats](https://github.com/rseichter/automx2/blob/master/docs).
+
+## Contributing
+
+Submitting ideas, suggestions and bug reports in the form of
+[GitHub issues](https://github.com/rseichter/automx2/issues) is welcome. Please refer to
+[this blog article](https://about.gitlab.com/blog/2016/03/03/start-with-an-issue/). To avoid Copyright issues, I do not
+currently accept code contributions. I hope that this will change at some future date. However, it is possible to
+sponsor specific new features. Contact me via email to discuss this in detail.
