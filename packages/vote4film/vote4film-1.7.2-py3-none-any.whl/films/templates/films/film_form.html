@@ -1,0 +1,64 @@
+{% extends "web/base.html" %}
+{% load films_extras %}
+
+
+{% block secondary_nav %}
+  <a tabindex="5"
+     class="nav__item nav__item--secondary {% if not object %} nav__item--selected{% endif %}"
+     href="{% url 'films:film-create' %}">
+    Add Film
+  </a>
+  {% if object %}
+    <a tabindex="6"
+       class="nav__item nav__item--secondary nav__item--selected"
+       href="{% url 'films:film-update' object.pk %}">
+      Update Film
+    </a>
+  {% endif %}
+{% endblock secondary_nav %}
+
+
+{% block content %}
+  {% if object %}
+    <h1>Update {{ film.title }}</h1>
+  {% else %}
+    <h1>Add a Film</h1>
+  {% endif %}
+  <p>
+  {% if not object %}
+    <a target="_blank" href="https://m.imdb.com/find?q=&s=tt&ttype=ft">
+      Search on IMDB
+    </a>
+    (copy the link when you find the film and come back).
+  {% endif %}
+  {% if object %}
+    <form action="{% url 'films:film-refresh' film.pk %}" method="post">
+      {% csrf_token %}
+      <button class="button button--secondary">
+        Refresh film information from external sources
+      </button>
+    </form>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if object %}
+      {% define "Save" as button_text %}
+    {% else %}
+      {% define "Add Film" as button_text %}
+    {% endif %}
+    <input class="button"
+           type="submit"
+           name="_save"
+           value="{{ button_text }}">
+    <input class="button button--secondary"
+           type="submit"
+           name="_edit"
+           value="{{ button_text }} and continue editing">
+    <input class="button button--secondary"
+           type="submit"
+           name="_addanother"
+           value="{{ button_text }} and add another">
+  </form>
+{% endblock content %}

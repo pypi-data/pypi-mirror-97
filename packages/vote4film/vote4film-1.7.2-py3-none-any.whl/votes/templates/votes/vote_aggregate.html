@@ -1,0 +1,52 @@
+{% extends "web/base.html" %}
+
+{% comment %}
+  Takes in:
+    - {{ films }} Films to watch
+    - {{ watched_films }} Films already watched
+    - {{ num_to_watch }}
+{% endcomment %}
+
+{% load humanize %}
+
+
+{% block secondary_nav %}
+  <a tabindex="5"
+    class="nav__item nav__item--secondary"
+    href="{% url 'films:film-create' %}">
+    Add Film
+  </a>
+{% endblock secondary_nav %}
+
+
+{% block content %}
+  <h1>Films to Watch</h1>
+  <p>
+    There are <strong>{{ num_to_watch|apnumber }} films to watch</strong>,
+    ordered from <strong>the most to the least popular</strong> based on everyone's votes.
+  {% if object_list %}
+    <h1 class="item-seperator">Most Popular</h1>
+    {% for film in films %}
+      {% if forloop.counter0 == 1 %}
+        <h1 class="item-seperator">Less Popular</h1>
+      {% endif %}
+      {% if forloop.counter0 > 1 and forloop.revcounter0 == 0 %}
+        <h1 class="item-seperator">Least Popular</h1>
+      {% endif %}
+      {% include "votes/includes/film_card.html" with film=film only %}
+    {% empty %}
+      <p>There are no films left to watch :(
+      <p><a href="{% url 'films:film-create' %}">Add a film!</a>
+    {% endfor %}
+
+    {% if watched_films %}
+      <h1 class="item-seperator">Already Seen</h2>
+      {% for film in watched_films %}
+        {% include "votes/includes/film_card.html" with film=film only %}
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    <p>There are no films added :(
+    <p><a href="{% url 'films:film-create' %}">Add a film!</a>
+  {% endif %}
+{% endblock %}

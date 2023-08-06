@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vote4Film - Login</title>
+
+{% block content %}
+  <h1>Vote4Film - Login</h1>
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>
+        Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% else %}
+    {% if user.is_authenticated %}
+      <p>You are already logged in, return <a href="{% url 'web:home' %}">the app</a>.
+    {% endif %}
+  {% endif %}
+
+  <form action="{% url 'web:login' %}" method="post" >
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="login">
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+
+  {% comment %}
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p><a href="{% url 'password_reset' %}">Lost password?</a>
+  {% endcomment %}
+{% endblock %}
