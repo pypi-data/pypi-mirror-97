@@ -1,0 +1,14 @@
+on:
+  ControlRequest:
+    - !ControlReqDriver {}
+  SearchRequest:
+    - !VectorSearchDriver {}
+  [IndexRequest, UpdateRequest]:
+    - !ExcludeQL
+      with:
+        fields:
+          - buffer
+          - chunks
+    - !VectorIndexDriver {}
+  DeleteRequest:
+    - !DeleteDriver {}
