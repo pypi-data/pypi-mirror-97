@@ -1,0 +1,27 @@
+# Name: festin
+# Version: 2.0.0
+# Concurrency: Sync and Async
+# Description: Find related domains and open S3 bucket in it, including S3 compatible providers
+# Tags: network, festin, dns, s3, network
+
+function festin(originDomain, dns, useTor) {
+    tor = ""
+    if(useTor) {
+        tor = "--tor"
+    }
+    resultFile = tmpFile()
+    r = exec ("festin {originDomain} {tor} -ds {dns} -rr {resultFile}", False) {
+        if(contains("Adding", outputLine)) {
+            fields = strSplit(outputLine)
+            domain = strSubstr(get(fields ,7), 1, -1)
+            send(domain)
+        }
+    }
+    r["buckets"] = []
+    buckets = readFileAsLines(resultFile)
+    iterate(buckets, "line") {
+        parsedLine = parseJSON(line)
+        listAppend(r["buckets"],parsedLine)
+    }
+    return r
+}
