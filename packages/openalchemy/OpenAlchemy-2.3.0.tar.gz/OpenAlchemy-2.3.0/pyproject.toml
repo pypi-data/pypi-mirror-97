@@ -1,0 +1,79 @@
+[tool.poetry]
+name = "OpenAlchemy"
+version = "2.3.0"
+description = "Maps an OpenAPI schema to SQLAlchemy models."
+authors = ["David Andersson <anderssonpublic@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/jdkandersson/OpenAlchemy"
+repository = "https://github.com/jdkandersson/OpenAlchemy"
+documentation = "https://openapi-sqlalchemy.readthedocs.io/en/latest/index.html"
+keywords = ["OpenAPI", "SQLAlchemy", "Python", "models", "database"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Natural Language :: English",
+    "Topic :: Database",
+    "Topic :: Database :: Front-Ends",
+    "Topic :: Internet",
+    "Typing :: Typed",
+]
+include = ["open_alchemy", "*.json", "*.j2"]
+exclude = ["docs", "examples", "tests"]
+packages = [
+    { include = "open_alchemy" },
+]
+
+[tool.poetry.scripts]
+openalchemy = "open_alchemy.cli:main"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+SQLAlchemy = "^1.0"
+jsonschema = "^3"
+Jinja2 = "^2"
+sqlalchemy-stubs = ">=0.3,<0.5"
+typing_extensions = { version = "^3.7.4", python = "<3.8" }
+
+[tool.poetry.extras]
+yaml = ["PyYAML"]
+wheel = ["wheel"]
+
+[tool.poetry.dev-dependencies]
+pylint = "^2"
+mypy = "^0"
+pydocstyle = "^5"
+black = "^20.8b1"
+pre-commit = "^2"
+isort = "^5"
+Sphinx = "^3"
+doc8 = "^0"
+connexion = {version = "^2", extras = ["swagger-ui"]}
+Flask-SQLAlchemy = "^2"
+alembic = "^1"
+rstcheck = "^3"
+bandit = "^1"
+pytest = "^6"
+pytest-cov = "^2"
+pytest-flake8 = "^1"
+pytest-flask = "^1"
+pytest-flask-sqlalchemy = "^1"
+pytest-randomly = "^3"
+PyYAML = "^5"
+typeguard = "^2"
+sqlalchemy_mixins = "^1"
+wheel = "^0"
+myst-parser = "^0"
+sphinx-copybutton = "^0"
+furo = "^2021.2.28b28"
+sphinx-autobuild = "^2020"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

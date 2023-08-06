@@ -1,0 +1,93 @@
+{
+  "x-backref": {
+    "description": "Add a back reference to a relationship.",
+    "type": "string"
+  },
+  "x-uselist": {
+    "description": "Turn a many to one into a one to one relationship.",
+    "type": "boolean"
+  },
+  "x-secondary": {
+    "description": "Turn a one to many into a many to many relationship. The value of x-secondary is used as the name of the association table.",
+    "type": "string"
+  },
+  "x-primary-key": {
+    "description": "Make a column a primary key.",
+    "type": "boolean"
+  },
+  "x-autoincrement": {
+    "description": "Make an integer primary key column auto increment.",
+    "type": "boolean"
+  },
+  "x-index": {
+    "description": "Add index to a column.",
+    "type": "boolean"
+  },
+  "x-composite-index": {
+    "description": "Add composite index to a table.",
+    "$ref": "#/CompositeIndex"
+  },
+  "x-unique": {
+    "description": "Add unique constraint to a column.",
+    "type": "boolean"
+  },
+  "x-composite-unique": {
+    "description": "Add composite unique constraint to a table.",
+    "$ref": "#/CompositeUnique"
+  },
+  "x-json": {
+    "description": "Treat the property as a JSON object rather than a particular type.",
+    "type": "boolean"
+  },
+  "x-foreign-key": {
+    "description": "Add a foreign key constraint to a column. Must have the format \"<table name>.<column name>\".",
+    "type": "string",
+    "pattern": "^.+\\..+$"
+  },
+  "x-foreign-key-column": {
+    "description": "Customize the column used for the foreign key constraint of a relationship.",
+    "type": "string"
+  },
+  "x-foreign-key-kwargs": {
+    "description": "Define kwargs to be passed to the foreign key constructor.",
+    "type": "object",
+    "additionalProperties": true
+  },
+  "x-server-default": {
+    "description": "Get the server to calculate a default value.",
+    "type": "string"
+  },
+  "x-tablename": {
+    "description": "Define the name of a table.",
+    "type": "string"
+  },
+  "x-inherits": {
+    "description": "Define that a schema inherits from another schema or specify which schema to inherit from.",
+    "oneOf": [{ "type": "string" }, { "type": "boolean" }]
+  },
+  "x-kwargs": {
+    "description": "Define kwargs to be passed to a function based on the context.",
+    "type": "object",
+    "additionalProperties": true
+  },
+  "x-mixins": {
+    "description": "The import path for a mixin class to be added as a parent for a model.",
+    "$ref": "#/Mixins"
+  },
+  "x-backrefs": {
+    "description": "INTERNAL USE ONLY: Note on a schema that a back reference was created.",
+    "$ref": "#/BackRef"
+  },
+  "x-de-$ref": {
+    "description": "INTERNAL USE ONLY: Track the name of a constructed model for a property referencing an object.",
+    "type": "string"
+  },
+  "x-dict-ignore": {
+    "description": "INTERNAL USE ONLY: Do not add to the schema record used by from_- and to_dict functions.",
+    "type": "boolean"
+  },
+  "x-generated": {
+    "description": "INTERNAL USE ONLY: The property is generated automatically (eg. auto incremented or has a default value) which is used to help determine whether the column is nullable.",
+    "type": "boolean"
+  }
+}
