@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "fastocr"
+version = "0.1.4"
+description = "FastOCR is a desktop application for OCR API."
+license = "LGPL-3.0-only"
+authors = ["Bruce Zhang <zttt183525594@gmail.com>"]
+homepage = "https://github.com/BruceZhang1993/FastOCR"
+repository = "https://github.com/BruceZhang1993/FastOCR"
+documentation = "https://github.com/BruceZhang1993/FastOCR"
+keywords = ["ocr"]
+include = ["fastocr/qml/*.qml", "fastocr/data/FastOCR.desktop", "fastocr/data/config.example.ini",
+    "fastocr/data/i18n.pro", "fastocr/i18n/*.qm", "fastocr/resource/icon/*/*.svg", "fastocr/resource/icon/*/*.png"]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.10"
+qasync = "*"
+click = "*"
+aiohttp = "*"
+dbus-python = { version = "*", optional = true }
+pyqt5 = "*"
+pyqt5-sip = "*"
+
+[tool.poetry.dev-dependencies]
+dephell = "^0.8.3"
+
+[tool.poetry.extras]
+dbus = ["dbus-python"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+fastocr = 'fastocr.__main__:main'
+
+[[tool.poetry.source]]
+name = "douban"
+url = "https://pypi.doubanio.com/simple/"
+default = true
+
+[[tool.poetry.source]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
