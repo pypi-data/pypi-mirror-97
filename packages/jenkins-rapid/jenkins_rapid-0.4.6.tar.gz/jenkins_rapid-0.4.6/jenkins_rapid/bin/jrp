@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+"""jenkins_debug_console
+
+Usage:
+    jrp --job <jobname>  --file <jenkinsfile> [--url <url>] [--user <username>] [--token <api_token>] [--parameters-yaml <yamlfile>] [--sleep <sleep_time>] [--wait-timer <time>]
+    jrp stop --job <jobname> [--url <url>] [--user <username>] [--token <api_token>] 
+    jrp delete --job <jobname>  [--url <url>] [--user <username>] [--token <api_token>]
+    jrp --version
+    jrp --help
+
+Examples:
+    jrp  --job deploy_my_app -f jenkinsfile -u https://jenkins.example.com -p params.yaml
+
+Options:
+  -j, --job <jobname>               Job name.
+  -f, --file <jenkinsfile>          Jenkins pipeline script file
+  -l, --url <url>                   Jenkins URL [default: http://localhost:8080]
+  -u, --user <username>             Jenkins user name
+  -t, --token <api_token>           Jenkins user token
+  -s, --sleep <sleep_time>          Sleep time between polling requests [default: 2]
+  -w, --wait-timer <time>           Wait time in queue [default: 100]
+  -p, --parameters-yaml <yamlfile>  yaml file with list of name and value keys (Ex. in Readme.md)
+  -h, --help                        Show this screen and exit.
+  -v, --version                     Show version
+"""
+
+from jenkins_rapid.jenkins_debug_console import Job
+from docopt import docopt
+import sys, traceback
+import pkg_resources
+import os
+
+
+if __name__ == '__main__':
+    arguments = docopt(__doc__)
+    myjob = Job(arguments)
+
+    if arguments["--version"]:
+        print(" \n Jenkins Rapid " + pkg_resources.get_distribution("jenkins_rapid").version + "\n")
+    elif arguments['stop']:
+        print ("stopping jobs")
+        myjob.stop_jobs()
+    elif arguments['delete']:
+        myjob.delete_job()
+    else:
+        try:
+            # Clear terminal screen on start
+            os.system('cls' if os.name == 'nt' else 'clear')
+            myjob.main()
+        except KeyboardInterrupt:
+            print ("Shutdown requested...exiting")
+        except Exception:
+            traceback.print_exc(file=sys.stdout)
+        sys.exit(0)
+    
+        
