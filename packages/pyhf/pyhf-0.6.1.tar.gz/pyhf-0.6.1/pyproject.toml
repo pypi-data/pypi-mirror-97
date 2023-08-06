@@ -1,0 +1,74 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["wheel", "setuptools>=30.3.0", "attrs>=17.1", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38']
+skip-string-normalization = true
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | .eggs
+  | build
+)/
+'''
+
+[tool.check-manifest]
+ignore = [
+    'docs*',
+    'validation*',
+    'examples*',
+    'tests*',
+    'docker*',
+    'binder*',
+    '.*',
+    'pyproject.toml',
+    'pytest.ini',
+    'codecov.yml',
+    'codemeta.json',
+    'CODE_OF_CONDUCT.md',
+    'CONTRIBUTING.md',
+    'AUTHORS',
+]
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--ignore=setup.py --ignore=validation/ --ignore=binder/ --ignore=docs/ --cov=pyhf --cov-report=term-missing --cov-config=.coveragerc --cov-report xml --doctest-modules --doctest-glob='*.rst'"
+testpaths = [
+    "src",
+    "tests",
+]
+markers = [
+    "fail_jax",
+    "fail_numpy",
+    "fail_numpy_minuit",
+    "fail_pytorch",
+    "fail_pytorch64",
+    "fail_tensorflow",
+    "only_jax",
+    "only_numpy",
+    "only_numpy_minuit",
+    "only_pytorch",
+    "only_pytorch64",
+    "only_tensorflow",
+    "skip_jax",
+    "skip_numpy",
+    "skip_numpy_minuit",
+    "skip_pytorch",
+    "skip_pytorch64",
+    "skip_tensorflow",
+]
+
+[tool.nbqa.config]
+black = "pyproject.toml"
+
+[tool.nbqa.mutate]
+black = 1
+pyupgrade = 1
+
+[tool.nbqa.addopts]
+pyupgrade = ["--py37-plus"]
