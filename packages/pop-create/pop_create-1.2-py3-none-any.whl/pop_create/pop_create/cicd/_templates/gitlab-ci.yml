@@ -1,0 +1,45 @@
+---
+stages:
+  - pre-commit
+  - test-suite
+
+include:
+  - project: saltstack/pop/cicd/ci-templates
+    file: /lint/pre-commit-run-all.yml
+
+.test-suite:
+  stage: test-suite
+  needs:
+    - pre-commit-run-all
+  script:
+    - python3 -m pip install nox
+    - nox -e tests-3 -- -vv
+  artifacts:
+    when: always
+    paths:
+      - artifacts
+    reports:
+      junit: artifacts/junit-report.xml
+    expire_in: 30 days
+  after_script:
+    - cicd/upload-code-coverage.sh
+
+tests-3.6:
+  extends: .test-suite
+  image: python:3.6
+
+tests-3.7:
+  extends: .test-suite
+  image: python:3.7
+
+tests-3.8:
+  extends: .test-suite
+  image: python:3.8
+
+tests-3.9:
+  extends: .test-suite
+  image: python:3.9
+
+#tests-3.10:
+#  extends: .test-suite
+#  image: python:3.10.0a1
