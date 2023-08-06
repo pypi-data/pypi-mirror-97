@@ -1,0 +1,37 @@
+from functools import wraps
+from flask import abort
+from flask_login import current_user
+
+
+def roles_required(*roles):
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            try:
+                if current_user.has_roles(*roles):
+                    return func(*args, **kwargs)
+            except AttributeError:
+                abort(400)
+                
+            return abort(403)
+
+        return wrapped
+
+    return decorator
+
+
+def roles_accepted(*roles):
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            try:
+                if current_user.has_any_roles(*roles):
+                    return func(*args, **kwargs)
+            except AttributeError:
+                abort(400)
+
+            return abort(403)
+
+        return wrapped
+
+    return decorator

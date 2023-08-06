@@ -1,0 +1,54 @@
+from flask import Blueprint, request
+from flask_jwt_extended import (
+    get_jwt_identity,
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+)
+from flask_restx import Api
+from application_tpl.models import User
+$PWD_VERIFIER_METHOD_IMPORT
+from application_tpl.api.resources.examples.pet import pet_ns
+
+apibp = Blueprint("api", __name__, url_prefix="/api")
+
+api = Api(apibp, version="1.0", description="A simple demo API")
+api.add_namespace(pet_ns)
+
+
+@apibp.route("/authenticate", methods=["POST"])
+def authenticate():
+    if not request.is_json:
+        return {"msg": "Missing JSON in request"}, 400
+
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    if not username:
+        return {"msg": "Missing username parameter"}, 400
+    if not password:
+        return {"msg": "Missing password parameter"}, 400
+
+    user: User = User.get_by_email(username)
+
+    if not user or not $PWD_VERIFIER_METHOD:
+        return {"msg": "Bad credentials."}, 401
+
+    # Identity can be any data that is json serializable
+    ret = {
+        "access_token": create_access_token(identity=username),
+        "refresh_token": create_refresh_token(identity=username),
+    }
+    return ret, 200
+
+
+# The jwt_required(refresh=True) decorator insures a valid refresh
+# token is present in the request before calling this endpoint. We
+# can use the get_jwt_identity() function to get the identity of
+# the refresh token, and use the create_access_token() function again
+# to make a new access token for this identity.
+@apibp.route("/refresh")
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+    ret = {"access_token": create_access_token(identity=current_user)}
+    return ret, 200
