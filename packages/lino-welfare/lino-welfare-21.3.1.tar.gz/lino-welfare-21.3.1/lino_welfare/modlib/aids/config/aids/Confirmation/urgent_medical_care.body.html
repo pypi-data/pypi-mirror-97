@@ -1,0 +1,25 @@
+{% extends "aids/Confirmation/certificate.body.html" %}
+
+{% block what %}
+<p>
+{%- if language == 'de' -%}
+
+<b>{{when}}</b>
+weder Eingliederungseinkommen noch Sozialhilfe 
+{{iif(obj.is_past(), "bezieht", "bezogen hat")}}, da das
+augenblickliche Statut nur Anrecht auf die in Artikel 57 § 2.1 des
+Grundlagengesetzes über die ÖSHZ vom 08.07.1976 vorgesehene dringende
+medizinische Hilfe gibt.
+
+{%- else -%}
+
+{{iif(obj.is_past(), "n'a bénéficié", "ne bénéficie")}}
+<b>{{when}}</b>
+ni du revenu d’intégration ni d'une aide sociale, étant
+donné que son statut actuel donne uniquement droit à l’aide médicale
+urgente conformément à l’article 57 § 2.1 de la loi du 08.07.1976
+organique des CPAS.
+
+{%- endif -%}
+</p>
+{% endblock %}

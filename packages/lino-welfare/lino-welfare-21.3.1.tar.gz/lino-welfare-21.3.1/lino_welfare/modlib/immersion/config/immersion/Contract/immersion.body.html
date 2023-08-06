@@ -1,0 +1,179 @@
+{% extends "excerpts/base.body.html" %}
+{% set site_config = settings.SITE.site_config %}
+{% set pcsw = site_config.site_company %}
+{% set dots = "." * 30 %}
+{% set article = Counter() %}
+
+{% block our_ref %}
+{{tr("U. Zeichen",fr="Notre réf.")}}:
+<span class="VariableText">
+{{obj.user.initials}}/{{obj.client.id}}/{{this.id}}
+</span>
+{% endblock %}
+
+{% block title %}
+{% if language != settings.SITE.get_default_language() %}
+<p class="CenteredHeader">({{_("Translation")}})</p>
+{% endif %}
+<h1>{{obj.get_excerpt_title()}}</h1>
+{% endblock %}
+
+{% block body %}
+
+<p align="center">
+Convention de stage d’immersion sous forme de mise en situation
+professionnelle au sein des services internes du {{pcsw}}
+</p>
+
+<p>Entre le {{pcsw}}, dont le siège est situé à
+<b>{{', '.join(pcsw.address_location_lines())}}</b>,
+représenté par
+<b>{{site_config.signer1}}, {{site_config.signer1_function}}</b>
+et
+<b>{{site_config.signer2}}, {{site_config.signer2_function}}</b>,
+ci-après dénommé «le CPAS»,</p>
+
+<p class="EnhancedPar">
+et <b>le Service Insertion Socio-Professionnelle</b> 
+représenté par le travailleur social : {{obj.user}}
+</p>
+
+
+<p class="EnhancedPar">
+et <b>le service accueillant:</b> 
+{{obj.company.get_full_name(nominative=True)}}
+<br>
+{{tr(de="mit Sitz in",fr="dont le siège est situé à")}}
+{{', '.join(obj.company.address_location_lines())}}
+{%- if obj.contact_person -%}
+, représentée par {{obj.contact_person.get_full_name(nominative=True)}}
+{%- endif -%},
+{%- if obj.contact_role -%}, {{obj.contact_role}}{%- endif -%},
+</p>
+
+
+<p class="EnhancedPar">
+et <b>{{obj.client.get_full_name(nominative=True)}}</b>, 
+{{tr(de="wohnhaft zu",fr="domicilié"+obj.client.mf("","e","(e)")+" à")}}
+{{', '.join(obj.client.address_location_lines())}},
+ci-après dénommé{{obj.client.mf(" le","e la","(e) le(la)")}} « stagiaire »</p>
+
+<p>Il a été convenu ce qui suit :</p>
+
+<h2>Article {{article()}}</h2>
+
+<p>Dans le cadre des initiatives du CPAS, pour l’insertion
+socioprofessionnelle de ses usagers et afin d’organiser une insertion
+professionnelle de qualité, le service insertion et le service
+accueillant réunissent leurs efforts pour permettre à
+<b>{{obj.company.get_full_name()}}<b> d’effectuer une formation par mise en
+situation, afin d’approcher le métier d’auxiliaire polyvalente, les
+contraintes inhérentes à un horaire, un rythme régulier, un travail
+dirigé.</p>
+
+<h2>Article {{article()}}</h2>
+
+<p>Le présent contrat est signé pour une période de <b>{{obj.cv_duration}}</b>
+jours ouvrables,
+soit du <b>{{fds(obj.applies_from)}}</b> 
+au <b>{{fds(obj.applies_until)}}</b>, selon l’horaire suivant : 
+<b>de 7h00 à 15 h, du lundi au vendredi</b>.
+</p>
+
+<h2>Article {{article()}}</h2>
+
+<p>Le CPAS s’engage :</p>
+
+<ul>
+<li>à souscrire toutes les assurances contre les risques d’accident de
+travail et en responsabilité civile durant la période sus-indiquée de
+la formation par mise en situation;</li>
+<li>à défrayer <em>{{obj.client.get_full_name(nominative=True)}}</em>, à
+raison de <b>1 € par heure</b> prestée durant cette même période.</li>
+</ul>
+
+<h2>Article {{article()}}</h2>
+
+<p>Le service accueillant s’engage à :</p>
+<ul>
+<li>accueillir et diriger <em>{{obj.client.get_full_name(nominative=True)}}</em> durant la période de formation par mise en situation.</li>
+</ul>
+
+
+<h2>Article {{article()}}</h2>
+
+<p>Le C.P.A.S. confie sa mission d’accompagnement au service insertion.
+Le service insertion s’engage à accompagner la stagiaire.  Cet
+accompagnement a pour objet :</p>
+
+<ul>
+<li>d’examiner avec le stagiaire le déroulement de sa participation au travail ;</li>
+
+<li>de lui apporter une aide en cas de difficultés susceptibles de
+nuire à son insertion professionnelle.</li>
+</ul>
+
+
+<h2>Article {{article()}}</h2>
+
+<p>{{obj.client.get_full_name(nominative=True)}} s’engage à:</p>
+
+<ul>
+<li>démontrer ses compétences en tant qu’auxiliaire polyvalente ;</li>
+<li>à respecter les contraintes inhérentes au travail :</li>
+<ul>
+<li>respect des horaires ;</li>
+<li>respect du matériel ;</li>
+<li>respect des collègues ;</li>
+<li>respect de la patientèle ;</li>
+<li>respect des ordres et remarques.</li>
+</ul>
+</ul>
+
+<h2>Article {{article()}}</h2>
+
+<p>Au cours et au terme de la période de formation par mise en situation,
+une évaluation entre le service Insertion, le service accueillant et
+{{obj.client.mf("le","la","le (la)")}} stagiaire déterminera les aptitudes
+de {{obj.client.mf("ce dernier","cette dernière","ce dernier")}}
+à exercer un travail sous contrat.</p>
+
+
+<h2>Article {{article()}}</h2>
+
+<p>Si une situation se présentait mettant en péril la bonne fin de la
+formation par mise en situation, chacune des parties se réserve le
+droit d’en référer aux autres afin d’examiner l’opportunité de mettre
+fin au présent contrat.</p>
+
+<p>Fait à {{pcsw.city}}, en autant d’exemplaires que de parties dont
+chacune reconnaît avoir reçu le sien.</p>
+
+<ul>
+<li>Pour le CPAS:
+<ul>
+<li>{{site_config.signer1}}, {{site_config.signer1_function}} {{dots}}</li>
+<li>{{site_config.signer2}}, {{site_config.signer2_function}} {{dots}}</li>
+</ul>
+</li>
+
+<li>Pour le Service Accueillant:
+{%- if obj.contact_person -%}
+{{obj.contact_person.get_full_name(nominative=True)}}
+{%- endif -%}
+{%- if obj.contact_role -%} ({{obj.contact_role}}){%- endif -%}
+{{dots}}
+</li>
+
+<li>Pour le Service Insertion:
+{{obj.user}}
+{{dots}}
+</li>
+
+<li>{{obj.client.mf("le","la","le (la)")}} stagiaire:
+{{obj.client.get_full_name(nominative=True)}}
+{{dots}}</li>
+
+</ul>
+
+{% endblock %}

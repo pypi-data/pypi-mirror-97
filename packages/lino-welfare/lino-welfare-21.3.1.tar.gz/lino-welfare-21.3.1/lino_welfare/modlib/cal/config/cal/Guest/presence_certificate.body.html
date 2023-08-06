@@ -1,0 +1,61 @@
+{% extends "excerpts/base.body.html" %}
+
+{% block our_ref %}
+{{tr("U. Zeichen",fr="Notre réf.")}}: {{obj.user.initials}}/{{this.user.initials}}/{{obj.partner.id}}/{{this.id}}
+{% endblock %}
+
+{% block body %}
+
+<p>{{tr(en="We hereby certify that",
+        de="Hiermit bescheinigen wir, dass",
+        fr="Par la présente nous certifions que")}}</p>
+
+<p class="EnhancedPar">
+{%- if obj.client -%}
+{{obj.client.get_full_name(nominative=True)}}
+<br>
+{{tr(de="Nationalregisternummer",fr="Numéro du Registre National")}}
+{{obj.client.national_id}}
+<br>
+{%- set addr = obj.client.get_primary_address() -%}
+{{addr.living_at_text() if addr else ""}}
+{#
+{{tr(de="wohnhaft zu",fr="domicilié"+obj.client.mf("","e","(e)")+" à")}}
+{{', '.join(obj.client.address_location_lines())}}
+#}
+{%- endif -%}
+</p>
+
+
+{{ super() }}
+
+<p>
+
+{%- set times = (dd.strftime(obj.waiting_since), 
+dd.strftime(obj.gone_since or this.time)) -%}
+{%- if obj.waiting_since -%}
+<b>{%- if obj.waiting_since.date() == this.date -%}
+{{tr(en="was present today", 
+     de="am heutigen Tage", 
+     fr="s'est présenté aujourd'hui")}}
+{% else %}
+{{tr(en="was present on ", 
+     de="am ", 
+     fr="s'est présenté le")+fdf(obj.waiting_since.date())}}
+{% endif -%}
+{% endif -%}
+{%- if times[1] %}
+{{tr(en="between %s and %s o'clock",
+    de="in der Zeit von %s Uhr bis %s Uhr",
+    fr="entre %s h et %s h") % times}}
+{% else %}
+{{tr(en="at %s o'clock",
+    de="um %s Uhr",
+    fr="à %s h") % times[0] }}
+{% endif -%}</b>
+{{tr(en="in the centre for administrative reasons.",
+de="im ÖSHZ zwecks Regelung administrativer Angelegenheiten vorstellig wurde.",
+    fr="au CPAS pour régler des affaires administratives.")}}
+</p>
+
+{% endblock %}

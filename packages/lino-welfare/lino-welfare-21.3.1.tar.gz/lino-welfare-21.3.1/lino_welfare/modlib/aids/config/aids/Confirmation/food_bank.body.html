@@ -1,0 +1,30 @@
+{% extends "aids/Confirmation/certificate.body.html" %}
+
+{% block intro -%}
+<p>
+{% if language == 'de' %}
+Wir bescheinigen hiermit, dass folgende Personen aus Gründen der
+sozial-finanziellen Lage Anrecht auf eine Sozialhilfe in Naturalien durch
+Nutzung der Lebensmittelbank
+{{iif(obj.is_past(), "hatte/hatten", "hat/haben")}}.
+{% else %}
+Par la présente nous confirmons que les personnes suivantes, à cause de leur
+situation socio-économique,
+{{iif(obj.is_past(), "a bénéficié", "bénéficie")}}
+du droit d'utiliser la banque alimentaire.
+{% endif %}
+</p>
+<p>
+{{ ar.show(rt.models.households.RefundsByPerson, obj.client, column_names="person_info age:10 gender:10") }}
+</p>
+{%- endblock %}
+
+{% block what -%}
+<p>
+{% if language == 'de' %}
+Dieses Anrecht ist gültig <b>{{when}}</b>.
+{% else %}
+Ce droit est valable <b>{{when}}</b>.
+{% endif %}
+</p>
+{%- endblock %}

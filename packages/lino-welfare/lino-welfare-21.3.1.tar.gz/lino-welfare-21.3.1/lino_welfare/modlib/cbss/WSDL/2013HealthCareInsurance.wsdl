@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--=============================================-->
+<!--=   Service : HealthCareInsurance                      -->
+<!--=   Filename : 2013HealthCareInsurance.wsdl                      -->
+<!--=   Author : Alain Tilmant                      -->
+<!--=   Owner : BCSS                      -->
+<!--=   Date : 2013-11-06                      -->
+<!--=  Status : Planned                       -->
+<!--=   Description :Service Front-End de la BCSS : Insurability data                      -->
+<!--=  Current Version : 1.0                      -->
+<!--=   Revision History :                      -->
+<!--  *                      -->
+<!--=============================================-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="HealthCareInsuranceService" targetNamespace="http://kszbcss.fgov.be/intf/HealthCareInsuranceService/v1" xmlns:common="http://kszbcss.fgov.be/types/common/v3"  xmlns:puo="http://kszbcss.fgov.be/types/HealthCareInsurance/v1"  xmlns:tns="http://kszbcss.fgov.be/intf/HealthCareInsuranceService/v1"  	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<!--========= wsdl:types ===========-->
+	<wsdl:types>
+		<!--xmlns:common="http://kszbcss.fgov.be/types/common/v3"  xmlns:puo="http://kszbcss.fgov.be/types/HealthCareInsurance/v1"  xmlns:tns="http://kszbcss.fgov.be/intf/HealthCareInsuranceService/v1"  	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"-->
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://kszbcss.fgov.be/intf/HealthCareInsuranceService/v1" xmlns:common="http://kszbcss.fgov.be/types/common/v3"  xmlns:puo="http://kszbcss.fgov.be/types/HealthCareInsurance/v1"  xmlns:tns="http://kszbcss.fgov.be/intf/HealthCareInsuranceService/v1"  	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" version="2013-11-06">
+			<xsd:import schemaLocation="HealthCareInsuranceTypesV1.xsd" namespace="http://kszbcss.fgov.be/types/HealthCareInsurance/v1"/>
+			<xsd:import schemaLocation="CommonV3.xsd" namespace="http://kszbcss.fgov.be/types/common/v3"/>
+			<!--========= xsd element ===========-->
+			<xsd:element name="getInsuranceOrganizationInformationsRequest" type="puo:GetInsuranceOrganizationInformationsRequestType"/>
+			<xsd:element name="getInsuranceOrganizationInformationsResponse" type="puo:GetInsuranceOrganizationInformationsResponseType"/>
+			<xsd:element name="getInsuranceOrganizationInformationsFault" type="common:CBSSFaultType"/>
+			<xsd:element name="consultMAFRequest" type="puo:ConsultMAFRequestType"/>
+			<xsd:element name="consultMAFResponse" type="puo:ConsultMAFResponseType"/>
+			<xsd:element name="consultMAFFault" type="common:CBSSFaultType"/>
+			<xsd:element name="consultHolderCodeRequest" type="puo:ConsultHolderCodeRequestType"/>
+			<xsd:element name="consultHolderCodeResponse" type="puo:ConsultHolderCodeResponseType"/>
+			<xsd:element name="consultHolderCodeFault" type="common:CBSSFaultType"/>
+		</xsd:schema>
+	</wsdl:types>
+	<!--========= wsdl:message ===========-->
+	<wsdl:message name="getInsuranceOrganizationInformationsRequestMsg">
+		<wsdl:part name="getInsuranceOrganizationInformationsRequestParameters" element="tns:getInsuranceOrganizationInformationsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="getInsuranceOrganizationInformationsResponseMsg">
+		<wsdl:part name="getInsuranceOrganizationInformationsResponseParameters" element="tns:getInsuranceOrganizationInformationsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="getInsuranceOrganizationInformationsFaultMsg">
+		<wsdl:part name="getInsuranceOrganizationInformationsFaultParameters" element="tns:getInsuranceOrganizationInformationsFault"/>
+	</wsdl:message>
+	<wsdl:message name="consultMAFRequestMsg">
+		<wsdl:part name="consultMAFRequestParameters" element="tns:consultMAFRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultMAFResponseMsg">
+		<wsdl:part name="consultMAFResponseParameters" element="tns:consultMAFResponse"/>
+	</wsdl:message>
+	<wsdl:message name="consultMAFFaultMsg">
+		<wsdl:part name="consultMAFFaultParameters" element="tns:consultMAFFault"/>
+	</wsdl:message>
+	<wsdl:message name="consultHolderCodeRequestMsg">
+		<wsdl:part name="consultHolderCodeRequestParameters" element="tns:consultHolderCodeRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultHolderCodeResponseMsg">
+		<wsdl:part name="consultHolderCodeResponseParameters" element="tns:consultHolderCodeResponse"/>
+	</wsdl:message>
+	<wsdl:message name="consultHolderCodeFaultMsg">
+		<wsdl:part name="consultHolderCodeFaultParameters" element="tns:consultHolderCodeFault"/>
+	</wsdl:message>
+	<!--========= wsdl:portType ===========-->
+	<wsdl:portType name="HealthCareInsurancePortType">
+		<wsdl:operation name="getInsuranceOrganizationInformations">
+			<wsdl:input name="getInsuranceOrganizationInformationsRequest" message="tns:getInsuranceOrganizationInformationsRequestMsg"/>
+			<wsdl:output name="getInsuranceOrganizationInformationsResponse" message="tns:getInsuranceOrganizationInformationsResponseMsg"/>
+			<wsdl:fault name="getInsuranceOrganizationInformationsFault" message="tns:getInsuranceOrganizationInformationsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultMAF">
+			<wsdl:input name="consultMAFRequest" message="tns:consultMAFRequestMsg"/>
+			<wsdl:output name="consultMAFResponse" message="tns:consultMAFResponseMsg"/>
+			<wsdl:fault name="consultMAFFault" message="tns:consultMAFFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultHolderCode">
+			<wsdl:input name="consultHolderCodeRequest" message="tns:consultHolderCodeRequestMsg"/>
+			<wsdl:output name="consultHolderCodeResponse" message="tns:consultHolderCodeResponseMsg"/>
+			<wsdl:fault name="consultHolderCodeFault" message="tns:consultHolderCodeFaultMsg"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<!--========= wsdl:binding ===========-->
+	<wsdl:binding name="HealthCareInsuranceHTTPBinding" type="tns:HealthCareInsurancePortType">
+		<soap:binding xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="getInsuranceOrganizationInformations">
+			<soap:operation xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" soapAction="http://kszbcss.fgov.be/HealthCareInsuranceService/getInsuranceOrganizationInformations"/>
+			<wsdl:input>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="getInsuranceOrganizationInformationsFault">
+				<soap:fault xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="getInsuranceOrganizationInformationsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="consultMAF">
+			<soap:operation xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" soapAction="http://kszbcss.fgov.be/HealthCareInsuranceService/consultMAF"/>
+			<wsdl:input>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="consultMAFFault">
+				<soap:fault xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="consultMAFFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="consultHolderCode">
+			<soap:operation xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" soapAction="http://kszbcss.fgov.be/HealthCareInsuranceService/consultHolderCode"/>
+			<wsdl:input>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="consultHolderCodeFault">
+				<soap:fault xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="consultHolderCodeFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<!--========= wsdl:service ===========-->
+	<wsdl:service name="HealthCareInsuranceService">
+	  <wsdl:port name="HealthCareInsuranceConsult_01" binding="tns:HealthCareInsuranceHTTPBinding">
+        <soap:address location="https://b2b-%(cbss_environment)s.ksz-bcss.fgov.be:4520/HealthCareInsuranceService/consult_01"/>            
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
