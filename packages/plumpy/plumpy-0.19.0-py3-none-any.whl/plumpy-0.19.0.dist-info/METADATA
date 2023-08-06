@@ -1,0 +1,125 @@
+Metadata-Version: 2.1
+Name: plumpy
+Version: 0.19.0
+Summary: A python workflow library
+Home-page: https://github.com/muhrin/plumpy.git
+Author: Martin Uhrin
+Author-email: martin.uhrin@gmail.com
+License: GPLv3 and MIT, see LICENSE file
+Keywords: workflow multithreaded rabbitmq
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml (~=5.1.2)
+Requires-Dist: nest-asyncio (~=1.4.0)
+Requires-Dist: aio-pika (~=6.6)
+Requires-Dist: kiwipy[rmq] (~=0.7.4)
+Requires-Dist: aiocontextvars (~=0.2.2) ; python_version < "3.7"
+Provides-Extra: docs
+Requires-Dist: sphinx (~=3.2.0) ; extra == 'docs'
+Requires-Dist: myst-nb (~=0.11.0) ; extra == 'docs'
+Requires-Dist: sphinx-book-theme (~=0.0.39) ; extra == 'docs'
+Requires-Dist: ipython (~=7.0) ; extra == 'docs'
+Provides-Extra: pre-commit
+Requires-Dist: mypy (==0.790) ; extra == 'pre-commit'
+Requires-Dist: pre-commit (~=2.2) ; extra == 'pre-commit'
+Requires-Dist: pylint (==2.5.2) ; extra == 'pre-commit'
+Provides-Extra: tests
+Requires-Dist: pytest (~=5.4) ; extra == 'tests'
+Requires-Dist: shortuuid ; extra == 'tests'
+Requires-Dist: pytest-asyncio ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pytest-notebook ; extra == 'tests'
+
+# plumpy
+
+[![Build status][github-ci]][github-link]
+[![Docs status][rtd-badge]][rtd-link]
+[![Latest Version][pypi-badge]][pypi-link]
+[![PyVersions][pyversions-badge]][pyversions-link]
+[![License][license-badge]][license-link]
+
+A python workflows library that supports writing Processes with a well defined set of inputs and outputs that can be
+strung together.
+
+RabbitMQ is used to queue up, control and monitor running processes via the
+[kiwipy](https://pypi.org/project/kiwipy/) library.
+
+Features:
+
+* Processes can be remotely controlled by sending messages over RabbitMQ all from a simple interface
+* Progress can be saved between steps and continued later
+* Optional explicit specification of inputs and outputs including their types, validation functions, help strings, etc.
+
+## Installation
+
+```bash
+pip install plumpy
+```
+
+or
+
+```bash
+conda install -c conda-forge plumpy
+```
+
+## Development
+
+This package utilises [tox](https://tox.readthedocs.io) for unit test automation, and [pre-commit](https://pre-commit.com/) for code style formatting and test automation.
+
+To install these development dependencies:
+
+```bash
+pip install tox pre-commit
+```
+
+To run the unit tests:
+
+```bash
+tox
+```
+
+For the `rmq` tests you will require a running instance of RabbitMQ.
+One way to achieve this is using Docker and launching [`test/rmq/docker-compose.yml`](test/rmq/docker-compose.yml).
+
+To run the pre-commit tests:
+
+```bash
+pre-commit run --all
+```
+
+To build the documentation:
+
+```bash
+tox -e docs-clean
+```
+
+Changes should be submitted as Pull Requests (PRs) to the `develop` branch.
+
+## Publishing Releases
+
+1. Create a release PR/commit to the `develop` branch, updating `plumpy/version.py` and `CHANGELOG.md`.
+2. Fast-forward merge `develop` into the `master` branch
+3. Create a release on GitHub (<https://github.com/aiidateam/plumpy/releases/new>), pointing to the release commit on `master`, named `v.X.Y.Z` (identical to version in `plumpy/version.py`)
+4. This will trigger the `continuous-deployment` GitHub workflow which, if all tests pass, will publish the package to PyPi. Check this has successfully completed in the GitHub Actions tab (<https://github.com/aiidateam/plumpy/actions>).
+
+(if the release fails, delete the release and tag)
+
+[github-ci]: https://github.com/aiidateam/plumpy/workflows/continuous-integration/badge.svg?branch=develop&event=push
+[github-link]: https://github.com/aiidateam/plumpy/actions
+[rtd-badge]: https://readthedocs.org/projects/plumpy/badge
+[rtd-link]: http://plumpy.readthedocs.io/
+[pypi-badge]: https://img.shields.io/pypi/v/plumpy.svg
+[pypi-link]: https://pypi.python.org/pypi/plumpy/
+[pyversions-badge]: https://img.shields.io/pypi/pyversions/plumpy.svg
+[pyversions-link]: https://pypi.python.org/pypi/plumpy/
+[license-badge]: https://img.shields.io/pypi/l/plumpy.svg
+[license-link]: https://pypi.python.org/pypi/plumpy/
+
+
