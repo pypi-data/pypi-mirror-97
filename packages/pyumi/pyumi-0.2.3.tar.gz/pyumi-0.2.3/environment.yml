@@ -1,0 +1,32 @@
+name: pyumi
+channels:
+  - conda-forge
+dependencies:
+  # required
+  - python==3.7  # 3.7 required by rhino3dm
+  - tqdm  # for progress bar
+  - osmnx  # comes with all the geos stuff
+  - ipykernel  # For Jupyter Notebooks
+  - tabulate  # for repr
+  
+  # code checks
+  - isort>=5.2.1  # check that imports are in the right order
+  - black
+  
+  # documentation
+  - sphinx
+  
+  # testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - yappi  # yappi profiler is much better at ignoring pytest
+  - coverage
+  
+  # Other
+  - pip
+  - pip:
+    - path  # pathlib wrapper
+    - rhino3dm  # duh
+    - git+https://github.com/building-energy/epw.git#egg=epw  # for parsing epw files
+    - cjio  # Reading CityJson
