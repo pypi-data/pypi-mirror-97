@@ -1,0 +1,114 @@
+{
+  "graph_details": {
+    "nodes": {
+      "1": {
+        "name": "DataFrame",
+        "parameters": {},
+        "module": "fathom.datasources",
+        "schema_json": {
+          "fields": [
+            { "name": "id", "type": "integer" },
+            { "name": "timestamp", "type": "string" },
+            { "name": "event_count_3h", "type": "number" },
+            { "name": "next_failure_in_30_days", "type": "integer" },
+            { "name": "age", "type": "number" },
+            { "name": "volt", "type": "number" },
+            { "name": "rotate", "type": "number" },
+            { "name": "pressure", "type": "number" },
+            { "name": "vibration", "type": "number" }
+          ]
+        }
+      },
+      "2": {
+        "name": "SimpleImputer",
+        "parameters": {
+          "missing_values": null,
+          "strategy": "mean",
+          "fill_value": null,
+          "copy": true,
+          "add_indicator": false
+        },
+        "module": "sklearn.impute._base"
+      },
+      "3": {
+        "name": "RandomForestClassifier",
+        "parameters": {
+          "n_estimators": 100,
+          "criterion": "gini",
+          "max_depth": null,
+          "min_samples_split": 2,
+          "min_samples_leaf": 1,
+          "min_weight_fraction_leaf": 0,
+          "max_features": "auto",
+          "max_leaf_nodes": null,
+          "min_impurity_decrease": 0,
+          "min_impurity_split": null,
+          "bootstrap": true,
+          "oob_score": false,
+          "warm_start": false,
+          "class_weight": null,
+          "ccp_alpha": 0,
+          "max_samples": null
+        },
+        "module": "sklearn.ensemble._forest"
+      },
+      "4": {
+        "name": "RollingAggregation",
+        "parameters": {
+          "aggregation0": {},
+          "aggregation1": {
+            "itemsChosen": ["sum", "mean", "median"],
+            "periodLength": 10,
+            "periodChosen": "days"
+          }
+        },
+        "module": "fathom.transformers.rolling_aggregation"
+      },
+      "5": {
+        "name": "ExpandingWindowValidator",
+        "parameters": {
+          "y_columns": "next_failure_in_30_days",
+          "time_column": "timestamp",
+          "train_cutoff_window_str": "60 days",
+          "test_cutoff_window_str": "30 days",
+          "model_type": "classifier",
+          "metrics": null
+        },
+        "module": "fathom.runnable.expanding_window"
+      }
+    },
+    "edges": [
+      [1, "id", 4, "id"],
+      [1, "timestamp", 4, "timestamp"],
+      [1, "next_failure_in_30_days", 3, "y"],
+      [1, "age", 2, "X"],
+      [1, "volt", 2, "X"],
+      [1, "rotate", 2, "X"],
+      [1, "pressure", 2, "X"],
+      [1, "vibration", 2, "X"],
+      [1, "age", 2, "X"],
+      [1, "volt", 2, "X"],
+      [1, "rotate", 2, "X"],
+      [1, "pressure", 2, "X"],
+      [1, "vibration", 2, "X"],
+      [1, "age", 2, "X"],
+      [1, "volt", 2, "X"],
+      [1, "rotate", 2, "X"],
+      [1, "pressure", 2, "X"],
+      [1, "vibration", 2, "X"],
+      [1, "age", 2, "X"],
+      [1, "volt", 2, "X"],
+      [1, "rotate", 2, "X"],
+      [1, "pressure", 2, "X"],
+      [1, "vibration", 2, "X"],
+      [1, "age", 2, "X"],
+      [1, "volt", 2, "X"],
+      [1, "rotate", 2, "X"],
+      [1, "pressure", 2, "X"],
+      [1, "vibration", 2, "X"],
+      [2, "transform", 4, "X"],
+      [3, "model", 5, "model"],
+      [4, "transform", 3, "X"]
+    ]
+  }
+}

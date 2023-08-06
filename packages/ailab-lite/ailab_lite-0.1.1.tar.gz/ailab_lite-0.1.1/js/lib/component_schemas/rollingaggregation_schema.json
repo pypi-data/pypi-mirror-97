@@ -1,0 +1,50 @@
+[{
+    "name": "RollingAggregation",
+    "js_name": "RollingAggregation",
+    "doc": "",
+    "json_schema_form": {
+        "type": "object",
+        "properties": {
+            "timestamp": {
+              "title": "timestamp",
+              "type": "string",
+              "enum": []
+            },
+            "id": {
+              "title": "id",
+              "type": "string",
+              "enum": []
+            },
+            "aggregation": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "itemsChosen": {
+                    "type": "array",
+                    "title": "Aggregation method",
+                    "items": {
+                      "type": "string",
+                      "enum": ["count", "sum", "mean", "median", "var", "std", "min", "max", "skew", "kurt"]
+                    }
+                  },
+                  "periodLength": {
+                    "type": "number",
+                    "title": "Period Length"
+                  },
+                  "periodChosen": {
+                    "type": "string",
+                    "title": "Time resolution",
+                    "oneOf": [
+                      {"const": "seconds", "title": "seconds"}, 
+                      {"const": "minutes", "title": "minutes"},
+                      {"const": "hours", "title": "hours"},
+                      {"const": "days", "title": "days"}
+                    ]
+                  }
+                }
+              }
+            }
+        }
+    }
+}]
