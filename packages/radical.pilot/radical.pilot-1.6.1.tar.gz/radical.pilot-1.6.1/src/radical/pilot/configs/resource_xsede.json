@@ -1,0 +1,415 @@
+
+{
+    "stampede2_ssh": {
+        "description"                 : "The XSEDE 'Stampede' cluster at TACC (https://www.tacc.utexas.edu/stampede/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["local", "gsissh", "ssh"],
+        "mandatory_args"              : ["project"],
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://stampede2.tacc.utexas.edu:2222/",
+            "filesystem_endpoint"     : "gsisftp://stampede2.tacc.utexas.edu:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "sftp://stampede2.tacc.utexas.edu/"
+        },
+        "local"                       :
+        {
+            "job_manager_endpoint"    : "slurm://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "file://stampede2.tacc.utexas.edu/"
+        },
+        "default_queue"               : "normal",
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "SSH",
+        "mpi_launch_method"           : "IBRUN",
+        "pre_bootstrap_0"             :["module load TACC",
+                                         "module load intel/18.0.0",
+                                         "module load python3/3.7.0"
+                                        ],
+        "default_remote_workdir"      : "$WORK",
+        "valid_roots"                 : ["/scratch", "$SCRATCH", "/work", "$WORK"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "export_to_task"                : ["LMOD_CMD",
+                                         "LMOD_SYSTEM_DEFAULT_MODULES",
+                                         "LD_LIBRARY_PATH"],
+        "task_pre_exec"               : []
+    },
+
+    "stampede2_mpirun": {
+        "description"                 : "The XSEDE 'Stampede' cluster at TACC (https://www.tacc.utexas.edu/stampede/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["local", "gsissh", "ssh"],
+        "mandatory_args"              : ["project"],
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://stampede2.tacc.utexas.edu:2222/",
+            "filesystem_endpoint"     : "gsisftp://stampede2.tacc.utexas.edu:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "sftp://stampede2.tacc.utexas.edu/"
+        },
+        "local"                       :
+        {
+            "job_manager_endpoint"    : "slurm://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "file://stampede2.tacc.utexas.edu/"
+        },
+        "default_queue"               : "normal",
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "MPIRUN",
+        "task_launch_method"          : "MPIRUN",
+        "mpi_launch_method"           : "MPIRUN",
+        "pre_bootstrap_0"             : ["module load TACC",
+                                         "module load intel/18.0.0",
+                                         "module load python3/3.7.0"
+                                        ],
+        "default_remote_workdir"      : "$WORK",
+        "valid_roots"                 : ["/scratch", "$SCRATCH", "/work", "$WORK"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "export_to_task"                : ["LMOD_CMD",
+                                         "LMOD_SYSTEM_DEFAULT_MODULES",
+                                         "LD_LIBRARY_PATH"],
+        "task_pre_exec"               : ["module restore"]
+    },
+
+    "stampede2_ibrun": {
+        "description"                 : "The XSEDE 'Stampede' cluster at TACC (https://www.tacc.utexas.edu/stampede/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["local", "gsissh", "ssh"],
+        "mandatory_args"              : ["project"],
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://stampede2.tacc.utexas.edu:2222/",
+            "filesystem_endpoint"     : "gsisftp://stampede2.tacc.utexas.edu:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "sftp://stampede2.tacc.utexas.edu/"
+        },
+        "local"                       :
+        {
+            "job_manager_endpoint"    : "slurm://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "file://stampede2.tacc.utexas.edu/"
+        },
+        "cores_per_node"              : 68,
+        "default_queue"               : "normal",
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "IBRUN",
+        "task_launch_method"          : "IBRUN",
+        "mpi_launch_method"           : "IBRUN",
+      # "blocked_cores"               : [64, 65, 66, 67],
+      # "blocked_gpus"                : [0],
+        "pre_bootstrap_0"             : ["module load TACC",
+                                         "module load intel/18.0.0",
+                                         "module load python3/3.7.0"
+                                        ],
+        "default_remote_workdir"      : "$WORK",
+        "valid_roots"                 : ["/scratch", "$SCRATCH", "/work", "$WORK"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "export_to_task"                : ["LMOD_CMD",
+                                         "LMOD_SYSTEM_DEFAULT_MODULES",
+                                         "LD_LIBRARY_PATH"],
+        "task_pre_exec"               : []
+    },
+
+    "stampede2_srun": {
+        "description"                 : "The XSEDE 'Stampede' cluster at TACC (https://www.tacc.utexas.edu/stampede/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["local", "gsissh", "ssh"],
+        "mandatory_args"              : ["project"],
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://stampede2.tacc.utexas.edu:2222/",
+            "filesystem_endpoint"     : "gsisftp://stampede2.tacc.utexas.edu:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "sftp://stampede2.tacc.utexas.edu/"
+        },
+        "local"                       :
+        {
+            "job_manager_endpoint"    : "slurm://stampede2.tacc.utexas.edu/",
+            "filesystem_endpoint"     : "file://stampede2.tacc.utexas.edu/"
+        },
+        "default_queue"               : "normal",
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SRUN",
+        "task_launch_method"          : "SRUN",
+        "mpi_launch_method"           : "SRUN",
+        "pre_bootstrap_0"             :["module load TACC",
+                                         "module load intel/18.0.0",
+                                         "module load python3/3.7.0"
+                                        ],
+        "default_remote_workdir"      : "$WORK",
+        "valid_roots"                 : ["/scratch", "$SCRATCH", "/work", "$WORK"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "export_to_task"                : ["LMOD_CMD",
+                                         "LMOD_SYSTEM_DEFAULT_MODULES",
+                                         "LD_LIBRARY_PATH"],
+        "task_pre_exec"               : []
+    },
+
+    "comet_ssh": {
+        "description"                 : "The Comet HPC resource at SDSC 'HPC for the 99%%' (http://www.sdsc.edu/services/hpc/hpc_systems.html#comet).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["ssh", "gsissh"],
+        "mandatory_args"              : ["project"],
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://comet.sdsc.xsede.org/"
+        },
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "gsisftp://comet.sdsc.xsede.org/"
+        },
+        "default_queue"               : "compute",
+        "cores_per_node"              : 24,
+        "lfs_path_per_node"           : "/scratch/$USER/$SLURM_JOB_ID",
+        "lfs_size_per_node"           : 176105,
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "SSH",
+        "mpi_launch_method"           : "IBRUN",
+        "pre_bootstrap_0"             : ["module load python"],
+        "default_remote_workdir"      : "/oasis/scratch/comet/$USER/temp_project",
+        "valid_roots"                 : ["/oasis/scratch/comet"],
+      # "valid_roots"                 : ["/home"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "task_tmp"                      : "/scratch/$USER/$SLURM_JOBID"
+    },
+
+    "comet_ssh_funcs": {
+        "description"                 : "The Comet HPC resource at SDSC 'HPC for the 99%%' (http://www.sdsc.edu/services/hpc/hpc_systems.html#comet).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["ssh", "gsissh"],
+        "mandatory_args"              : ["project"],
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://comet.sdsc.xsede.org/"
+        },
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "gsisftp://comet.sdsc.xsede.org/"
+        },
+        "default_queue"               : "compute",
+        "cores_per_node"              : 24,
+        "lfs_path_per_node"           : "/scratch/$USER/$SLURM_JOB_ID",
+        "lfs_size_per_node"           : 176105,
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "NOOP",
+        "agent_spawner"               : "FUNCS",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "FUNCS",
+        "pre_bootstrap_0"             : ["module load python"],
+        "default_remote_workdir"      : "/oasis/scratch/comet/$USER/temp_project",
+        "valid_roots"                 : ["/oasis/scratch/comet"],
+      # "valid_roots"                 : ["/home"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "task_tmp"                      : "/scratch/$USER/$SLURM_JOBID"
+    },
+
+    "comet_spark": {
+        "description"                 : "The Comet HPC resource at SDSC 'HPC for the 99%%' (http://www.sdsc.edu/services/hpc/hpc_systems.html#comet).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["ssh", "gsissh"],
+        "mandatory_args"              : ["project"],
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://comet.sdsc.xsede.org/"
+        },
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "gsisftp://comet.sdsc.xsede.org/"
+        },
+        "default_queue"               : "compute",
+        "cores_per_node"              : 24,
+        "lfs_path_per_node"           : "/scratch/$USER/$SLURM_JOB_ID",
+        "lfs_size_per_node"           : 176105,
+        "resource_manager"            : "SLURM",
+        "agent_type"                  : "multicore",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "FORK",
+        "task_launch_method"          : "SPARK",
+        "mpi_launch_method"           : "MPIRUN_RSH",
+        "pre_bootstrap_0"             : ["module load python"],
+        "pre_bootstrap_1"             : [
+            "export PATH=$PATH",
+            "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+        ],
+        "default_remote_workdir"      : "/oasis/scratch/comet/$USER/temp_project",
+        "valid_roots"                 : ["/oasis/scratch/comet"],
+      # "valid_roots"                 : ["/home"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default"
+    },
+
+    "comet_mpirun": {
+        "description"                 : "The Comet HPC resource at SDSC 'HPC for the 99%%' (http://www.sdsc.edu/services/hpc/hpc_systems.html#comet).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription or the pilot will fail.",
+        "schemas"                     : ["ssh", "gsissh"],
+        "mandatory_args"              : ["project"],
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://comet.sdsc.xsede.org/"
+        },
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://comet.sdsc.xsede.org/",
+            "filesystem_endpoint"     : "gsisftp://comet.sdsc.xsede.org/"
+        },
+        "default_queue"               : "compute",
+        "cores_per_node"              : 24,
+        "lfs_path_per_node"           : "/scratch/$USER/$SLURM_JOB_ID",
+        "lfs_size_per_node"           : 176105,
+        "resource_manager"            : "SLURM",
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "SSH",
+        "mpi_launch_method"           : "MPIRUN",
+        "pre_bootstrap_0"             : ["module purge",
+                                         "module load intel",
+                                         "module load python"
+                                        ],
+        "pre_bootstrap_1"             : ["export PATH=/opt/intel/2018.1.163/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/:$PATH",
+                                         "export LD_LIBRARY_PATH=/opt/intel/2018.1.163/compilers_and_libraries_2018.1.163/linux/mpi/intel64/lib:$LD_LIBRARY_PATH"
+                                        ],
+        "default_remote_workdir"      : "/oasis/scratch/comet/$USER/temp_project",
+        "valid_roots"                 : ["/oasis/scratch/comet"],
+      # "valid_roots"                 : ["/home"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "default",
+        "task_tmp"                      : "/scratch/$USER/$SLURM_JOBID"
+    },
+
+    "bridges_mpiexec": {
+        "description"                 : "The XSEDE 'Bridges' cluster at PSC (https://portal.xsede.org/psc-bridges/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription.",
+        "schemas"                     : ["gsissh", "ssh", "go"],
+      # "mandatory_args"              : [],
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://bridges.psc.xsede.org:2222/",
+            "filesystem_endpoint"     : "gsisftp://bridges.psc.xsede.org:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://bridges.psc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://bridges.psc.xsede.org/"
+        },
+        "go":
+        {
+            "job_manager_endpoint"    : "slurm+ssh://bridges.psc.xsede.org/",
+            "filesystem_endpoint"     : "go://xsede#bridges/"
+        },
+        "default_queue"               : "RM",
+        "resource_manager"            : "SLURM",
+        "lfs_path_per_node"           : "$LOCAL",
+        "lfs_size_per_node"           : 3713368,
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "MPIEXEC",
+        "mpi_launch_method"           : "MPIEXEC",
+        "pre_bootstrap_0"             : ["module purge",
+                                         "module load slurm",
+                                         "module load anaconda3",
+                                         "module load intel/19.3",
+                                         "module load mpi/intel_openmpi/19.3"
+                                        ],
+        "default_remote_workdir"      : "$SCRATCH",
+        "valid_roots"                 : ["/home", "/pylon1", "/pylon5"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "anaconda",
+        "export_to_task"                : [],
+        "task_pre_exec"               : [],
+        "system_architecture"         : {"gpu": "p100"},
+        "gpus_per_node"               : 2
+    },
+
+    "bridges2": {
+        "description"                 : "The XSEDE 'Bridges2' cluster at PSC (https://portal.xsede.org/psc-bridges/).",
+        "notes"                       : "Always set the ``project`` attribute in the PilotDescription.",
+        "schemas"                     : ["local", "gsissh", "ssh"],
+      # "mandatory_args"              : [],
+        "local"                      :
+        {
+            "job_manager_endpoint"    : "slurm://bridges2.psc.xsede.org/",
+            "filesystem_endpoint"     : "file://bridges2.psc.xsede.org/"
+        },
+        "gsissh"                      :
+        {
+            "job_manager_endpoint"    : "slurm+gsissh://bridges2.psc.xsede.org:2222/",
+            "filesystem_endpoint"     : "gsisftp://bridges2.psc.xsede.org:2222/"
+        },
+        "ssh"                         :
+        {
+            "job_manager_endpoint"    : "slurm+ssh://bridges2.psc.xsede.org/",
+            "filesystem_endpoint"     : "sftp://bridges2.psc.xsede.org/"
+        },
+        "default_queue"               : "RM",
+        "resource_manager"            : "SLURM",
+        "lfs_path_per_node"           : "${LOCAL}",
+        "lfs_size_per_node"           : 2516582,
+        "agent_scheduler"             : "CONTINUOUS",
+        "agent_spawner"               : "POPEN",
+        "agent_launch_method"         : "SSH",
+        "task_launch_method"          : "MPIRUN",
+        "mpi_launch_method"           : "MPIRUN",
+        "pre_bootstrap_0"             : ["module reset",
+                                         "module load gcc",
+                                         "module load openmpi/3.1.6-gcc8.3.1",
+                                         "module load anaconda3"
+                                        ],
+        "default_remote_workdir"      : "$PROJECT",
+        "valid_roots"                 : ["/home", "/ocean"],
+        "rp_version"                  : "local",
+        "virtenv_mode"                : "create",
+        "python_dist"                 : "anaconda",
+        "export_to_task"              : [],
+        "task_pre_exec"               : [],
+        "gpus_per_node"               : 8,
+        "system_architecture"         : {"gpu": "v100"}
+    }
+
+}
+
