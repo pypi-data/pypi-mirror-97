@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}
+{% block content %}
+<div id='content' class='container'>
+    <ul class='nav nav-tabs mt-2'>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/') }}'>ホーム</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/groups') }}'>グループ</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/users') }}'>ユーザー</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link active' href='{{ url('/apps') }}'>アプリ</a>
+        </li>
+    </ul>
+    <div class='container'>
+        {% if permission('admin', request.user) %}
+        <div class='mb-3 mt-3'>
+            <a href='{{ url('/apps/settings') }}'><button class='btn btn-primary'>アプリ設定</button></a>
+        </div>
+        {% endif %}
+        <div class="inner">
+            <div class='app-list'>
+            {% for app in apps %}
+                {{ lists.appItem(app, link=url(app.path)) }}
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
