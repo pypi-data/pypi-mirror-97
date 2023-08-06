@@ -1,0 +1,64 @@
+id: 'target_histrogram'
+label: 'Target Return Histograms'
+category: '[Radar and Sonar]'
+
+parameters:
+- id: target_time
+  label: 'Return time of target'
+  dtype: float
+
+- id: samples_per_pulse
+  label: 'Samples per pulse'
+  dtype: int
+  default: 'samples_per_pulse'
+
+- id: samp_rate
+  label: 'Sample rate'
+  dtype: float
+  default: 'samp_rate'
+
+- id: num_pulses
+  label: 'Number of pulses'
+  dtype: int
+  default: 100
+
+- id: histogram_filename
+  label: 'Histogram filename'
+  dtype: string
+  default: ''
+
+- id: gui_hint
+  label: GUI Hint
+  dtype: gui_hint
+  hide: part
+
+templates:
+  imports: from freetail_gnuradio.target_histogram import target_histogram
+  var_make: self.${id} = None
+  make: |-
+      <%
+          win = '_%s_signal_noise_histogram'%id
+      %>\
+      ${win} = target_histogram(${target_time}, ${samples_per_pulse}, ${samp_rate}, ${num_pulses}, ${histogram_filename})
+      self.${id} = ${win}
+      ${gui_hint() % win}
+  callbacks:
+  - set_num_pulses(${num_pulses})
+  - set_target_time(${target_time})
+  - set_histogram_filename(${histogram_filename})
+
+inputs:
+- domain: stream
+  dtype: float
+  
+- domain: message
+  id: update
+  optional: true
+
+outputs:
+- domain: stream
+  dtype: float
+  multiplicity: 1
+
+file_format: 1
+
