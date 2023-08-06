@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>⇆🎉 {{ title }}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css{{ ts }}">
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css{{ ts }}">
+</head>
+
+<body>
+    <div id="ops">
+        <a href="#" data-dest="" data-desc="close submenu">---</a>
+        <a href="#" data-perm="read" data-dest="search" data-desc="search for files by attributes, path/name, music tags, or any combination of those.&lt;br /&gt;&lt;br /&gt;&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,&lt;br /&gt;&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,&lt;br /&gt;&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
+        {%- if have_up2k_idx %}
+        <a href="#" data-dest="up2k" data-desc="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>
+        {%- else %}
+        <a href="#" data-perm="write" data-dest="up2k" data-desc="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>
+        {%- endif %}
+        <a href="#" data-perm="write" data-dest="bup" data-desc="bup: basic uploader, even supports netscape 4.0">🎈</a>
+        <a href="#" data-perm="write" data-dest="mkdir" data-desc="mkdir: create a new directory">📂</a>
+        <a href="#" data-perm="write" data-dest="new_md" data-desc="new-md: create a new markdown document">📝</a>
+        <a href="#" data-perm="write" data-dest="msg" data-desc="msg: send a message to the server log">📟</a>
+        <a href="#" data-dest="cfg" data-desc="configuration options">⚙️</a>
+        <div id="opdesc"></div>
+    </div>
+
+    <div id="op_search" class="opview">
+        {%- if have_tags_idx %}
+        <table id="srch_form" class="tags"></table>
+        {%- else %}
+        <table id="srch_form"></table>
+        {%- endif %}
+        <div id="srch_q"></div>
+    </div>
+
+    {%- include 'upload.html' %}
+
+    <div id="op_cfg" class="opview opbox">
+        <h3>key notation</h3>
+        <div id="key_notation"></div>
+    </div>
+    
+    <h1 id="path">
+        <a href="#" id="entree">🌲</a>
+        {%- for n in vpnodes %}
+        <a href="/{{ n[0] }}">{{ n[1] }}</a>
+        {%- endfor %}
+    </h1>
+    
+    <div id="tree">
+        <a href="#" id="detree">🍞...</a>
+        <a href="#" step="2" id="twobytwo">+</a>
+        <a href="#" step="-2" id="twig">&ndash;</a>
+        <a href="#" id="dyntree">a</a>
+        <ul id="treeul"></ul>
+        <div id="thx_ff">&nbsp;</div>
+    </div>
+
+<div id="wrap">
+
+    <div id="pro" class="logue">{{ logues[0] }}</div>
+
+    <table id="files">
+        <thead>
+            <tr>
+                <th></th>
+                <th><span>File Name</span></th>
+                <th sort="int"><span>Size</span></th>
+                {%- for k in taglist %}
+                    {%- if k.startswith('.') %}
+                        <th sort="int"><span>{{ k[1:] }}</span></th>
+                    {%- else %}
+                        <th><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
+                    {%- endif %}
+                {%- endfor %}
+                <th><span>T</span></th>
+                <th><span>Date</span></th>
+            </tr>
+        </thead>
+        <tbody>
+
+{%- for f in files %}
+    <tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
+    {%- if f.tags is defined %}
+        {%- for k in taglist %}
+            <td>{{ f.tags[k] }}</td>
+        {%- endfor %}
+    {%- endif %}
+    <td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
+{%- endfor %}
+
+        </tbody>
+    </table>
+    
+    <div id="epi" class="logue">{{ logues[1] }}</div>
+
+    <h2><a href="?h">control-panel</a></h2>
+
+</div>
+
+    {%- if srv_info %}
+    <div id="srv_info"><span>{{ srv_info }}</span></div>
+    {%- endif %}
+
+    <div id="widget">
+        <div id="wtoggle">♫</div>
+        <div id="widgeti">
+            <div id="pctl"><a href="#" id="bprev">⏮</a><a href="#" id="bplay">▶</a><a href="#" id="bnext">⏭</a></div>
+            <canvas id="pvol" width="288" height="38"></canvas>
+            <canvas id="barpos"></canvas>
+            <canvas id="barbuf"></canvas>
+        </div>
+    </div>
+
+    <script>
+        var tag_order_cfg = {{ tag_order }};
+    </script>
+    <script src="/.cpr/util.js{{ ts }}"></script>
+    <script src="/.cpr/browser.js{{ ts }}"></script>
+    <script src="/.cpr/up2k.js{{ ts }}"></script>
+    <script>
+        apply_perms({{ perms }});
+    </script>
+</body>
+
+</html>

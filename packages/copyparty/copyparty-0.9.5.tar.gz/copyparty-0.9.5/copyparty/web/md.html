@@ -1,0 +1,155 @@
+<!DOCTYPE html><html><head>
+	<meta charset="utf-8">
+	<title>📝🎉 {{ title }}</title> <!-- 📜 -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.7">
+	<link href="/.cpr/md.css" rel="stylesheet">
+	{%- if edit %}
+	<link href="/.cpr/md2.css" rel="stylesheet">
+	{%- endif %}
+</head>
+<body>
+	<div id="mn">navbar</div>
+	<div id="mh">
+		<a id="lightswitch" href="#">go dark</a>
+		<a id="navtoggle" href="#">hide nav</a>
+		{%- if edit %}
+			<a id="save" href="?edit">save</a>
+			<a id="sbs" href="#">sbs</a>
+			<a id="nsbs" href="#">editor</a>
+			<div id="toolsbox">
+				<a id="tools" href="#">tools</a>
+				<a id="fmt_table" href="#">prettify table (ctrl-k)</a>
+				<a id="iter_uni" href="#">non-ascii: iterate (ctrl-u)</a>
+				<a id="mark_uni" href="#">non-ascii: markup</a>
+				<a id="cfg_uni" href="#">non-ascii: whitelist</a>
+				<a id="help" href="#">help</a>
+			</div>
+		{%- else %}
+			<a href="?edit">edit (basic)</a>
+			<a href="?edit2">edit (fancy)</a>
+			<a href="?raw">view raw</a>
+		{%- endif %}
+	</div>
+	<div id="toc"></div>
+	<div id="mtw">
+		<textarea id="mt" autocomplete="off">{{ md }}</textarea>
+	</div>
+	<div id="mw">
+		<div id="ml">
+			<div style="text-align:center;margin:5em 0">
+				<div style="font-size:2em;margin:1em 0">Loading</div>
+				if you're still reading this, check that javascript is allowed
+			</div>
+		</div>
+		<div id="mp"></div>
+	</div>
+	
+	{%- if edit %}
+	<div id="helpbox">
+		<textarea autocomplete="off">
+
+write markdown (most html is 🙆 too)
+
+## hotkey list
+* `Ctrl-S` to save
+* `Ctrl-E` to toggle mode
+* `Ctrl-K` to prettyprint a table
+* `Ctrl-U` to iterate non-ascii chars
+* `Ctrl-H` / `Ctrl-Shift-H` to create a header
+* `TAB` / `Shift-TAB` to indent/dedent a selection
+
+## toolbar
+1. toggle dark mode
+2. show/hide navigation bar
+3. save changes on server
+4. side-by-side editing
+5. toggle editor/preview
+6. this thing :^)
+
+## markdown
+|||
+|--|--|
+|`**bold**`|**bold**|
+|`_italic_`|_italic_|
+|`~~strike~~`|~~strike~~|
+|`` `code` ``|`code`|
+|`[](#hotkey-list)`|[](#hotkey-list)|
+|`[](/foo/bar.md#header)`|[](/foo/bar.md#header)|
+|`<blink>💯</blink>`|<blink>💯</blink>|
+
+## tables
+    |left-aligned|centered|right-aligned
+    | ---------- | :----: | ----------:
+    |one         |two     |three
+
+|left-aligned|centered|right-aligned
+| ---------- | :----: | ----------:
+|one         |two     |three
+
+## lists
+	* one
+	* two
+	1. one
+	1. two
+* one
+* two
+1. one
+1. two
+
+## headers
+	# level 1
+	## level 2
+	### level 3
+
+## quote
+	> hello
+> hello
+
+## codeblock
+		four spaces (no tab pls)
+
+## code in lists
+	* foo
+	  bar
+          six spaces total
+* foo
+  bar
+      six spaces total
+.
+		</textarea>
+	</div>
+	{%- endif %}
+	
+	<script>
+
+var last_modified = {{ lastmod }};
+var md_opt = {
+	link_md_as_html: false,
+	allow_plugins: {{ md_plug }},
+	modpoll_freq: {{ md_chk_rate }}
+};
+
+(function () {
+    var btn = document.getElementById("lightswitch");
+    var toggle = function (e) {
+		if (e) e.preventDefault();
+        var dark = !document.documentElement.getAttribute("class");
+        document.documentElement.setAttribute("class", dark ? "dark" : "");
+        btn.innerHTML = "go " + (dark ? "light" : "dark");
+        if (window.localStorage)
+            localStorage.setItem('darkmode', dark ? 1 : 0);
+    };
+    btn.onclick = toggle;
+    if (window.localStorage && localStorage.getItem('darkmode') == 1)
+		toggle();
+})();
+
+	</script>
+    <script src="/.cpr/util.js"></script>
+	<script src="/.cpr/deps/marked.full.js"></script>
+	<script src="/.cpr/md.js"></script>
+	{%- if edit %}
+	<script src="/.cpr/md2.js"></script>
+	{%- endif %}
+</body></html>
