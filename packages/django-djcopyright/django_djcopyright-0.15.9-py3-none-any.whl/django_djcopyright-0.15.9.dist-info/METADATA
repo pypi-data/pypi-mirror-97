@@ -1,0 +1,185 @@
+Metadata-Version: 2.1
+Name: django-djcopyright
+Version: 0.15.9
+Summary: Django reusable app to show pretty formatted copyright years
+Home-page: https://github.com/vint21h/django-djcopyright/
+Author: Alexei Andrushievich
+Author-email: vint21h@vint21h.pp.ua
+License: GPLv3+
+Keywords: django,copyright,django-copyright
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Plugins
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.0
+Classifier: Framework :: Django :: 3.1
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Utilities
+Description-Content-Type: text/x-rst
+Requires-Dist: django (>=2.2<=3.2)
+Requires-Dist: django-appconf (>=1.0.3)
+Provides-Extra: test
+Requires-Dist: attrs (==20.3.0) ; extra == 'test'
+Requires-Dist: bandit (==1.7.0) ; extra == 'test'
+Requires-Dist: black (==20.8b1) ; extra == 'test'
+Requires-Dist: check-manifest (==0.46) ; extra == 'test'
+Requires-Dist: check-wheel-contents (==0.2.0) ; extra == 'test'
+Requires-Dist: coverage (==5.5) ; extra == 'test'
+Requires-Dist: coveralls (==3.0.1) ; extra == 'test'
+Requires-Dist: curlylint (==0.12.0) ; extra == 'test'
+Requires-Dist: darglint (==1.7.0) ; extra == 'test'
+Requires-Dist: dennis (==0.9) ; extra == 'test'
+Requires-Dist: django-nose (==1.4.7) ; extra == 'test'
+Requires-Dist: django-stubs (==1.7.0) ; extra == 'test'
+Requires-Dist: dodgy (==0.2.1) ; extra == 'test'
+Requires-Dist: dotenv-linter (==0.2.0) ; extra == 'test'
+Requires-Dist: flake8-annotations-complexity (==0.0.6) ; extra == 'test'
+Requires-Dist: flake8-annotations-coverage (==0.0.5) ; extra == 'test'
+Requires-Dist: flake8-bugbear (==21.3.1) ; extra == 'test'
+Requires-Dist: flake8-docstrings (==1.5.0) ; extra == 'test'
+Requires-Dist: flake8-fixme (==1.1.1) ; extra == 'test'
+Requires-Dist: flake8 (==3.8.4) ; extra == 'test'
+Requires-Dist: importlib-metadata (==3.7.0) ; extra == 'test'
+Requires-Dist: interrogate (==1.3.2) ; extra == 'test'
+Requires-Dist: isort (==5.7.0) ; extra == 'test'
+Requires-Dist: mypy (==0.812) ; extra == 'test'
+Requires-Dist: nose-exclude (==0.5.0) ; extra == 'test'
+Requires-Dist: nose-timer (==1.0.0) ; extra == 'test'
+Requires-Dist: pep8-naming (==0.11.1) ; extra == 'test'
+Requires-Dist: polint (==0.4) ; extra == 'test'
+Requires-Dist: pre-commit-hooks (==3.4.0) ; extra == 'test'
+Requires-Dist: pre-commit (==2.10.1) ; extra == 'test'
+Requires-Dist: pygments (==2.8.0) ; extra == 'test'
+Requires-Dist: pylint-django (==2.4.2) ; extra == 'test'
+Requires-Dist: pylint (==2.7.2) ; extra == 'test'
+Requires-Dist: pyroma (==3.0.1) ; extra == 'test'
+Requires-Dist: readme-renderer (==29.0) ; extra == 'test'
+Requires-Dist: rednose (==1.3.0) ; extra == 'test'
+Requires-Dist: removestar (==1.2.2) ; extra == 'test'
+Requires-Dist: seed-isort-config (==2.2.0) ; extra == 'test'
+Requires-Dist: tabulate (==0.8.9) ; extra == 'test'
+Requires-Dist: tox-gh-actions (==2.4.0) ; extra == 'test'
+Requires-Dist: tox-pyenv (==1.1.0) ; extra == 'test'
+Requires-Dist: tox (==3.23.0) ; extra == 'test'
+Requires-Dist: twine (==3.3.0) ; extra == 'test'
+Requires-Dist: yesqa (==1.2.2) ; extra == 'test'
+
+.. django-djcopyright
+.. README.rst
+
+
+A django-djcopyright documentation
+==================================
+
+|GitHub|_ |Coveralls|_ |Requires|_ |pypi-license|_ |pypi-version|_ |pypi-python-version|_ |pypi-django-version|_ |pypi-format|_ |pypi-wheel|_ |pypi-status|_
+
+    *django-djcopyright is a Django reusable application to show pretty formatted copyright years*
+
+.. contents::
+
+Installation
+------------
+* Obtain your copy of source code from the git repository: ``$ git clone https://github.com/vint21h/django-djcopyright.git``. Or download the latest release from https://github.com/vint21h/django-djcopyright/tags/.
+* Run ``$ python ./setup.py install`` from the repository source tree or unpacked archive. Or use pip: ``$ pip install django-djcopyright``.
+
+Configuration
+-------------
+* Add ``"djcopyright"`` to ``settings.INSTALLED_APPS``.
+
+.. code-block:: python
+
+    # settings.py
+
+    INSTALLED_APPS += [
+        "djcopyright",
+    ]
+
+Settings
+--------
+``DJCOPYRIGHT_START_YEAR``
+    Contains year to start show copyright from. Defaults to ``1970``.
+
+``DJCOPYRIGHT_FORMAT_STRING``
+    Contains format string to show copyright. Defaults to ``"{start_year} - {current_year}"``.
+
+``DJCOPYRIGHT_SHOW_CURRENT_YEAR``
+    Show current year in copyright string. Defaults to ``True``.
+
+``DJCOPYRIGHT_SHOW_START_YEAR``
+    Show start year in copyright string. Defaults to ``True``.
+
+Usage
+-----
+If you want always have ``"COPYRIGHT_YEARS"`` variable in templates context, just add ``"djcopyright.context_processors.djcopyright_years"`` to ``settings.TEMPLATE_CONTEXT_PROCESSORS``
+
+.. code-block:: python
+
+    # settings.py
+
+    TEMPLATE_CONTEXT_PROCESSORS += [
+        "djcopyright.context_processors.djcopyright_years",
+    ]
+
+
+Else you can use ``djcopyright_years`` templatetag which can be loaded from ``djcopyright_tags``.
+
+.. code-block:: django
+
+    {# footer.html #}
+
+    {% load djcopyright_tags %}
+
+    {% djcopyright_years as COPYRIGHT_YEARS %}
+    {{ COPYRIGHT_YEARS }}
+
+Licensing
+---------
+django-djcopyright is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+For complete license text see COPYING file.
+
+Contacts
+--------
+**Project Website**: https://github.com/vint21h/django-djcopyright/
+
+**Author**: Alexei Andrushievich <vint21h@vint21h.pp.ua>
+
+For other authors list see AUTHORS file.
+
+
+.. |GitHub| image:: https://github.com/vint21h/django-djcopyright/workflows/build/badge.svg
+    :alt: GitHub
+.. |Coveralls| image:: https://coveralls.io/repos/github/vint21h/django-djcopyright/badge.svg?branch=master
+    :alt: Coveralls
+.. |Requires| image:: https://requires.io/github/vint21h/django-djcopyright/requirements.svg?branch=master
+    :alt: Requires
+.. |pypi-license| image:: https://img.shields.io/pypi/l/django-djcopyright
+    :alt: License
+.. |pypi-version| image:: https://img.shields.io/pypi/v/django-djcopyright
+    :alt: Version
+.. |pypi-django-version| image:: https://img.shields.io/pypi/djversions/django-djcopyright
+    :alt: Supported Django version
+.. |pypi-python-version| image:: https://img.shields.io/pypi/pyversions/django-djcopyright
+    :alt: Supported Python version
+.. |pypi-format| image:: https://img.shields.io/pypi/format/django-djcopyright
+    :alt: Package format
+.. |pypi-wheel| image:: https://img.shields.io/pypi/wheel/django-djcopyright
+    :alt: Python wheel support
+.. |pypi-status| image:: https://img.shields.io/pypi/status/django-djcopyright
+    :alt: Package status
+.. _GitHub: https://github.com/vint21h/django-djcopyright/actions/
+.. _Coveralls: https://coveralls.io/github/vint21h/django-djcopyright?branch=master
+.. _Requires: https://requires.io/github/vint21h/django-djcopyright/requirements/?branch=master
+.. _pypi-license: https://pypi.org/project/django-djcopyright/
+.. _pypi-version: https://pypi.org/project/django-djcopyright/
+.. _pypi-django-version: https://pypi.org/project/django-djcopyright/
+.. _pypi-python-version: https://pypi.org/project/django-djcopyright/
+.. _pypi-format: https://pypi.org/project/django-djcopyright/
+.. _pypi-wheel: https://pypi.org/project/django-djcopyright/
+.. _pypi-status: https://pypi.org/project/django-djcopyright/
+
+
