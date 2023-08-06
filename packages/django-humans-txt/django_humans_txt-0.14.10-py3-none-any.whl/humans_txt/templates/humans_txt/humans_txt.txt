@@ -1,0 +1,31 @@
+{# django-humans-txt #}
+{# humans_txt/templates/humans_txt/humans_txt.txt #}
+
+
+{% if HUMANS_TXT_BANNER %}
+    {{ HUMANS_TXT_BANNER|safe }}
+{% endif %}
+{% if HUMANS_TXT_TEAM %}
+    /* TEAM */
+    {% for person in HUMANS_TXT_TEAM %}
+        {{ person.title }}: {{ person.name }}
+        {% if person.contact %}Contact: {{ person.contact }}{% endif %}
+        {% if person.location %}Location: {{ person.location }}{% endif %}
+        {% if person.twitter %}Twitter: {{ person.twitter }}{% endif %}
+    {% endfor %}
+{% endif %}
+{% if HUMANS_TXT_THANKS %}
+    /* THANKS */
+    {% for thank in HUMANS_TXT_THANKS %}
+    {{ thank.name }}{% if thank.url %}: {{ thank.url }}{% endif %}
+    {% endfor %}
+{% endif %}
+{% if HUMANS_TXT_LAST_UPDATE or HUMANS_TXT_STANDARDS or HUMANS_TXT_COMPONENTS or HUMANS_TXT_SOFTWARE %}
+    /* SITE */
+
+    {% if HUMANS_TXT_LAST_UPDATE %}Last update: {{ HUMANS_TXT_LAST_UPDATE|date:"c" }}{% endif %}
+    {% if HUMANS_TXT_LANGUAGES %}Language: {% for language in HUMANS_TXT_LANGUAGES %}{{ language }}{% if not forloop.last %} / {% endif %}{% endfor %}{% endif %}
+    {% if HUMANS_TXT_STANDARDS %}Standards: {% for standard in HUMANS_TXT_STANDARDS %}{{ standard.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+    {% if HUMANS_TXT_COMPONENTS %}Components: {% for component in HUMANS_TXT_COMPONENTS %}{{ component.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+    {% if HUMANS_TXT_SOFTWARE %}Software: {% for software in HUMANS_TXT_SOFTWARE %}{{ software.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+{% endif %}
