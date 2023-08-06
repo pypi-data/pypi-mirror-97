@@ -1,0 +1,1 @@
+pip install git+https://github.com/guillermomolina/zfs-clone-manager#egg=zfs-clone-manager
