@@ -1,0 +1,17 @@
+language: python
+python: "3.8"
+os: linux
+dist: focal
+
+install:
+  - pip install flit future-fstrings
+  - flit install --symlink --extras test
+
+script: pytest
+
+deploy:
+  provider: script
+  script: flit publish
+  on:
+    tags: true
+    python: "3.8"
