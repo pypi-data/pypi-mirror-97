@@ -1,0 +1,164 @@
+Metadata-Version: 2.1
+Name: soopervisor
+Version: 0.3.3
+Summary: UNKNOWN
+Home-page: https://github.com/ploomber/soopervisor
+Author: 
+Author-email: 
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Dist: click
+Requires-Dist: tqdm
+Requires-Dist: pydantic
+Requires-Dist: Jinja2
+Requires-Dist: pyyaml
+Requires-Dist: ploomber (>=0.9.3)
+Provides-Extra: all
+Requires-Dist: docker ; extra == 'all'
+Requires-Dist: boxsdk ; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: docker ; extra == 'dev'
+Requires-Dist: boxsdk ; extra == 'dev'
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: Faker ; extra == 'dev'
+Requires-Dist: yapf ; extra == 'dev'
+Requires-Dist: sphinx ; extra == 'dev'
+Requires-Dist: apache-airflow ; extra == 'dev'
+Requires-Dist: twine ; extra == 'dev'
+Requires-Dist: argo-workflows-dsl ; extra == 'dev'
+
+Soopervisor
+===========
+
+.. image:: https://github.com/ploomber/soopervisor/workflows/CI/badge.svg
+   :target: https://github.com/ploomber/soopervisor/workflows/CI/badge.svg
+   :alt: CI badge
+
+
+Soopervisor introduces the concept of a *Ploomber project*, which is a standard
+way of running `Ploomber <github.com/ploomber/ploomber>`_ pipelines.
+
+
+Use cases
+=========
+
+1. Running a pipeline locally
+2. Running a pipeline in a continuous integration service
+3. Scheduling a pipeline using cron (or Github Actions)
+4. Running in Kubernetes via Argo workflows
+5. Running in Apache Airflow
+
+
+How it works
+============
+
+When running a pipeline, Soopervisor expects the following file layout:
+
+1. ``environment.yml``: `Conda environment specification <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually>`_
+2. ``pipeline.yaml``: Ploomber pipeline specification
+
+The parent folder to all these files is defined as the project's root folder.
+The name of such folder is designed as the project's name.
+
+For example if your ``pipeline.yaml`` is located at
+``/path/to/projects/some-project/pipeline.yaml``, your project's root folder
+is ``/path/to/projects/some-project`` and your project's name is
+``some-project``.
+
+If your project follows these two conventions, you'll be able to use Soopervisor
+to run your project locally, continuous integration service or Apache Airflow.
+
+
+Project validation
+==================
+
+Before building/exporting your project, Soopervisor first checks that the
+project has the right structure, if it finds any issues, it reports them so you
+can fix them before you attempt to run the pipeline.
+
+If all checks pass, it generates a bash script to install the conda environment
+and then run the pipeline.
+
+How the script is used to actually execute the pipeline depends on your
+configuration settings, the simplest case is to just run it locally, but you
+can also tell Soopervisor to run the pipeline inside a Docker container or
+to just export your project to run in Kubernetes (using Argo) or Airflow.
+
+
+Installation
+============
+
+.. code-block:: sh
+
+   pip install soopervisor
+
+CHANGELOG
+=========
+
+0.3.3 (2021-03-07)
+------------------
+* Support to pass extra cli args to ``ploomber task`` (via ``args`` in ``soopervisor.yaml``) when running in Argo and Airflow
+
+0.3.2 (2021-02-13)
+------------------
+* Adds ``--root`` arg to ``soopervisor export-airflow`` to select an alternative project's root
+* Determines default entry point using Ploomber's API to allow automated discovery of ``pipeline.yaml`` in package layouts (e.g. ``src/package/pipeline.yaml``)
+
+
+0.3.1 (2021-02-11)
+------------------
+* Changes to the Airflow generated DAG
+* Fixes a bug when initializing configuration from projects whose root is not the current directory
+
+0.3 (2021-01-24)
+----------------
+* ``env.airflow.yaml`` optional when exporting to Airflow (#17)
+* Validating exported argo YAML spec
+* Output argo YAML spec displays script in literal mode to make it readable
+* Fixed extra whitespace in generated script
+* Refactors ``ArgoMountedVolume`` to provide flexibility for different types of k8s volumes
+* Adds section in the documentation to run examples using minikube
+* Adds a few ``echo`` statements to generated script to provide better status feedback
+
+
+0.2.2 (2020-11-21)
+------------------
+* Adds ability to skip dag loading during project validation
+* Box uploader imported only if needed
+* Exposes option to skip dag loading from the CLI
+
+
+0.2.1 (2020-11-20)
+------------------
+* Adds Airflow DAG export
+* Adds Argo/Kubernetes DAG export
+* Support for uploading products to Box
+
+
+0.2 (2020-10-15)
+----------------
+* Adds ``DockerExecutor``
+* Products are saved in a folder with the name of the current commit by default
+* Conda environments are created locally in a `.soopervisor/` folder
+* Conda environments are cached by default
+* Ability to customize arguments to ``ploomber build``
+
+0.1 (2020-08-09)
+-----------------
+
+* First release
+
+
