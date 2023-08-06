@@ -1,0 +1,100 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {%block title%}
+        {%if item.id == 0%}
+            New Cashnet Item - Create
+        {%else%}
+            Cashnet Item {{item.id}} - Edit
+        {%endif%}
+        {%endblock%}
+    </title>
+    {% block scripts %}
+        {%datatables%}
+    {% endblock %}
+</head>
+<body>
+    {% block breadcrumbs %}
+        <a href="{%url 'cashnet:catalog_index'%}">Catalog</a>
+        &rsaquo;
+        {%if item.id == 0%}
+            <a href="{%url 'cashnet:catalog_edit' item.id%}" class="active">New Item</a>
+        {%else%}
+            <a href="{%url 'cashnet:catalog_edit' item.id%}" class="active">Item #{{item.id}}</a>
+        {%endif%}
+    {%endblock%}
+    {% block pagecontent %}
+
+    {%if item.id == 0%}
+        <h1>New Cashnet Item</h1>
+    {%else%}
+        <h1>Cashnet Item #{{item.id}}</h1>
+    {%endif%}
+
+    <form method="post" action="{%url 'cashnet:catalog_save' item.id%}">
+        {%csrf_token%}
+        <table class="table table-striped table-hover table-condensed" id="item_table">
+            <tr>
+                <th scope="col"><label for="item_code">Django Code</label></th>
+                <td>
+                    <input type="text" id="item_code" name="item_code" value="{{item.item_code}}" maxlength="80" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="cashnet_code">Cashnet Code</label></th>
+                <td>
+                    <input type="text" id="cashnet_code" name="cashnet_code" value="{{item.cashnet_code}}" maxlength="80" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="description">Description</label></th>
+                <td>
+                    <input type="text" id="description" name="description" value="{{item.description}}" maxlength="128" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="amount">Amount</label></th>
+                <td>
+                    <input type="text" id="amount" name="amount" value="{%format_decimal item.amount comma=False%}" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="sale_amount">Sale Amount</label></th>
+                <td>
+                    <input type="text" id="sale_amount" name="sale_amount" value="{%format_decimal item.sale_amount comma=False%}" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="sale_start_date">Sale Start Date</label></th>
+                <td>
+                    <input type="datetime-local" id="sale_start_date" name="sale_start_date" value="{{item.sale_start_date_input}}" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="sale_end_date">Sale End Date</label></th>
+                <td>
+                    <input type="datetime-local" id="sale_end_date" name="sale_end_date" value="{{item.sale_end_date_input}}" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="col"><label for="gl">GL</label></th>
+                <td>
+                    <input type="text" id="gl" name="gl" value="{{item.gl|default:''}}" maxlength="30" class="form-control" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" class="btn btn-success" value="Save" />
+                    <input type="reset" class="btn btn-default" value="Reset" />
+                </td>
+            </tr>
+        </table>
+    </form>
+    {% endblock %}
+</body>
+</html>
