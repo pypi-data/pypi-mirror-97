@@ -1,0 +1,57 @@
+Metadata-Version: 2.1
+Name: tiny-render
+Version: 0.1.3
+Summary: A simple wrapper of Jinja2 to render text based file, eg. SQL code and YAML files
+Home-page: https://github.com/zhongdai/tiny-render
+Keywords: template,Jinja2,json,yaml
+Author: Zhong Dai
+Author-email: zhongdai.au@gmail.com
+Requires-Python: >=3.6
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: Jinja2 (>=2.11.3,<3.0.0)
+Project-URL: Repository, https://github.com/zhongdai/tiny-render
+Description-Content-Type: text/markdown
+
+# Tiny Render
+
+This is a very simple wrapper for `Jinja2` by providing few built-in variables.
+
+Variables,
+
+- `{{ _gitsha }}` - will be the shortsha for `git` hash, the value will be `None` if `git` is not
+installed or the current directory is not a git repo.
+- `{{ 'HOME' | getenv }}` - the environment variable `HOME` will be renderred. It will raise exception
+if `HOME` is not set
+- `{{ _date_str }}` - the current date in `yyyymmdd` format
+- `{{ _time_str }}` - the current date/time in `yyyymmddHHMMSS` format
+
+
+## Installation
+
+```bash
+pip install tiny-render
+```
+
+Sample Code
+
+```python
+from tiny_render import Render
+
+with open(os.path.join("/tmp","test.txt"), 'w') as f:
+    f.write("gitsha: {{_gitsha}}, hello {{key}}")
+
+params = {"key": "world"}
+
+r = Render("/tmp")
+
+r.go("test.txt", **params)
+
+# the output is "gitsha: xxxxxxx, hello world"
+```
