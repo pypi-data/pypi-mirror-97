@@ -1,0 +1,92 @@
+{% set project=entity %}
+<script class="dialog_loaded"></script>
+
+<div class="row-fluid padding-2">
+
+    <div class="span12">
+        {% include 'project/dialog/project_basic_information_form.jinja2' %}
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    function init_dialog() {
+        console.debug('starting to initialize project dialog!!!');
+
+        var dialog_template_label = $('#dialog_template_label');
+        dialog_template_label.find('span').remove();
+        dialog_template_label.append('<span>{{ mode }} Project</span>');
+
+        {# ***************************************************************** #}
+        {# Submit Button #}
+        $(document).ready(function () {
+            var submit_button = $('#dialog_template_submit_button');
+            submit_button.on('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                submit_button.button('loading');
+
+                console.log('project_form');
+
+                var project_form = $('#project_form');
+
+                var brand = $('#brand');
+                var production_house = $('#production_house');
+                var adv_agency = $('#adv_agency');
+                var product_project_name = $('#product_project_name');
+                var mark_name = $('#mark_name');
+
+                var g_data = {
+                     'product_project_name' : product_project_name.val(),
+                     'mark_name': mark_name.val()
+                };
+                var generic_text =  JSON.stringify(g_data);
+{#                var _client_query = '';#}
+{#                if (production_firm.val()){#}
+{#                    _client_query +="&production_house="+production_house.val();#}
+{#                }#}
+{#                if (adv_agency.val()){#}
+{#                    _client_query +="&agency="+adv_agency.val();#}
+{#                }#}
+{#                if (brand.val()){#}
+{#                    _client_query +="&brand="+brand.val();#}
+{#                }#}
+{#                console.log("project_form.serialize(): _client_query="+_client_query);#}
+
+                if (project_form.validate()) {
+                    $.post(
+                        project_form.attr('action'),
+                        project_form.serialize()+"&generic_text="+generic_text
+                    ).done(function (new_url) {
+                        window.location.assign(new_url);
+                    }).fail(function (jqXHR) {
+                        bootbox.alert(jqXHR.responseText);
+                        submit_button.button('reset');
+                    });
+                }
+            });
+        });
+        console.debug('finished initializing the project dialog!')
+    }
+</script>
+
+<script type="text/javascript">
+
+    function destruct_dialog() {
+        $('#project_form').unbind();
+        $('#project_name').unbind();
+        $('#project_login').unbind();
+        $('#project_email').unbind();
+        $('#project_password').unbind();
+        $('#project_password2').unbind();
+        $('#dialog_template_submit_button').unbind();
+
+        $('#dialog_template').data('modal', null);
+
+    }
+</script>
+
+
+
