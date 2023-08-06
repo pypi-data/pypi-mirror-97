@@ -1,0 +1,37 @@
+#######################################################################
+# Pyrate scenario file
+#######################################################################
+qmarket:
+  parent: four_bus_goa
+  modules: []
+  custom_modules: 
+    - [market_agents, midas.adapter.market_agents:MarketAgentsModule]
+    - [qmarket, midas.adapter.qmarket:QMarketModule]
+  step_size: 15*60
+  start_date: 2017-01-01 12:00:00+0100
+  forecast_horizon_hours: 0.25
+  end: 4*900
+  mosaikdb_params:
+    filename: pyrate.hdf5
+  weather_params:
+    bremen:
+      weather_mapping:
+        WeatherForecast:
+          - interpolate: True
+            randomize: True
+  der_params:
+    four_bus_pv:
+      import_str: pysimmods.mosaik:FlexibilitySimulator
+      q_control: qp_set
+      inverter_mode: capacitive
+      mapping:
+        2: [[PV, 0.01175], [PV, 0.014]]
+        3: [[PV, 0.01195], [PV, 0.014]]
+      weather_forecast_mapping:
+        PV: [bremen, 0]
+  marketagents_params:
+    four_bus: {}
+  qmarket_params:
+    four_bus:
+      u_max: 1.04
+      u_min: 0.96
