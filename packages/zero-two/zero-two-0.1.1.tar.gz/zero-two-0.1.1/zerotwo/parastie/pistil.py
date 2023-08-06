@@ -1,0 +1,2 @@
+class Pistil():
+    role = "pistil"
