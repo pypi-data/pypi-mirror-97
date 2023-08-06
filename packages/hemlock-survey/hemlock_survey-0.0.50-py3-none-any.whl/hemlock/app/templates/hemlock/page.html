@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+    <page id="{{ page.model_id }}"></page>
+    <head>
+        {% block head %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {{ page.css.render() | safe }}
+        {% for q in page.questions %}
+            {{ q.css.render() | safe }}
+        {% endfor %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+        {% if page.navbar is not none %}
+        {{ page.navbar | safe }}
+        {% endif %}
+
+        <div class="container h-100">
+            <div class="row h-100 justify-content-center align-items-center">
+                <form method="POST" class="col-12 form-margins" enctype="multipart/form-data">
+                {% block form %}
+                    {% set part = page.part %}
+                    {% if part is not none and part.meta.get('Test') == '1' %}
+                    <input type="hidden" name="part_id" value="{{ part.id }}"/>
+                    <input type="hidden" name="part_key" value="{{ part._key }}"/>
+                    {% endif %}
+
+                    {% if page.error not in [false, none] %}
+                    <div {{ page.error_attrs.to_html() | safe }}>
+                        {{ error | safe }}
+                    </div>
+                    {% endif %}
+                    
+                    {% for q in page.questions %}
+                        {{ q._render() | safe }}
+                    {% endfor %}
+                    <br/>
+        
+                    {% if page.forward is not none and not page.terminal %}
+                    <button {{ page.forward_btn_attrs.to_html() | safe}}>
+                        {{ page.forward | safe }}
+                    </button>
+                    {% endif %}
+                    {% if page.back is not none and not page.first_page() %}
+                    <button {{ page.back_btn_attrs.to_html() | safe }}>
+                        {{ page.back | safe }}
+                    </button>
+                    {% endif %}
+                    <p style="clear:both;"><br></p>
+        
+                    {% if page.banner is not none %}
+                    <div id="banner">{{ page.banner | safe }}</div>
+                    {% endif %}
+                {% endblock %}
+                </form>
+            </div>
+        </div>
+
+        {{ page.js.render() | safe }}
+        {% for q in page.questions %}
+            {{ q._render_js() | safe }}
+        {% endfor %}
+    {% endblock %}
+    </body>
+</html>

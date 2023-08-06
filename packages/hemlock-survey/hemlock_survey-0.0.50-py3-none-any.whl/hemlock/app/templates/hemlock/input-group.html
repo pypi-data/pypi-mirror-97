@@ -1,0 +1,21 @@
+{% extends 'hemlock/form-group.html' %}
+
+{% block content %}
+<div class="input-group">
+    {% if q.prepend is not none %}
+    <div class="input-group-prepend">
+        <span class="input-group-text">
+            {{ q.convert_markdown(q.prepend, strip_last_paragraph=True) | safe }}
+        </span>
+    </div>
+    {% endif %}
+    {% block input %}{% endblock %}
+    {% if q.append is not none %}
+    <div class="input-group-append">
+        <span class="input-group-text">
+            {{ q.convert_markdown(q.append, strip_last_paragraph=True) | safe }}
+        </span>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
