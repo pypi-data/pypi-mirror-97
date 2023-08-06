@@ -1,0 +1,65 @@
+Metadata-Version: 2.1
+Name: lldblogger-cli
+Version: 1.0
+Summary: __pip_description__
+Home-page: UNKNOWN
+Author: ocean
+Author-email: tomcat1991@126.com
+License: MIT
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Requires-Dist: coloredlogs
+Requires-Dist: fire
+
+# 使用指引
+安装lldblogger
+```
+pip install lldblogger
+```
+指定要测试的app目录地址和断点日志配置文件
+```
+from lldblogger.runner import Runner
+
+runner = Runner(log_output_path='log file path')
+runner.run("path to app", "path to config json")
+
+...
+
+runner.terminate() # 停止调试
+```
+app文件可以从debug配置的ipa包中解压出来，同时需要将配套的dSYM文件置于同一个目录，可以通过Runner的构造函数指定断点日志输出到哪个文件。
+
+断点日志配置文件格式如下:
+
+```
+[
+  {
+    "file": "文件名",
+    "line": 48,
+    "log": "[测试串行队列] counter： @counter@"
+  },
+  {
+    "symbol": "-[ViewController viewDidLoad]",
+    "log": "<From LLDB> [LLDBTest] 使用符号断点 ViewController viewDidLoad"
+  }
+]
+```
+目前支持两种形式的断点日志
+1. 指定文件名和代码行数，`file`表示文件名，比如`AppDelegate.m`，`line`表示代码行数，`log`表示要打印的日志
+2. 指定方法的符号名称`symbol`，同样`log`表示要打印的日志
+
+日志`log`可以包含动态参数，使用`@@`包裹动态参数，比如要打印局部变量`localVar`，可以这么写
+```
+"log": "局部变量：@localVar@"
+```
+
+目前已测试的动态参数支持情况：
+1. 方法的参数
+1. 局部变量
+1. 静态变量
+1. 类的实例变量
+1. 简单的表达式
+

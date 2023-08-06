@@ -1,0 +1,20 @@
+import lldblogger
+from lldblogger.runner import Runner
+import fire
+import time
+import signal
+
+class LLDBLoggerCLI(object):
+    def manage_ctrlC(self, *args):
+        self.runner.terminate()
+
+    def run(self, app_path, brk_log_file, output_log_file=""):
+        if len(app_path) == 0:
+            app_path = "/Users/ocean/Library/Developer/Xcode/DerivedData/LLDBLoggerTestApp-eaykmiqekedjzmbuegvnyznedjnr/Build/Products/Debug-iphoneos/LLDBLoggerTestApp.app"
+        if len(brk_log_file) == 0:
+            brk_log_file = "/Users/ocean/Documents/Projects/Company/LLDBLogger/lldblogger/tests/test_case_sim.json"
+        signal.signal(signal.SIGINT, self.manage_ctrlC)
+        self.runner = lldblogger.runner.Runner(log_output_path=output_log_file)
+        self.runner.run(app_path, brk_log_file)
+
+fire.Fire(LLDBLoggerCLI)
