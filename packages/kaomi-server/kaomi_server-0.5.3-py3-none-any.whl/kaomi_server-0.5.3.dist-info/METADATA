@@ -1,0 +1,115 @@
+Metadata-Version: 2.1
+Name: kaomi-server
+Version: 0.5.3
+Summary: This package contains the server endpoint for the Kaomi deployer. Kaomi server has to be run on the system where you want to deploy.
+Home-page: https://gitlab.linkspirit.it/linkspirit/kaomi-deployer.git
+Author: Linkspirit Team
+Author-email: tecnici@linkspirit.it
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+Requires-Dist: cherrypy (>=18.0.0)
+
+# Kaomi Server
+
+This package is the server for KAOMI Deployer.
+
+## Installaton, configuration and use
+
+1\. Create a virtualenv
+
+~~~
+virtualenv env --python=python3
+source env/bin/activate
+~~~
+
+2\. Install the package
+
+~~~
+pip install kaomi_server
+~~~
+
+3\. Create configuration folder
+
+~~~
+python -m kaomi_server configure --folder <path>
+~~~
+
+5\. Create the config file for `systemd` with path `/etc/systemd/system/kaomi-server.service`
+
+
+~~~
+[Unit]
+Description=Kaomi Server (TM) Service
+
+[Service]
+Type=simple
+User=root
+Group=root
+# Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.
+# Prefixing the path with '-' makes it try to load, but if the file doesn't
+# exist, it continues onward.
+EnvironmentFile=-/etc/default/kaomi-server
+EnvironmentFile=-/etc/sysconfig/kaomi-server
+ExecStart=<virtualenv path>/env/bin/python -m kaomi_server start --config <path file server.conf> --apikey <path directory conf.d> 
+Restart=on-abnormal
+WorkingDirectory=<virtualenv path>
+
+# When stopping, how long to wait before giving up and sending SIGKILL?
+# Keep in mind that SIGKILL on a process can cause data loss.
+TimeoutStopSec=3min
+
+[Install]
+WantedBy=multi-user.target
+~~~
+
+Start Kaomi server on startup
+
+~~~
+systemctl daemon-reload
+systemctl enable kaomi-server.service
+~~~
+
+Start the server right now 
+
+~~~
+systemctl start kaomi-server.service
+~~~
+
+---
+
+### Formato rispose del server
+
+The server responses are json dictionaries with the following structure:
+
+~~~
+{ "status": "status code", "substatus": "substatus code", "message": "meaning of the substatus" "data": "eventual useful data" }
+~~~
+
+### Status and substatus codes
+
+
+| status | substatus | meaning | data | example |
+|---|-----|-----|:-----:|----|
+| 0 | | EVERYTHING WENT OK | |
+|   | 0 | Action executed | - | Specified folder has been created
+|   | 1 | Final status reached but not in common way | - | Folder already existed
+| 1 |   | REQUEST'S ERRORS |   |   
+|   | 0 | Wrong request type | - | Get request where only POST admitted| 
+|   | 1 | Payload content-length greater than maximum allowed | Max request size in bytes | 
+|   | 2 | Json content cannot be parsed | - | 
+|   | 3 | Content-length not specified or not valid | - |
+|   | 4 | Missing fields in JSON | List of requeted fields |
+|   | 5 | ValueError in JSON | Exception text | Permissions received are not valid
+| 2 |   | APPLICATION'S ERRORS |   |   
+|   | 0 | Generic server error occurred | Exception text | | 
+|   | 1 | Invalid apikey | - | 
+|   | 2 | Action not permitted | Exception text | 
+|   | 3 | A RuntimeError occurred | Exception text |
+|   | 4 | File/folder already exists | Exception text |
+|   | 5 | The uploaded file is too big | - | Uploaded file exceed maximum size (data contains maximum size in MB) |
+|   | 6 | Client ip not allowed | - | The client ip is not in the allowed list |
+
