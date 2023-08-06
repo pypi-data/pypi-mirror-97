@@ -1,0 +1,145 @@
+Metadata-Version: 2.1
+Name: pydtk
+Version: 0.0.0
+Summary: A Python toolkit for managing, retrieving and processing data.
+Home-page: https://github.com/dataware-tools/python-toolkit.git
+License: Apache-2.0
+Keywords: toolkit,data,dataware,metadata
+Author: Yusuke Adachi
+Author-email: adachi.yusuke@hdwlab.co.jp
+Requires-Python: >=3.6.1,<4.0
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Provides-Extra: cassandra
+Provides-Extra: elasticsearch
+Provides-Extra: influxdb
+Provides-Extra: mongodb
+Provides-Extra: mysql
+Provides-Extra: pointcloud
+Provides-Extra: postgresql
+Provides-Extra: ros
+Requires-Dist: attrdict
+Requires-Dist: bitstring (>=3.1.7,<4.0.0)
+Requires-Dist: cassandra-driver (>=3.24.0,<4.0.0); extra == "cassandra"
+Requires-Dist: deepmerge (>=0.1.1,<0.2.0)
+Requires-Dist: elasticsearch (>=7.11.0,<8.0.0); extra == "elasticsearch"
+Requires-Dist: fire (>=0.3.1,<0.4.0)
+Requires-Dist: flatten-dict (>=0.3.0,<0.4.0)
+Requires-Dist: gnupg; extra == "ros"
+Requires-Dist: influxdb (>=5.3.0,<6.0.0); extra == "influxdb"
+Requires-Dist: mysqlclient (>=2.0.1,<3.0.0); extra == "mysql"
+Requires-Dist: numpy (>=1.16.6,<2.0.0)
+Requires-Dist: opencv-python (>=4.2.0.34,<5.0.0.0)
+Requires-Dist: pandas (>=1.0.3,<2.0.0)
+Requires-Dist: psycopg2-binary (>=2.8.6,<3.0.0); extra == "postgresql"
+Requires-Dist: pycryptodomex; extra == "ros"
+Requires-Dist: pymongo (>=3.11.3,<4.0.0); extra == "mongodb"
+Requires-Dist: pyntcloud; extra == "pointcloud"
+Requires-Dist: pyyaml
+Requires-Dist: rospkg; extra == "ros"
+Requires-Dist: six (>=1.15.0,<2.0.0)
+Requires-Dist: sqlalchemy (>=1.3.17,<2.0.0)
+Requires-Dist: sqlalchemy-migrate
+Requires-Dist: tinydb (>=3.2.1,<4.0.0)
+Requires-Dist: tinymongo (>=0.2.0,<0.3.0)
+Requires-Dist: tqdm (>=4.46.1,<5.0.0)
+Project-URL: Repository, https://github.com/dataware-tools/python-toolkit.git
+Description-Content-Type: text/markdown
+
+# Python Dataware Toolkit
+
+A Python toolkit for managing, retrieving, and processing data.
+
+## Installation
+You can install the toolkit with:
+```bash
+$ pip3 install git+https://github.com/dataware-tools/pydtk.git
+
+```
+
+If you want to install the toolkit with extra feature (e.g. support for MongoDB and ROS), 
+you can install extra dependencies as follows:
+```bash
+$ pip3 install git+https://github.com/dataware-tools/pydtk.git#egg=pydtk[mongodb,ros]
+
+```
+
+
+## Usage
+
+By using Pydtk, you can load a variety of types of data with a unified interface as shown below.
+
+1. Load DBHandler for retrieving metadata
+```python
+from pydtk.db import V4DBHandler as DBHandler
+
+# Initialize handler (This will read all the metadata from DB on initialization)
+handler = DBHandler(
+    db_class='meta',
+    db_host='./examples/example_db',
+    base_dir_path='./test'
+)
+
+```
+
+2. Read metadata from db with data selection.
+```python
+# Select by timestamp
+handler.read(pql='start_timestamp > 1420000000 and end_timestamp < 1500000000')
+print(handler.data)
+
+# Select by record-id
+handler.read(pql='record_id == regex("B05.*")')
+print(handler.data)
+
+```
+
+3. Load data from files based on metadata.
+```python
+from pydtk.io import BaseFileReader, NoModelMatchedError
+
+reader = BaseFileReader()
+
+try:
+    for sample in handler:
+        print('loading content "{0}" from file "{1}"'.format(sample['contents'], sample['path']))
+        try:
+            timestamps, data, columns = reader.read(sample)
+            assert print(data)
+        except NoModelMatchedError as e:
+            print(str(e))
+            continue
+except EOFError:
+    pass
+```
+
+
+## Documentation
+For more information about this toolkit, please refer the [document](https://dataware-tools.github.io/pydtk/).
+
+
+## Setup for contribution
+To improve this toolkit, firstly clone this repository and then 
+run the following command to prepare the environment. 
+
+```bash
+$ poetry install
+
+```
+
+Make sure that [poetry](https://python-poetry.org/) is installed before executing the command.
+
+If you want to install the toolkit with extra feature (e.g. support for MongoDB), 
+please specify it with `-E` option.  
+Example (installation with `mongodb` and `ros` extras):
+```bash
+$ poetry install -E mongodb -E ros
+
+```
+
