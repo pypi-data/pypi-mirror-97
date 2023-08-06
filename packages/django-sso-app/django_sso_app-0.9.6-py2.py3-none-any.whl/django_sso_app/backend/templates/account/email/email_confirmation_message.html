@@ -1,0 +1,10 @@
+{% extends "account/email/base_email.html" %}{% load account %}{% user_display user as user_display %}{% load i18n %}
+{% block welcome %}
+{% blocktrans %}Hello from {{ EMAILS_SITE_NAME }}!{% endblocktrans %}
+{% endblock%}
+<br /><br />
+{% block content %}{% blocktrans %}You're receiving this e-mail because user {{ user_display }} has given yours as an e-mail address to connect their account.
+To confirm this is correct, go to {% endblocktrans %}<a href="{{ activate_url }}">{{ activate_url }}</a>.
+<br /><br />
+{% blocktrans %}Thank you from {{ EMAILS_SITE_NAME }}!{% endblocktrans %}
+{% endblock %}
