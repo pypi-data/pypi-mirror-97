@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  # set via ArgoConfig.project_name
+  generateName: null
+
+spec:
+  entrypoint: dag
+
+  # set via ArgoConfig.mounted_volumes
+  volumes: null
+
+  templates:
+  - name: run-task
+    inputs:
+      parameters:
+      - name: task_name
+    script:
+      # set via ArgoConfig.image
+      image: null
+      command: [bash]
+      # set via ArgoConfig.mounted_volumes (using the first entry)
+      workingDir: null
+      source: null
+      volumeMounts: null
+
+  - name: dag
+    dag:
+      tasks: null
