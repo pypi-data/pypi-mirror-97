@@ -1,0 +1,1 @@
+from tkinterDnD.dnd import make_draggable, make_draggable_component
