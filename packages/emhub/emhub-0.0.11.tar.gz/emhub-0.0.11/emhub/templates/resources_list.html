@@ -1,0 +1,179 @@
+
+<!-- Modal -->
+<div class="modal" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="exampleModalLongTitle">Delete Resource</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid  dashboard-content">
+    <!-- Header -->
+    {% set title = "Resource Management" %}
+    {% set about = "Here you can operate with resources. " %}
+    {% set navigation = [('Admin', ''), ('Resources', '')] %}
+    {% include 'include_header.html' %}
+
+    <!-- ============================================================== -->
+    <!-- pagehader  -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <!-- ============================================================== -->
+        <!--  resources table  -->
+        <!-- ============================================================== -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="card">
+                <h5 class="card-header">Resources List</h5>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="bg-light">
+                                <tr class="border-0">
+                                    <th class="border-0">Id</th>
+                                    <th class="border-0">Image</th>
+                                    <th class="border-0">Color</th>
+                                    <th class="border-0">Resource Name</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="border-0">Tags</th>
+                                    <th class="border-0">Requires Slot</th>
+                                    <th class="border-0">Latest cancel (h)</th>
+                                    <th class="border-0">Min/Max  booking (h)</th>
+                                    <th class="border-0">Daily Cost (SEK)</th>
+                                    {% if current_user.is_manager %}
+                                    <th class="border-0">Actions</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for r in resources %}
+                                <tr>
+                                    <td> {{ r['id'] }} </td>
+                                    <td>
+                                        <div class="m-r-10"><img src="{{ r['image'] }}" alt="user" class="rounded" width="75"></div>
+                                    </td>
+                                    <td><div style="background-color: {{ r['color'] }}; width: 30px; height: 30px"> &nbsp;</div></td>
+                                    <td> {{ r['name'] }} </td>
+                                    <td> {{ r['status'] }} </td>
+                                    <td> {{ r['tags'] }}</td>
+                                    <td> {{ r['requires_slot'] }}</td>
+                                    <td> {{ r['latest_cancellation'] }}</td>
+                                    <td> {{ r['min_booking'] }} / {{ r['max_booking'] }}</td>
+                                    <td> {{ r['daily_cost'] }}</td>
+                                    {% if current_user.is_manager %}
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-light" onclick="javascript:showResource({{ r['id'] }})"><i class="far fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-light" onclick="javascript:notImplemented('Can not DELETE Resource. ')"
+                                                data-id="{{ r['id'] }}" data-name="{{ r['name'] }}"><i class="far fa-trash-alt"></i></button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- end resources table  -->
+        <!-- ============================================================== -->
+    </div>
+</div>
+
+
+<!-- ============================================================== -->
+<!-- Resource Modal -->
+<!-- ============================================================== -->
+<div class="modal fade" id="resource-modal" tabindex="-1" role="dialog" aria-labelledby="resourceModal" aria-hidden="true">
+</div>
+
+<script>
+
+(function(window, document, $, undefined) {
+"use strict";
+
+$('select').selectpicker();
+
+})(window, document, window.jQuery);
+
+
+/* Show the Resource Form, either for a new booking or an existing one */
+function showResource(resourceId) {
+    ajaxContent = get_ajax_content("resource_form", {resource_id: resourceId});
+
+    ajaxContent.done(function(html) {
+        $("#resource-modal").html(html);
+        // Show the form after setting html content
+        $('#resource-modal').modal('show');
+    });
+
+    ajaxContent.fail(function(jqXHR, textStatus) {
+        alert( "Request failed: " + textStatus );
+    });
+
+}  // function showResource
+
+/** Helper functions to handle Template AJAX response or failure */
+function handleAjaxDone(jsonResponse) {
+    var error = null;
+
+    if ('resource' in jsonResponse) {
+    }
+    else if ('error' in jsonResponse) {
+        error = jsonResponse.error;
+    }
+    else {
+        error = 'Unexpected response from server.'
+    }
+
+    if (error)
+        showError(error);
+    else {
+        $('#resource-modal').on('hidden.bs.modal', function () {
+            load_main_content("resources_list");
+        });
+        $('#resource-modal').modal('hide');
+    }
+}
+
+
+function handleAjaxFail(jqXHR, textStatus) {
+    showError("Request failed: " + textStatus );
+}
+
+/** This function will be called when the OK button in the Application form
+ * is clicked. It can be either Create or Update action.
+ */
+function onResourceOkButtonClick() {
+    // Update template values
+    var resource = getFormAsJson('resource-form', true);
+    resource.id = parseInt($('#resource-id').val());
+
+    var ajaxContent = $.ajax({
+        url: "{{ url_for('api.update_resource') }}",
+        type: "POST",
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({attrs: resource}),
+        dataType: "json"
+    });
+
+    ajaxContent.done(handleAjaxDone);
+    ajaxContent.fail(handleAjaxFail);
+}  // function onTemplateOkButtonClick
+
+</script>

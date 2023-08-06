@@ -1,0 +1,128 @@
+<!-- ============================================================== -->
+<!-- Application Modal Content -->
+<!-- ============================================================== -->
+{% set readonly = '' if current_user.is_manager else 'readonly' %}
+{% set disabled = '' if current_user.is_manager else 'disabled' %}
+
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="application-modal-title"> Application: {{ application.code }} </h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <!-- Application Form -->
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <form id="validationform" data-parsley-validate="" novalidate="">
+                    <input type="hidden" id="application-id" name="application-id" value="{{ application.id }}">
+                    <!-- Created Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Created</label>
+                        <label class="col-12 col-sm-8 col-form-label text-sm-left">{{ application.created|pretty_datetime }}</label>
+                    </div>
+
+                    <!-- Alias Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Alias</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <input type="text" {{ readonly }} required="" placeholder="Enter Alias" id="application-alias" class="form-control" value="{{ application.alias }}">
+                        </div>
+                    </div>
+
+                    <!-- Title Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Title</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <input type="text" {{ readonly }} required="" placeholder="Enter Title" id="application-title" class="form-control" value="{{ application.title }}">
+                        </div>
+                    </div>
+
+                    <!-- Description Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Description </label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <textarea {{ readonly }} required="" class="form-control" id="application-description">{{ application.description }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Resource allocation -->
+                   <div class="form-group row">
+                        <label class="col-sm-3 col-form-label text-sm-right">Resource allocation (days)</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <div class="row" style="padding-left: 0; margin-left: 0; align-items: center">
+                                <label class="col-1" style="padding-left: 0;  margin-left: 0">Krios</label>
+                                <input {{ readonly }} type="text" required="" id="quota-krios" class="form-control col-3" value="{{ application.resource_allocation['quota']['krios'] }}">
+                            <label class="col-1" style="margin-right: 15px;">Talos</label>
+                                <input {{ readonly }} type="text" required="" id="quota-talos" class="form-control col-3" value="{{ application.resource_allocation['quota']['talos'] }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label text-sm-right">Allowed outside Slot</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <div class="row" style="align-items: center">
+                                {% for m in microscopes %}
+                                    {% set checked = 'checked' if m['noslot'] else '' %}
+                                    <label class="custom-control custom-checkbox col-2">
+                                    <input type="checkbox" {{ disabled }} {{ checked }} class="custom-control-input noslot" value="{{ m['id'] }}"><span class="custom-control-label">{{ m['name'] }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if current_user.is_manager %}
+                    <!-- Row to add more PIs, only for Admins -->
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label text-sm-right"></label>
+                            <input type="text" placeholder="Enter PI ids (separated by space)" id="application-add-users" class="form-control col-sm-6">
+                            <div class="col-sm-3 text-sm-left">
+                                <a href="javascript:onAddPiClick()" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Add PI </a>
+                            </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label text-sm-right">PI List</label>
+                        <table class="table col-sm-9">
+
+                        <tbody>
+                            <tr class="table-primary">
+                                <td>{{ application.creator.name }}</td>
+                                <td>{{ application.creator.email }}</td>
+                            </tr>
+                            </tr>
+                            {% for u in application.pi_list[1:] %}
+                                <tr>
+                                    <td id="{{ u.id }}">{{ u.name }}</td>
+                                    <td> {{ u.email }}</td>
+                                    </tr>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+
+                </form>
+            </div>
+            <!-- end Application Form -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+          {% if current_user.is_manager %}
+            <button type="button" id="application-btn-cancel"  class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" id="application-btn-ok" class="btn btn-outline-dark" onclick="javascript: onApplicationOkButtonClick()">Update</button>
+          {% else %}
+              <button type="button" id="application-btn-ok"  class="btn btn-outline-secondary" data-dismiss="modal">OK</button>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+<!-- ============================================================== -->
+<!-- End of Application Modal Content -->
+<!-- ============================================================== -->
