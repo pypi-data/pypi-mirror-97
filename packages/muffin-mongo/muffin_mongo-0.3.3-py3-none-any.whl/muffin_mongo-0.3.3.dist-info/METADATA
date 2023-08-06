@@ -1,0 +1,173 @@
+Metadata-Version: 2.1
+Name: muffin-mongo
+Version: 0.3.3
+Summary: MongoDB support for Muffin framework.
+Home-page: https://github.com/klen/muffin-mongo
+Author: Kirill Klenov
+Author-email: horneds@gmail.com
+License: MIT
+Project-URL: Documentation, https://github.com/klen/muffin-mongo
+Project-URL: Source code, https://github.com/klen/muffin-mongo
+Project-URL: Issue tracker, https://github.com/klen/muffin-mongo/issues
+Keywords: mongodb,muffin,asyncio,asgi,web
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Framework :: AsyncIO
+Requires-Python: >=3.7
+Requires-Dist: muffin (>=0.50)
+Requires-Dist: motor (>=2.3.1)
+Provides-Extra: build
+Requires-Dist: bump2version ; extra == 'build'
+Requires-Dist: twine ; extra == 'build'
+Requires-Dist: wheel ; extra == 'build'
+Provides-Extra: tests
+Requires-Dist: pytest ; extra == 'tests'
+Requires-Dist: pytest-aio ; extra == 'tests'
+Requires-Dist: pytest-mypy ; extra == 'tests'
+
+Muffin-Mongo
+############
+
+.. _description:
+
+Muffin-Mongo -- MongoDB support for Muffin_ framework.
+
+.. _badges:
+
+.. image:: https://github.com/klen/muffin-mongo/workflows/tests/badge.svg
+    :target: https://github.com/klen/muffin-mongo/actions
+    :alt: Tests Status
+
+.. image:: https://img.shields.io/pypi/v/muffin-mongo
+    :target: https://pypi.org/project/muffin-mongo/
+    :alt: PYPI Version
+
+.. _contents:
+
+.. contents::
+
+.. _requirements:
+
+Requirements
+=============
+
+- python >= 3.7
+
+.. note:: The plugin supports only asyncio evenloop (not trio)
+
+.. _installation:
+
+Installation
+=============
+
+**Muffin-Mongo** should be installed using pip: ::
+
+    pip install muffin-mongo
+
+.. _usage:
+
+Usage
+=====
+
+Setup the plugin and connect it into your app:
+
+.. code-block:: python
+
+    from muffin import Application
+    from muffin_mongo import Plugin as Mongo
+
+    # Create Muffin Application
+    app = Application('example')
+
+    # Initialize the plugin
+    # As alternative: db = DB(app, **options)
+    mongo = Mongo(db_url='mongodb://localhost:27017', database='db_name')
+    mongo.setup(app)
+
+
+That's it now you are able to use the plugin inside your views:
+
+.. code-block:: python
+
+    @app.route('/items', methods=['GET'])
+    async def get_items(request):
+        """Return a JSON with items from the database."""
+        documents = await mongo.items.find().sort('key').to_list(100)
+        return [dict(dd.items(), _id=str(dd['_id'])) for dd in documents]
+
+    @app.route('/items', methods=['POST'])
+    async def insert_item(request):
+        """Store items from JSON into database. Return ids."""
+        data = await request.data()  # parse formdata/json from the request
+        res = await mongo.items.insert_many(data)
+        return [str(key) for key in res.inserted_ids]
+
+
+Configuration options
+----------------------
+
+=========================== ======================================= =========================== 
+Name                        Default value                           Desctiption
+--------------------------- --------------------------------------- ---------------------------
+**db_url**                  ``"mongodb://localhost:27017"``         A mongo connection URL
+**database**                ``None``                                A database name (optional)
+=========================== ======================================= =========================== 
+
+You are able to provide the options when you are initiliazing the plugin:
+
+.. code-block:: python
+
+    mongo.setup(app, db_url='mongodb://localhost:27017')
+
+Or setup it from ``Muffin.Application`` configuration using the ``MONGO_`` prefix:
+
+.. code-block:: python
+
+   MONGO_DB_URL = 'mongodb://localhost:27017'
+
+``Muffin.Application`` configuration options are case insensitive
+
+.. _bugtracker:
+
+Bug tracker
+===========
+
+If you have any suggestions, bug reports or
+annoyances please report them to the issue tracker
+at https://github.com/klen/muffin-mongo/issues
+
+.. _contributing:
+
+Contributing
+============
+
+Development of Muffin-Mongo happens at: https://github.com/klen/muffin-mongo
+
+
+Contributors
+=============
+
+* klen_ (Kirill Klenov)
+
+.. _license:
+
+License
+========
+
+Licensed under a `MIT license`_.
+
+.. _links:
+
+
+.. _klen: https://github.com/klen
+.. _Muffin: https://github.com/klen/muffin
+.. _MIT license: http://opensource.org/licenses/MIT
+
+
