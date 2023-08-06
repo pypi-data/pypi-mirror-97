@@ -1,0 +1,58 @@
+Metadata-Version: 2.1
+Name: vops
+Version: 0.0.23
+Summary: A package for graphing profit-loss option diagrams
+Home-page: https://github.com/RJL22/vops
+Author: Ryan Lee
+Author-email: ryanjlee22@gmail.com
+License: UNKNOWN
+Description: # Vops
+        This python project uses data from yahoo finance to graph option profit-loss diagrams.
+        
+        Note: any examples used here are outdated because the option contracts have expired.
+        
+        ## Installing
+        Installing with pip:
+        ```bash
+        pip install vops
+        ```
+        
+        ## Usage
+        Simple program graphing a long call option:
+        ```python
+        from vops import scraping
+        from vops import graphing
+        
+        optionObj = scraping.scrapeCallOptions('AMD')
+        
+        graphing.graphLongCall(optionObj, 'AMD201231C00060000')
+        ```
+        Graphing both short and long positions on a call option:
+        ```python
+        optionObj = scraping.scrapeCallOptions('AMD')
+        
+        graphing.graphCalls(optionObj, 'AMD201231C00060000')
+        ```
+        
+        Exporting graphs to a png:
+        ```python
+        graphing.graphCalls(optionObj, 'AMD201231C00060000', export = True)
+        ```
+        
+        Output:
+        
+        ![plot](./res/options.png)
+        
+        ## Todo
+        
+        * Add axis labels to all graphs
+        * Create method for graphing long and short put options simultaneously
+        * Merge call/put options chains
+        * Allow option chains from different chains to be scraped
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
