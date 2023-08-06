@@ -1,0 +1,2 @@
+PRODUCT_NAME = "code42cli"
+MAIN_COMMAND = "code42"
