@@ -1,0 +1,210 @@
+'\" t
+.\"     Title: rnrview
+.\"    Author: Franco Bugnano
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 2021-03-04
+.\"    Manual: rnr manual
+.\"    Source: rnrview 1.0.3
+.\"  Language: English
+.\"
+.TH "RNRVIEW" "1" "2021\-03\-04" "rnrview 1\&.0\&.3" "rnr manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+rnrview \- Console file viewer
+.SH "SYNOPSIS"
+.sp
+\fBrnrview\fR [\fIOPTIONS\fR] \fIFILE\fR
+.SH "DESCRIPTION"
+.sp
+rnrview(1) is a text based file viewer that complements rnr(1)
+.SH "OPTIONS"
+.PP
+\fB\-h, \-\-help\fR
+.RS 4
+Show command line options
+.RE
+.PP
+\fB\-V, \-\-version\fR
+.RS 4
+Show program\(cqs version number and exit
+.RE
+.PP
+\fB\-b, \-\-nocolor\fR
+.RS 4
+Requests to run in black and white
+.RE
+.PP
+\fB\-t\fR \fITABSIZE\fR\fB, \-\-tabsize\fR \fITABSIZE\fR
+.RS 4
+Set tab size (default: 4)
+.RE
+.PP
+\fB\-d, \-\-debug\fR
+.RS 4
+Activate debug mode
+.RE
+.SH "KEY BINDINGS"
+.PP
+\fBESC\fR
+.RS 4
+Return to normal mode (like Vim)
+.RE
+.PP
+\fBq, Q, v, F3, F10\fR
+.RS 4
+Exit
+.RE
+.PP
+\fBCTRL\-O\fR
+.RS 4
+Show console output
+.RE
+.PP
+\fBj, DOWN\fR
+.RS 4
+Scroll down a line
+.RE
+.PP
+\fBk, UP\fR
+.RS 4
+Scroll up a line
+.RE
+.PP
+\fBg, HOME\fR
+.RS 4
+Go to the top of the file
+.RE
+.PP
+\fBG, END\fR
+.RS 4
+Go to the end of the file
+.RE
+.PP
+\fBCTRL\-B, PAGE UP\fR
+.RS 4
+Go up a page
+.RE
+.PP
+\fBCTRL\-F, PAGE DOWN\fR
+.RS 4
+Go down a page
+.RE
+.PP
+\fBw, F2\fR
+.RS 4
+Toggle word wrapping
+.RE
+.PP
+\fBh, F4\fR
+.RS 4
+Toggle Hex mode
+.RE
+.PP
+\fB:, F5\fR
+.RS 4
+Go to line number / hex offset
+.RE
+.PP
+\fB/, ?, f, F, F7\fR
+.RS 4
+Find in file
+.RE
+.PP
+\fBn\fR
+.RS 4
+Find next
+.RE
+.PP
+\fBN\fR
+.RS 4
+Find previous
+.RE
+.SH "FIND IN FILE"
+.SS "REGULAR EXPRESSION"
+.sp
+rnrview(1) uses the Python dialect of regular expressions, as described in: https://docs\&.python\&.org/3/howto/regex\&.html
+.sp
+The file will be tested against the regular expression on a line\-by\-line basis\&.
+.SS "WILDCARD SEARCH"
+.sp
+Wildcard search uses the following wildcards:
+.PP
+\fB*\fR
+.RS 4
+Matches everything
+.RE
+.PP
+\fB?\fR
+.RS 4
+Matches any single character
+.RE
+.PP
+\fB[\fR\fISEQ\fR\fB]\fR
+.RS 4
+Matches any character in
+\fISEQ\fR
+.RE
+.PP
+\fB[!\fR\fISEQ\fR\fB]\fR
+.RS 4
+Matches any character not in
+\fISEQ\fR
+.RE
+.sp
+The file will be tested against the wildcard expression on a line\-by\-line basis\&.
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBEXAMPLE\fR
+.RS 4
+.PP
+sp* eg?s
+.RS 4
+Search for "sp" followed by any number of characters, space, "eg", followed by one character, and "s"\&.
+.RE
+.RE
+.SS "HEXADECIMAL"
+.sp
+When in hex mode, the search function accepts text in quotes and constant numbers\&. Text in quotes is matched exactly after removing the quotes\&. Each number matches one or more bytes\&. You can mix quoted text with constants like this:
+.sp
+"String" 34 0xBB 012 "more text"
+.sp
+Numbers are always interpreted in hex\&. In the example above, "34" is interpreted as 0x34\&. The prefix "0x" isn\(cqt really needed: we could type "BB" instead of "0xBB"\&. And "012" is interpreted as 0x00 0x12, not as an octal number\&.
+.SH "RESOURCES"
+.sp
+GitHub: https://github\&.com/bugnano/rnr
+.sp
+PyPI: https://pypi\&.org/project/rnr/
+.SH "SEE ALSO"
+.sp
+rnr(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020\-2021 Franco Bugnano\&. Free use of this software is granted under the terms of the GNU General Public License (GPL)\&.
+.SH "AUTHOR"
+.PP
+\fBFranco Bugnano\fR
+.RS 4
+Author.
+.RE
