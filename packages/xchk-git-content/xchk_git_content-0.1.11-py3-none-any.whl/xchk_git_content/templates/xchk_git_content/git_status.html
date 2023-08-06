@@ -1,0 +1,60 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<p>Voor dit onderdeel is er geen videomateriaal.</p>
+<h3>Schriftelijk materiaal</h3>
+<p>Terwijl je aan het werk bent, moet je goed in de gaten houden in welke fase bepaalde data zich bevindt: working directory, staging area of project history. Anders weet je niet welke data veilig gelogd is en welke je makkelijk kwijt zou kunnen raken. Je kan hiervan een overzicht opvragen met het commando <code>git status</code>. <strong>Om een gedetailleerder overzicht te krijgen, gebruiken wij steeds <code>git status -u</code>.</strong></p>
+
+<p>Wanneer je dit commando uitvoert in je Git repository, kan je verschillende boodschappen zien.</p>
+
+<ul>
+	<li>"Untracked files"
+		<ul>
+			<li>
+				<em> Dit betekent dat de file in kwestie nog volledig onbekend is voor Git. Er is met andere woorden nog nooit data uit deze file gecommit en er staat ook geen data uit deze file in de staging area. Als je de file wil opvolgen in je logboek, moet je hem eerst <em>stagen</em> en dan <em>committen</em>.</li>
+		</ul>
+	</li>
+	<li>"Changes not staged for commit" (gevolgd door nog wat extra tekst <strong>die je voorlopig best negeert</strong>)
+		<ul>
+			<li>Dit betekent dat de file in kwestie wel al gekend is voor Git, maar dat hij nieuwe of aangepaste data bevat. Als je deze wijzigingen wil opvolgen in je logboek, moet je de file eerst <em>stagen</em> en dan <em>committen</em>.</li>
+		</ul>
+	</li>
+	<li>"Changes to be committed"
+		<ul>
+			<li>Dit is een overzicht van je huidige staging area. Als je een commit-operatie uitvoert, maak je deze wijzigingen deel van je projectgeschiedenis.</li>
+		</ul>
+	</li>
+</ul>
+
+<p class="alert alert-warning">
+Lees de output van dit commando altijd voor je een commit-operatie uitvoert!
+</p>
+
+<p class="alert alert-info">
+Het kan perfect zijn dat eenzelfde file data bevat die al in de staging area staat en data die alleen maar in de working directory staat. Dezelfde filenaam kan dus verschijnen in verschillende boodschappen van <code>git status</code>!
+</p>
+
+<p class="alert alert-info">
+Git gebruikt een kleurcodering om aan te geven welke wijzigingen in welke fase staan. Indien je kleurenblind bent, kan het de moeite zijn de gebruikte kleuren te veranderen. Ga na via een zoekmachine hoe je de kleuren van Git aanpast voor jouw shell.
+</p>
+
+{% endblock course_content %}
+
+{% block assignment %}
+<ol>
+  <li>Controleer dat er geen enkele wijziging aanwezig is in je working directory of staging area.</li>
+  <li>Maak een tekstbestand (met de naam die gevraagd wordt in de technische vereisten) en zet daarin alleen de tekst "test" (zonder aanhalingstekens).</li>
+  <li>Sla het bestand op.</li>
+  <li>Verlaat het bestand en vraag een overzicht van je wijzigingen. <strong>Bekijk dit en vergelijk met de uitleg op deze pagina.</strong></li>
+  <li>Voer uit: <code>git add --all</code>.</li>
+  <li>Open je bestand opnieuw.</li>
+  <li>Zet op de tweede regel ook "test" (zonder aanhalingstekens).</li>
+  <li>Sla het bestand op.</li>
+  <li>Verlaat het bestand en vraag een overzicht van je wijzigingen. <strong>Bekijk dit en vergelijk met de uitleg op deze pagina.</strong></li>
+  <li>Kopieer (enkel!) de output, dus niet de regel die je net hebt getypt maar wel alles wat daarop volgt, vanaf het eerste geprinte karakter.</li>
+  <li>Sla de output op in je tekstbestand (overschrijf wat er al stond).</li>
+  <li>Stage en commit je tekstbestand.</li>
+  <li>Voer uit: <code>git push</code>.</li>
+</ol>
+{% endblock assignment %}
