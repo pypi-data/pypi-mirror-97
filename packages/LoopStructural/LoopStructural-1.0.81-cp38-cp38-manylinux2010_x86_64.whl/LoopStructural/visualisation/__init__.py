@@ -1,0 +1,27 @@
+"""
+This is the base visualistion module for loop structural
+
+Submodules
+==========
+
+.. autosummary::
+    :toctree: _autosummary
+
+    map_viewer
+    model_visualisation
+    rotation_angle_plotter
+
+"""
+from ..utils import getLogger
+logger = getLogger()
+try:
+    import matplotlib
+    from .map_viewer import MapView
+    from .rotation_angle_plotter import RotationAnglePlotter
+except ImportError:
+    logger.warning('Cannot use MapView or RotationAnglePlotter as matplotlib is not installed. \n'\
+                   'Install matplotlib and try again. ')
+try:
+    from .sphinx_scraper import _get_loop_visualisation_scraper
+except:
+    logger.error('Cannot use sphinx scraper, pip install -r docs/requirements.txt')
