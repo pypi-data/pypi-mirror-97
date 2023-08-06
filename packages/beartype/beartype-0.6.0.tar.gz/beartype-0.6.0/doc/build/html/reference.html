@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference &#8212; beartype 0.5.2 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="prev" title="Changes" href="changes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<p>Behold the non-API of beartype!</p>
+<span class="target" id="module-beartype"></span><p><strong>Beartype.</strong></p>
+<p>For PEP 8 compliance, this namespace exposes a subset of the metadata constants
+provided by the top-level <code class="xref py py-mod docutils literal notranslate"><span class="pre">meta</span></code> submodule commonly inspected by external
+automation.</p>
+<dl class="py data">
+<dt id="beartype.__version__">
+<code class="sig-prename descclassname">beartype.</code><code class="sig-name descname">__version__</code><em class="property"> = '0.5.2'</em><a class="headerlink" href="#beartype.__version__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable package version as a <code class="docutils literal notranslate"><span class="pre">.</span></code>-delimited string.</p>
+<p>For PEP 8 compliance, this specifier has the canonical name <code class="docutils literal notranslate"><span class="pre">__version__</span></code>
+rather than that of a typical global (e.g., <code class="docutils literal notranslate"><span class="pre">VERSION_STR</span></code>).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="beartype.__version_info__">
+<code class="sig-prename descclassname">beartype.</code><code class="sig-name descname">__version_info__</code><em class="property"> = (0, 5, 2)</em><a class="headerlink" href="#beartype.__version_info__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Machine-readable package version as a tuple of integers.</p>
+<p>For PEP 8 compliance, this specifier has the canonical name
+<code class="docutils literal notranslate"><span class="pre">__version_info__</span></code> rather than that of a typical global (e.g.,
+<code class="docutils literal notranslate"><span class="pre">VERSION_PARTS</span></code>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="beartype.beartype">
+<code class="sig-prename descclassname">beartype.</code><code class="sig-name descname">beartype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/beartype/_decor/main.html#beartype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#beartype.beartype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate the passed <strong>callable</strong> (e.g., function, method) to validate both
+all annotated parameters passed to this callable <em>and</em> the annotated value
+returned by this callable if any.</p>
+<p>This decorator performs rudimentary type checking based on Python 3.x
+function annotations, as officially documented by PEP 484 (“Type Hints”).
+While PEP 484 supports arbitrarily complex type composition, this decorator
+requires <em>all</em> parameter and return value annotations to be either:</p>
+<ul class="simple">
+<li><p>Classes (e.g., <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code>).</p></li>
+<li><p>Tuples of classes (e.g., <code class="docutils literal notranslate"><span class="pre">(int,</span> <span class="pre">OrderedDict)</span></code>).</p></li>
+</ul>
+<p>If optimizations are enabled by the active Python interpreter (e.g., due to
+option <code class="docutils literal notranslate"><span class="pre">-O</span></code> passed to this interpreter), this decorator reduces to a
+noop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>CallableTypes</em>) – <strong>Non-class callable</strong> (i.e., callable object that is <em>not</em> a class) to
+be decorated by a dynamically generated new callable wrapping this
+original callable with pure-Python type-checking.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dynamically generated new callable wrapping this original callable with
+pure-Python type-checking.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>CallableTypes</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>BeartypeDecorHintException</strong> – If any annotation on this callable is neither:
+    
+    * A <strong>PEP-compliant type</strong> (i.e., instance or class complying with a
+      PEP supported by <a class="reference internal" href="#module-beartype" title="beartype"><code class="xref py py-mod docutils literal notranslate"><span class="pre">beartype</span></code></a>), including:
+    
+      * <a href="#id1"><span class="problematic" id="id2">`PEP 484`_</span></a> types (i.e., instance or class declared by the stdlib
+        <code class="xref py py-mod docutils literal notranslate"><span class="pre">typing</span></code> module).
+    
+    * A <strong>PEP-noncompliant type</strong> (i.e., instance or class complying with
+      <a class="reference internal" href="#module-beartype" title="beartype"><code class="xref py py-mod docutils literal notranslate"><span class="pre">beartype</span></code></a>-specific semantics rather than a PEP), including:
+    
+      * <strong>Fully-qualified forward references</strong> (i.e., strings specified as
+        fully-qualified classnames).
+      * <strong>Tuple unions</strong> (i.e., tuples containing one or more classes
+        and/or forward references).</p></li>
+<li><p><strong>BeartypeDecorParamNameException</strong> – If the name of any parameter declared on this callable is prefixed by
+    the reserved substring <code class="docutils literal notranslate"><span class="pre">__beartype_</span></code>.</p></li>
+<li><p><strong>BeartypeDecorHintPep563Exception</strong> – If <a href="#id3"><span class="problematic" id="id4">`PEP 563`_</span></a> is active for this callable and evaluating a <strong>postponed
+    annotation</strong> (i.e., annotation whose value is a string) on this
+    callable raises an exception (e.g., due to that annotation referring to
+    local state no longer accessible from this deferred evaluation).</p></li>
+<li><p><strong>BeartypeDecorWrappeeException</strong> – If this callable is either uncallable or a class.</p></li>
+<li><p><strong>. _PEP 484:</strong> – <a class="reference external" href="https://www.python.org/dev/peps/pep-0484">https://www.python.org/dev/peps/pep-0484</a></p></li>
+<li><p><strong>. _PEP 563:</strong> – <a class="reference external" href="https://www.python.org/dev/peps/pep-0563">https://www.python.org/dev/peps/pep-0563</a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">beartype</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Package</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="changes.html" title="previous chapter">Changes</a></li>
+      <li>Next: <a href="tutorial.html" title="next chapter">Tutorial</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014-2021 Cecil Curry.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/reference.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

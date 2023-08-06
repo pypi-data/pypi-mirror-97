@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>beartype._decor.main &#8212; beartype 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for beartype._decor.main</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># --------------------( LICENSE                           )--------------------</span>
+<span class="c1"># Copyright (c) 2014-2021 Cecil Curry.</span>
+<span class="c1"># See &quot;LICENSE&quot; for further details.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">**Beartype decorator.**</span>
+
+<span class="sd">This private submodule implements the core :func:`beartype` decorator as well</span>
+<span class="sd">as ancillary functions called by that decorator. The :mod:`beartype.__init__`</span>
+<span class="sd">submodule then imports the former for importation as the public</span>
+<span class="sd">:mod:`beartype.beartype` decorator by downstream callers -- completing the</span>
+<span class="sd">virtuous cycle of code life.</span>
+
+<span class="sd">This private submodule is *not* intended for importation by downstream callers.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ....................{ TODO                              }....................</span>
+<span class="c1">#FIXME: [FEATURE] Define the following supplementary decorators:</span>
+<span class="c1">#* @beartype.beartype_O1(), identical to the current @beartype.beartype()</span>
+<span class="c1">#  decorator but provided for disambiguity. This decorator only type-checks</span>
+<span class="c1">#  exactly one item from each container for each call rather than all items.</span>
+<span class="c1">#* @beartype.beartype_Ologn(), type-checking log(n) random items from each</span>
+<span class="c1">#  container of &quot;n&quot; items for each call.</span>
+<span class="c1">#* @beartype.beartype_On(), type-checking all items from each container for</span>
+<span class="c1">#  each call. We have various ideas littered about GitHub on how to optimize</span>
+<span class="c1">#  this for various conditions, but this is never going to be ideal and should</span>
+<span class="c1">#  thus never be the default.</span>
+<span class="c1">#</span>
+<span class="c1">#To differentiate between these three strategies, consider:</span>
+<span class="c1">#* Declare an enumeration in &quot;beartype._decor._data&quot; resembling:</span>
+<span class="c1">#    from enum import Enum</span>
+<span class="c1">#    BeartypeStrategyKind = Enum(&#39;BeartypeStrategyKind (&#39;O1&#39;, &#39;Ologn&#39;, &#39;On&#39;,))</span>
+<span class="c1">#* Define a new &quot;BeartypeData.strategy_kind&quot; instance variable.</span>
+<span class="c1">#* Set this variable to the corresponding &quot;BeartypeStrategyKind&quot; enumeration</span>
+<span class="c1">#  member based on which of the three decorators listed above was called.</span>
+<span class="c1">#* Explicitly pass the value of the &quot;BeartypeData.strategy_kind&quot; instance</span>
+<span class="c1">#  variable to the beartype._decor._code._pep._pephint.pep_code_check_hint()</span>
+<span class="c1">#  function as a new memoized &quot;strategy_kind&quot; parameter.</span>
+<span class="c1">#* Conditionally generate type-checking code throughout that function depending</span>
+<span class="c1">#  on the value of that parameter.</span>
+
+<span class="c1">#FIXME: Ensure that *ALL* calls to memoized callables throughout the codebase</span>
+<span class="c1">#are called with purely positional rather than keyword arguments. Currently, we</span>
+<span class="c1">#suspect the inverse is the case. To do so, we&#39;ll probably want to augment the</span>
+<span class="c1">#wrapper closure returned by the @callable_cached decorator to emit non-fatal</span>
+<span class="c1">#warnings when called with non-empty keyword arguments.</span>
+<span class="c1">#</span>
+<span class="c1">#Alternately, we might simply want to prohibit keyword arguments altogether by</span>
+<span class="c1">#defining a new @callable_cached_positional decorator restricted to positional</span>
+<span class="c1">#arguments. Right... That probably makes more sense. Make it so, ensign!</span>
+<span class="c1">#</span>
+<span class="c1">#Then, for generality:</span>
+<span class="c1">#</span>
+<span class="c1">#* Preserve the existing @callable_cached decorator as is. We won&#39;t be using</span>
+<span class="c1">#  it, but there&#39;s little sense in destroying something beautiful.</span>
+<span class="c1">#* Globally replace all existing &quot;@callable_cached&quot; substrings with</span>
+<span class="c1">#  &quot;@callable_cached_positional&quot;. Voila!</span>
+
+<span class="c1">#FIXME: *CRITICAL EDGE CASE:* If the passed &quot;func&quot; is a coroutine, that</span>
+<span class="c1">#coroutine *MUST* be called preceded by the &quot;await&quot; keyword rather than merely</span>
+<span class="c1">#called as is. Detecting coroutines is trivial, thankfully: e.g.,</span>
+<span class="c1">#</span>
+<span class="c1">#    if inspect.iscoroutinefunction(func):</span>
+<span class="c1">#</span>
+<span class="c1">#Actually, shouldn&#39;t that be the more general-purpose test:</span>
+<span class="c1">#</span>
+<span class="c1">#    if inspect.isawaitable(func):</span>
+<span class="c1">#</span>
+<span class="c1">#The latter seems more correct. In any case, given that:</span>
+<span class="c1">#</span>
+<span class="c1">#* Modify the &quot;CODE_CALL_CHECKED&quot; and &quot;CODE_CALL_UNCHECKED&quot; snippets to</span>
+<span class="c1">#  conditionally precede the function call with the substring &quot;await &quot;: e.g.,</span>
+<span class="c1">#      CODE_CALL_UNCHECKED = &#39;&#39;&#39;</span>
+<span class="c1">#          return {func_await}__beartype_func(*args, **kwargs)</span>
+<span class="c1">#      &#39;&#39;&#39;</span>
+<span class="c1">#  Note the absence of delimiting space. This is, of course, intentional.</span>
+<span class="c1">#* Unconditionally format the &quot;func_await&quot; substring into both of those</span>
+<span class="c1">#  snippets, define ala:</span>
+<span class="c1">#      format_await = &#39;await &#39; if inspect.iscoroutinefunction(func) else &#39;&#39;</span>
+<span class="c1">#* Oh, and note that our defined wrapper function must also be preceded by the</span>
+<span class="c1">#  &quot;async &quot; keyword. So, we&#39;ll also need to augment &quot;CODE_SIGNATURE&quot;.</span>
+<span class="c1">#FIXME: As a counterargument to the above approach, note this commentary I</span>
+<span class="c1">#stumbled across while researching an entirely separate topic:</span>
+<span class="c1">#    &quot;...trying to automatically detect whether a function is sync or async</span>
+<span class="c1">#    it’s almost always a bad idea, because it’s very difficult to do reliably.</span>
+<span class="c1">#    Instead it’s almost always better to make the user say explicitly which</span>
+<span class="c1">#    one they mean, for example by having two versions of a decorator and</span>
+<span class="c1">#    telling the user to use @mydecorator_sync on sync functions and</span>
+<span class="c1">#    @mydecorator_async on async functions.&quot;</span>
+<span class="c1">#Is this actually the case? Clearly, we&#39;ll need to research just how</span>
+<span class="c1">#deterministic the inspect.isawaitable() tester is. Does that tester fall down</span>
+<span class="c1">#(i.e., return false negatives or positives) in well-known edge cases?</span>
+<span class="c1">#FIXME: Unit test this extensively, please.</span>
+
+<span class="c1">#FIXME: Non-critical optimization: if the active Python interpreter is already</span>
+<span class="c1">#performing static type checking (e.g., with Pyre or mypy), @beartype should</span>
+<span class="c1">#unconditionally reduce to a noop for the current process. Note that:</span>
+<span class="c1">#</span>
+<span class="c1">#* Detecting static type checking is trivial, as PEP 563 standardizes the newly</span>
+<span class="c1">#  declared &quot;typing.TYPE_CHECKING&quot; boolean constant to be true only if static</span>
+<span class="c1">#  type checking is currently occurring. Note that @beartype supports this now.</span>
+<span class="c1">#* Detecting whether static type checking just occurred is clearly less</span>
+<span class="c1">#  trivial and possibly even infeasible. We&#39;re unclear what exactly separates</span>
+<span class="c1">#  the &quot;static type checking&quot; phase from the runtime phase performed by static</span>
+<span class="c1">#  type checkers, but something clearly does. If all else fails, we can</span>
+<span class="c1">#  probably attempt to detect whether the basename of the command invoked by</span>
+<span class="c1">#  the parent process matches &quot;(Pyre|mypy|pyright|pytype)&quot; or... something. Of</span>
+<span class="c1">#  course, that itself is non-trivial due to Windows, so here we are. *sigh*</span>
+
+<span class="c1">#FIXME: Emit one non-fatal warning for each annotated type that is either:</span>
+<span class="c1">#</span>
+<span class="c1">#* &quot;beartype.cave.UnavailableType&quot;.</span>
+<span class="c1">#* &quot;beartype.cave.UnavailableTypes&quot;.</span>
+<span class="c1">#</span>
+<span class="c1">#Both cases imply user-side misconfiguration, but not sufficiently awful enough</span>
+<span class="c1">#to warrant fatal exceptions. Moreover, emitting warnings rather than</span>
+<span class="c1">#exceptions enables end users to unconditionally disable all unwanted warnings,</span>
+<span class="c1">#whereas no such facilities exist for unwanted exceptions.</span>
+<span class="c1">#FIXME: Validate all tuple annotations to be non-empty *EXCLUDING*</span>
+<span class="c1">#&quot;beartype.cave.UnavailableTypes&quot;, which is intentionally empty.</span>
+<span class="c1">#FIXME: Unit test the above edge case.</span>
+
+<span class="c1">#FIXME: Add support for all possible kinds of parameters. @beartype currently</span>
+<span class="c1">#supports most but *NOT* all types. Specifically:</span>
+<span class="c1">#</span>
+<span class="c1">#* Type-check variadic keyword arguments. Currently, only variadic positional</span>
+<span class="c1">#  arguments are type-checked. When doing so, remove the</span>
+<span class="c1">#  &quot;Parameter.VAR_KEYWORD&quot; type from the &quot;_PARAM_KIND_IGNORABLE&quot; set.</span>
+<span class="c1">#* Type-check positional-only arguments under Python &gt;= 3.8. Note that, since</span>
+<span class="c1">#  C-based callables have *ALWAYS* supported positional-only arguments, the</span>
+<span class="c1">#  &quot;Parameter.POSITIONAL_ONLY&quot; type is defined for *ALL* Python versions</span>
+<span class="c1">#  despite only being usable in actual Python from Python &gt;= 3.8. In other</span>
+<span class="c1">#  words, support for type-checking positional-only arguments should be added</span>
+<span class="c1">#  unconditionally without reference to Python version -- we suspect, anyway.</span>
+<span class="c1">#  When doing so, remove the &quot;Parameter.POSITIONAL_ONLY&quot; type from the</span>
+<span class="c1">#  &quot;_PARAM_KIND_IGNORABLE&quot; set.</span>
+<span class="c1">#* Remove the &quot;_PARAM_KIND_IGNORABLE&quot; set entirely.</span>
+
+<span class="c1"># ....................{ IMPORTS                           }....................</span>
+<span class="kn">import</span> <span class="nn">functools</span><span class="o">,</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">beartype.roar</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BeartypeDecorWrappeeException</span><span class="p">,</span>
+    <span class="n">BeartypeDecorWrapperException</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">beartype._decor._code.codemain</span> <span class="kn">import</span> <span class="n">generate_code</span>
+<span class="kn">from</span> <span class="nn">beartype._decor._code.codesnip</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PARAM_NAME_FUNC</span><span class="p">,</span> <span class="n">PARAM_NAME_TYPISTRY</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">beartype._decor._data</span> <span class="kn">import</span> <span class="n">BeartypeData</span>
+<span class="kn">from</span> <span class="nn">beartype._decor._typistry</span> <span class="kn">import</span> <span class="n">bear_typistry</span>
+<span class="kn">from</span> <span class="nn">beartype._util.cache.pool.utilcachepoolobjecttyped</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">acquire_object_typed</span><span class="p">,</span> <span class="n">release_object_typed</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">beartype._decor._code._pep._error.peperror</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">raise_pep_call_exception</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">beartype._util.text.utiltextmunge</span> <span class="kn">import</span> <span class="n">number_lines</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="c1"># from beartype._util.utilobject import get_object_name</span>
+<span class="c1"># from types import FunctionType</span>
+
+<span class="c1"># See the &quot;beartype.__init__&quot; submodule for further commentary.</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;STAR_IMPORTS_CONSIDERED_HARMFUL&#39;</span><span class="p">]</span>
+
+<span class="c1"># ....................{ CONSTANTS                         }....................</span>
+<span class="n">_GLOBAL_ATTRS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;__beartype_getrandbits&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">,</span>
+    <span class="s1">&#39;__beartype_raise_pep_call_exception&#39;</span><span class="p">:</span> <span class="n">raise_pep_call_exception</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Dictionary mapping from the name to value of all attributes internally</span>
+<span class="sd">accessed as globals (rather than as locals externally passed as private default</span>
+<span class="sd">parameters) in wrapping functions created and returned by the :func:`beartype`</span>
+<span class="sd">decorator.</span>
+
+<span class="sd">The names of these attributes are embedded in one or more string global</span>
+<span class="sd">constants declared by one or more snippet submodules (e.g.,</span>
+<span class="sd">:mod:`beartype._decor._code.codesnip`). To avoid colliding with the names of</span>
+<span class="sd">arbitrary caller-defined parameters, these names *must* be aliased under</span>
+<span class="sd">alternate names prefixed by ``__beartype_``.</span>
+
+<span class="sd">Caveats</span>
+<span class="sd">----------</span>
+<span class="sd">**Attributes frequently accessed in the body of these functions should instead</span>
+<span class="sd">be externally passed as default parameters into these functions.** This</span>
+<span class="sd">includes the frequently accessed ``__beartypistry`` local, which is thus passed</span>
+<span class="sd">as a private default parameter to the signatures of these functions.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># ....................{ DECORATORS                        }....................</span>
+<span class="k">def</span> <span class="nf">beartype</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Decorate the passed **callable** (e.g., function, method) to validate both</span>
+<span class="sd">    all annotated parameters passed to this callable *and* the annotated value</span>
+<span class="sd">    returned by this callable if any.</span>
+
+<span class="sd">    This decorator performs rudimentary type checking based on Python 3.x</span>
+<span class="sd">    function annotations, as officially documented by PEP 484 (&quot;Type Hints&quot;).</span>
+<span class="sd">    While PEP 484 supports arbitrarily complex type composition, this decorator</span>
+<span class="sd">    requires *all* parameter and return value annotations to be either:</span>
+
+<span class="sd">    * Classes (e.g., :class:`int`, :class:`OrderedDict`).</span>
+<span class="sd">    * Tuples of classes (e.g., ``(int, OrderedDict)``).</span>
+
+<span class="sd">    If optimizations are enabled by the active Python interpreter (e.g., due to</span>
+<span class="sd">    option ``-O`` passed to this interpreter), this decorator reduces to a</span>
+<span class="sd">    noop.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : CallableTypes</span>
+<span class="sd">        **Non-class callable** (i.e., callable object that is *not* a class) to</span>
+<span class="sd">        be decorated by a dynamically generated new callable wrapping this</span>
+<span class="sd">        original callable with pure-Python type-checking.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    CallableTypes</span>
+<span class="sd">        Dynamically generated new callable wrapping this original callable with</span>
+<span class="sd">        pure-Python type-checking.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ----------</span>
+<span class="sd">    BeartypeDecorHintException</span>
+<span class="sd">        If any annotation on this callable is neither:</span>
+
+<span class="sd">        * A **PEP-compliant type** (i.e., instance or class complying with a</span>
+<span class="sd">          PEP supported by :mod:`beartype`), including:</span>
+
+<span class="sd">          * `PEP 484`_ types (i.e., instance or class declared by the stdlib</span>
+<span class="sd">            :mod:`typing` module).</span>
+
+<span class="sd">        * A **PEP-noncompliant type** (i.e., instance or class complying with</span>
+<span class="sd">          :mod:`beartype`-specific semantics rather than a PEP), including:</span>
+
+<span class="sd">          * **Fully-qualified forward references** (i.e., strings specified as</span>
+<span class="sd">            fully-qualified classnames).</span>
+<span class="sd">          * **Tuple unions** (i.e., tuples containing one or more classes</span>
+<span class="sd">            and/or forward references).</span>
+<span class="sd">    BeartypeDecorParamNameException</span>
+<span class="sd">        If the name of any parameter declared on this callable is prefixed by</span>
+<span class="sd">        the reserved substring ``__beartype_``.</span>
+<span class="sd">    BeartypeDecorHintPep563Exception</span>
+<span class="sd">        If `PEP 563`_ is active for this callable and evaluating a **postponed</span>
+<span class="sd">        annotation** (i.e., annotation whose value is a string) on this</span>
+<span class="sd">        callable raises an exception (e.g., due to that annotation referring to</span>
+<span class="sd">        local state no longer accessible from this deferred evaluation).</span>
+<span class="sd">    BeartypeDecorWrappeeException</span>
+<span class="sd">        If this callable is either uncallable or a class.</span>
+
+<span class="sd">    .. _PEP 484:</span>
+<span class="sd">       https://www.python.org/dev/peps/pep-0484</span>
+<span class="sd">    .. _PEP 563:</span>
+<span class="sd">       https://www.python.org/dev/peps/pep-0563</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Validate the type of the decorated object *BEFORE* performing any work</span>
+    <span class="c1"># assuming this object to define attributes (e.g., &quot;func.__name__&quot;).</span>
+    <span class="c1">#</span>
+    <span class="c1"># If this object is uncallable, raise an exception.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BeartypeDecorWrappeeException</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="si">}</span><span class="s1"> uncallable.&#39;</span><span class="p">)</span>
+    <span class="c1"># Else if this object is a class, raise an exception.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BeartypeDecorWrappeeException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="si">}</span><span class="s1"> unsupported, &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;as classes currently unsupported by @beartype.&#39;</span>
+        <span class="p">)</span>
+    <span class="c1"># Else, this object is a non-class callable. Let&#39;s do this, folks.</span>
+
+    <span class="c1"># If either...</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="c1"># This callable is unannotated *OR*...</span>
+        <span class="ow">not</span> <span class="n">func</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="ow">or</span>
+        <span class="c1"># This callable is decorated by the @typing.no_type_check decorator</span>
+        <span class="c1"># defining this dunder instance variable on this callable *OR*...</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__no_type_check__&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span>
+        <span class="c1"># This callable is a @beartype-specific wrapper previously generated by</span>
+        <span class="c1"># this decorator...</span>
+        <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__beartype_wrapper&#39;</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="c1"># Efficiently reduce to a noop (i.e., the identity decorator) by</span>
+        <span class="c1"># returning this callable as is.</span>
+        <span class="k">return</span> <span class="n">func</span>
+
+    <span class="c1">#FIXME: Optimize by caching and reusing previously cached &quot;BeartypeData&quot;</span>
+    <span class="c1">#instances across @beartype decorations. To do so:</span>
+    <span class="c1">#</span>
+    <span class="c1">#* Define a new &quot;beartype._util.cache.utilcachepoolobj&quot; submodule copied</span>
+    <span class="c1">#  from the existing &quot;beartype._util.cache.list.utilfixedlistpool&quot;</span>
+    <span class="c1">#  submodule. &quot;utilcachepoolobj&quot; should publish a similar API, except:</span>
+    <span class="c1">#  * Keys should be arbitrary classes rather than integers.</span>
+    <span class="c1">#  * Pool items should be arbitrary objects of those classes rather than</span>
+    <span class="c1">#    fixed lists.</span>
+    <span class="c1">#* Define a new BeartypeData.init() method resembling the existing</span>
+    <span class="c1">#  BeartypeData.__init__() dunder method.</span>
+    <span class="c1">#* Call (in order):</span>
+    <span class="c1">#  func_data = utilcachepoolobj.acquire_object(BeartypeData)</span>
+    <span class="c1">#  func_data.init(func)</span>
+
+    <span class="c1"># Previously cached callable metadata reinitialized from this callable.</span>
+    <span class="n">func_data</span> <span class="o">=</span> <span class="n">acquire_object_typed</span><span class="p">(</span><span class="n">BeartypeData</span><span class="p">)</span>
+    <span class="n">func_data</span><span class="o">.</span><span class="n">reinit</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+    <span class="c1"># Generate the raw string of Python statements implementing this wrapper.</span>
+    <span class="n">func_code</span><span class="p">,</span> <span class="n">is_func_code_noop</span> <span class="o">=</span> <span class="n">generate_code</span><span class="p">(</span><span class="n">func_data</span><span class="p">)</span>
+
+    <span class="c1"># If this wrapper proxies this callable *WITHOUT* type-checking,</span>
+    <span class="c1"># efficiently reduce to a noop (i.e., the identity decorator) by returning</span>
+    <span class="c1"># this callable as is.</span>
+    <span class="k">if</span> <span class="n">is_func_code_noop</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">func</span>
+
+    <span class="c1"># Dictionary mapping from local attribute names to values passed to the</span>
+    <span class="c1"># module-scoped outermost definition (but *NOT* the actual body) of this</span>
+    <span class="c1"># wrapper. Note that:</span>
+    <span class="c1">#</span>
+    <span class="c1"># * For efficiency, only attributes specific to the body of this wrapper</span>
+    <span class="c1">#   are copied from the current namespace. Attributes generically</span>
+    <span class="c1">#   applicable to the body of all wrappers are instead implicitly imported</span>
+    <span class="c1">#   from this submodule by passing &quot;_GLOBAL_ATTRS&quot; below.</span>
+    <span class="c1"># * For each attribute specified here, one new keyword parameter of the</span>
+    <span class="c1">#   form &quot;{local_attr_key_name}={local_attr_key_name}&quot; *MUST* be added to</span>
+    <span class="c1">#   the signature for this wrapper defined by the &quot;CODE_SIGNATURE&quot; string.</span>
+    <span class="c1">#</span>
+    <span class="c1"># For the above reasons, the *ONLY* attribute that should be passed is the</span>
+    <span class="c1"># wrapper-specific &quot;__beartype_func&quot; attribute.</span>
+    <span class="n">local_attrs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">PARAM_NAME_FUNC</span><span class="p">:</span> <span class="n">func</span><span class="p">,</span>
+        <span class="n">PARAM_NAME_TYPISTRY</span><span class="p">:</span> <span class="n">bear_typistry</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Fully-qualified name of this undecorated callable to be decorated.</span>
+    <span class="c1"># func_name_qualified = get_object_name(func)</span>
+
+    <span class="c1">#FIXME: Once this is working, use the commented code example starting with</span>
+    <span class="c1">#&quot;func_code_compiled = compile&quot; given below to associate this filename with</span>
+    <span class="c1">#this wrapper function.</span>
+    <span class="c1">#FIXME: Unit test this to externally be the case for function wrappers</span>
+    <span class="c1">#generated by @beartype, please.</span>
+
+    <span class="c1"># Fake filename of the in-memory fake module file masquerading as declaring</span>
+    <span class="c1"># this wrapper function. This filename guarantees the uniqueness of the</span>
+    <span class="c1"># 3-tuple ``({func_filename}, {func_file_line_number}, {func_name})``</span>
+    <span class="c1"># containing this filenames commonly leveraged by profilers (e.g.,</span>
+    <span class="c1"># &quot;cProfile&quot;) to identify arbitrary callables, where:</span>
+    <span class="c1"># * `{func_filename}` is this filename (e.g.,</span>
+    <span class="c1">#   `&quot;&lt;/home/leycec/py/betse/betse/lib/libs.py:beartype({func_name})&gt;&quot;`).</span>
+    <span class="c1"># * `{func_file_line_number}`, is *ALWAYS* 0 and thus *NEVER* unique.</span>
+    <span class="c1"># * `{func_name}`, is identical to that of the decorated callable and also</span>
+    <span class="c1">#   thus *NEVER* unique.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Ergo, uniquifying this filename is the *ONLY* means of uniquifying</span>
+    <span class="c1"># metadata identifying this wrapper function via runtime inspection.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note this filename is intentionally *NOT* prefixed and suffixed by the</span>
+    <span class="c1"># &quot;&lt;&quot; and &quot;&gt;&quot; delimiters. Why? Because the stdlib linecache.lazycache()</span>
+    <span class="c1"># function called below explicitly ignores filenames matching that</span>
+    <span class="c1"># syntactic format, presumably due to the standard fake module filename</span>
+    <span class="c1"># &quot;&lt;string&gt;&quot; applied by default to Python code dynamically generated by</span>
+    <span class="c1"># the eval() and exec() builtins. Since Python occasionally emits in-memory</span>
+    <span class="c1"># fake filenames resembling &quot;memory:0x7f2ea8589810&quot;, we adopt a similar</span>
+    <span class="c1"># syntax here to generate beartype-specific fake module filenames.</span>
+    <span class="c1"># func_wrapper_filename = f&#39;beartype_wrapper:{func_name_qualified}&#39;</span>
+
+    <span class="c1">#FIXME: Actually, we absolutely *DO* want to leverage the example</span>
+    <span class="c1">#documented below of leveraging the compile() builtin. We want to do so</span>
+    <span class="c1">#explicitly to pass something other than &quot;&lt;string&gt;&quot; here -- ideally,</span>
+    <span class="c1">#&quot;func.__code__.co_filename&quot;, ensuring that this wrapper function</span>
+    <span class="c1">#shares the same absolute filename as that of the original function.</span>
+    <span class="c1">#Note that a similar example (also leveraging the exec() builtin, which</span>
+    <span class="c1">#frankly seems excessive) is also given by:</span>
+    <span class="c1">#    https://stackoverflow.com/a/42478041/2809027</span>
+    <span class="c1">#</span>
+    <span class="c1">#Failure to do so reduces tracebacks induced by exceptions raised by</span>
+    <span class="c1">#this wrapper to non-human-readability, which is less than ideal: e.g.,</span>
+    <span class="c1">#</span>
+    <span class="c1">#    ModuleNotFoundError: No module named &#39;betsee.util.widget.abc.guiwdgabc&#39;</span>
+    <span class="c1">#</span>
+    <span class="c1">#    Traceback (most recent call last):</span>
+    <span class="c1">#      File &quot;/home/leycec/py/betsee/betsee/gui/simconf/stack/widget/mixin/guisimconfwdgeditscalar.py&quot;, line 313, in _set_alias_to_widget_value_if_sim_conf_open</span>
+    <span class="c1">#        widget=self, value_old=self._widget_value_last)</span>
+    <span class="c1">#      File &quot;&lt;string&gt;&quot;, line 25, in func_beartyped</span>
+    <span class="c1">#      File &quot;/home/leycec/py/betsee/betsee/gui/simconf/stack/widget/mixin/guisimconfwdgeditscalar.py&quot;, line 409, in __init__</span>
+    <span class="c1">#        *args, widget=widget, synopsis=widget.undo_synopsis, **kwargs)</span>
+    <span class="c1">#      File &quot;&lt;string&gt;&quot;, line 13, in func_beartyped</span>
+    <span class="c1">#</span>
+    <span class="c1">#Note the final traceback line, which is effectively useless.</span>
+    <span class="c1">#FIXME: Note that the existing third-party &quot;makefun&quot; package replacing the</span>
+    <span class="c1">#stdlib @functools.wraps() decorator is probably the optimal solution for</span>
+    <span class="c1">#preserving metadata on the original callable into our wrapper callable.</span>
+    <span class="c1">#While we absolutely should *NOT* depend on that or any other third-party</span>
+    <span class="c1">#package, that package&#39;s implementation should lend us useful insight.</span>
+    <span class="c1">#Indeed, see the _make() function of the &quot;makefun.main&quot; submodule:</span>
+    <span class="c1">#    https://github.com/smarie/python-makefun/blob/master/makefun/main.py</span>
+
+    <span class="c1"># Attempt to define this wrapper as a closure of this decorator. For</span>
+    <span class="c1"># obscure and presumably uninteresting reasons, Python fails to locally</span>
+    <span class="c1"># declare this closure when the locals() dictionary is passed; to capture</span>
+    <span class="c1"># this closure, a local dictionary must be passed instead.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note that the same result may also be achieved via the compile() builtin</span>
+    <span class="c1"># and &quot;types.FunctionType&quot; class: e.g.,</span>
+    <span class="c1">#</span>
+    <span class="c1">#     func_code_compiled = compile(</span>
+    <span class="c1">#         func_code, &quot;&lt;string&gt;&quot;, &quot;exec&quot;).co_consts[0]</span>
+    <span class="c1">#     return types.FunctionType(</span>
+    <span class="c1">#         code=func_code_compiled,</span>
+    <span class="c1">#         globals=_GLOBAL_ATTRS,</span>
+    <span class="c1">#         argdefs=(&#39;__beartype_func&#39;, func)</span>
+    <span class="c1">#     )</span>
+    <span class="c1">#</span>
+    <span class="c1"># Since doing so is both more verbose and obfuscatory for no tangible gain,</span>
+    <span class="c1"># the current circumspect approach is preferred.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># print(&#39;\n@beartyped {} wrapper:\n\n{}\n&#39;.format(func_data.func_name, func_code))</span>
+        <span class="c1"># print(&#39;\n@beartyped {} wrapper:\n\n{}\n&#39;.format(func_data.func_name, number_lines(func_code)))</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">func_code</span><span class="p">,</span> <span class="n">_GLOBAL_ATTRS</span><span class="p">,</span> <span class="n">local_attrs</span><span class="p">)</span>
+
+        <span class="c1">#FIXME: See above.</span>
+        <span class="c1">#FIXME: Should &quot;exec&quot; be &quot;single&quot; instead? Does it matter? Is there any</span>
+        <span class="c1">#performance gap between the two?</span>
+        <span class="c1"># func_code_compiled = compile(</span>
+        <span class="c1">#     func_code, func_wrapper_filename, &quot;exec&quot;).co_consts[0]</span>
+        <span class="c1"># return FunctionType(</span>
+        <span class="c1">#     code=func_code_compiled,</span>
+        <span class="c1">#     globals=_GLOBAL_ATTRS,</span>
+        <span class="c1">#</span>
+        <span class="c1">#     #FIXME: This really doesn&#39;t seem right, but... *shrug*</span>
+        <span class="c1">#     argdefs=tuple(local_attrs.values()),</span>
+        <span class="c1"># )</span>
+    <span class="c1"># If doing so fails for any reason, raise an exception suffixed by</span>
+    <span class="c1"># debuggable wrapper code such that each line of this code is prefixed by</span>
+    <span class="c1"># that line&#39;s number, rendering &quot;SyntaxError&quot; exceptions referencing</span>
+    <span class="c1"># arbitrary line numbers human-readable: e.g.,</span>
+    <span class="c1">#       File &quot;&lt;string&gt;&quot;, line 56</span>
+    <span class="c1">#         if not (</span>
+    <span class="c1">#          ^</span>
+    <span class="c1">#     SyntaxError: invalid syntax</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BeartypeDecorWrapperException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;@beartyped </span><span class="si">{</span><span class="n">func_data</span><span class="o">.</span><span class="n">func_name</span><span class="si">}</span><span class="s1"> wrapper unparseable:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">number_lines</span><span class="p">(</span><span class="n">func_code</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">exception</span>
+
+    <span class="c1"># This wrapper.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note that, as the above logic successfully compiled this wrapper, this</span>
+    <span class="c1"># dictionary is guaranteed to contain a key with this wrapper&#39;s name whose</span>
+    <span class="c1"># value is this wrapper. Ergo, no additional validation of the existence of</span>
+    <span class="c1"># this key or type of this wrapper is needed.</span>
+    <span class="n">func_wrapper</span> <span class="o">=</span> <span class="n">local_attrs</span><span class="p">[</span><span class="n">func_data</span><span class="o">.</span><span class="n">func_wrapper_name</span><span class="p">]</span>
+
+    <span class="c1"># Declare this wrapper to be generated by @beartype, which tests for the</span>
+    <span class="c1"># existence of this attribute above to avoid re-decorating callables</span>
+    <span class="c1"># already decorated by @beartype by efficiently reducing to a noop.</span>
+    <span class="n">func_wrapper</span><span class="o">.</span><span class="n">__beartype_wrapper</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Propagate identifying metadata (stored as special attributes) from the</span>
+    <span class="c1"># original function to this wrapper for debuggability, including:</span>
+    <span class="c1">#</span>
+    <span class="c1"># * &quot;__name__&quot;, the unqualified name of this function.</span>
+    <span class="c1"># * &quot;__doc__&quot;, the docstring of this function (if any).</span>
+    <span class="c1"># * &quot;__module__&quot;, the fully-qualified name of this function&#39;s module.</span>
+    <span class="n">functools</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="n">wrapper</span><span class="o">=</span><span class="n">func_wrapper</span><span class="p">,</span> <span class="n">wrapped</span><span class="o">=</span><span class="n">func</span><span class="p">)</span>
+
+    <span class="c1"># Release this callable metadata back to its object pool.</span>
+    <span class="n">release_object_typed</span><span class="p">(</span><span class="n">func_data</span><span class="p">)</span>
+
+    <span class="c1"># Return this wrapper.</span>
+    <span class="k">return</span> <span class="n">func_wrapper</span>
+
+<span class="c1"># ....................{ OPTIMIZATION                      }....................</span>
+<span class="c1"># If the active Python interpreter is either...</span>
+<span class="k">if</span> <span class="p">(</span>
+    <span class="c1"># Optimized (e.g., option &quot;-O&quot; was passed to this interpreter) *OR*...</span>
+    <span class="ow">not</span> <span class="n">__debug__</span> <span class="ow">or</span>
+    <span class="c1"># Running under an external static type checker -- in which case there is</span>
+    <span class="c1"># no benefit to attempting runtime type-checking whatsoever...</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note that this test is largely pointless. By definition, static type</span>
+    <span class="c1"># checkers should *NOT* actually run any code -- merely parse and analyze</span>
+    <span class="c1"># that code. Ergo, this boolean constant should *ALWAYS* be false from the</span>
+    <span class="c1"># runtime context under which @beartype is only ever run. Nonetheless, this</span>
+    <span class="c1"># test is only performed once per process and is thus effectively free.</span>
+    <span class="n">TYPE_CHECKING</span>
+<span class="p">):</span>
+<span class="c1"># Then unconditionally disable @beartype-based type-checking across the entire</span>
+<span class="c1"># codebase by reducing the @beartype decorator to the identity decorator.</span>
+<span class="c1"># Ideally, this would have been implemented at the top rather than bottom of</span>
+<span class="c1"># this submodule as a conditional resembling:</span>
+<span class="c1">#     if __debug__:</span>
+<span class="c1">#         def beartype(func: CallableTypes) -&gt; CallableTypes:</span>
+<span class="c1">#             return func</span>
+<span class="c1">#         return</span>
+<span class="c1">#</span>
+<span class="c1"># Tragically, Python fails to support module-scoped &quot;return&quot; statements. *sigh*</span>
+<div class="viewcode-block" id="beartype"><a class="viewcode-back" href="../../../reference.html#beartype.beartype">[docs]</a>    <span class="k">def</span> <span class="nf">beartype</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Identity decorator.</span>
+
+<span class="sd">        This decorator currently reduces to a noop, as the active Python</span>
+<span class="sd">        interpreter is optimized (e.g., option ``-O`` was passed to this</span>
+<span class="sd">        interpreter at execution time).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">func</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">beartype</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Package</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../changes.html">Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2014-2021 Cecil Curry.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
