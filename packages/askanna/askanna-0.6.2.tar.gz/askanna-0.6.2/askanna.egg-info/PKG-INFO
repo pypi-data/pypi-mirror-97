@@ -1,0 +1,194 @@
+Metadata-Version: 2.1
+Name: askanna
+Version: 0.6.2
+Summary: AskAnna CLI & Python SDK is part of the AskAnna platform to kickstart your data science projects
+Home-page: https://askanna.io
+Author: AskAnna
+Author-email: devops@askanna.io
+License: Apache License 2.0
+Project-URL: Documentation Python SDK, https://docs.askanna.io/python-sdk/
+Project-URL: Documentation CLI, https://docs.askanna.io/cli/
+Project-URL: Documentation AskAnna, https://docs.askanna.io/
+Project-URL: Release notes, https://gitlab.com/askanna/askanna-python/-/blob/master/CHANGELOG.md
+Project-URL: Issue tracker, https://gitlab.com/askanna/askanna-python/issues
+Project-URL: Source code, https://gitlab.com/askanna/askanna-python
+Description: # AskAnna CLI & Python SDK
+        
+        The AskAnna CLI offers a command-line interface to the AskAnna platform. With the Python SDK
+        you can run AskAnna functions directly from your Python script. The CLI & Python SDK
+        simplifies the communication with the AskAnna platform and provides facilities
+        for supporting every part of a data science project.
+        
+        [![PyPi](https://img.shields.io/pypi/v/askanna.svg)](https://pypi.org/project/askanna/)
+        [![License](https://img.shields.io/badge/license-Apache%202-brightgreen.svg)](https://gitlab.askanna.io/askanna/askanna-cli/-/blob/release/0.6.2/LICENSE)
+        [![Documentation](https://img.shields.io/badge/docs-latest-success.svg)](https://docs.askanna.io/)
+        [![Downloads](https://pepy.tech/badge/askanna)](https://pepy.tech/project/askanna)
+        
+        ## Documentation
+        
+        For the latest version check the
+        [AskAnna Documentation](https://docs.askanna.io/). Or open directly the documentation for:
+        
+        * [Command-line (CLI)](https://docs.askanna.io/cli/)
+        * [Python SDK](https://docs.askanna.io/python-sdk/)
+        
+        ## Quickstart
+        
+        ### Install AskAnna
+        
+        ```bash
+        pip install askanna
+        ```
+        
+        ## Update AskAnna
+        
+        ```bash
+        pip install -U askanna
+        ```
+        
+        ### Login to AskAnna
+        
+        ```bash
+        askanna login
+        ```
+        
+        This will create a `.askanna.yml` in your home folder.
+        
+        When used in a CI, one can configure authentication by setting an environment
+        variable:
+        
+        ```bash
+        export AA_REMOTE=https://beta-api.askanna.eu/v1/
+        export AA_TOKEN={{ API TOKEN }}
+        ```
+        
+        The API token can be found in the created `.askanna.yml` file or in the
+        curl information on a job run page in the AskAnna platform.
+        
+        ### How to push your code to AskAnna
+        
+        First add a `askanna.yml` file to the main directory of your project. In
+        AskAnna create a project, copy the push-target and add it to the `askanna.yml`
+        file.
+        
+        Next run `askanna push` and your code will be uploaded to the project in
+        AskAnna.
+        
+        You can also push code from a CI environment. This requires the following
+        environment variables to be set:
+        
+        ```bash
+        export AA_TOKEN={{ API TOKEN }}
+        ```
+        
+        ## Credits
+        
+        Tools used in the AskAnna package:
+        
+        * Cookiecutter: https://github.com/audreyr/cookiecutter
+        * `cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+        
+        
+        # History
+        
+        ## 0.6.2 (2020-03-08)
+        
+        - Make `askanna init` more friendly to use
+        - Refer to open source project on GitLab.com
+        - Tweak configuration and README
+        
+        ## 0.6.1 (2020-02-11)
+        
+        - Update references to the new documentation of AskAnna
+        
+        ## 0.6.0 (2020-02-03)
+        
+        - Added push-and-run via `askanna run --push` where you first push your code and then trigger a run
+        - Installed gcc in the default image we run on AskAnna
+        - Added developer option to specicy on which AskAnna remote you want to login
+        - Changes in parameter names for Python SDK (run.status and variable modules). If you used the 0.5.x version of the
+          AskAnna Python SDK this version can break your code.
+        
+        ## 0.5.1 (2020-01-27)
+        
+        - Fix that you can run a job with name and additional options
+        
+        ## 0.5.0 (2020-01-26)
+        
+        - Use `askanna run job_name` to run a job
+        - Start of AskAnna Python SDK with support for:
+          - starting a run
+          - getting the status of a run
+          - management of project variables
+          - listing jobs
+        - Refactor code base to support SDK and remove some unused functions
+        - In `askanna.yml` allow output/artifact to specify which files & directories you want to save
+        
+        ## 0.4.3 (2020-12-25)
+        
+        - `askanna create --template` will allow you to use your own template to create a new project
+        - Fix `askanna create` so it will actually create a project
+        - Update `askanna init` so it uses to same flow as `askanna create`
+        
+        ## 0.4.2 (2020-12-22)
+        
+        - Fix issue in `askanna init` which now generates a valid `askanna.yml` project config file
+        - Improvements regarding feedback and error messages when something goes wrong
+        - Fix issues regarding generating AskAnna config file
+        
+        ## 0.4.1 (2020-12-01)
+        
+        - Use Python to create a tmp directory so it works on all Python supported platforms
+        
+        ## 0.4.0 (2020-11-26)
+        
+        - Adding variable management for CLI
+        - Drop support for Python 3.5 because we use `dataclasses`
+        - Reorganisation of CLI setup in the code base to prepare for SDK development
+        - Reorganize how authentication and requests are made for all API communication
+        - Adding logout for CLI
+        
+        ## 0.3.1 (2020-10-23)
+        
+        - Improve artifact download to be more reliable in case of download failures
+        
+        ## 0.3.0 (2020-07-31)
+        
+        - Changed `askanna artifact` to `askanna artifact add`
+        - Adding `askanna artifact get`
+        - Adding `askanna variable list` to get a list of variables in askanna
+        - Adding `askanna variable change` to modify the value of a variable
+        
+        ## 0.2.0 (2020-07-23)
+        
+        - A default confirm question to confirm that you want to replace the current code package
+        - Added `askanna push --force` to skip the confirm question
+        - Added an optional argument to push add a message `askanna push -m "push message"`
+        - If no push messages provided, but a commit message is available, use the last commit message
+        - Changing how .askanna.yml is created
+        - Adding AskAnna functions for running in job
+        - Adding first test to check on push-target
+        - Download payload with CLI
+        
+        
+        ## 0.1.0 (2019-12-05)
+        
+        - First commit to repo
+        - Basic function to do askanna login
+        - First version of askanna package
+        
+Keywords: askanna ml ai data
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
