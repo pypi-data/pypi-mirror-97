@@ -1,0 +1,181 @@
+# coding=utf-8
+
+"""Command line processing"""
+
+import argparse
+
+from copyxnat.commands.find_commands import find_command
+from copyxnat.commands import find_commands
+from copyxnat.api.run_command import run_command
+from copyxnat.utils.versioning import get_version_string
+from copyxnat.config.server_params import XnatServerParams
+from copyxnat.config.app_settings import AppSettings
+
+
+def run_command_line(args=None):
+    """Entry point for copyxnat application"""
+
+    command, src_params, dst_params, project_list, app_settings = \
+        _parse_command_line(args)
+
+    run_command(command=command,
+                src_params=src_params,
+                dst_params=dst_params,
+                project_filter=project_list,
+                app_settings=app_settings
+                )
+
+
+def _parse_command_line(args):
+    parser = argparse.ArgumentParser(
+        description='CopyXnat: Utility for downloading or copying projects '
+                    'between XNAT servers')
+    version_string = get_version_string()
+    friendly_version_string = version_string if version_string else 'unknown'
+
+    parser.add_argument(
+        "--version",
+        action='version',
+        version=friendly_version_string
+    )
+
+    parser.add_argument("-c", "--cache-dir",
+                        help="File path here local cache files are to be stored"
+                        )
+
+    subparsers = parser.add_subparsers(dest='command')
+    for command in find_commands.commands():
+        subparsers.add_parser(command.COMMAND_LINE, help=command.HELP)
+
+    # Arguments common to all commands
+    parser.add_argument("-y", "--dry_run",
+                        action="store_true",
+                        help="Do not modify the destination",
+                        )
+    parser.add_argument("-k", "--insecure",
+                        action="store_true",
+                        help="Do not enforce strict SSL certificate checks",
+                        )
+    parser.add_argument("-v", "--verbose",
+                        action="store_true",
+                        help="Show verbose output",
+                        )
+    parser.add_argument("-s", "--src-host", required=True,
+                        help="Host name of the XNAT server containing the data"
+                        )
+    parser.add_argument("-u", "--src-user", required=True,
+                        help="User name for accessing XNAT server containing "
+                             "the data"
+                        )
+    parser.add_argument("-i", "--rsync-src-user",
+                        default=None,
+                        help="When using rsync transfer, ssh username for "
+                             "source server (this is not the XNAT username)"
+                        )
+    parser.add_argument("-p", "--project", default=None,
+                        help="Name of project containing the data"
+                        )
+    parser.add_argument("-n", "--skip-existing",
+                        action="store_true",
+                        help="Skip session and all children if it already "
+                             "exists on the destination server",
+                        )
+    parser.add_argument("-t", "--transfer-mode",
+                        default='file',
+                        choices=['file', 'zip', 'rsync', 'meta'],
+                        help="Choose how resource files will be transferred. "
+                             "The file method is the safest and copies files"
+                             "individually and maintains their attributes."
+                             "The zip method copies each resource folder as a "
+                             "zip archive. The rsync option is a more "
+                             "experimental approach which should be used with "
+                             "caution. It requires you to have ssh keys set up "
+                             "and you must supply the account usernames. The "
+                             "meta option only copies metadata and requires you"
+                             " to have manually transferred the files over "
+                             "first."
+                        )
+    for command in find_commands.commands():
+        command_key = command.COMMAND_LINE
+        sub_parser = subparsers.choices[command_key]
+
+        if command.USE_DST_SERVER:
+            sub_parser.add_argument("-d", "--dst-host",
+                                    help="Host name of the destination XNAT "
+                                         "server"
+                                    )
+
+            sub_parser.add_argument("-w", "--dst-user",
+                                    help="User name for accessing the "
+                                         "destination XNAT server"
+                                    )
+
+            sub_parser.add_argument("-f", "--fix-scan-types",
+                                    action="store_true",
+                                    help="Fix undefined scan types on the copy",
+                                    )
+
+            sub_parser.add_argument("-j", "--rsync-dst-user",
+                                    default=None,
+                                    help="When using rsync transfer, ssh "
+                                         "username for destination server "
+                                         "(this is not the XNAT username)"
+                                    )
+
+        if command.MODIFY_DST_SERVER:
+            sub_parser.add_argument("-m", "--ignore-datatype-errors",
+                                    action="store_true",
+                                    help="Copy data to destination server even "
+                                         "if the datatype is not known"
+                                    )
+
+            sub_parser.add_argument("-o", "--overwrite-existing",
+                                    action="store_true",
+                                    help="Overwrite existing data on the"
+                                         "destination server"
+                                    )
+    args = parser.parse_args(args)
+
+    # Command class
+    command = find_command(args.command)
+
+    # Source server parameters object
+    src_rsync = args.rsync_src_user if 'rsync_src_user' in args else None
+    src_params = XnatServerParams(host=args.src_host,
+                                  user=args.src_user,
+                                  rsync_user=src_rsync,
+                                  insecure=args.insecure)
+
+    # Destination server parameters object
+    if command.USE_DST_SERVER:
+        dst_host = args.dst_host if 'dst_host' in args else None
+        dst_user = args.dst_user if 'dst_user' in args else None
+        dst_rsync = args.rsync_dst_user if 'rsync_dst_user' in args else None
+        dst_params = XnatServerParams(host=dst_host,
+                                      user=dst_user,
+                                      rsync_user=dst_rsync,
+                                      insecure=args.insecure)
+    else:
+        dst_params = None
+
+    # Project list
+    project_list = args.project.split(',') if 'project' in args and \
+                                              args.project else None
+
+    # Application settings
+    app_settings = AppSettings(
+        fix_scan_types=_optional(args, 'fix_scan_types', False),
+        ignore_datatype_errors=_optional(args, 'ignore_datatype_errors', False),
+        dry_run=args.dry_run,
+        overwrite_existing=_optional(args, 'overwrite_existing', False),
+        transfer_mode=args.transfer_mode,
+        data_dir=args.cache_dir,
+        verbose=args.verbose,
+        skip_existing=args.skip_existing
+    )
+
+    return command, src_params, dst_params, project_list, app_settings
+
+
+def _optional(args, param, default):
+    return getattr(args, param) if param in args else default
