@@ -1,0 +1,60 @@
+Metadata-Version: 2.1
+Name: Eliatopia.py
+Version: 0.1.0
+Summary: an package that works with Eliatopia\s Api Keys
+Home-page: https://github.com/Al3x/Eliatopia_Library
+Author: Al3x3y
+Author-email: kami.eliatopia@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/Al3x3y/Eliatopia_Library/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# Eliatopia_Library
+An easy made library to get data from Eliatopia's api keys.
+
+## Quick Example
+```py
+from Eliatopia_Library.elia import Eliatopia
+
+Eliatopia = Eliatopia("0.0.1") #must specify the version or else you will get a error.
+
+Eliatopia.getOnline() #this will print the amount of players that are currently in game.
+```
+
+### Example in a discord bot made in discord.
+
+```py
+import discord
+from discord.ext import commands
+from Eliatopia_Library.elia import Eliatopia
+
+bot = commands.Bot(command_prefix="prefix", description="some random stuff.")
+
+@bot.event
+	print("{}\n{}".format(bot.user, bot.user.id))
+
+@bot.command()
+async def showPlayers(ctx):
+	await Eliatopia.getOnlineDiscord(ctx) #must add ctx between the paranthesis as we're using it in discord.py
+
+bot.run(token, bot=True)
+
+#current working functions.
+
+getOnline() #displays the amount of online players
+getOnlineDiscord(ctx) #sends the amount of online players in a discord channel where the command its executed.
+getServerTime() #displays the current server time (the game's server time)
+getServerTimeDiscord(ctx) #sends the game's server time in a discord channel where the command its executed.
+getLeaderboard(player)	#displays a player's statistics in the console (must specify the player's name)
+getLeaderboardDiscord(ctx, player) #sends a player's statistics in a discord server (must specify the player's name)
+```
+
+## This library will be updated soon as those aint all the functions.
+## Hope you will enjoy! :)
+
+
