@@ -1,0 +1,97 @@
+# Default values for renku-core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+cacheDirectory: /svc/cache
+cleanupInterval: 3600
+projectCloneDepth: 1
+templateCloneDepth: 1
+
+datasetsWorkerQueues: datasets.jobs
+managementWorkerQueues: cache.cleanup.files,cache.cleanup.projects
+cleanupFilesTTL: 1800
+cleanupProjectsTTL: 1800
+logLevel: INFO
+
+# override to automatically pull LFS data on clone
+gitLFSSkipSmudge: 1
+
+# Concurrency settings for the main service:
+# the default it 4 workers with 8 threads set in the Dockerfile
+nWorkers: 4
+nThreads: 8
+
+# NOTE: Make sure token secret is greater or equal to 32 bytes.
+jwtTokenSecret: bW9menZ3cnh6cWpkcHVuZ3F5aWJycmJn
+
+image:
+  repository: renku/renku-core
+  tag: 'latest'
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+
+metrics:
+  enabled: false
+  image:
+    repository: renku/rqmetrics
+    tag: latest
+    pullPolicy: IfNotPresent
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# nodeSelector: {}
+
+# tolerations: []
+
+# affinity: {}
+
+## The renku core service deploys its own redis as a dependency. These values
+## do probably not need to be changed.
+redis:
+  nameOverride: core-redis
+
+  cluster:
+    enabled: false
+
+  usePassword: false
+
+  master:
+    persistence:
+      enabled: false
+
+  networkPolicy:
+    enabled: true
+    allowExternal: false
+
+## Add sentry configuration
+sentry:
+  dsn:
+  environment:
+
+## Enable debug mode
+## WARNING: DO NOT enable this in production as it exposes the service container. It is to be used for
+## debugging a running instance of the core service and allows accessing and modifying the running
+## code directly. See the repository README for more information.
+debug: false

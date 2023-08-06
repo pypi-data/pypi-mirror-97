@@ -1,0 +1,216 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "renku-core.fullname" . }}
+  labels:
+{{ include "renku-core.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "renku-core.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '8765'
+      labels:
+        app.kubernetes.io/name: {{ include "renku-core.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{ include "call-nested" (list . "redis" "redis.fullname") }}-client: "true"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+        - name: shared-volume
+          emptyDir: {}
+      containers:
+      {{ if .Values.metrics.enabled }}
+        - name: {{ .Chart.Name}}-rqmetrics
+          image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
+          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+          env:
+            - name: RQ_REDIS_HOST
+              value: {{ include "call-nested" (list . "redis" "redis.fullname") }}-master
+      {{ end }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{ if .Values.debug }}
+          command: ["api", "--debug"]
+          securityContext:
+            runAsGroup: 2000
+          {{ else }}
+          args: ["api"]
+          {{ end }}
+          env:
+            - name: REDIS_HOST
+              value: {{ include "call-nested" (list . "redis" "redis.fullname") }}-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DATABASE
+              value: "0"
+            - name: REDIS_PASSWORD
+              value:
+            - name: CACHE_DIR
+              value: {{ .Values.cacheDirectory }}
+            - name: PROJECT_CLONE_DEPTH_DEFAULT
+              value: {{ .Values.projectCloneDepth | quote }}
+            - name: TEMPLATE_CLONE_DEPTH_DEFAULT
+              value: {{ .Values.templateCloneDepth | quote }}
+            - name: CORE_SERVICE_PREFIX
+              value: /renku
+            - name: RENKU_SVC_SWAGGER_URL
+              value: /renku/openapi.json
+            - name: SERVICE_LOG_LEVEL
+              value: {{ .Values.logLevel }}
+            - name: SENTRY_DSN
+              value: {{ .Values.sentry.dsn }}
+            - name: SENTRY_ENV
+              value: {{ .Values.sentry.environment }}
+            - name: DEBUG_MODE
+              value: {{ .Values.debug | quote }}
+            {{ if .Values.nWorkers }}
+            - name: RENKU_SVC_NUM_WORKERS
+              value: {{ .Values.nWorkers | quote }}
+            {{ end }}
+            {{ if .Values.nThreads }}
+            - name: RENKU_SVC_NUM_THREADS
+              value: {{ .Values.nThreads | quote }}
+            {{ end }}
+            - name: GIT_LFS_SKIP_SMUDGE
+              value: {{ .Values.gitLFSSkipSmudge | quote }}
+            - name: RENKU_DOMAIN
+              value: {{ .Values.global.renku.domain }}
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.cacheDirectory }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-datasets-workers
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["worker"]
+          env:
+            - name: REDIS_HOST
+              value: {{ include "call-nested" (list . "redis" "redis.fullname") }}-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DATABASE
+              value: "0"
+            - name: REDIS_PASSWORD
+              value:
+            - name: RENKU_JWT_TOKEN_SECRET
+              value: {{ .Values.jwtTokenSecret }}
+            - name: CACHE_DIR
+              value: {{ .Values.cacheDirectory }}
+            - name: RENKU_SVC_CLEANUP_INTERVAL
+              value: {{ .Values.cleanupInterval | quote }}
+            - name: RENKU_SVC_WORKER_QUEUES
+              value: {{ .Values.datasetsWorkerQueues }}
+            - name: RENKU_SVC_CLEANUP_TTL_FILES
+              value: {{ .Values.cleanupFilesTTL | quote }}
+            - name: RENKU_SVC_CLEANUP_TTL_PROJECTS
+              value: {{ .Values.cleanupProjectsTTL | quote }}
+            - name: DEPLOYMENT_LOG_LEVEL
+              value: {{ .Values.logLevel }}
+            - name: SENTRY_DSN
+              value: {{ .Values.sentry.dsn }}
+            - name: SENTRY_ENV
+              value: {{ .Values.sentry.environment }}
+            - name: GIT_LFS_SKIP_SMUDGE
+              value: {{ .Values.gitLFSSkipSmudge | quote }}
+            - name: RENKU_DOMAIN
+              value: {{ .Values.global.renku.domain }}
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.cacheDirectory }}
+
+        - name: {{ .Chart.Name }}-management-workers
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["worker"]
+          env:
+            - name: REDIS_HOST
+              value: {{ include "call-nested" (list . "redis" "redis.fullname") }}-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DATABASE
+              value: "0"
+            - name: REDIS_PASSWORD
+              value:
+            - name: CACHE_DIR
+              value: {{ .Values.cacheDirectory }}
+            - name: RENKU_SVC_CLEANUP_INTERVAL
+              value: {{ .Values.cleanupInterval | quote }}
+            - name: RENKU_SVC_WORKER_QUEUES
+              value: {{ .Values.managementWorkerQueues }}
+            - name: RENKU_SVC_CLEANUP_TTL_FILES
+              value: {{ .Values.cleanupFilesTTL | quote }}
+            - name: RENKU_SVC_CLEANUP_TTL_PROJECTS
+              value: {{ .Values.cleanupProjectsTTL | quote }}
+            - name: DEPLOYMENT_LOG_LEVEL
+              value: {{ .Values.logLevel }}
+            - name: SENTRY_DSN
+              value: {{ .Values.sentry.dsn }}
+            - name: SENTRY_ENV
+              value: {{ .Values.sentry.environment }}
+            - name: GIT_LFS_SKIP_SMUDGE
+              value: {{ .Values.gitLFSSkipSmudge | quote }}
+            - name: RENKU_DOMAIN
+              value: {{ .Values.global.renku.domain }}
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.cacheDirectory }}
+
+        - name: {{ .Chart.Name }}-scheduler
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["scheduler"]
+          env:
+            - name: REDIS_HOST
+              value: {{ include "call-nested" (list . "redis" "redis.fullname") }}-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DATABASE
+              value: "0"
+            - name: REDIS_PASSWORD
+              value:
+            - name: CACHE_DIR
+              value: {{ .Values.cacheDirectory | quote }}
+            - name: RENKU_SVC_CLEANUP_INTERVAL
+              value: {{ .Values.cleanupInterval | quote }}
+            - name: SENTRY_DSN
+              value: {{ .Values.sentry.dsn }}
+            - name: SENTRY_ENV
+              value: {{ .Values.sentry.environment }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
