@@ -1,0 +1,97 @@
+Metadata-Version: 2.1
+Name: jiraX
+Version: 9.0.0
+Summary: Lib created based on documentaion https://docs.atlassian.com/DAC/rest/jira/6.1.html
+Home-page: https://gitlab.com/integration_seon/libs/application/jira
+Author: Paulo Sérgio dos Santos Júnior
+Author-email: paulossjunior@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Requires-Dist: jira (==3.0a2)
+Requires-Dist: factory-boy (==2.12.0)
+
+# JiraX
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jiraX_SEON&metric=alert_status)](https://sonarcloud.io/dashboard?id=jiraX_SEON)[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jiraX_SEON&metric=coverage)](https://sonarcloud.io/dashboard?id=jiraX_SEON)[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jiraX_SEON&metric=code_smells)](https://sonarcloud.io/dashboard?id=jiraX_SEON)
+
+## General Information
+* **Software**:Jira
+* **Author**:Paulo Sérgio dos Santos Júnior
+* **Author's e-mail**:paulossjunior@gmail.com
+* **Source Repository**: [https://gitlab.com/integration_seon/libs/application/jira](https://gitlab.com/integration_seon/libs/application/jira)  
+
+## Goal
+Lib created based on documentaion https://docs.atlassian.com/DAC/rest/jira/6.1.html
+
+## Documentation
+The Documentation can be found in this [link](./docs/documentation.md)
+
+## Generate documentation
+
+To create the code documentation:
+```bash
+pdoc --html --force jiraX/ --output docs
+
+```
+### Acess code documentation	
+
+To accesss the documenation, go to folder docs/jiraX and open index.html 
+
+To run documentation server: pdoc jiraX --http localhost:8000 
+
+## Instalation
+To install jiraX, run this command in your terminal:
+
+```bash
+pip install jiraX
+```
+
+## Usage
+
+```python
+from jira import JIRA
+from pprint import pprint
+from jiraX import factories as factory
+
+user = "x@x.com"
+apikey = "Apikey"
+server =  'https://xyz.atlassian.net/'
+
+project_apl = factory.ProjectFactory(user=user,apikey=apikey,server=server)
+issue_apl = factory.IssueFactory(user=user,apikey=apikey,server=server)
+comment_apl = factory.CommentFactory(user=user,apikey=apikey,server=server)
+
+projects = project_apl.find_all()
+
+for project in projects:
+    pprint ("Project Data:"+project.name)
+    issues_in_proj = project_apl.find_issue(project.key)
+    for issue in issues_in_proj:
+        pprint ("x")
+        pprint ("Project Issue:")
+        issueX = issue_apl.find_by_id(issue.id)
+        pprint (issueX.fields.summary)
+        pprint (issueX.fields.issuetype.name)
+        pprint (issueX.fields.creator.accountId)
+        pprint (issueX.fields.creator.displayName)
+        pprint (issueX.fields.creator.emailAddress)
+
+
+        comments = comment_apl.find_by_issue(issueX)
+        pprint ("Comments:")
+        for comment in comments:
+            pprint ("Comment: "+str(comment.id))
+            pprint (comment.body)
+            pprint (comment.created)
+            pprint (comment.author.displayName)
+            pprint (comment.author.emailAddress)
+```
+
+## Copyright
+This lib was PowerRight by [SEON Application Lib Generator](https://gitlab.com/mdd_seon/application)
+
+
+
