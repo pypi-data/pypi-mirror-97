@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- electronic mail template -->
+        <record model="ir.ui.view" id="template_view_tree">
+            <field name="model">electronic.mail.template</field>
+            <field name="type">tree</field>
+            <field name="name">template_tree</field>
+        </record>
+        <record model="ir.ui.view" id="template_view_form">
+            <field name="model">electronic.mail.template</field>
+            <field name="type">form</field>
+            <field name="name">template_form</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_template_form">
+            <field name="name">Templates</field>
+            <field name="res_model">electronic.mail.template</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_template_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="template_view_tree"/>
+            <field name="act_window" ref="act_template_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_template_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="template_view_form"/>
+            <field name="act_window" ref="act_template_form"/>
+        </record>
+
+        <menuitem action="act_template_form" parent="menu_email_management"
+            id="menu_email_template"/>
+        <record model="ir.ui.menu-res.group" id="menu_email_template_group_email_admin">
+            <field name="menu" ref="menu_email_template"/>
+            <field name="group" ref="group_email_admin"/>
+        </record>
+
+        <record model="ir.model.access" id="access_electronic_mail_template">
+            <field name="model" search="[('model', '=', 'electronic.mail.template')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_electronic_mail_template_admin">
+            <field name="model" search="[('model', '=', 'electronic.mail.template')]"/>
+            <field name="group" ref="group_email_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- Send Template wizard -->
+        <record model="ir.ui.view" id="send_template_start">
+            <field name="model">electronic.mail.send.template.start</field>
+            <field name="type">form</field>
+            <field name="name">send_template_start</field>
+        </record>
+  </data>
+</tryton>
