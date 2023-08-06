@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GASsMan</title>
+    </head>
+    <body>
+        <form method="POST" action="/gm/auth/keycloak">
+            <input type="hidden" name="state" value="">
+            <input type="hidden" name="session_state" value="">
+            <input type="hidden" name="code" value="">
+        </form>
+        <script lang="javascript">
+            (function() {
+                var fragment = window.location.hash.substr(1);
+                var args = fragment.split('&');
+                var form = window.document.forms[0];
+
+                for (var c = 0; c < args.length; ++c) {
+                    var t = args[c].split('=');
+
+                    form.elements[t[0]].value = t[1];
+                }
+
+                form.submit();
+            })();
+        </script>
+    </body>
+</html>
