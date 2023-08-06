@@ -1,0 +1,120 @@
+Metadata-Version: 2.1
+Name: teachmedijkstra
+Version: 0.1.0
+Summary: Demonstration of the Dijkstra algorithm for educational purposes
+Home-page: https://gitlab.com/petrikm/teachmedijkstra
+Author: Milan Petrík
+Author-email: milan.petrik@protonmail.com
+License: GPLv3
+Keywords: Graph,Finding shortest path
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Education
+Classifier: Intended Audience :: Education
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+
+teachmedijkstra
+===============
+
+This package contains an implementation of the Dijkstra's algorithm for finding
+the shortest paths in a graph and serves to educational purposes.
+
+Its main goal is to produce a LaTeX document which contains:
+
+  * description of the performing of the Dijkstra's algorithm in a for of a
+    table where each row corresponds to a vertex of the graph and each column
+    corresponds to one time step of the algorithm,
+  * shortest path tree (or shortest path covering) which is a subgraph of the
+    processed graph that contains those edges that belong the shortest paths.
+
+The main motivation to write this program was to have a tool to automatically
+generate examen tests on Dijkstra's algorithm with randomly created graphs and
+with the corresponding solutions which consist of two items described in the
+list above.
+
+
+Installation
+------------
+
+Install the package from [PyPI](https://pypi.org/) utilizing the
+[pip](https://pypi.org/project/pip/) module:
+
+    python -m pip install teachmedijkstra
+
+
+Example
+-------
+
+What follows is a simple program using the package `teachmedijkstra`.
+It defines an undirected weighted graph with six vertices, performs the
+Dijkstra's algorithm to find the shortest paths starting from the vertex "a",
+and exports the result to a LaTeX file "example.tex".
+
+```python
+    import teachmedijkstra
+
+    graph = teachmedijkstra.UndirectedGraph()
+    graph.addVertex("a", (0,2))
+    graph.addVertex("b", (1,2))
+    graph.addVertex("c", (2,2))
+    graph.addVertex("d", (0,1))
+    graph.addVertex("e", (1,1))
+    graph.addVertex("f", (2,1))
+    graph.addEdge("a", "b", 7)
+    graph.addEdge("b", "c", 8)
+    graph.addEdge("d", "e", 6)
+    graph.addEdge("e", "f", 1)
+    graph.addEdge("a", "d", 5)
+    graph.addEdge("b", "e", 2)
+    graph.addEdge("c", "f", 4)
+    graph.addEdge("a", "e", 3)
+    graph.addEdge("b", "f", 9)
+
+    dijkstra = teachmedijkstra.Dijkstra(graph, "a")
+    dijkstra.run()
+
+    dijkstra.saveToLaTeXFile("example.tex")
+```
+
+
+More Examples
+-------------
+
+For more examples see the following programs:
+
+  * [example_undirected.py](examples/example_undirected.py)
+    ... example of performing the Dijkstra's algorithm on an undirected
+    weighted graph with 9 vertices,
+  * [example_directed.py](examples/example_directed.py)
+    ... example of performing the Dijkstra's algorithm on a directed weighted
+    graph with 9 vertices,
+  * [example_random.py](examples/example_random.py)
+    ... example of creating a number of exercises on Dijkstra's algorithm with
+    randomly generated graphs.
+
+
+Documentation
+-------------
+
+The comments in the code of the program are written with respect to produce a
+nicely written documentation when using
+[pdoc3](https://pdoc3.github.io/pdoc/)
+(see also the [PyPI page of pdoc3](https://pypi.org/project/pdoc3/)).
+In order to create the HTML document with the program documentation, install
+first _pdoc3_ from [PyPI](https://pypi.org/) utilizing the
+[pip](https://pypi.org/project/pip/) module:
+
+    python -m pip install pdoc3
+
+Once installed, run this command from the root directory of the project:
+
+    pdoc3 --html teachmedijkstra
+
+A directory html/ that contains the documentation will be created.
+
+
