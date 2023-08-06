@@ -1,0 +1,44 @@
+tune:
+  - func: take_forecast.tune.nodes.sarima_find_d
+    inputs:
+      - original_time_series
+      - params:adf_threshold
+      - params:d_stop
+    outputs:
+      - tune_stationary_series
+      - tune_d
+  - func: take_forecast.tune.nodes.sarima_find_s
+    inputs:
+      - tune_stationary_series
+      - params:yungbox_threshold
+      - params:s_start
+      - params:s_stop
+    outputs:
+      - tune_s
+  - func: take_forecast.tune.nodes.sarima_find_pq_max
+    inputs:
+      - tune_stationary_series
+      - tune_s
+    outputs:
+      - tune_p_max
+      - tune_q_max
+  - func: take_forecast.tune.nodes.sarima_find_spq_max
+    inputs:
+      - original_time_series
+      - tune_s
+      - params:n_cycles
+    outputs:
+      - tune_sp_max
+      - tune_sq_max
+  - func: take_forecast.tune.nodes.sarima_find_best_hp
+    inputs:
+      - original_time_series
+      - tune_p_max
+      - tune_d
+      - tune_q_max
+      - tune_s
+      - tune_sp_max
+      - tune_sq_max
+      - params:criteria
+    outputs:
+      - tune_sarima_hp

@@ -1,0 +1,76 @@
+Metadata-Version: 2.1
+Name: take-forecast
+Version: 1.0.0
+Summary: This module performs time series forecasting using Kedro pipelines.
+Home-page: UNKNOWN
+Author: Squad XD
+Author-email: analytics.dar@take.net
+License: MIT License
+Description: # Take Forecast
+        
+        A time series forecasting library that uses Kedro pipelines.
+        
+        For performing the forecast, there are four main steps:
+        
+        - **Tune:** Analyse the time series to find seasonality, unit roots,
+          memory lags and stochastic process lags.
+          
+        - **Fit:** Fit a SARIMA model with hyperparameters obtained 
+          in the last step and input data.
+          
+        - **Predict:** Make forecast using the fitted model. 
+          Also provide upper and lower boundaries for confidence interval.
+        
+        - **Evaluate:** Assess the model quality by error metrics evaluated
+          in train and test sets.
+        
+        
+        # Installation
+        
+        Use [pip](https://pypi.org/project/take-forecast/) to install:
+        
+        ```shell script
+        pip install take-forecast
+        ```
+        
+        # Usage
+        
+        A simple example using ``take_forecast``.
+        
+        ```python
+        import numpy as np
+        import pandas as pd
+        from take_forecast import ProjectContext
+        np.random.seed(0)
+        samples = 60
+        x = 100 + 80 * np.linspace(0, 1, samples) + 20 * np.random.randn(samples)
+        y = x[:-3] + x[1:-2] + x[2:-1] + x[3:]
+        date_end = pd.Timestamp.now()
+        date_start = date_end - pd.Timedelta(len(y) - 1, 'd')
+        index = pd.date_range(date_start, date_end, freq='d')
+        ts = pd.Series(y, index)
+        context = ProjectContext()
+        results = context.run_forecast(ts)
+        ```
+        
+        The ``results`` are informed as a report in a dict with following keys:
+        
+        - *forecast*: Prediction
+        - *forecast_lower*: Lower limit
+        - *forecast_upper*: Upper limit
+        - *alpha*: Significance level
+        - *error_metrics_report*: Train and test error metrics
+        - *model*: Fitted SARIMA model
+        
+        
+        # Author
+        
+        Take Blip - Data & Analytics - Research Tribe - Squad XD
+        
+Keywords: time series,forecast
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Provides-Extra: docs
+Provides-Extra: notebook

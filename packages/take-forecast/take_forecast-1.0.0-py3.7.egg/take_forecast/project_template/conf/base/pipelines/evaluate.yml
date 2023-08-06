@@ -1,0 +1,63 @@
+evaluate:
+  - func: take_forecast.evaluate.nodes.split_train_test
+    inputs:
+      - original_time_series
+      - params:r_split
+    outputs:
+      - eval_train_true
+      - eval_test_true
+  - func: take_forecast.fit.nodes.fit_sarima
+    name: evaluate_fit_sarima
+    inputs:
+      - eval_train_true
+      - tune_sarima_hp
+    outputs:
+      - eval_train_sarima
+  - func: take_forecast.evaluate.nodes.get_last_timestamp
+    inputs:
+      - eval_test_true
+    outputs:
+      - eval_test_last_timestamp
+  - func: take_forecast.predict.nodes.predict_series
+    name: evaluate_predict_series
+    inputs:
+      - eval_train_sarima
+      - params:eval_horizon
+      - eval_test_last_timestamp
+      - params:fc_alpha
+    outputs:
+      - eval_test_pred
+      - eval_test_pred_lower
+      - eval_test_pred_upper
+  - func: take_forecast.evaluate.nodes.predict_train_series
+    inputs:
+      - eval_train_sarima
+    outputs:
+      - eval_train_pred
+  - func: take_forecast.evaluate.nodes.limit_train_series
+    inputs:
+      - eval_train_true
+      - eval_train_pred
+    outputs:
+      - eval_train_true_lim
+      - eval_train_pred_lim
+  - func: take_forecast.evaluate.nodes.evaluate_error_metrics
+    name: evaluate_error_metrics_train
+    inputs:
+      - eval_train_true_lim
+      - eval_train_pred_lim
+    outputs:
+      - eval_train_metrics
+  - func: take_forecast.evaluate.nodes.evaluate_error_metrics
+    name: evaluate_error_metrics_test
+    inputs:
+      - eval_test_true
+      - eval_test_pred
+    outputs:
+      - eval_test_metrics
+  - func: take_forecast.evaluate.nodes.report_error_metrics
+    inputs:
+      - eval_train_metrics
+      - eval_test_metrics
+    outputs:
+      - error_metrics_report
