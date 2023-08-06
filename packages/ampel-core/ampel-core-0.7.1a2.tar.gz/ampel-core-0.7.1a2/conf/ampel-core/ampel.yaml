@@ -1,0 +1,79 @@
+db:
+  prefix: AmpelTest
+
+unit:
+
+  controller:
+    - ampel.core.DefaultProcessController
+
+  admin:
+    - ampel.core.AmpelExceptionPublisher
+    - ampel.core.OpsProcessor
+    - ampel.ingest.PointT2Ingester
+    - ampel.t2.T2Processor
+    - ampel.t3.T3Processor
+    - ampel.t3.context.T3AddLastRunTime
+    - ampel.t3.context.T3AddAlertsNumber
+    - ampel.t3.select.T3StockSelector
+    - ampel.t3.select.T3FilteringStockSelector
+    - ampel.t3.load.T3SimpleDataLoader
+    - ampel.t3.load.T3LatestStateDataLoader
+    - ampel.t3.complement.T3RandIntAppender
+    - ampel.t3.complement.T3ExtJournalAppender
+    - ampel.t3.run.T3UnitRunner
+    - ampel.t3.run.T3ChannelUnitRunner
+    - ampel.t3.run.T3DynamicUnitRunner
+
+  base:
+    - ampel.demo.unit.base.DemoPointT2Unit
+    - ampel.demo.unit.base.DemoFirstPointT2Unit
+    - ampel.demo.unit.base.DemoT3Unit
+
+  aux:
+    - ampel.aux.filter.SimpleDictArrayFilter
+    - ampel.aux.filter.FlatDictArrayFilter
+    - ampel.t3.run.project.T3ChannelProjector
+    - ampel.t3.run.filter.T3AmpelBufferFilter
+
+alias:
+  t3:
+    '%TRANSIENT':
+      col: stock
+    '%STOCK':
+      col: stock
+    '%DATAPOINT':
+      col: t0
+    '%T0':
+      col: t0
+    '%COMPOUND':
+      col: t1
+    '%T1':
+      col: t1
+    '%T2RECORD':
+      col: t2
+    '%T2':
+      col: t2
+    '%LOGRECORD':
+      col: logs
+    '%LOG':
+      col: logs
+
+resource:
+
+  '%mongo': mongodb://localhost:27017
+  '%extcats': mongodb://localhost:27017
+
+process:
+  - name: DefaultT2Process
+    tier: 2
+    schedule: every(5).minutes
+    processor:
+      unit: T2Processor
+  - name: ExceptionPublisher
+    tier: null
+    schedule: every(10).minutes
+    processor:
+      unit: OpsProcessor
+      config:
+        execute:
+          unit: AmpelExceptionPublisher
