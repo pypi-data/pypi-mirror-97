@@ -1,0 +1,55 @@
+Metadata-Version: 2.1
+Name: arn
+Version: 0.1.5
+Summary: A Python library for parsing AWS ARNs
+Home-page: UNKNOWN
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: dataclasses ; python_version < "3.7"
+Provides-Extra: dev
+Requires-Dist: black (==19.3b0) ; extra == 'dev'
+Requires-Dist: flake8 (==3.7.8) ; extra == 'dev'
+Requires-Dist: invoke (==1.3.0) ; extra == 'dev'
+Requires-Dist: isort (==4.3.21) ; extra == 'dev'
+Requires-Dist: pytest (==5.2.1) ; extra == 'dev'
+Requires-Dist: pytest-cov (==2.8.1) ; extra == 'dev'
+Requires-Dist: pytest-watch (==4.2.0) ; extra == 'dev'
+Requires-Dist: twine (==2.0.0) ; extra == 'dev'
+Requires-Dist: wheel (==0.34.2) ; extra == 'dev'
+
+# arn
+
+A Python library for parsing [AWS ARNs](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
+
+## Installation
+To install, just run
+```bash
+pip install arn
+```
+or add the library to your `setup.py` / `requirements.txt`.
+
+## Usage
+Given an ARN for a particular AWS resource, parse it with the appropriate class:
+```python
+from arn.elbv2 import TargetGroupArn
+
+target_group_arn_str = "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/foo-bar/abc123"
+target_group_arn = TargetGroupArn(target_group_arn_str)
+
+# use the ARN instance's __str__ to format the ARN back into a string 
+assert str(target_group_arn) == target_group_arn_str
+
+# common attributes
+assert target_group_arn.partition == "aws"
+assert target_group_arn.service == "elasticloadbalancing"
+assert target_group_arn.region == "us-east-1"
+assert target_group_arn.account == "123456789012"
+
+# attributes specific to the type of AWS resource
+assert target_group_arn.name == "foo-bar"
+assert target_group_arn.id == "abc123"
+```
+
+
