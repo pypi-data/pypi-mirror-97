@@ -1,0 +1,1 @@
+from rnm.collect import Collect,Detail
