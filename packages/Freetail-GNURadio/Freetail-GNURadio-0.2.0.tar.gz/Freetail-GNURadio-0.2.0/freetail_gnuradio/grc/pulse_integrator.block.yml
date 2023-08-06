@@ -1,0 +1,44 @@
+id: 'pulse_integrator'
+label: 'Pulse Integrator'
+category: '[Radar and Sonar]'
+
+parameters:
+- id: coherent
+  label: 'Type'
+  dtype: enum
+  options: ['True', 'False']
+  option_labels: ['Coherent', 'Noncoherent']
+  default: 'True'
+
+- id: num_pulses
+  label: 'Number of pulses'
+  dtype: int
+  default: 10
+
+- id: samples_per_pulse
+  label: 'Samples per pulse'
+  dtype: int
+  default: 'samples_per_pulse'
+
+- id: normalize_output
+  label: 'Normalize Output Level'
+  dtype: enum
+  options: ['True', 'False']
+  default: 'True'
+
+templates:
+  imports: from freetail_gnuradio.pulse_integrator import pulse_integrator
+  make: pulse_integrator(${coherent}, ${num_pulses}, ${samples_per_pulse}, ${normalize_output})
+
+inputs:
+- domain: stream
+  dtype: complex
+
+
+outputs:
+- domain: stream
+  dtype: complex
+  multiplicity: 1
+
+file_format: 1
+
