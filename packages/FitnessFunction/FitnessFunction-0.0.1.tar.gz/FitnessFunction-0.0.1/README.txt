@@ -1,0 +1,1 @@
+This library is besicaly contains the standard fitness function code.
