@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package porerefiner.rpc;
+
+import public "google/protobuf/timestamp.proto";
+import public "google/protobuf/duration.proto";
+
+message TripleTag {
+    string namespace = 1;
+    string name = 2;
+    string value = 3;
+}
+
+
+message Run {
+    int32 id = 1;
+    string name = 2;
+    string mnemonic_name =  3;
+    string library_id = 4;
+    string status = 5;
+    string path = 6;
+    string flowcell_type = 7;
+    string flowcell_id = 8;
+    string basecalling_model = 9;
+    string sequencing_kit = 10;
+    google.protobuf.Timestamp started = 11;
+    google.protobuf.Duration elapsed = 12;
+
+    repeated string barcode_kit = 13;
+
+    message File {
+        string name = 1;
+        string path = 2;
+        string spot_id = 5;
+        uint64 size = 8;
+        bool ready = 10;
+        string hash = 12;
+
+        repeated string tags = 30;
+        repeated TripleTag trip_tags = 35;
+}
+
+    message Sample {
+
+        int32 id = 1;
+        string name = 2;
+        string accession = 3;
+        string barcode_id = 4;
+        string barcode_seq = 5;
+        string organism = 6;
+        string extraction_kit = 7;
+        string comment = 8;
+        string user = 9;
+
+        repeated File files = 20;
+        repeated string tags = 30;
+        repeated TripleTag trip_tags = 40;
+    }
+
+    message Job {
+        int32 id = 1;
+        string name = 2;
+        string status = 3;
+    }
+
+    repeated File files = 15;
+    repeated Sample samples = 20;
+    repeated string tags = 30;
+    repeated TripleTag trip_tags = 35;
+    repeated Job jobs = 40;
+
+}
+
+message Error {
+    oneof error {
+        int32 code = 1;
+        string type = 2;
+    }
+    string err_message = 3;
+}
+
+message RunResponse {
+    oneof reply {
+        Run run = 1;
+        Error error = 2;
+    }
+}
+
+message RunListRequest {
+    bool all = 1;
+    repeated string tags = 20;
+}
+
+message RunList {
+    repeated Run runs = 1;
+}
+
+message RunListResponse {
+    oneof reply {
+        RunList runs = 1;
+        Error error = 2;
+    }
+}
+
+message RunRequest {
+    oneof term {
+        uint32 id = 1;
+        string name = 2;
+    }
+}
+
+message RunRsyncRequest {
+    oneof term {
+        uint32 id = 1;
+        string name = 2;
+    }
+    string dest = 3;
+}
+
+message RunRsyncResponse {
+    Error error = 1;
+}
+
+
+
+message GenericResponse {
+    Error error = 1;
+}
+
+message TagRequest {
+    uint32 id = 1;
+    repeated string tags = 2;
+    bool untag = 3;
+    string namespace = 4;
+}
+
+message TripleTagRequest {
+    uint32 id = 1;
+    repeated TripleTag trip_tags = 2;
+}
+
+message SampleSheet {
+
+    string porerefiner_ver = 1;
+    string library_id = 2;
+    string sequencing_kit = 3;
+    google.protobuf.Timestamp date = 4;
+
+    repeated string barcode_kit = 5;
+
+    message Sample {
+        string sample_id = 1;
+        string accession = 2;
+        string barcode_id = 3;
+        string organism = 4;
+        string extraction_kit = 5;
+        string comment = 6;
+        string user = 7;
+        repeated TripleTag trip_tags = 20;
+    }
+
+    repeated Sample samples = 10;
+    repeated string tags = 30;
+    repeated TripleTag trip_tags = 35;
+
+
+}
+
+message RunAttachRequest {
+    oneof term {
+        uint32 id = 1;
+        string name = 2;
+    }
+
+    SampleSheet sheet = 5;
+
+}
+
+
+
+service PoreRefiner {
+
+    rpc GetRuns (RunListRequest) returns (RunListResponse);
+
+    rpc GetRunInfo (RunRequest) returns (RunResponse);
+
+    rpc AttachSheetToRun (RunAttachRequest) returns (GenericResponse);
+
+    rpc RsyncRunTo (RunRsyncRequest) returns (RunRsyncResponse);
+
+    rpc Tag (TagRequest) returns (GenericResponse);
+
+}
