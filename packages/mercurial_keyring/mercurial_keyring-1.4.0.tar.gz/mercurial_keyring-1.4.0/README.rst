@@ -1,0 +1,431 @@
+.. -*- mode: rst; compile-command: "rst2html README.rst README.html" -*-
+
+=======================================================
+Mercurial Keyring
+=======================================================
+
+Mercurial Keyring is a Mercurial_ extension used to securely save HTTP
+and SMTP authentication passwords in password databases (Gnome
+Keyring, KDE KWallet, OSXKeyChain, Windows Vault etc).
+
+With ``mercurial_keyring`` active, Mercurial remembers your passwords
+and reuses them without prompting (as if you stored them in ``.hgrc``),
+but password storage is reasonably secure.
+
+Actual password storage is implemented by the keyring_ library, this 
+extension glues it to Mercurial.
+
+.. contents::
+   :local:
+   :depth: 2
+
+.. sectnum::
+
+.. _keyring: http://pypi.python.org/pypi/keyring
+
+How does it work
+=======================================================
+
+On your first pull or push to HTTP url (or first email sent via given
+SMTP server), you are prompted for the password, just like bare
+Mercurial does. But the password you entered is saved to appropriate
+password database. On successive runs, whenever the password is
+needed, ``mercurial_keyring`` checks for password in password
+database, and uses it without troubling you.
+
+In case password turns out to be incorrect (for example, because you
+changed it, or entered it incorrectly), ``mercurial_keyring`` prompts
+you again, and overwrites the password.
+
+You can use many passwords (for various remote urls).  Saved passwords
+are identified by pair of username and url prefix. See below for
+information how to configure those properly.
+
+Installation
+=======================================================
+
+Prerequisites
+-------------
+
+This extension requires keyring_ and `mercurial_extension_utils`_ to
+work. In many cases both will be installed automatically while you
+install ``mercurial_keyring``, but you may need to control the process.
+
+The keyring_ library can usually be installed by::
+
+    pip install --user keyring
+
+(or ``easy_install keyring``), but on some systems it is preferable to
+use official distribution archive. For example, on Debian and Ubuntu,
+you may install ``python-keyring`` and either ``python-keyring-gnome``
+or ``python-keyring-kwallet`` packages::
+
+    sudo apt-get install python-keyring python-keyring-gnome
+
+(this will save you the need to provide working compiler and various
+development libraries).
+
+The `mercurial_extension_utils`_ module is tiny Python-only module,
+which can be installed by::
+
+    pip install --user mercurial_extension_utils
+
+but in some cases (Windows…) requires more care. See
+`mercurial_extension_utils`_ documentation.
+    
+
+Extension installation
+----------------------
+
+There are two possible ways of installing the extension: using PyPi package,
+or using source clone.
+
+To install as a package::
+
+    pip install --user mercurial_keyring
+
+(or ``sudo pip install mercurial_keyring`` for system-wide
+installation) and then enable it in ``~/.hgrc`` (or
+``/etc/mercurial/hgrc`` or ``Mercurial.ini``) using::
+
+    [extensions]
+    mercurial_keyring = 
+
+To install using source clone, install keyring_ according to the
+instructions above, then clone::
+    
+    hg clone https://foss.heptapod.net/mercurial/mercurial_keyring/
+    hg clone https://foss.heptapod.net/mercurial/mercurial-extension_utils/
+
+and configure Mercurial using  full path to the extension module::
+
+    [extensions]
+    mercurial_keyring = /path/to/mercurial_keyring/mercurial_keyring.py
+
+.. _the code: 
+.. _mercurial_keyring.py: https://foss.heptapod.net/mercurial/mercurial_keyring/src/tip/mercurial_keyring.py
+
+Password backend configuration
+=======================================================
+
+The most appropriate password backend should usually be picked without
+configuration (considering installed libraries, operating system,
+active desktop session). Still, if necessary, it can be configured
+using ``keyringrc.cfg`` file.  Refer to keyring_ docs for more
+details.
+
+.. note::
+
+   With current (as I write) keyring (5.6), this file is (on Linux)
+   located at ``~/.local/share/python_keyring/keyringrc.cfg`` and
+   it's example content looks like::
+
+        [backend]
+        default-keyring=keyring.backends.Gnome.Keyring
+        # default-keyring=keyring.backends.kwallet.Keyring
+
+   For list of known backends run ``pydoc keyring.backends`` or
+   ``keyring --list-backends`` (which of those commands work,
+   depends on the keyring_ version).
+
+
+``hgrc`` configuration (HTTP)
+=======================================================
+
+Mercurial Keyring uses standard Mercurial ``[auth]`` configuration to
+detect your username (on given remote) and url prefix. You are
+strongly advised to configure both.
+
+Without the username ``mercurial_keyring`` can't save or restore
+passwords, so it disables itself.
+
+Without url prefix ``mercurial_keyring`` works, but binds passwords to
+repository urls. That means you will have to (re)enter password for
+every repository cloned from given remote (and that there will be many
+copies of this password in secure storage).
+
+Repository level configuration
+------------------------------------
+
+Edit repository-local ``.hg/hgrc`` and save there the remote
+repository path and the username, but do not save the password. For
+example:
+
+::
+
+    [paths]
+    myremote = https://my.server.com/hgrepo/someproject
+
+    [auth]
+    myremote.prefix = https://my.server.com/hgrepo
+    myremote.username = John
+
+Simpler form with url-embedded name can also be used:
+
+::
+
+    [paths]
+    bitbucket = https://John@my.server.com/hgrepo/someproject/
+
+but is not recommended.
+
+Note that all repositories sharing the same ``prefix`` share the same
+password.
+
+Mercurial allows also for password in ``.hg/hgrc`` (either given by
+``«prefix».password``, or embedded in url). If such password is found,
+Mercurial Keyring disables itself.
+
+
+Account-level configuration
+---------------------------
+
+If you are consistent about remote repository nicknames, you can
+configure the username in your `~/.hgrc` (`.hgrc` in your home
+directory). For example, write there::
+
+    [auth]
+    acme.prefix = hg.acme.com/repositories
+    acme.username = johnny
+    acme.schemes = http https
+    heptapod.prefix = https://foss.heptapod.net
+    heptapod.username = Mekk
+    mydep.prefix = https://dev.acmeorg.com
+    mydep.username = drmartin
+
+and as long as you use  ``acme`` alias for repositories like
+``https://hg.acme.com/repositories/my_beautiful_app``, username
+``johnny`` will be used, and the same password reused. Similarly
+any ``hg push heptapod`` will assume username ``Mekk`` and share
+the same password.
+
+With such config repository-level ``.hg/hgrc`` need only contain
+``[paths]``.
+
+Additional advantage of this method is that it works also during
+`clone`.
+
+
+.. note::
+
+   Mercurial Keyring works well with `Path Pattern`_. On my setup I use
+   prefix as above, and::
+
+       [path_pattern]
+       heptapod.local = ~/devel/mercurial/{below}
+       heptapod.remote = https://foss.heptapod.net/mercurial/{below:/=-}
+ 
+   so all my repositories understand ``hg push bitbucket`` without
+   any repository-level configuration.
+
+
+``hgrc`` configuration (SMTP)
+=======================================================
+
+Edit either repository-local ``.hg/hgrc``, or ``~/.hgrc`` and set
+there all standard email and smtp properties, including SMTP
+username, but without SMTP password. For example:
+
+::
+
+    [email]
+    method = smtp
+    from = Joe Doe <Joe.Doe@remote.com>
+
+    [smtp]
+    host = smtp.gmail.com
+    port = 587
+    username = JoeDoe@gmail.com
+    tls = true
+
+Just as in case of HTTP, you *must* set username, but *must not* set
+password here to use the extension, in other cases it will revert to
+the default behavior.
+
+Usage
+======================================================
+
+Saving and restoring passwords
+-------------------------------------------------------
+
+Configure the repository as above, then just ``hg pull``, ``hg push``,
+etc.  You should be asked for the password only once (per every
+username and remote repository prefix or url combination).
+
+Similarly, for email, configure as above and just ``hg email``.
+Again, you will be asked for the password once (per every username and
+email server address combination).
+
+Checking password status (``hg keyring_check``)
+-------------------------------------------------------
+
+The ``keyring_check`` command can be used to check whether/which
+password(s) are saved. It can be used in three ways:
+
+- without parameters, it prints info related to all HTTP paths
+  defined for current repository (everything from ``hg paths``
+  that resolves to HTTP url)::
+
+    hg keyring_check
+
+- given alias as param, it prints info about this alias::
+
+    hg keyring_check work
+
+- finally, any path can be checked::
+
+    hg keyring_check https://foss.heptapod.net/mercurial/mercurial_keyring
+
+Deleting saved password (``hg keyring_clear``)
+-------------------------------------------------------
+
+The ``keyring_clear`` command removes saved password related to given
+path. It can be used in two ways:
+
+- given alias as param, it drops password used by this alias::
+
+    hg keyring_clear work
+
+- given full path, it drops password related to this path::
+
+    hg keyring_clear https://foss.heptapod.net/mercurial/mercurial_keyring
+
+Managing passwords using GUI tools
+------------------------------------------------------
+
+Many password backends provide GUI tools for password management,
+for example Gnome Keyring passwords can be managed using ``seahorse``,
+and KDE Wallet using ``kwalletmanager``. Those GUI tools can be used
+to review, edit, or delete saved passwords.
+
+Unfortunately, as I write, keyring_ library does not allow one to
+configure how/where exactly saved passwords are put in the hierarchy,
+and the place is not always intuitive. For example, in KDE Wallet, all
+passwords saved using ``mercurial_keyring`` show up in the folder
+named ``Python``.
+
+.. note::
+
+   This is slightly problematic in case ``mercurial_keyring`` is not
+   the only program using keyring_ library. Passwords saved by another
+   Python application or script (which also uses keyring_) will be put
+   into the same place, and it may be unclear which password belongs
+   to which program. To remedy this, ``mercurial_keyring`` applies
+   slightly unusual labels of the form
+   ``«username»﻿@@﻿«urlprefix»﻿@﻿Mercurial`` - for example my bitbucket
+   password is labelled ``Mekk﻿@@﻿https﻿://﻿bitbucket.org﻿@﻿Mercurial``.
+
+Implementation details
+=======================================================
+
+The extension is monkey-patching the mercurial ``passwordmgr`` class
+to replace the ``find_user_password`` method. Detailed order of operations
+is described in the comments inside `the code`_.
+
+Frequent problems
+=======================================================
+
+Most problems people face while using ``mercurial_keyring`` are in
+fact problems with ``keyring`` library and it's backends. In
+particular, those can manifest by:
+
+- technical errors mentioning sentences like ``No recommended backend
+  was available. Install the keyrings.alt package…`` (or similar),
+
+- warnings like ``keyring: keyring backend doesn't seem to work…``
+
+- password prompts on every action (= passwords not being saved).
+
+Those almost always mean that *natural* keyring backend for given
+desktop type doesn't work, or is not present at all.  For example,
+some necessary runtime component can be down (say, you use Linux, but
+neither Gnome Keyring, nor KDE Wallet, is running). Or appropriate
+backend is not installed because it could not be build during keyring_
+library installation (maybe because some required library was not
+present at the moment of keyring installation, or maybe because
+compiler as such is not present on the system).
+
+To diagnose such problems, try using ``keyring`` utility, as described
+on keyring_ documentation page, for example by::
+
+    keyring --list-backends
+    keyring -b keyrings.alt.Gnome.Keyring set testsvc testuser
+    keyring -b keyrings.alt.Gnome.Keyring get testsvc testuser
+
+(of course using appropriate backend). If you miss the ``keyring`` command
+as such, try ``python -m keyring`` instead::
+
+    python -m keyring --list-backends
+    python -m keyring -b keyrings.alt.Gnome.Keyring set testsvc testuser
+    python -m keyring -b keyrings.alt.Gnome.Keyring get testsvc testuser
+
+If appropriate backend is missing (not listed), or doesn't work
+(second or third command fails), your keyring is broken. Try looking
+for further pointers in keyring_ documentation, that project mailing
+list, or issue tracker. Typically it will turn out, that you need to
+install some missing tool, or library, and reinstall keyring.
+
+.. note::
+
+   Depending on keyring_ version, installation of some dependency may
+   resolve problem. For example (as of late 2018), I got KDE Wallet
+   backend working with pip-installed keyring after::
+
+       pip install dbus-python
+
+   Note also, that recent versions of keyring library (since version 12) use Python
+   entrypoints to find available backends. Those are incompatible with
+   some binary packaging methods (like ``py2app``) and may cause
+   problems. In particular there were packaged installations of TortoiseHG_
+   which were unable to load keyring backends. See `#61 <https://foss.heptapod.net/mercurial/mercurial_keyring/issues/61/tortoisehg-encounters-unknown-exception>`_ for some more details.
+
+
+If ``keyring`` command works, but mercurial with mercurial_keyring does not,
+try enforcing  proper backend (by means of ``keyringrc.cfg``, see above).
+Only if this doesn't help, there may be a bug in mercurial_keyring.
+
+By far easiest way to have properly working keyring is to use packaged
+binary version (like ``python-keyring`` Ubuntu package, or keyring
+bundled with TortoiseHG_ on some systems). If you pip-installed keyring
+and it doesn't work, you may consider removing it via ``pip uninstall
+keyring`` and looking for binary package instead.
+
+
+
+
+History
+=======================================================
+
+See `HISTORY.rst`_.
+
+Repository, bug reports, enhancement suggestions
+===================================================
+
+Development is tracked on HeptaPod, see 
+https://foss.heptapod.net/mercurial/mercurial_keyring/
+
+Use issue tracker there for bug reports and enhancement
+suggestions.
+
+Thanks to Octobus_ and `Clever Cloud`_ for hosting this service.
+
+
+
+Additional notes
+=======================================================
+
+Information about this extension is also available
+on Mercurial Wiki: https://www.mercurial-scm.org/wiki/KeyringExtension
+
+Check also `other Mercurial extensions I wrote`_.
+
+.. _Octobus: https://octobus.net/
+.. _Clever Cloud: https://www.clever-cloud.com/
+
+.. _other Mercurial extensions I wrote: http://code.mekk.waw.pl/mercurial.html
+
+.. _HISTORY.rst: https://foss.heptapod.net/mercurial/mercurial_keyring/src/tip/HISTORY.rst
+.. _TortoiseHg: https://foss.heptapod.net/mercurial/tortoisehg/thg
+.. _Mercurial: https://www.mercurial-scm.org/
+.. _mercurial_extension_utils: https://foss.heptapod.net/mercurial/mercurial-extension_utils/
+.. _Path Pattern: https://foss.heptapod.net/mercurial/mercurial-path_pattern/
