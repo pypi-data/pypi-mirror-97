@@ -1,0 +1,132 @@
+Metadata-Version: 2.1
+Name: tdmgr
+Version: 0.2.9
+Summary: Tasmota Device Manager is able to find, monitor and do magic things. The easy way. Like a Superhero.
+Home-page: https://github.com/jziolkowski/tdm
+Author: jziolkowski
+Author-email: jacek@ziolkowscy.com
+License: GPLv3
+Project-URL: Issue Tracker, https://github.com/jziolkowski/tdm/issues
+Project-URL: Documentation, https://github.com/jziolkowski/tdm/wiki
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Home Automation
+Classifier: Development Status :: 4 - Beta
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: paho-mqtt (>=1.4)
+Requires-Dist: PyQt5 (==5.14.2)
+
+# Tasmota Device Manager
+Easy to use GUI application to manage, configure and monitor devices flashed with [Tasmota firmware](https://github.com/arendst/Tasmota)
+
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/jziolkowski/tdm?style=for-the-badge)](https://github.com/jziolkowski/tdm/releases/latest)
+[![GitHub All Releases](https://img.shields.io/github/downloads/jziolkowski/tdm/total?logo=github&style=for-the-badge)](https://github.com/jziolkowski/tdm/releases/latest)
+[![https://pypi.org/project/tdmgr/](https://img.shields.io/pypi/dw/tdmgr?logo=pypi&style=for-the-badge)](https://pypi.org/project/tdmgr/)
+[![Discord](https://img.shields.io/discord/545967340794413078?logo=discord&style=for-the-badge)](https://discord.gg/eAhVDXM)
+[![https://www.buymeacoffee.com/eYmkLXO](https://img.shields.io/badge/Donate-Buy%20me%20a%20coffee-orange?style=for-the-badge)](https://www.buymeacoffee.com/eYmkLXO)
+
+![image](https://user-images.githubusercontent.com/11555742/66050573-bf764900-e52d-11e9-8356-e3dbf4ef6205.png)
+
+#### Minimum fully-supported Tasmota firmware version: [6.6.0.17](https://github.com/arendst/Tasmota/blob/development/tasmota/CHANGELOG.md#66017-20191009)
+
+#### To the users:
+I'm very grateful for all your support over the months, ideas, and donations, and most of all: patience.
+While I'm not in any way abandoning this project, I don't have as much time as I'd like to work on it. If anything, keep being patient as new features will come, but I'm not at liberty of setting any deadlines or plans.
+
+
+# Features
+
+ - [autodiscovery](https://github.com/jziolkowski/tdm/wiki/Autodiscovery) of Tasmota devices (even if they use custom FullTopics)
+ - module, GPIO and template configuration
+ - rules editor with Var/Mem/Ruletimer monitor
+ - easy to read detachable telemetry viewers (working in active and passive mode) 
+ - relay, color and PWM control
+ - user-friendly configuration of buttons, switches and relays, including their related SetOptions
+ - timers editor
+ - clear retained relay and LWT topics
+ - detachable device consoles with command completion and intuitive history 
+ - selectable views to see the most vital device parameters at a glance
+ - BSSID aliasing for larger deployments
+ - support for current and legacy Timers payloads (thanks @GrahamM)
+
+# Planned functions
+
+ - PWM/NTP/Topics configuration dialogs and a few others
+ - config export for OpenHAB and HomeAssistant
+ - dynamic and manual grouping of devices: by group topic, module, firmware revision, and more
+ - group actions: reset/restart/control power/upgrade
+ - quick settings for common use cases
+ - code completion in rules editor
+ - built-in OTA server
+ - and much more! (you're welcome to post feature requests)
+
+# Requirements and installation instructions
+
+See the [wiki article](https://github.com/jziolkowski/tdm/wiki/Prerequisites-installation-and-running)
+
+Uses free icons from [Icons8](https://icons8.com)
+
+Kind thanks to all users that report issues and provide PRs!
+
+
+# Changelog
+## [0.2.6] - 2019-12-24
+## Changed
+- support for 16 var/mem in rules editor
+- for older devices, the missing rows now say "unknown" instead of "loading" to avoid confusion
+
+## [0.2.5] - 2019-12-06
+### Added
+- now available as `tdmgr.exe` for Windows
+- now available on PyPI as `tdmgr`
+- support for SetOption4 (commands reply on /<COMMAND> topic instead of /RESULT)
+
+## Changed
+- removed support for Var/Mem command JSON payload for Tasmota pre 6.6.0.12 
+- rule parser now doesn't throw errors when rule contains JSON
+
+## [0.2.4] - 2019-12-04
+### Added
+- optional MQTT messages dump for devices
+
+## Changed
+- main script name changed to `tdmgr.py` prior to packaging on PyPI (due to conflicting name with other project)
+
+## [0.2.3] - 2019-11-27
+### Added
+- ~/TDM directory is created automatically if missing, to prevent logging module crash
+
+### Fixed
+- forced RSSI to be cast as int() for some odd cases
+- reconnect is now enough to subscribe to new custom patterns (thanks to pgollor)
+
+## [0.2.2] - 2019-11-21
+### Added
+- Device list now sorts correctly when using diactrics in friendly names
+- Some logging features for MQTT and Autodiscovery process
+- Toolbar actions now available in device list context menu (#55)
+- Preferences dialog: console word-wrap setting and font size and version formatting option for device list
+- Clear obsolete LWTs dialog added in MQTT menu
+- Save/Clear functions to console
+
+### Fixed
+- Power ALL was sending true/false instead of 0/1 (#53)
+
+## [0.2.1] - 2019-11-16
+### Fixed
+- forced sorting of POWER\<x\> keys when generating toggle actions and drawing state icons
+- exception catching when SetOption parsing fails in older Tasmota versions 
+
+## [0.2.0] - 2019-10-02
+### Added
+- consoles for each device, with colored output to ease reading (needs some polishing), command completion and history
+- buttons, switches and relays configuration dialog
+- custom widgets in the redesigned device list, including different views
+
+### Changed
+- most of the codebase rewritten
+
+
