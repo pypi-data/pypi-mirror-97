@@ -1,0 +1,25 @@
+{% for decorator in decorators -%}
+{{ decorator }}
+{% endfor -%}
+class {{ class_name }}({{ base_class }}):
+{%- if description %}
+    """
+    {{ description }}
+    """
+{%- endif %}
+{%- if config %}
+{%- filter indent(4) %}
+{% include 'Config.jinja2' %}
+{%- endfilter %}
+{%- endif %}
+{%- if not fields %}
+    pass
+{%- else %}
+    {%- if fields[0].field %}
+    __root__: {{ fields[0].type_hint }} = {{ fields[0].field }}
+    {%- elif fields[0].required or (fields[0].default == 'None' and fields[0].strip_default_none) %}
+    __root__: {{ fields[0].type_hint }}
+    {%- else %}
+    __root__: {{ fields[0].type_hint }} = {{ fields[0].represented_default }}
+    {%- endif %}
+{%- endif %}
