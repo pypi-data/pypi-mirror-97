@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "http://localhost/schemas/marc21/marc21-v1.0.0.json",
+  "additionalProperties": false,
+  "title": "Invenio Records Marc21 v1.0.0",
+  "type": "object",
+
+  "definitions": {
+    
+    "identifier": {
+      "description": "An identifier.",
+      "type": "string"
+    },
+    
+    "identifiers": {
+      "description": "Identifiers object (keys being scheme, value being the identifier).",
+      "type": "object",
+      "additionalProperties": {"$ref": "#/definitions/identifier"}
+    },
+
+    "internal-pid": {
+      "type": "object",
+      "description": "An internal persistent identifier object.",
+      "additionalProperties": false,
+      "required": ["pk", "status"],
+      "properties": {
+        "pk": {
+          "description": "Primary key of the PID object.",
+          "type": "integer"
+        },
+        "status": {
+          "description": "The status of the PID (from Invenio-PIDStore).",
+          "type": "string",
+          "enum": [
+            "N",
+            "K",
+            "R",
+            "M",
+            "D"
+          ]
+        }
+      }
+    },
+
+    "external-pid": {
+      "type": "object",
+      "description": "An external persistent identifier object.",
+      "additionalProperties": false,
+      "required": ["identifier", "provider"],
+      "properties": {
+        "identifier": {"$ref": "#/definitions/identifier"},
+        "provider": {
+          "description": "The provider of the persistent identifier.",
+          "type": "string"
+        },
+        "client": {
+          "description": "Client identifier for the specific PID.",
+          "type": "string"
+        }
+      }
+    },
+    
+    "user": {
+      "type": "object",
+      "description": "..",
+      "additionalProperties": false,
+      "properties": {
+        "user": {
+          "type": "integer"
+        }
+      }
+    },
+
+    "agent": {
+      "description": "An agent (user, software process, community, ...).",
+      "oneOf": [
+        {"$ref": "#/definitions/user"}
+      ]
+    }
+  },
+
+  "properties": {
+    "$schema": {
+      "description": "This record's jsonschema.",
+      "type": "string"
+    },
+    "id": {
+      "description": "Invenio record identifier (integer).",
+      "type": "string"
+    },
+    "pid": {"$ref": "#/definitions/internal-pid"},
+
+    "conceptid": {
+      "description": "Persistent concept record identifier (alphanumeric).",
+      "type": "string"
+    },
+    "conceptpid": {"$ref": "#/definitions/internal-pid"},
+
+    "pids": {
+      "additionalProperties": {"$ref": "#/definitions/external-pid"},
+      "description": "Managed persistent identifiers for a record including e.g. OAI-PMH identifier, minted DOIs and more. Managed PIDs are registered in the PIDStore"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Resource metadata.",
+      "additionalProperties": true
+    },
+    
+    "access": {
+      "type": "object",
+      "description": "Record access control and ownership.",
+      "additionalProperties": false,
+      "properties": {
+
+        "metadata": {
+          "description": "Metadata visibility (true - public, false - private)",
+          "type": "boolean"
+        },
+
+        "files": {
+          "description": "Files visibility (true - public, false - private)",
+          "type": "boolean"
+        },
+
+        "owned_by": {
+          "description": "List of user IDs that are owners of the record.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/definitions/agent"}
+        },
+
+        "embargo_date": {
+          "description": "Embargo date of record (ISO8601 formatted date time in UTC). At this time both metadata and files will be made public.",
+          "type": "string",
+          "format": "date-time"
+        },
+
+        "access_condition": {
+          "description": "Conditions under which access to files are granted",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "condition": {
+              "type": "string",
+              "description": "Textual description under which conditions access is granted."
+            },
+            "default_link_validity": {
+              "type": "integer",
+              "description": "Number of days"
+            }
+          }
+        },
+
+        "access_right": {
+          "default": "open",
+          "description": "TODO - Access right for record. - should be computed or moved to metadata?",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
