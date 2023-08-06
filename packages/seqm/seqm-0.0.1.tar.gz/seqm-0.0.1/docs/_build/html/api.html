@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>API &mdash; seqm 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> seqm
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sequence-composition-metrics">Sequence Composition Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#domain-conversion">Domain Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sequence-similarity-metrics">Sequence Similarity Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sequence-related-utilities">Sequence-Related Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#objects">Objects</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">seqm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sequence-composition-metrics">
+<h2>Sequence Composition Metrics<a class="headerlink" href="#sequence-composition-metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="seqm.polydict">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">polydict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em>, <em class="sig-param"><span class="n">nuc</span><span class="o">=</span><span class="default_value">'ACGT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.polydict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes largest homopolymer for all specified
+nucleotides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">polydict</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">{&#39;A&#39;: 4, &#39;C&#39;: 2, &#39;G&#39;: 1, &#39;T&#39;: 1}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.polylength">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">polylength</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.polylength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate length of maximum homopolymer stretch
+within sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">polylength</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.entropy">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Shannon entropy of sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.40</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">1.75</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.gc_percent">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">gc_percent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.gc_percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate fraction of GC bases within sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">gc_percent</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">0.375</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.gc_skew">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">gc_skew</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.gc_skew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate GC skew (g-c)/(g+c) for sequence. For
+homopolymer stretches with no GC, the skew will be rounded
+to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">gc_skew</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.gc_shift">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">gc_shift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.gc_shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate GC shift (a + t)/(g + c) for sequence. For
+homopolymer stretches with no GC, the shift will be rounded to
+the number of bases in the sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">gc_shift</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.67</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.dna_weight">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">dna_weight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.dna_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return molecular weight of triphosphate dna sequence (g/mol).</p>
+<p>See <a class="reference external" href="https://www.thermofisher.com/us/en/home/references/ambion-tech-support/rna-tools-and-calculators/dna-and-rna-molecular-weights-and-conversions.html">https://www.thermofisher.com/us/en/home/references/ambion-tech-support/rna-tools-and-calculators/dna-and-rna-molecular-weights-and-conversions.html</a>
+for details on conversions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">dna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3968.59</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.rna_weight">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">rna_weight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.rna_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return molecular weight of triphosphate rna sequence (g/mol).</p>
+<p>See <a class="reference external" href="https://www.thermofisher.com/us/en/home/references/ambion-tech-support/rna-tools-and-calculators/dna-and-rna-molecular-weights-and-conversions.html">https://www.thermofisher.com/us/en/home/references/ambion-tech-support/rna-tools-and-calculators/dna-and-rna-molecular-weights-and-conversions.html</a>
+for details on conversions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">rna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">4082.59</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.aa_weight">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">aa_weight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.aa_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return molecular weight of amino acid sequence (g/mol).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">aa_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">700.8</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.zipsize">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">zipsize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.zipsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate size of gzip-compressed sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">zipsize</span><span class="p">(</span><span class="s1">&#39;AGGATAAGAGATAGATTT&#39;</span><span class="p">)</span>
+<span class="go">39.31</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="domain-conversion">
+<h2>Domain Conversion<a class="headerlink" href="#domain-conversion" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="seqm.revcomplement">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">revcomplement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.revcomplement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverse complement sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">revcomplement</span><span class="p">(</span><span class="s1">&#39;AACCTT&#39;</span><span class="p">)</span>
+<span class="go">&#39;AAGGTT&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.complement">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">complement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.complement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complement sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">complement</span><span class="p">(</span><span class="s1">&#39;AACCTT&#39;</span><span class="p">)</span>
+<span class="go">TTGGAA</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.aa">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">aa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.aa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return amino acid translation of sequence. Ends of the sequences
+that don’t produce a full codon will be clipped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">aa</span><span class="p">(</span><span class="s1">&#39;ATGTAG&#39;</span><span class="p">)</span>
+<span class="go">M*</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.likelihood">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates quality scores sequence into error likelihoods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Sequence of quality scores.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.qscore">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">qscore</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.qscore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates quality score sequence into phred-scaled likelihoods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – Sequence of quality scores.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="sequence-similarity-metrics">
+<h2>Sequence Similarity Metrics<a class="headerlink" href="#sequence-similarity-metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="seqm.hamming">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">hamming</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq1</span></em>, <em class="sig-param"><span class="n">seq2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.hamming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate hamming distance between sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq1</strong> (<em>str</em>) – Reference sequence</p></li>
+<li><p><strong>seq2</strong> (<em>str</em>) – Sequence to compare</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hamming</span><span class="p">(</span><span class="s1">&#39;AACCTT&#39;</span><span class="p">,</span> <span class="s1">&#39;AAGCCTT&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.edit">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq1</span></em>, <em class="sig-param"><span class="n">seq2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around editdistance.eval for fast Levenshtein
+distance computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq1</strong> (<em>str</em>) – Reference sequence</p></li>
+<li><p><strong>seq2</strong> (<em>str</em>) – Sequence to compare</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">edit</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="s1">&#39;bahama&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="sequence-related-utilities">
+<h2>Sequence-Related Utilities<a class="headerlink" href="#sequence-related-utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="seqm.random">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">11</span></em>, <em class="sig-param"><span class="n">template</span><span class="o">=</span><span class="default_value">'ACGT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate random sequence of specified length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Length of random sequence to generate.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – String with bases to use in generating sequence.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">random_sequence</span><span class="p">()</span>
+<span class="go">CGGACGGTATG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">random_sequence</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;AC&#39;</span><span class="p">)</span>
+<span class="go">CCCAA</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="seqm.wrap">
+<code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">wrap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq</span></em>, <em class="sig-param"><span class="n">bases</span><span class="o">=</span><span class="default_value">60</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.wrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print wrapped sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> (<em>str</em>) – Nucleotide sequence</p></li>
+<li><p><strong>bases</strong> (<em>int</em>) – Number of bases to include on each line.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sequtils</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">CGGACGGTATG</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">CGG</span>
+<span class="go">ACG</span>
+<span class="go">GTA</span>
+<span class="go">TG</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="objects">
+<h2>Objects<a class="headerlink" href="#objects" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="seqm.Sequence">
+<em class="property">class </em><code class="sig-prename descclassname">seqm.</code><code class="sig-name descname">Sequence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.Sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for managing sequence structure and operating
+on sequences (i.e. getting amino acid sequence, reverse
+complement, gc content, etc …).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<em>str</em>) – Nucleotide sequence.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">sequtils</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="s1">&#39;ACGTACGT&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">gc_content</span>
+<span class="go">0.25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">revcomplement</span>
+<span class="go">ACGTACGT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">dna_weight</span>
+<span class="go">3895.59</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt id="seqm.Sequence.aa">
+<code class="sig-name descname">aa</code><a class="headerlink" href="#seqm.Sequence.aa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.aa()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.aa_weight">
+<code class="sig-name descname">aa_weight</code><a class="headerlink" href="#seqm.Sequence.aa_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.aa_weight()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.complement">
+<code class="sig-name descname">complement</code><a class="headerlink" href="#seqm.Sequence.complement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.complement()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.dna_weight">
+<code class="sig-name descname">dna_weight</code><a class="headerlink" href="#seqm.Sequence.dna_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.dna_weight()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="seqm.Sequence.edit">
+<code class="sig-name descname">edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.Sequence.edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.edit()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>str</em><em>, </em><a class="reference internal" href="#seqm.Sequence" title="seqm.Sequence"><em>Sequence</em></a>) – Sequence to compare.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.entropy">
+<code class="sig-name descname">entropy</code><a class="headerlink" href="#seqm.Sequence.entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.entropy()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.gc_percent">
+<code class="sig-name descname">gc_percent</code><a class="headerlink" href="#seqm.Sequence.gc_percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.gc_percent()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.gc_shift">
+<code class="sig-name descname">gc_shift</code><a class="headerlink" href="#seqm.Sequence.gc_shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.gc_shift()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.gc_skew">
+<code class="sig-name descname">gc_skew</code><a class="headerlink" href="#seqm.Sequence.gc_skew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.gc_skew()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="seqm.Sequence.hamming">
+<code class="sig-name descname">hamming</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.Sequence.hamming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.hamming()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>str</em><em>, </em><a class="reference internal" href="#seqm.Sequence" title="seqm.Sequence"><em>Sequence</em></a>) – Sequence to compare.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.polydict">
+<code class="sig-name descname">polydict</code><a class="headerlink" href="#seqm.Sequence.polydict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.polydict()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.polylength">
+<code class="sig-name descname">polylength</code><a class="headerlink" href="#seqm.Sequence.polylength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.polylength()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.revcomplement">
+<code class="sig-name descname">revcomplement</code><a class="headerlink" href="#seqm.Sequence.revcomplement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.revcomplement()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.rna_weight">
+<code class="sig-name descname">rna_weight</code><a class="headerlink" href="#seqm.Sequence.rna_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.rna_weight()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="seqm.Sequence.wrap">
+<code class="sig-name descname">wrap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bases</span><span class="o">=</span><span class="default_value">60</span></em><span class="sig-paren">)</span><a class="headerlink" href="#seqm.Sequence.wrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.wrap()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bases</strong> (<em>int</em>) – Number of bases to include in line.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="seqm.Sequence.zipsize">
+<code class="sig-name descname">zipsize</code><a class="headerlink" href="#seqm.Sequence.zipsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around <code class="xref py py-func docutils literal notranslate"><span class="pre">sequtils.zipsize()</span></code>
+for the <code class="xref py py-class docutils literal notranslate"><span class="pre">sequtils.Sequence</span></code> object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2016, Blake Printy.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

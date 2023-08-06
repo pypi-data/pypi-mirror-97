@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Usage &mdash; seqm 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> seqm
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#list-of-available-functions">List of Available Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sequence-quantification">Sequence Quantification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#domain-conversion">Domain Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distance-metrics">Distance Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-usage">Command-Line Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">seqm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://atgtag.github.io/seqm/latest">seqm</a> module contains functions for calculating sequence-related distance and complexity metrics, commonly used in language processing and next-generation sequencing. It has a simple and consistent API that be used for investigating sequence characteristics:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">seqm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">hamming</span><span class="p">(</span><span class="s1">&#39;ATTATT&#39;</span><span class="p">,</span> <span class="s1">&#39;ATTAGT&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="s1">&#39;ATTATT&#39;</span><span class="p">,</span> <span class="s1">&#39;ATAGT&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">polydict</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">{&#39;A&#39;: 4, &#39;C&#39;: 2, &#39;G&#39;: 1, &#39;T&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">polylength</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.40</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_percent</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">0.375</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_skew</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_shift</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.67</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">dna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3968.59</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">rna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">4082.59</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">aa_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">700.8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">zipsize</span><span class="p">(</span><span class="s1">&#39;AGGATAAGAGATAGATTT&#39;</span><span class="p">)</span>
+<span class="go">22</span>
+</pre></div>
+</div>
+<p>It also has a <a class="reference internal" href="api.html#seqm.Sequence" title="seqm.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">seqm.Sequence</span></code></a> object for object-based access to these properties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">seqm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">seqm</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">hamming</span><span class="p">(</span><span class="s1">&#39;AAAAGCGT&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">gc_percent</span>
+<span class="go">0.375</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">revcomplement</span>
+<span class="go">ACGTACGT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="o">.</span><span class="n">dna_weight</span>
+<span class="go">3895.59</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ... and so on ...</span>
+</pre></div>
+</div>
+<p>All of the metrics available in the repository are listed below, and can also be found in the <a class="reference external" href="./api.html">API</a> section of the documentation.</p>
+</div>
+<div class="section" id="list-of-available-functions">
+<h2>List of Available Functions<a class="headerlink" href="#list-of-available-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sequence-quantification">
+<h3>Sequence Quantification<a class="headerlink" href="#sequence-quantification" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Metric</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.polydict" title="seqm.polydict"><code class="xref py py-func docutils literal notranslate"><span class="pre">polydict()</span></code></a></p></td>
+<td><p>Length of longest homopolymer for all bases in sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.polylength" title="seqm.polylength"><code class="xref py py-func docutils literal notranslate"><span class="pre">polylength()</span></code></a></p></td>
+<td><p>Length of longest homopolymer in sequence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.entropy" title="seqm.entropy"><code class="xref py py-func docutils literal notranslate"><span class="pre">entropy()</span></code></a></p></td>
+<td><p>Shannon entropy for bases in sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.gc_percent" title="seqm.gc_percent"><code class="xref py py-func docutils literal notranslate"><span class="pre">gc_percent()</span></code></a></p></td>
+<td><p>Percentage of GC bases in sequence relative to all bases.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.gc_skew" title="seqm.gc_skew"><code class="xref py py-func docutils literal notranslate"><span class="pre">gc_skew()</span></code></a></p></td>
+<td><p>GC skew for sequence:  (#G - #C)/(#G + #C).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.gc_shift" title="seqm.gc_shift"><code class="xref py py-func docutils literal notranslate"><span class="pre">gc_shift()</span></code></a></p></td>
+<td><p>GC shift for sequence: (#A + #T)/(#G + #C)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.dna_weight" title="seqm.dna_weight"><code class="xref py py-func docutils literal notranslate"><span class="pre">dna_weight()</span></code></a></p></td>
+<td><p>Molecular weight for sequence with DNA backbone.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.rna_weight" title="seqm.rna_weight"><code class="xref py py-func docutils literal notranslate"><span class="pre">rna_weight()</span></code></a></p></td>
+<td><p>Molecular weight for sequence with RNA backbone.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.aa_weight" title="seqm.aa_weight"><code class="xref py py-func docutils literal notranslate"><span class="pre">aa_weight()</span></code></a></p></td>
+<td><p>Molecular weight for amino acid sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.zipsize" title="seqm.zipsize"><code class="xref py py-func docutils literal notranslate"><span class="pre">zipsize()</span></code></a></p></td>
+<td><p>Compressibility of sequence.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="domain-conversion">
+<h3>Domain Conversion<a class="headerlink" href="#domain-conversion" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Conversion</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.revcomplement" title="seqm.revcomplement"><code class="xref py py-func docutils literal notranslate"><span class="pre">revcomplement()</span></code></a></p></td>
+<td><p>Length of longest homopolymer for all bases in sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.complement" title="seqm.complement"><code class="xref py py-func docutils literal notranslate"><span class="pre">complement()</span></code></a></p></td>
+<td><p>Length of longest homopolymer in sequence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.aa" title="seqm.aa"><code class="xref py py-func docutils literal notranslate"><span class="pre">aa()</span></code></a></p></td>
+<td><p>Shannon entropy for bases in sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.wrap" title="seqm.wrap"><code class="xref py py-func docutils literal notranslate"><span class="pre">wrap()</span></code></a></p></td>
+<td><p>Percentage of GC bases in sequence relative to all bases.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.likelihood" title="seqm.likelihood"><code class="xref py py-func docutils literal notranslate"><span class="pre">likelihood()</span></code></a></p></td>
+<td><p>GC skew for sequence:  (#G - #C)/(#G + #C).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.qscore" title="seqm.qscore"><code class="xref py py-func docutils literal notranslate"><span class="pre">qscore()</span></code></a></p></td>
+<td><p>GC shift for sequence: (#A + #T)/(#G + #C)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="distance-metrics">
+<h3>Distance Metrics<a class="headerlink" href="#distance-metrics" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Distance Metric</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="api.html#seqm.hamming" title="seqm.hamming"><code class="xref py py-func docutils literal notranslate"><span class="pre">hamming()</span></code></a></p></td>
+<td><p>Hamming distance between sequences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.edit" title="seqm.edit"><code class="xref py py-func docutils literal notranslate"><span class="pre">edit()</span></code></a></p></td>
+<td><p>Edit (levenshtein) distance between sequences</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utilities">
+<h3>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Utility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">random_sequence()</span></code></p></td>
+<td><p>Generate random sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api.html#seqm.wrap" title="seqm.wrap"><code class="xref py py-func docutils literal notranslate"><span class="pre">wrap()</span></code></a></p></td>
+<td><p>Newline-wrap sequence</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="command-line-usage">
+<h2>Command-Line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h2>
+<p>Once seqm is installed, all methods can be accessed via the <code class="docutils literal notranslate"><span class="pre">seqm</span></code> entry point:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$ seqm
+</pre></div>
+</div>
+<p>To run a specific method on a sequence, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$ seqm gc_skew AGTAGTAGTTTAGGTTAGGTAG
+<span class="m">8</span>.0
+</pre></div>
+</div>
+<p>For commands comparing sequences, simply use both sequences as arguments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$ seqm edit AGTAGTAGTAGTAT AGTAGTAGTAGAAAAT
+<span class="m">3</span>
+</pre></div>
+</div>
+<p>And finally, to supply command line arguments to a method, do the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$ seqm wrap AGTAGTAGTAGTATAGTAGTAGTAGAAAAT <span class="nv">bases</span><span class="o">=</span><span class="m">10</span>
+AGTAGTAGTA
+GTATAGTAGT
+AGTAGAAAAT
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2016, Blake Printy.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

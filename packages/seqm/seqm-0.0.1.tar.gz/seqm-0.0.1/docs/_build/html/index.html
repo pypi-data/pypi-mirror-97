@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>seqm - genomic sequence metrics &mdash; seqm 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> seqm
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">seqm</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">seqm</span></code> - genomic sequence metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="seqm-genomic-sequence-metrics">
+<h1><code class="docutils literal notranslate"><span class="pre">seqm</span></code> - genomic sequence metrics<a class="headerlink" href="#seqm-genomic-sequence-metrics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This package provides python utilities for sequence comparison, quantification, and feature extraction.</p>
+<p>The <a class="reference external" href="https://github.com/atgtag/seqm">seqm</a> module contains functions for calculating sequence-related distance and complexity metrics, commonly used in language processing and next-generation sequencing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">seqm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">hamming</span><span class="p">(</span><span class="s1">&#39;ATTATT&#39;</span><span class="p">,</span> <span class="s1">&#39;ATTAGT&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="s1">&#39;ATTATT&#39;</span><span class="p">,</span> <span class="s1">&#39;ATAGT&#39;</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">polydict</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">{&#39;A&#39;: 4, &#39;C&#39;: 2, &#39;G&#39;: 1, &#39;T&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">polylength</span><span class="p">(</span><span class="s1">&#39;AAAACCGT&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.40</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_percent</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">0.375</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_skew</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">gc_shift</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">1.67</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">dna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">3968.59</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">rna_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">4082.59</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">aa_weight</span><span class="p">(</span><span class="s1">&#39;AGGATAAG&#39;</span><span class="p">)</span>
+<span class="go">700.8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seqm</span><span class="o">.</span><span class="n">zipsize</span><span class="p">(</span><span class="s1">&#39;AGGATAAGAGATAGATTT&#39;</span><span class="p">)</span>
+<span class="go">22</span>
+</pre></div>
+</div>
+<p>For more information on available functionality, see the <a class="reference external" href="./usage.html">Usage</a> section of the documentation.</p>
+</div>
+<div class="section" id="content">
+<h2>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pip">pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#source">Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#questions-feedback">Questions/Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#list-of-available-functions">List of Available Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#sequence-quantification">Sequence Quantification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#domain-conversion">Domain Conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#distance-metrics">Distance Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#command-line-usage">Command-Line Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#sequence-composition-metrics">Sequence Composition Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#domain-conversion">Domain Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#sequence-similarity-metrics">Sequence Similarity Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#sequence-related-utilities">Sequence-Related Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#objects">Objects</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2016, Blake Printy.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
