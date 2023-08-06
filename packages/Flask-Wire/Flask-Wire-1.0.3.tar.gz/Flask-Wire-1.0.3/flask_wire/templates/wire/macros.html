@@ -1,0 +1,34 @@
+{% macro wire_frame(id, initial=None, on_events=None, error_text='Failed to fetch data', error_use_html=False,
+loader_text='Loading data', loader_use_html=False, frame_classes=None, error_classes=None, loader_classes=None) %}
+  <div wire:frame="{{ id }}" {% if initial %}wire:init="{{ initial }}"{% endif %}
+       {% if on_events %}wire:on-event="{{ on_events|join(',') }}"{% endif %}>
+    <div wire:loader class="{% if loader_classes %}{{ loader_classes }}{% endif %}" style="display: none">
+      {% if loader_text %}
+        {% if loader_use_html %}
+          {{ loader_text|safe }}
+        {% else %}
+          {{ loader_text }}
+        {% endif %}
+      {% endif %}
+    </div>
+    <div wire:error-body class="{% if error_classes %}{{ error_classes }}{% endif %}" style="display: none">
+      {% if error_text %}
+        {% if error_use_html %}
+          {{ error_text|safe }}
+        {% else %}
+          {{ error_text }}
+        {% endif %}
+      {% endif %}
+    </div>
+    <div wire:body class="{% if frame_classes %}{{ frame_classes }}{% endif %}"></div>
+  </div>
+{% endmacro %}
+
+{% macro wire_trigger(target, source, text, persist=False, extra_classes=None) %}
+  <a href="javascript:" wire:target="{{ target }}" wire:source{% if persist %}.persist{% endif %}="{{ source }}"
+     class="{% if extra_classes %}{{ extra_classes }}{% endif %}">{{ text }}</a>
+{% endmacro %}
+
+{% macro wire_mutation(target=None, events=None) %}
+  wire:mutate {% if target %}wire:target="{{ target }}"{% elif events %}wire:event="{{ events|join(',') }}"{% endif %}
+{% endmacro %}
