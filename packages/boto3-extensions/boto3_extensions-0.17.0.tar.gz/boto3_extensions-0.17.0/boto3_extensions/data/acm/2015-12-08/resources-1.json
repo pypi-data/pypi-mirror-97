@@ -1,0 +1,110 @@
+{
+  "service": {
+    "actions": {
+      "ImportCertificate": {
+        "request": { "operation": "ImportCertificate" },
+        "resource": {
+          "type": "Certificate",
+          "identifiers": [
+            { "target": "CertificateArn", "source": "response", "path": "CertificateArn" }
+          ]
+        }
+      },
+      "RequestCertificate": {
+        "request": { "operation": "RequestCertificate" },
+        "resource": {
+          "type": "Certificate",
+          "identifiers": [
+            { "target": "CertificateArn", "source": "response", "path": "CertificateArn" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Certificates": {
+        "request": { "operation": "ListCertificates" },
+        "resource": {
+          "type": "Certificate",
+          "identifiers": [
+            { "target": "CertificateArn", "source": "response", "path": "CertificateSummaryList[].CertificateArn" }
+          ],
+          "path": "CertificateSummaryList[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Certificate": {
+      "identifiers": [
+        {
+          "name": "CertificateArn",
+          "memberName": "CertificateArn"
+        }
+      ],
+      "shape": "CertificateDetail",
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteCertificate",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+            ]
+          }
+        },
+        "GetCertificate": {
+          "request": {
+            "operation": "GetCertificate",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+            ]
+          }
+        },
+        "AddTagsToCertificate": {
+          "request": {
+            "operation": "AddTagsToCertificate",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+            ]
+          },
+          "path": "Tags"
+        },
+        "ListTagsForCertificate": {
+          "request": {
+            "operation": "ListTagsForCertificate",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+            ]
+          },
+          "path": "Tags"
+        },
+        "RemoveTagsFromCertificate": {
+          "request": {
+            "operation": "RemoveTagsFromCertificate",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+            ]
+          }
+        },
+        "ResendValidationEmail": {
+          "request": {
+            "operation": "ResendValidationEmail",
+            "params": [
+              { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" },
+              { "target": "Domain", "source": "data", "path": "DomainValidationOptions[0].DomainName" },
+              { "target": "ValidationDomain", "source": "data", "path": "DomainValidationOptions[0].ValidationDomain" }
+            ]
+          }
+        }
+      },
+      "load": {
+        "request": {
+          "operation": "DescribeCertificate",
+          "params": [
+            { "target": "CertificateArn", "source": "identifier", "name": "CertificateArn" }
+          ]
+        },
+        "path": "Certificate"
+      }
+    }
+  }
+}

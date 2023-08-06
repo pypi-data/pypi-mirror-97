@@ -1,0 +1,210 @@
+{
+  "service": {
+    "actions": {
+      "CreateTrail": {
+        "request": { "operation": "CreateTrail" },
+        "resource": {
+          "type": "Trail",
+          "identifiers": [
+            { "target": "TrailARN", "source": "response", "path": "TrailARN" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Events": {
+        "request": {
+          "operation": "LookupEvents"
+        },
+        "resource": {
+          "type": "Event",
+          "identifiers": [
+            { "target": "EventId", "source": "response", "path": "Events[].EventId" }
+          ],
+          "path": "Events[]"
+        }
+      },
+      "Trails": {
+        "request": {
+          "operation": "DescribeTrails"
+        },
+        "resource": {
+          "type": "Trail",
+          "identifiers": [
+            { "target": "TrailARN", "source": "response", "path": "trailList[].TrailARN" }
+          ],
+          "path": "trailList[]"
+        }
+      },
+      "PublicKeys": {
+        "request": {
+          "operation": "ListPublicKeys"
+        },
+        "resource": {
+          "type": "PublicKey",
+          "identifiers": [
+            { "target": "Fingerprint", "source": "response", "path": "PublicKeyList[].Fingerprint" },
+            { "target": "ValidityStartTime", "source": "response", "path": "PublicKeyList[].ValidityStartTime" },
+            { "target": "ValidityEndTime", "source": "response", "path": "PublicKeyList[].ValidityEndTime" }
+          ],
+          "path": "PublicKeyList[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Event": {
+      "identifiers": [
+        { "name": "EventId",
+          "memberName": "EventId" }
+      ],
+      "shape": "Event",
+      "load": {
+        "request": {
+          "operation": "LookupEvents",
+          "params": [
+            { "target": "LookupAttributes[0].AttributeKey", "source": "string", "value": "EventId" },
+            { "target": "LookupAttributes[0].AttributeValue", "source": "identifier", "name": "EventId" }
+          ]
+        },
+        "path": "Events[0]"
+      }
+    },
+    "Trail": {
+      "identifiers": [
+        { "name": "TrailARN",
+          "memberName": "TrailARN" }
+      ],
+      "shape": "Trail",
+      "actions": {
+        "AddTags": {
+          "request": {
+            "operation": "AddTags",
+            "params": [
+              { "target": "ResourceId", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "RemoveTags": {
+          "request": {
+            "operation": "RemoveTags",
+            "params": [
+              { "target": "ResourceId", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "ListTags": {
+          "request": {
+            "operation": "ListTags",
+            "params": [
+              { "target": "ResourceIdList[0]", "source": "identifier", "name": "TrailARN" }
+            ]
+          },
+          "path": "ResourceTagList[0].TagsList"
+        },
+        "Delete": {
+          "request": {
+            "operation": "DeleteTrail",
+            "params": [
+              { "target": "Name", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "GetEventSelectors": {
+          "request": {
+            "operation": "GetEventSelectors",
+            "params": [
+              { "target": "TrailName", "source": "identifier", "name": "TrailARN" }
+            ]
+          },
+          "path": "EventSelectors[]"
+        },
+        "GetStatus": {
+          "request": {
+            "operation": "GetTrailStatus",
+            "params": [
+              { "target": "Name", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "PutEventSelectors": {
+          "request": {
+            "operation": "PutEventSelectors",
+            "params": [
+              { "target": "TrailName", "source": "identifier", "name": "TrailARN" }
+            ]
+          },
+          "path": "EventSelectors[]"
+        },
+        "StartLogging": {
+          "request": {
+            "operation": "StartLogging",
+            "params": [
+              { "target": "Name", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "StopLogging": {
+          "request": {
+            "operation": "StopLogging",
+            "params": [
+              { "target": "Name", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        },
+        "UpdateTrail": {
+          "request": {
+            "operation": "UpdateTrail",
+            "params": [
+              { "target": "Name", "source": "identifier", "name": "TrailARN" }
+            ]
+          }
+        }
+      },
+      "load": {
+        "request": {
+          "operation": "DescribeTrails",
+          "params": [
+            {
+              "target": "trailNameList[0]",
+              "source": "identifier",
+              "name": "TrailARN"
+            }
+          ]
+        },
+        "path": "trailList[0]"
+      }
+    },
+    "PublicKey": {
+      "identifiers": [
+        { "name": "Fingerprint",
+          "memberName": "Fingerprint" },
+        { "name": "ValidityStartTime",
+          "memberName": "ValidityStartTime" },
+        { "name": "ValidityEndTime",
+          "memberName": "ValidityEndTime" }
+      ],
+      "shape": "PublicKey",
+      "actions": { 
+      },
+      "load": {
+        "request": {
+          "operation": "ListPublicKeys",
+          "params": [
+            {
+              "target": "StartTime",
+              "source": "identifier",
+              "name": "ValidityStartTime"
+            },
+            {
+              "target": "EndTime",
+              "source": "identifier",
+              "name": "ValidityEndTime"
+            }
+          ]
+        },
+        "path": "trailList[0]"
+      }
+    }
+  }
+}

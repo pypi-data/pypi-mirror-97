@@ -1,0 +1,76 @@
+{
+    "service": {
+      "hasMany": {
+        "IdentityPools": {
+            "request": {
+                "operation": "ListIdentityPools",
+                "params": [
+                  {"target": "MaxResults", "source": "string", "value": 60}
+                ]
+            },
+            "resource": {
+              "type": "IdentityPool",
+              "identifiers": [
+                {"target": "Id", "source": "response", "path": "IdentityPools[].IdentityPoolId"}
+              ]
+            }
+        }
+      }
+    },
+    "resources": {
+      "IdentityPool": {
+        "shape": "IdentityPool",
+        "identifiers": [
+          {
+            "name": "Id"
+          }
+        ],
+        "load": {
+          "request": {
+            "operation": "DescribeIdentityPool",
+            "params": [
+              {"target": "IdentityPoolId", "source": "identifier", "name": "Id"}
+            ]
+          }
+        },
+        "hasMany": {
+            "Identities": {
+              "request": {
+                  "operation": "ListIdentities",
+                  "params": [
+                    {"target": "IdentityPoolId", "source": "identifier", "name": "Id"},
+                    {"target": "MaxResults", "source": "string", "value": 60}
+                  ]
+                },
+              "resource": {
+                "type": "Identity",
+                "identifiers": [
+                    {"target": "IdentityPoolId", "source": "identifier", "name": "Id"},
+                    {"target": "Id", "source": "response", "path": "Identities[].IdentityId"}
+                ]
+              }
+            }
+          }
+    },
+    "Identity": {
+      "shape": "IdentityDescription",
+      "identifiers": [
+        {
+          "name": "IdentityPoolId"
+        },
+        {
+          "name": "Id",
+          "memberName": "IdentityId"
+        }
+      ],
+      "load": {
+        "request": {
+          "operation": "DescribeIdentity",
+          "params": [
+              {"target": "IdentityId", "source": "identifier", "name": "Id"}
+          ]
+        }
+      }
+    }
+  }
+}

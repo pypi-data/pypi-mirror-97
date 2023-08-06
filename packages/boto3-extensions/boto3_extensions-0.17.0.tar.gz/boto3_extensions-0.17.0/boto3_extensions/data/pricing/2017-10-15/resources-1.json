@@ -1,0 +1,47 @@
+{
+  "service": {
+    "actions": {
+    },
+    "hasMany": {
+      "Services": {
+        "request": {
+          "operation": "DescribeServices"
+        },
+        "resource": {
+          "type": "Service",
+          "identifiers": [
+            { "target": "ServiceCode", "source": "response", "path": "Services[].ServiceCode" }
+          ],
+          "path": "Services[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Service": {
+      "identifiers": [
+        { "name": "ServiceCode",
+          "memberName": "ServiceCode" }
+      ],
+      "shape": "Service",
+      "actions": {
+        "GetProducts": {
+          "request": {
+            "operation": "GetProducts",
+            "params": [
+              { "target": "ServiceCode", "source": "identifier", "name": "ServiceCode" }
+            ]
+          }
+        },
+        "GetAttributeValues": {
+          "request": {
+            "operation": "GetAttributeValues",
+            "params": [
+              { "target": "ServiceCode", "source": "identifier", "name": "ServiceCode" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

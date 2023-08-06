@@ -1,0 +1,203 @@
+{
+  "service": {
+    "has": {
+      "Cluster": {
+        "resource": {
+          "type": "Cluster",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "Snapshot": {
+        "resource": {
+          "type": "Snapshot",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "ReservedNode": {
+        "resource": {
+          "type": "ReservedNode",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "ReservedNodeOffering": {
+        "resource": {
+          "type": "ReservedNodeOffering",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Clusters": {
+        "request": {
+          "operation": "DescribeClusters"
+        },
+        "resource": {
+          "type": "Cluster",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "Clusters[].ClusterIdentifier" }
+          ],
+          "path": "Clusters[]"
+        }
+      },
+      "Snapshots": {
+        "request": {
+          "operation": "DescribeClusterSnapshots"
+        },
+        "resource": {
+          "type": "Snapshot",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "Snapshots[].SnapshotIdentifier" }
+          ],
+          "path": "Snapshots[]"
+        }
+      },
+      "ReservedNodes": {
+        "request": {
+          "operation": "DescribeReservedNodes"
+        },
+        "resource": {
+          "type": "ReservedNode",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "ReservedNodes[].ReservedNodeId" }
+          ],
+          "path": "ReservedNodes[]"
+        }
+      },
+      "ReservedNodeOfferings": {
+        "request": {
+          "operation": "DescribeReservedNodeOfferings"
+        },
+        "resource": {
+          "type": "ReservedNodeOffering",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "ReservedNodeOfferings[].ReservedNodeOfferingId" }
+          ],
+          "path": "ReservedNodeOfferings[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Cluster": {
+      "identifiers": [
+        { "name": "Id",
+          "memberName": "ClusterIdentifier" }
+      ],
+      "shape": "Cluster",
+      "load": {
+        "request": {
+          "operation": "DescribeClusters",
+          "params": [
+            {
+              "target": "ClusterIdentifier",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "Clusters[0]"
+      },
+      "hasMany": {
+        "Snapshots": {
+          "request": { 
+            "operation": "DescribeClusterSnapshots",
+            "params": [
+              { "target": "ClusterIdentifier", "source": "identifier", "name": "Id" }
+            ]
+          },
+          "resource": {
+            "type": "Snapshot",
+            "identifiers": [
+              { "target": "Id", "source": "response", "path": "Snapshots[].SnapshotIdentifier" }
+            ],
+            "path": "Snapshots[]"
+          }
+        }
+      }
+    },
+    "Snapshot": {
+      "identifiers": [
+        { "name": "Id",
+          "memberName": "SnapshotIdentifier" }
+      ],
+      "shape": "Snapshot",
+      "load": {
+        "request": {
+          "operation": "DescribeClusterSnapshots",
+          "params": [
+            {
+              "target": "SnapshotIdentifier",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "Snapshots[0]"
+      }
+    },
+    "ReservedNode": {
+      "identifiers": [
+        { "name": "Id",
+          "memberName": "ReservedNodeId" }
+      ],
+      "shape": "ReservedNode",
+      "load": {
+        "request": {
+          "operation": "DescribeReservedNodes",
+          "params": [
+            {
+              "target": "ReservedNodeId",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "ReservedNodes[0]"
+      }
+    },
+    "ReservedNodeOffering": {
+      "identifiers": [
+        { "name": "Id",
+          "memberName": "ReservedNodeOfferingId" }
+      ],
+      "shape": "ReservedNodeOffering",
+      "load": {
+        "request": {
+          "operation": "DescribeReservedNodeOfferings",
+          "params": [
+            {
+              "target": "ReservedNodeOfferingId",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "ReservedNodeOfferings[0]"
+      },
+      "actions": {
+        "Purchase": {
+          "request": {
+            "operation": "PurchaseReservedNodeOffering",
+            "params": [
+              { "target": "ReservedNodeOfferingId", "source": "identifier", "name": "Id" }
+            ]
+          },
+          "resource": {
+            "type": "ReservedNode",
+            "identifiers": [
+              { "target": "Id", "source": "response", "path": "ReservedNode.ReservedNodeId" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

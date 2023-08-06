@@ -1,0 +1,240 @@
+{
+  "service": {
+    "hasMany": {
+      "Keys": {
+        "request": {"operation": "ListKeys"},
+        "resource": {
+          "type": "Key",
+          "identifiers": [
+            {"target": "KeyId", "source": "response", "path": "Keys[].KeyId"}
+          ]
+        }
+      },
+      "Aliases": {
+        "request": {"operation": "ListAliases"},
+        "resource": {
+          "type": "Alias",
+          "identifiers": [
+            {"target": "Name", "source": "response", "path": "Aliases[].AliasName"}
+          ],
+          "path": "Aliases[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Key": {
+      "shape": "KeyMetadata",
+      "identifiers": [
+        {
+          "name": "KeyId"
+        }
+      ],
+      "load": {
+        "request": {
+          "operation": "DescribeKey",
+          "params": [
+            {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+          ]
+        },
+        "path": "KeyMetadata"
+      },
+      "actions": {
+        "CancelKeyDeletion": {
+          "request": {
+            "operation": "CancelKeyDeletion",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "CreateGrant": {},
+        "DeleteImportedKeyMaterial": {
+          "request": {
+            "operation": "DeleteImportedKeyMaterial",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "Disable": {
+          "request": {
+            "operation": "DisableKey",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "DisableKeyRotation": {
+          "request": {
+            "operation": "DisableKeyRotation",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "Enable": {
+          "request": {
+            "operation": "EnableKey",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "EnableKeyRotation": {
+          "request": {
+            "operation": "EnableKeyRotation",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        },
+        "GetKeyPolicy": {
+          "request": {
+            "operation": "GetKeyPolicy",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        }
+      },
+      "has": {
+        "KeyRotationStatus": {
+          "resource": {
+            "type": "KeyRotationStatus",
+            "identifiers": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          }
+        }
+      },
+      "hasMany": {
+        "KeyPolicies": {
+          "request": {
+            "operation": "ListKeyPolicies",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          },
+          "resource": {
+            "type": "KeyPolicy",
+            "identifiers": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"},
+              {"target": "Name", "source": "response", "path": "PolicyNames[]"}
+            ]
+          }
+        },
+        "Grants": {
+          "request": {
+            "operation": "ListGrants",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          },
+          "resource": {
+            "type": "Grant",
+            "identifiers": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"},
+              {"target": "GrantId", "source": "response", "path": "Grants[].GrantId"}
+            ],
+            "path": "Grants[]"
+          }
+        },
+        "Tags": {
+          "request": {
+            "operation": "ListResourceTags",
+            "params": [
+              {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+            ]
+          },
+          "resource": {
+            "type": "Tag",
+            "identifiers": [
+              {"target": "TagKey", "source": "response", "path": "Tags[].TagKey"}
+            ],
+            "path": "Tags[]"
+          }
+        }
+      }
+    },
+    "Alias": {
+      "shape": "AliasListEntry",
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "AliasName"
+        }
+      ],
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteAlias",
+            "params": [
+              {"target": "AliasName", "source": "identifier", "name": "Name"}
+            ]
+          }
+        }
+      }
+    },
+    "KeyPolicy": {
+      "identifiers": [
+        {
+          "name": "KeyId"
+        },
+        {
+          "name": "Name",
+          "memberName": "PolicyName"
+        }
+      ],
+      "shape": "GetKeyPolicyResponse",
+      "load": {
+        "request": {
+          "operation": "GetKeyPolicy",
+          "params": [
+            {"target": "KeyId", "source": "identifier", "name": "KeyId"},
+            {"target": "PolicyName", "source": "identifier", "name": "Name"}
+          ]
+        },
+        "path": "Policy"
+      }
+    },
+    "Grant": {
+      "identifiers": [
+        {
+          "name": "KeyId"
+        },
+        {
+          "name": "GrantId",
+          "memberName": "GrantId"
+        }
+      ],
+      "shape": "GrantListEntry"
+    },
+    "Tag": {
+      "identifiers": [
+        {
+          "name": "TagKey"
+        }
+      ],
+      "shape": "Tag"
+    },
+    "KeyRotationStatus": {
+      "identifiers": [
+        {
+          "name": "KeyId",
+          "memberName": "KeyId"
+        }
+      ],
+      "shape": "GetKeyRotationStatusResponse",
+      "load": {
+        "request": {
+          "operation": "GetKeyRotationStatus",
+          "params": [
+            {"target": "KeyId", "source": "identifier", "name": "KeyId"}
+          ]
+        },
+        "path": "@"
+      }
+    }
+  }
+}

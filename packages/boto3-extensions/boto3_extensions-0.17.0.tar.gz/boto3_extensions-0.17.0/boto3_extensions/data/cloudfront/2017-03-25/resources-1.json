@@ -1,0 +1,59 @@
+{
+  "service": {
+    "has": {
+      "Distribution": {
+        "resource": {
+          "type": "Distribution",
+          "identifiers": [
+            {
+              "target": "Id",
+              "source": "input"
+            }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Distributions": {
+        "request": {
+          "operation": "ListDistributions"
+        },
+        "resource": {
+          "type": "Distribution",
+          "identifiers": [
+            {
+              "target": "Id",
+              "source": "response",
+              "path": "DistributionList.Items[].Id"
+            }
+          ],
+          "path": "DistributionList.Items[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Distribution": {
+      "identifiers": [
+        {
+          "name": "Id",
+          "memberName": "Id"
+        }
+      ],
+      "shape": "DistributionSummary",
+      "load": {
+        "request": {
+          "operation": "GetDistribution",
+          "params": [
+            {
+              "target": "Id",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "Distribution"
+      }
+    }
+  }
+}

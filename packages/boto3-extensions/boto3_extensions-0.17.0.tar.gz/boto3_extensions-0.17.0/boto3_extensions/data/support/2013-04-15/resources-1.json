@@ -1,0 +1,229 @@
+{
+  "service": {
+    "actions": {
+      "AddAttachmentsToSet": {
+        "request": {
+          "operation": "AddAttachmentsToSet"
+        }
+      },
+      "CreateCase": {
+        "request": {
+          "operation": "CreateCase"
+        },
+        "resource": {
+          "type": "CaseDetails",
+          "identifiers": [
+            { "target": "CaseId", "source": "response", "path": "caseId" }
+          ],
+          "path": "@"
+        }
+      },
+      "DescribeSeverityLevels": {
+        "request": {
+          "operation": "DescribeSeverityLevels"
+        }
+      },
+      "DescribeServices": {
+        "request": {
+          "operation": "DescribeServices"
+        }
+      },
+      "RefreshTrustedAdvisorCheck": {
+        "request": {
+          "operation": "RefreshTrustedAdvisorCheck"
+        }
+      }
+    },
+    "has": {
+      "Case": {
+        "resource": {
+          "type": "CaseDetails",
+          "identifiers": [
+            {
+              "target": "CaseId",
+              "source": "input"
+            }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Cases": {
+        "request": {
+          "operation": "DescribeCases"
+        },
+        "resource": {
+          "type": "CaseDetails",
+          "identifiers": [
+            { "target": "CaseId", "source": "response", "path": "cases[].caseId" }
+          ],
+          "path": "cases[]"
+        }
+      },
+      "TrustedAdvisorChecks": {
+        "request": {
+          "operation": "DescribeTrustedAdvisorChecks",
+          "params": [
+            { "target": "language", "source": "string", "value": "en" }
+          ]
+        },
+        "resource": {
+          "type": "TrustedAdvisorCheckDescription",
+          "identifiers": [
+            { "target": "id", "source": "response", "path": "checks[].id" }
+          ],
+          "path": "checks[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "CaseDetails": {
+      "identifiers": [
+        { "name": "CaseId",
+          "memberName": "CaseId" }
+      ],
+      "shape": "CaseDetails",
+      "load": {
+        "request": {
+          "operation": "DescribeCases",
+          "params": [
+            {
+              "target": "caseIdList[0]",
+              "source": "identifier",
+              "name": "CaseId"
+            }
+          ]
+        },
+        "path": "cases[0]"
+      },
+      "hasMany": {
+        "Communications": {
+          "request": {
+            "params": [
+              { "target": "caseId", "source": "identifier", "name": "CaseId" }
+            ],
+            "operation": "DescribeCommunications"
+          },
+          "resource": {
+            "type": "Communication",
+            "identifiers": [
+              { "target": "CaseId", "source": "response", "path": "communications[].caseId" }
+            ],
+            "path": "communications[]"
+          }
+        }
+      },
+      "actions": {
+        "AddCommunicationToCase": {
+          "request": {
+            "operation": "AddCommunicationToCase",
+            "params": [
+              { "target": "caseId", "source": "identifier", "name": "CaseId" }
+            ]
+          }
+        },
+        "ResolveCase": {
+          "request": {
+            "operation": "ResolveCase",
+            "params": [
+              { "target": "caseId", "source": "identifier", "name": "CaseId" }
+            ]
+          }
+        }
+      }
+    },
+    "Communication": {
+      "identifiers": [
+        { "name": "CaseId",
+          "memberName": "CaseId" }
+      ],
+      "shape": "Communication"
+    },
+    "TrustedAdvisorCheckDescription": {
+      "identifiers": [
+          { "name": "id",
+            "memberName": "id" }
+      ],
+      "shape": "TrustedAdvisorCheckDescription",
+      "hasMany": {
+        "CheckSummary": {
+          "request": {
+            "params": [
+              { "target": "checkIds[0]", "source": "identifier", "name": "id" }
+            ],
+            "operation": "DescribeTrustedAdvisorCheckSummaries"
+          },
+          "resource": {
+            "type": "TrustedAdvisorCheckSummary",
+            "identifiers": [
+              { "target": "checkId", "source": "response", "path": "summaries[].checkId" }
+            ],
+            "path": "summaries[]"
+          }
+        }
+      },
+      "actions": {
+        "Refresh": {
+          "request": {
+            "params": [
+              { "target": "checkId", "source": "identifier", "name": "id" }
+            ],
+            "operation": "RefreshTrustedAdvisorCheck"
+          }
+        },
+        "RefreshStatus": {
+          "request": {
+            "params": [
+              { "target": "checkIds[0]", "source": "identifier", "name": "id" }
+            ],
+            "operation": "DescribeTrustedAdvisorCheckRefreshStatuses"
+          },
+          "resource": {
+            "type": "TrustedAdvisorCheckRefreshStatus",
+            "identifiers": [
+              { "target": "checkId", "source": "response", "path": "statuses[0].checkId" }
+            ],
+            "path": "statuses[0]"
+          }
+        },
+        "CheckResult": {
+          "request": {
+            "params": [
+              { "target": "checkId", "source": "identifier", "name": "id" }
+            ],
+            "operation": "DescribeTrustedAdvisorCheckResult"
+          },
+          "resource": {
+            "type": "TrustedAdvisorCheckResult",
+            "identifiers": [
+              { "target": "checkId", "source": "response", "path": "result.checkId" }
+            ],
+            "path": "result"
+          }
+        }
+      }
+    },
+    "TrustedAdvisorCheckSummary": {
+      "identifiers": [
+        { "name": "checkId",
+          "memberName": "checkId" }
+      ],
+      "shape": "TrustedAdvisorCheckSummary"
+    },
+    "TrustedAdvisorCheckResult": {
+      "identifiers": [
+        { "name": "checkId",
+          "memberName": "checkId" }
+      ],
+      "shape": "TrustedAdvisorCheckResult"
+    },
+    "TrustedAdvisorCheckRefreshStatus": {
+      "identifiers": [
+        { "name": "checkId",
+          "memberName": "checkId" }
+      ],
+      "shape": "TrustedAdvisorCheckRefreshStatus"
+    }
+  }
+}

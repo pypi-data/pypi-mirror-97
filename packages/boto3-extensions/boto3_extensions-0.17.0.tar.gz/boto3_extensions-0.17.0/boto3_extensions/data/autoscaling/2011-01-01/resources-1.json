@@ -1,0 +1,82 @@
+{
+  "service": {
+    "has": {
+      "AutoScalingGroup": {
+        "resource": {
+          "type": "AutoScalingGroup",
+          "identifiers": [
+            { "target": "Name", "source": "input" }
+          ]
+        }
+      },
+      "LaunchConfiguration": {
+        "resource": {
+          "type": "LaunchConfiguration",
+          "identifiers": [
+            { "target": "Name", "source": "input" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "AutoScalingGroups": {
+        "request": { "operation": "DescribeAutoScalingGroups" },
+        "resource": {
+          "type": "AutoScalingGroup",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "AutoScalingGroups[].AutoScalingGroupName" }
+          ],
+          "path": "AutoScalingGroups[]"
+        }
+      },
+      "LaunchConfigurations": {
+        "request": { "operation": "DescribeLaunchConfigurations" },
+        "resource": {
+          "type": "LaunchConfiguration",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "LaunchConfigurations[].LaunchConfigurationName" }
+          ],
+          "path": "LaunchConfigurations[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "AutoScalingGroup": {
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "AutoScalingGroupName"
+        }
+      ],
+      "shape": "AutoScalingGroup",
+      "load": {
+        "request": {
+          "operation": "DescribeAutoScalingGroups",
+          "params": [
+            { "target": "AutoScalingGroupNames[0]", "source": "identifier", "name": "Name" }
+          ]
+        },
+        "path": "AutoScalingGroups[0]"
+      }
+    },
+    "LaunchConfiguration": {
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "LaunchConfigurationName"
+        }
+      ],
+      "shape": "LaunchConfiguration",
+      "load": {
+        "request": {
+          "operation": "DescribeLaunchConfigurations",
+          "params": [
+            { "target": "LaunchConfigurationNames[0]", "source": "identifier", "name": "Name" }
+          ]
+        },
+        "path": "LaunchConfigurations[0]"
+      }
+    }
+  }
+}

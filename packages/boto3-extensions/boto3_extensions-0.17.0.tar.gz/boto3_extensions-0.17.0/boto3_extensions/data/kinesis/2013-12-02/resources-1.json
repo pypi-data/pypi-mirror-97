@@ -1,0 +1,35 @@
+{
+  "service": {
+    "hasMany": {
+      "Streams": {
+        "request": {"operation": "ListStreams"},
+        "resource": {
+          "type": "Stream",
+          "identifiers": [
+            {"target": "Name", "source": "response", "path": "StreamNames[]"}
+          ]
+        }
+      }
+    }
+  },
+  "resources": {
+    "Stream": {
+      "shape": "StreamDescription",
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "StreamName"
+        }
+      ],
+      "load": {
+        "request": {
+          "operation": "DescribeStream",
+          "params": [
+            {"target": "StreamName", "source": "identifier", "name": "Name"}
+          ]
+        },
+        "path": "StreamDescription"
+      }
+    }
+  }
+}

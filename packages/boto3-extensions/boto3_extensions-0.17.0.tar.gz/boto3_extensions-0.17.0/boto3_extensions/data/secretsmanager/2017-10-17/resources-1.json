@@ -1,0 +1,136 @@
+{
+  "service": {
+    "actions": {
+      "CreateSecret": {
+        "request": { "operation": "CreateSecret" },
+        "resource": {
+          "type": "Secret",
+          "identifiers": [
+            { "target": "Name", "source": "requestParameter", "path": "Name" }
+          ]
+        }
+      }
+    },
+    "has": {
+      "Secret": {
+        "resource": {
+          "type": "Secret",
+          "identifiers": [
+            { "target": "Name", "source": "input" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Secrets": {
+        "request": { "operation": "ListSecrets" },
+        "resource": {
+          "type": "Secret",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "SecretList[].Name" }
+          ],
+          "path": "SecretList[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Secret": {
+      "identifiers": [
+        { "name": "Name" }
+      ],
+      "load": {
+        "request": {
+          "operation": "DescribeSecret",
+          "params": [
+            { "target": "SecretId", "source": "identifier", "name": "Name" }
+          ]
+        },
+        "path": "@" 
+      },
+      "shape": "SecretListEntry",
+      "actions": {
+        "GetRandomPassword": {
+          "request": {
+            "operation": "GetRandomPassword",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "Update": {
+          "request": {
+            "operation": "UpdateSecret",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "Delete": {
+          "request": {
+            "operation": "DeleteSecret",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "RotateSecret": {
+          "request": {
+            "operation": "RotateSecret",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "CancelRotate": {
+          "request": {
+            "operation": "CancelRotateSecret",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "PutSecretValue": {
+          "request": {
+            "operation": "PutSecretValue",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "GetSecretValue": {
+          "request": {
+            "operation": "GetSecretValue",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "RestoreSecret": {
+          "request": {
+            "operation": "RestoreSecret",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "TagResource": {
+          "request": {
+            "operation": "TagResource",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "UntagResource": {
+          "request": {
+            "operation": "UntagResource",
+            "params": [
+              { "target": "SecretId", "source": "identifier", "name": "Name" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

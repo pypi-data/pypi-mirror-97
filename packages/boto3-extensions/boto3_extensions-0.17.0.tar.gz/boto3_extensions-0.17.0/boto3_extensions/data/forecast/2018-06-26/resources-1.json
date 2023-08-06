@@ -1,0 +1,1139 @@
+{
+    "service": {
+        "actions": {
+            "CreateDatasetGroup": {
+                "request": {
+                    "operation": "CreateDatasetGroup"
+                },
+                "resource": {
+                    "type": "DatasetGroup",
+                    "identifiers": [
+                        {
+                            "target": "arn",
+                            "source": "response",
+                            "path": "DatasetGroupArn"
+                        }
+                    ],
+                    "path": ""
+                }
+            },
+            "CreateDataset": {
+                "request": {
+                    "operation": "CreateDataset"
+                },
+                "resource": {
+                    "type": "Dataset",
+                    "identifiers": [
+                        {
+                            "target": "arn",
+                            "source": "response",
+                            "path": "DatasetArn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "hasMany": {
+            "DatasetGroups": {
+                "request": {
+                    "operation": "ListDatasetGroups"
+                },
+                "resource": {
+                    "type": "DatasetGroup",
+                    "identifiers": [
+                        {
+                            "target": "arn",
+                            "source": "response",
+                            "path": "DatasetGroups[].DatasetGroupArn"
+                        }
+                    ],
+                    "path": "DatasetGroups[]"
+                }
+            },
+            "Datasets": {
+                "request": {
+                    "operation": "ListDatasets"
+                },
+                "resource": {
+                    "type": "Dataset",
+                    "identifiers": [
+                        {
+                            "target": "arn",
+                            "source": "response",
+                            "path": "Datasets[].DatasetArn"
+                        }
+                    ],
+                    "path": "Datasets[]"
+                }
+            }
+        }
+    },
+    "resources": {
+        "DatasetGroup": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "DatasetGroupSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribeDatasetGroup",
+                    "params": [
+                        {
+                            "target": "DatasetGroupArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "Datasets": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "DatasetGroupArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "DescribeDatasetGroup"
+                    },
+                    "resource": {
+                        "type": "Dataset",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "DatasetArns[]"
+                            }
+                        ],
+                        "path": "DatasetArns[]"
+                    }
+                },
+                "Predictors": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "Filters[0].Key",
+                                "source": "string",
+                                "value": "DatasetGroupArn"
+                            },
+                            {
+                                "target": "Filters[0].Condition",
+                                "source": "string",
+                                "value": "IS"
+                            },
+                            {
+                                "target": "Filters[0].Value",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListPredictors"
+                    },
+                    "resource": {
+                        "type": "Predictor",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "Predictors[].PredictorArn"
+                            }
+                        ],
+                        "path": "Predictors[]"
+                    }
+                },
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "CreatePredictor": {
+                    "request": {
+                        "operation": "CreatePredictor",
+                        "params": [
+                            {
+                                "target": "InputDataConfig.DatasetGroupArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    },
+                    "resource": {
+                        "type": "Predictor",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "PredictorArn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteDatasetGroup",
+                        "params": [
+                            {
+                                "target": "DatasetGroupArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Update": {
+                    "request": {
+                        "operation": "UpdateDatasetGroup",
+                        "params": [
+                            {
+                                "target": "DatasetGroupArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "Dataset": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "DatasetSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribeDataset",
+                    "params": [
+                        {
+                            "target": "DatasetArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "DatasetImportJobs": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "Filters[0].Key",
+                                "source": "string",
+                                "value": "DatasetArn"
+                            },
+                            {
+                                "target": "Filters[0].Condition",
+                                "source": "string",
+                                "value": "IS"
+                            },
+                            {
+                                "target": "Filters[0].Value",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListDatasetImportJobs"
+                    },
+                    "resource": {
+                        "type": "DatasetImportJob",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "DatasetImportJobs[].DatasetImportJobArn"
+                            }
+                        ],
+                        "path": "DatasetImportJobs[]"
+                    }
+                },
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "CreateDatasetImportJob": {
+                    "request": {
+                        "operation": "CreateDatasetImportJob",
+                        "params": [
+                            {
+                                "target": "DatasetArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    },
+                    "resource": {
+                        "type": "DatasetImportJob",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "DatasetImportJobArn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteDataset",
+                        "params": [
+                            {
+                                "target": "DatasetArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "DatasetReady",
+                    "params": [
+                        {
+                            "target": "DatasetArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "DatasetImportJob": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "DatasetImportJobSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribeDatasetImportJob",
+                    "params": [
+                        {
+                            "target": "DatasetImportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "Stop": {
+                    "request": {
+                        "operation": "StopResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteDatasetImportJob",
+                        "params": [
+                            {
+                                "target": "DatasetImportJobArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "DatasetImportJobReady",
+                    "params": [
+                        {
+                            "target": "DatasetImportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "Predictor": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "PredictorSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribePredictor",
+                    "params": [
+                        {
+                            "target": "PredictorArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "Forecasts": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "Filters[0].Key",
+                                "source": "string",
+                                "value": "PredictorArn"
+                            },
+                            {
+                                "target": "Filters[0].Condition",
+                                "source": "string",
+                                "value": "IS"
+                            },
+                            {
+                                "target": "Filters[0].Value",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListForecasts"
+                    },
+                    "resource": {
+                        "type": "Forecast",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "Forecasts[].ForecastArn"
+                            }
+                        ],
+                        "path": "Forecasts[]"
+                    }
+                },
+                "EvaluationResults": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "PredictorArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "GetAccuracyMetrics"
+                    },
+                    "resource": {
+                        "type": "EvaluationResult",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "PredictorEvaluationResults[].AlgorithmArn"
+                            }
+                        ],
+                        "path": "PredictorEvaluationResults[]"
+                    }
+                },
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "Stop": {
+                    "request": {
+                        "operation": "StopResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeletePredictor",
+                        "params": [
+                            {
+                                "target": "PredictorArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "CreateForecast": {
+                    "request": {
+                        "operation": "CreateForecast",
+                        "params": [
+                            {
+                                "target": "PredictorArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    },
+                    "resource": {
+                        "type": "Forecast",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "ForecastArn"
+                            }
+                        ]
+                    }
+                },
+                "CreatePreditorBacktestExportJob": {
+                    "request": {
+                        "operation": "CreatePreditorBacktestExportJob",
+                        "params": [
+                            {
+                                "target": "PredictorArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    },
+                    "resource": {
+                        "type": "PredictorBacktestExportJob",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "PredictorBacktestExportJobArn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "PredictorReady",
+                    "params": [
+                        {
+                            "target": "PredictorArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "PredictorBacktestExportJob": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "PredictorBacktestExportJob",
+            "load": {
+                "request": {
+                    "operation": "DescribeForecastExportJob",
+                    "params": [
+                        {
+                            "target": "PredictorBacktestExportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "Stop": {
+                    "request": {
+                        "operation": "StopResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteForecastExportJob",
+                        "params": [
+                            {
+                                "target": "ForecastExportJobArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "PredictorBacktestExportJobReady",
+                    "params": [
+                        {
+                            "target": "PredictorBacktestExportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "EvaluationResult": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "EvaluationResult"
+        },
+        "Forecast": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "ForecastSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribeForecast",
+                    "params": [
+                        {
+                            "target": "ForecastArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "ForecastExportJobs": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "Filters[0].Key",
+                                "source": "string",
+                                "value": "ForecastArn"
+                            },
+                            {
+                                "target": "Filters[0].Condition",
+                                "source": "string",
+                                "value": "IS"
+                            },
+                            {
+                                "target": "Filters[0].Value",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListForecastExportJobs"
+                    },
+                    "resource": {
+                        "type": "ForecastExportJob",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "ForecastExportJobs[].ForecastExportJobArn"
+                            }
+                        ],
+                        "path": "ForecastExportJobs[]"
+                    }
+                },
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "Stop": {
+                    "request": {
+                        "operation": "StopResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteForecast",
+                        "params": [
+                            {
+                                "target": "ForecastArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "CreateForecastExportJob": {
+                    "request": {
+                        "operation": "CreateForecastExportJob",
+                        "params": [
+                            {
+                                "target": "ForecastArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    },
+                    "resource": {
+                        "type": "ForecastExportJob",
+                        "identifiers": [
+                            {
+                                "target": "arn",
+                                "source": "response",
+                                "path": "ForecastExportJobArn"
+                            }
+                        ],
+                        "path": ""
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "ForecastReady",
+                    "params": [
+                        {
+                            "target": "ForecastArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "ForecastExportJob": {
+            "identifiers": [
+                {
+                    "name": "arn",
+                    "memberName": "arn"
+                }
+            ],
+            "shape": "ForecastExportJobSummary",
+            "load": {
+                "request": {
+                    "operation": "DescribeForecastExportJob",
+                    "params": [
+                        {
+                            "target": "ForecastExportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ]
+                },
+                "path": ""
+            },
+            "hasMany": {
+                "Tags": {
+                    "request": {
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ],
+                        "operation": "ListTagsForResource"
+                    },
+                    "resource": {
+                        "type": "Tag",
+                        "identifiers": [
+                            {
+                                "target": "resource_arn",
+                                "source": "identifier",
+                                "path": "arn"
+                            },
+                            {
+                                "target": "key",
+                                "source": "response",
+                                "path": "Tags[].Key"
+                            },
+                            {
+                                "target": "value",
+                                "source": "response",
+                                "path": "Tags[].Value"
+                            }
+                        ],
+                        "path": "Tags[]"
+                    }
+                }
+            },
+            "actions": {
+                "Stop": {
+                    "request": {
+                        "operation": "StopResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "Delete": {
+                    "request": {
+                        "operation": "DeleteForecastExportJob",
+                        "params": [
+                            {
+                                "target": "ForecastExportJobArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                },
+                "TagResource": {
+                    "request": {
+                        "operation": "TagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "arn"
+                            }
+                        ]
+                    }
+                }
+            },
+            "waiters": {
+                "Ready": {
+                    "waiterName": "ForecastExportJobReady",
+                    "params": [
+                        {
+                            "target": "ForecastExportJobArn",
+                            "source": "identifier",
+                            "name": "arn"
+                        }
+                    ],
+                    "path": ""
+                }
+            }
+        },
+        "Tag": {
+            "identifiers": [
+                {
+                    "name": "resource_arn",
+                    "memberName": "resource_arn"
+                },
+                {
+                    "name": "key",
+                    "memberName": "key"
+                },
+                {
+                    "name": "value",
+                    "memberName": "value"
+                }
+            ],
+            "shape": "Tag",
+            "actions": {
+                "Delete": {
+                    "request": {
+                        "operation": "UntagResource",
+                        "params": [
+                            {
+                                "target": "ResourceArn",
+                                "source": "identifier",
+                                "name": "resource_arn"
+                            },
+                            {
+                                "target": "TagKeys[0]",
+                                "source": "identifier",
+                                "name": "key"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

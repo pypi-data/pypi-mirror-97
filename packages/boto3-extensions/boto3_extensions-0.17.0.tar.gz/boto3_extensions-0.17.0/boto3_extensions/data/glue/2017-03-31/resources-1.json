@@ -1,0 +1,92 @@
+{
+  "service": {
+    "hasMany": {
+      "Jobs": {
+        "request": { "operation": "GetJobsV2" },
+        "resource": {
+          "type": "Job",
+          "identifiers": [
+            { "target": "name", "source": "response", "path": "jobs[].name" }
+          ],
+          "path": "jobs[]"
+        }
+      },
+      "Tables": {
+        "request": { "operation": "GetTables" },
+        "resource": {
+          "type": "Table",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "TableList[].Name" }
+          ],
+          "path": "TableList[]"
+        }
+      },
+      "Crawlers": {
+        "request": { "operation": "GetCrawlers" },
+        "resource": {
+          "type": "Crawler",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "Crawlers[].Name" }
+          ],
+          "path": "Crawlers[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Job": {
+      "identifiers": [
+        {
+          "name": "name",
+          "memberName": "name"
+        }
+      ],
+      "shape": "Job",
+      "load": {
+        "request": {
+          "operation": "GetJobV2",
+          "params": [
+            { "target": "jobName", "source": "identifier", "name": "name" }
+          ]
+        },
+        "path": "job"
+      }
+    },
+    "Table": {
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "Name"
+        }
+      ],
+      "shape": "Table",
+      "load": {
+        "request": {
+          "operation": "GetTable",
+          "params": [
+            { "target": "Name", "source": "identifier", "name": "Name" }
+          ]
+        },
+        "path": "Table"
+      }
+    },
+    "Crawler": {
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "Name"
+        }
+      ],
+      "shape": "Crawler",
+      "load": {
+        "request": {
+          "operation": "GetCrawler",
+          "params": [
+            { "target": "Name", "source": "identifier", "name": "Name" }
+          ]
+        },
+        "path": "Crawler"
+      }
+    }
+  }
+}

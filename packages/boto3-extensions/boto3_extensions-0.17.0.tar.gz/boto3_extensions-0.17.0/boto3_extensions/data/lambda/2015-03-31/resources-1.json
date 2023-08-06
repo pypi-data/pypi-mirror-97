@@ -1,0 +1,206 @@
+{
+  "service": {
+    "actions": {
+      "CreateFunction": {
+        "request": { "operation": "CreateFunction" }
+      }
+    },
+    "has": {
+      "Function": {
+        "resource": {
+          "type": "Function",
+          "identifiers": [  ]
+        }
+      }
+    },
+    "hasMany": {
+      "Functions": {
+        "request": {
+          "operation": "ListFunctions"
+        },
+        "resource": {
+          "type": "Function",
+          "identifiers": [
+            {
+              "target": "FunctionName",
+              "source": "response",
+              "path": "Functions[].FunctionName"
+            }
+          ],
+          "path": "Functions[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Function": {
+      "identifiers": [
+        {
+          "name": "FunctionName",
+          "memberName": "FunctionName"
+        }
+      ],
+      "shape": "FunctionConfiguration",
+      "load": {
+        "request": {
+          "operation": "GetFunction",
+          "params": [
+            {
+              "target": "FunctionName",
+              "source": "identifier",
+              "name": "FunctionName"
+            }
+          ]
+        },
+        "path": "Configuration"
+      },
+      "actions": {
+      },
+      "has": {
+      },
+      "hasMany": {
+        "Aliases": {
+          "request": {
+            "operation": "ListAliases",
+            "params": [{
+              "target": "FunctionName",
+              "source": "identifier",
+              "name": "FunctionName"
+            }]
+          },
+          "resource": {
+            "type": "Aliases",
+            "identifiers": [
+              {
+                "target": "AliasName",
+                "source": "response",
+                "path": "Aliases[].Name"
+              }
+            ],
+            "path": "Aliases[]"
+          }
+        },
+        "EventSourceMappings": {
+          "request": {
+            "operation": "ListEventSourceMappings",
+            "params": [{
+              "target": "FunctionName",
+              "source": "identifier",
+              "name": "FunctionName"
+            }]
+          },
+          "resource": {
+            "type": "EventSourceMapping",
+            "identifiers": [
+              {
+                "target": "UUID",
+                "source": "response",
+                "path": "EventSourceMappings[].UUID"
+              }
+            ],
+            "path": "EventSourceMappings[]"
+          }
+        },
+        "Versions": {
+          "request": {
+            "operation": "ListVersionsByFunction",
+            "params": [{
+              "target": "FunctionName",
+              "source": "identifier",
+              "name": "FunctionName"
+            }]
+          },
+          "resource": {
+            "type": "Version",
+            "identifiers": [
+              {
+                "target": "Version",
+                "source": "response",
+                "path": "Versions[].Version"
+              },
+              {
+                "target": "FunctionName",
+                "source": "response",
+                "path": "Versions[].FunctionName"
+              }
+            ],
+            "path": "Versions[]"
+          }
+        }
+      }
+    },
+    "Aliases": {
+      "identifiers": [
+        {
+          "name": "AliasName",
+          "memberName": "AliasName"
+        }
+      ],
+      "shape": "AliasConfiguration",
+      "actions": {
+      },
+      "has": {
+      },
+      "hasMany": {
+      }
+    },
+    "EventSourceMapping": {
+      "identifiers": [
+        {
+          "name": "UUID",
+          "memberName": "UUID"
+        }
+      ],
+      "shape": "EventSourceMappingConfiguration",
+      "actions": {
+      },
+      "has": {
+      },
+      "hasMany": {
+      }
+    },
+    "Version": {
+      "identifiers": [
+        {
+          "name": "FunctionName",
+          "memberName": "FunctionName"
+        },
+        {
+          "name": "Version",
+          "memberName": "Version"
+        }
+      ],
+      "shape": "FunctionConfiguration",
+      "actions": {
+      },
+      "hasMany": {
+        "Aliases": {
+          "request": {
+            "operation": "ListAliases",
+            "params": [{
+                "target": "FunctionName",
+                "source": "identifier",
+                "name": "FunctionName"
+              },
+              {
+                "target": "FunctionVersion",
+                "source": "identifier",
+                "name": "Version"
+              }]
+          },
+          "resource": {
+            "type": "Aliases",
+            "identifiers": [
+              {
+                "target": "AliasName",
+                "source": "response",
+                "path": "Aliases[].Name"
+              }
+            ],
+            "path": "Functions[]"
+          }
+        }
+      }
+    }
+  }
+}

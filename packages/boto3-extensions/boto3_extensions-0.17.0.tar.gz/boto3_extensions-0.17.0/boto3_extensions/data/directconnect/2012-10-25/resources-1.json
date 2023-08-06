@@ -1,0 +1,70 @@
+{
+  "service": {
+    "hasMany": {
+      "Connections": {
+        "request": {
+          "operation": "DescribeConnections"
+        },
+        "resource": {
+          "type": "Connection",
+          "identifiers": [
+            { "target": "connectionId", "source": "response", "path": "connections[].connectionId" }
+          ],
+          "path": "connections[]"
+        }
+      },
+      "VirtualInterfaces": {
+        "request": {
+          "operation": "DescribeVirtualInterfaces"
+        },
+        "resource": {
+          "type": "VirtualInterface",
+          "identifiers": [
+            { "target": "virtualInterfaceId", "source": "response", "path": "virtualInterfaces[].virtualInterfaceId" }
+          ],
+          "path": "virtualInterfaces[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Connection": {
+      "identifiers": [
+        { "name": "connectionId", "memberName": "connectionId" }
+      ],
+      "shape": "Connection",
+      "load": {
+        "request": {
+          "operation": "DescribeConnections",
+          "params": [
+            {
+              "target": "connectionId",
+              "source": "identifier",
+              "name": "connectionId"
+            }
+          ]
+        },
+        "path": "connections[0]"
+      }
+    },
+    "VirtualInterface": {
+      "identifiers": [
+        { "name": "virtualInterfaceId", "memberName": "virtualInterfaceId" }
+      ],
+      "shape": "VirtualInterface",
+      "load": {
+        "request": {
+          "operation": "DescribeVirtualInterfaces",
+          "params": [
+            {
+              "target": "virtualInterfaceId",
+              "source": "identifier",
+              "name": "virtualInterfaceId"
+            }
+          ]
+        },
+        "path": "virtualInterfaces[0]"
+      }
+    }
+  }
+}

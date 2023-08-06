@@ -1,0 +1,48 @@
+{
+    "service": {
+        "hasMany": {
+            "Pipelines": {
+                "request": {
+                    "operation": "ListPipelines"
+                },
+                "resource": {
+                    "type": "Pipeline",
+                    "identifiers": [
+                        { "target": "Id", "source": "response", "path": "pipelineIdList[].id" }
+                    ]
+                },
+                "path": "pipelineIdList[]"
+            }
+        },
+        "has": {
+            "Pipeline": {
+                "resource": {
+                    "type": "Pipeline",
+                    "identifiers": [
+                        { "target": "Id", "source": "input" }
+                    ]
+                }
+            }
+        }
+    },
+    "resources": {
+        "Pipeline": {
+            "shape": "PipelineDescription",
+            "identifiers": [
+                {
+                    "name": "Id",
+                    "memberName": "pipelineIds"
+                }
+            ],
+            "load": {
+                "request": {
+                    "operation": "DescribePipelines",
+                    "params": [
+                        {"target": "pipelineIds[0]", "source": "identifier", "name": "Id"}
+                    ]
+                },
+                "path": "pipelineDescriptionList[0]"
+            }
+        }
+    }
+}

@@ -1,0 +1,78 @@
+{
+  "service": {
+    "has": {
+      "LoadBalancer": {
+        "resource": {
+          "type": "LoadBalancer",
+          "identifiers": [{
+            "target": "Name",
+            "source": "input"
+          }]
+        }
+      }
+    },
+    "hasMany": {
+      "LoadBalancers": {
+        "request": {
+          "operation": "DescribeLoadBalancers"
+        },
+        "resource": {
+          "type": "LoadBalancer",
+          "identifiers": [{
+            "target": "Name",
+            "source": "response",
+            "path": "LoadBalancerDescriptions[].LoadBalancerName"
+          }],
+          "path": "LoadBalancerDescriptions[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "LoadBalancer": {
+      "identifiers": [{
+        "name": "Name",
+        "memberName": "LoadBalancerName"
+      }],
+      "shape": "LoadBalancerDescription",
+      "load": {
+        "request": {
+          "operation": "DescribeLoadBalancers",
+          "params": [{
+            "target": "LoadBalancerNames[0]",
+            "source": "identifier",
+            "name": "Name"
+          }]
+        },
+        "path": "LoadBalancerDescriptions[0]"
+      },
+      "hasMany": {
+        "Tags": {
+          "request": {
+            "params": [{
+              "target": "LoadBalancerNames[0]",
+              "source": "identifier",
+              "name": "Name"
+            }],
+            "operation": "DescribeTags"
+          },
+          "resource": {
+            "type": "Tag",
+            "identifiers": [{
+              "target": "Key",
+              "source": "response",
+              "path": "TagDescriptions[].Tags[].Key"
+            }],
+            "path": "TagDescriptions[].Tags[]"
+          }
+        }
+      }
+    },
+    "Tag": {
+      "shape": "Tag",
+      "identifiers": [{
+        "name": "Key"
+      }]
+    }
+  }
+}

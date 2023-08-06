@@ -1,0 +1,42 @@
+{
+  "service": {
+    "hasMany": {
+      "Documents": {
+        "request": {
+          "operation": "ListDocuments"
+        },
+        "resource": {
+          "type": "Document",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "DocumentIdentifiers[].Name" }
+          ],
+          "path": "ReportDefinitions[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Document": {
+      "identifiers": [
+        { "name": "Name",
+          "memberName": "Name" }
+      ],
+      "shape": "DocumentIdentifier",
+      "load": {
+        "request": {
+          "operation": "GetDocument",
+          "params": [
+            {
+              "target": "Name",
+              "source": "identifier",
+              "name": "Name"
+            }
+          ]
+        },
+        "path": "@"
+      },
+      "actions": {
+      }
+    }
+  }
+}

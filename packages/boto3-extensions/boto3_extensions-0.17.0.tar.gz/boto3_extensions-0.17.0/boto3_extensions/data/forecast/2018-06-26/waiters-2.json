@@ -1,0 +1,191 @@
+{
+    "version": 2,
+    "waiters": {
+        "DatasetReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribeDataset",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `UPDATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        },
+        "DatasetImportJobReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribeDatasetImportJob",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        },
+        "PredictorReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribePredictor",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        },
+        "PredictorBacktestExportJobReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribePredictorBacktestExportJob",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        },
+        "ForecastReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribeForecast",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        },
+        "ForecastExportJobReady": {
+            "delay": 60,
+            "maxAttempts": 120,
+            "operation": "DescribeForecastExportJob",
+            "acceptors": [
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `ACTIVE`",
+                    "state": "success"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `CREATE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "path",
+                    "expected": true,
+                    "argument": "Status == `DELETE_FAILED`",
+                    "state": "failure"
+                },
+                {
+                    "matcher": "error",
+                    "expected": "ResourceNotFoundException",
+                    "state": "retry"
+                }
+            ]
+        }
+    }
+}

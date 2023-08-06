@@ -1,0 +1,500 @@
+{
+  "service": {
+    "actions": {
+      "CreateCacheCluster": {
+        "request": { "operation": "CreateCacheCluster" },
+        "resource": {
+          "type": "Cluster",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "CacheCluster.CacheClusterId" }
+          ],
+          "path": "CacheCluster"
+        }
+      },
+      "CreateCacheSubnetGroup": {
+        "request": { "operation": "CreateCacheSubnetGroup" },
+        "resource": {
+          "type": "SubnetGroup",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "CacheSubnetGroup.CacheSubnetGroupName" }
+          ],
+          "path": "CacheSubnetGroup"
+        }
+      },
+      "CreateCacheParameterGroup": {
+        "request": { "operation": "CreateCacheParameterGroup" },
+        "resource": {
+          "type": "ParameterGroup",
+          "identifiers": [
+            { "target": "Name", "source": "response", "path": "CacheParameterGroup.CacheParameterGroupName" }
+          ],
+          "path": "CacheParameterGroup"
+        }
+      },
+      "CreateReplicationGroup": {
+        "request": { "operation": "CreateReplicationGroup" },
+        "resource": {
+          "type": "ReplicationGroup",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "ReplicationGroup.ReplicationGroupId" }
+          ],
+          "path": "ReplicationGroup"
+        }
+      }
+    },
+    "has": {
+      "Cluster": {
+        "resource": {
+          "type": "Cluster",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "EngineVersion": {
+        "resource": {
+          "type": "EngineVersion",
+          "identifiers": [
+            { "target": "Engine", "source": "input" },
+            { "target": "Version", "source": "input" }
+          ]
+        }
+      },
+      "ParameterGroup": {
+        "resource": {
+          "type": "ParameterGroup",
+          "identifiers": [
+            { "target": "Name", "source": "input" }
+          ]
+        }
+      },
+      "ReplicationGroup": {
+        "resource": {
+          "type": "ReplicationGroup",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "ReservedNode": {
+        "resource": {
+          "type": "ReservedNode",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "ReservedNodesOffering": {
+        "resource": {
+          "type": "ReservedNodesOffering",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "Snapshot": {
+        "resource": {
+          "type": "Snapshot",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      },
+      "SubnetGroup": {
+        "resource": {
+          "type": "SubnetGroup",
+          "identifiers": [
+            { "target": "Name", "source": "input" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "Clusters": {
+        "request": {"operation": "DescribeCacheClusters"},
+        "resource": {
+          "type": "Cluster",
+          "identifiers": [
+            {"target": "Id", "source": "response", "path": "CacheClusters[].CacheClusterId"}
+          ],
+          "path": "CacheClusters[]"
+        }
+      },
+      "EngineVersions": {
+        "request": {"operation": "DescribeCacheEngineVersions"},
+        "resource": {
+          "type": "EngineVersion",
+          "identifiers": [
+            {"target": "Engine", "source": "response", "path": "CacheEngineVersions[].Engine"},
+            {"target": "Version", "source": "response", "path": "CacheEngineVersions[].EngineVersion"}
+          ],
+          "path": "CacheEngineVersions[]"
+        }
+      },
+      "ParameterGroups": {
+        "request": {"operation": "DescribeCacheParameterGroups"},
+        "resource": {
+          "type": "ParameterGroup",
+          "identifiers": [
+            {"target": "Name", "source": "response", "path": "CacheParameterGroups[].CacheParameterGroupName"}
+          ],
+          "path": "CacheParameterGroups[]"
+        }
+      },
+      "ReplicationGroups": {
+        "request": {"operation": "DescribeReplicationGroups"},
+        "resource": {
+          "type": "ReplicationGroup",
+          "identifiers": [
+            {"target": "Id", "source": "response", "path": "ReplicationGroups[].ReplicationGroupId"}
+          ],
+          "path": "ReplicationGroups[]"
+        }
+      },
+      "ReservedNodes": {
+        "request": {"operation": "DescribeReservedCacheNodes"},
+        "resource": {
+          "type": "ReservedNode",
+          "identifiers": [
+            {"target": "Id", "source": "response", "path": "ReservedCacheNodes[].ReservedCacheNodeId"}
+          ],
+          "path": "ReservedCacheNodes[]"
+        }
+      },
+      "ReservedNodesOfferings": {
+        "request": {"operation": "DescribeReservedCacheNodesOfferings"},
+        "resource": {
+          "type": "ReservedNodesOffering",
+          "identifiers": [
+            {"target": "Id", "source": "response", "path": "ReservedCacheNodesOfferings[].ReservedCacheNodesOfferingId"}
+          ],
+          "path": "ReservedCacheNodesOfferings[]"
+        }
+      },
+      "Snapshots": {
+        "request": {"operation": "DescribeSnapshots"},
+        "resource": {
+          "type": "Snapshot",
+          "identifiers": [
+            {"target": "Name", "source": "response", "path": "Snapshots[].SnapshotName"}
+          ],
+          "path": "Snapshots[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "Cluster":{
+      "identifiers": [
+        {
+         "name": "Id",
+         "memberName": "CacheClusterId"
+        }
+      ],
+      "shape": "CacheCluster",
+      "load": {
+        "request": {
+          "operation": "DescribeCacheClusters",
+          "params": [
+            {"target": "CacheClusterId", "source": "identifier", "name": "Id"}
+          ]
+        },
+        "path": "CacheClusters[0]"
+      },
+      "actions": {
+        "CreateSnapshot": {
+          "request": {
+            "operation": "CreateSnapshot",
+            "params": [
+              { "target": "CacheClusterId", "source": "identifier", "name": "Id" }
+            ]
+          },
+          "resource": {
+            "type": "Snapshot",
+            "identifiers": [
+              { "target": "Name", "source": "response", "path": "Snapshot.SnapshotName" }
+            ],
+            "path": "Snapshot"
+          }
+        },
+        "Delete": {
+          "request": {
+            "operation": "DeleteCacheCluster",
+            "params": [
+              { "target": "CacheClusterId", "source": "identifier", "name": "Id" }
+            ]
+          }
+        },
+        "Reboot": {
+          "request": {
+            "operation": "RebootCacheCluster",
+            "params": [
+              { "target": "CacheClusterId", "source": "identifier", "name": "Id" }
+            ]
+          }
+        }
+      },
+      "has": {
+        "ParameterGroup": {
+          "resource": {
+            "type": "ParameterGroup",
+            "identifiers": [
+              { "target": "Name", "source": "data", "path": "CacheParameterGroup" }
+            ]
+          }
+        }
+      }
+    },
+    "EngineVersion": {
+      "identifiers": [
+        {
+         "name": "Engine",
+         "memberName": "Engine"
+        },
+        {
+         "name": "Version",
+         "memberName": "EngineVersion"
+        }
+      ],
+      "shape": "CacheEngineVersion",
+      "load": {
+        "request": {
+          "operation": "DescribeCacheEngineVersions",
+          "params": [
+            {"target": "Engine", "source": "identifier", "name": "Engine"},
+            {"target": "EngineVersion", "source": "identifier", "name": "Version"}
+          ]
+        },
+        "path": "CacheEngineVersions[0]"
+      }
+    },
+    "Parameter": {
+      "identifiers": [
+        {
+         "name": "GroupName",
+         "memberName": "CacheParameterGroupName"
+        },
+        {
+         "name": "Name",
+         "memberName": "ParameterName"
+        }
+      ],
+      "shape": "Parameter"
+    },
+    "ParameterGroup": {
+      "identifiers": [
+        {
+         "name": "Name",
+         "memberName": "CacheParameterGroupName"
+        }
+      ],
+      "shape": "CacheParameterGroup",
+      "load": {
+        "request": {
+          "operation": "DescribeCacheParameterGroups",
+          "params": [
+            {"target": "CacheParameterGroupName", "source": "identifier", "name": "Name"}
+          ]
+        },
+        "path": "CacheParameterGroups[0]"
+      },
+      "hasMany": {
+        "Parameters": {
+          "request": {
+            "operation": "DescribeCacheParameters",
+            "params": [
+              { "target": "CacheParameterGroupName", "source": "identifier", "name": "Name" }
+            ]
+          },
+          "resource": {
+            "type": "Parameter",
+            "identifiers": [
+              { "target": "GroupName", "source": "identifier", "name": "Name" },
+              { "target": "Name", "source": "response", "path": "Parameters[].ParameterName" }
+            ],
+            "path": "Parameters[]"
+          }
+        },
+        "TypeSpecificParameters": {
+          "request": {
+            "operation": "DescribeCacheParameters",
+            "params": [
+              { "target": "CacheParameterGroupName", "source": "identifier", "name": "Name" }
+            ]
+          },
+          "resource": {
+            "type": "Parameter",
+            "identifiers": [
+              { "target": "GroupName", "source": "identifier", "name": "Name" },
+              { "target": "Name", "source": "response", "path": "CacheNodeTypeSpecificParameters[].ParameterName" }
+            ],
+            "path": "CacheNodeTypeSpecificParameters[]"
+          }
+        }
+      },
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteCacheParameterGroup",
+            "params": [
+              { "target": "CacheParameterGroupName", "source": "identifier", "name": "Name" }
+            ]
+          }
+        }
+      }
+    },
+    "ReplicationGroup": {
+      "identifiers": [
+        {
+         "name": "Id",
+         "memberName": "ReplicationGroupId"
+        }
+      ],
+      "shape": "ReplicationGroup",
+      "has": {
+        "Clusters": {
+          "resource": {
+              "type": "Cluster",
+              "identifiers": [
+                { "target": "Id", "source": "data", "path": "MemberClusters[]" }
+              ],
+              "path": "MemberClusters[]"
+          }
+        }
+      },
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteReplicationGroup",
+            "params": [
+              { "target": "ReplicationGroupId", "source": "identifier", "name": "Id" }
+            ]
+          }
+        }
+      }
+    },
+    "ReservedNode": {
+      "identifiers": [
+        {
+         "name": "Id",
+         "memberName": "ReservedCacheNodeId"
+        }
+      ],
+      "shape": "ReservedCacheNode",
+      "load": {
+        "request": {
+          "operation": "DescribeReservedCacheNodes",
+          "params": [
+            {"target": "ReservedCacheNodeId", "source": "identifier", "name": "Id"}
+          ]
+        },
+        "path": "ReservedCacheNodes[0]"
+      }
+    },
+    "ReservedNodesOffering": {
+      "identifiers": [
+        {
+         "name": "Id",
+         "memberName": "ReservedCacheNodesOfferingId"
+        }
+      ],
+      "shape": "ReservedCacheNodesOffering",
+      "load": {
+        "request": {
+          "operation": "DescribeReservedCacheNodesOfferings",
+          "params": [
+            {"target": "ReservedCacheNodesOfferingId", "source": "identifier", "name": "Id"}
+          ]
+        },
+        "path": "ReservedCacheNodesOfferings[0]"
+      },
+      "actions": {
+        "Purchase": {
+          "request": {
+            "operation": "PurchaseReservedCacheNodesOffering",
+            "params": [
+              { "target": "ReservedCacheNodesOfferingId", "source": "identifier", "name": "Id" }
+            ]
+          }
+        }
+      }
+    },
+    "Snapshot":{
+      "identifiers": [
+        {
+         "name": "Name",
+         "memberName": "SnapshotName"
+        }
+      ],
+      "shape": "Snapshot",
+      "load": {
+        "request": {
+          "operation": "DescribeSnapshots",
+          "params": [
+            {"target": "SnapshotName", "source": "identifier", "name": "Name"}
+          ]
+        },
+        "path": "Snapshots[0]"
+      },
+      "actions": {
+        "Copy": {
+          "request": {
+            "operation": "CopySnapshot",
+            "params": [
+              { "target": "SourceSnapshotName", "source": "identifier", "name": "Name" }
+            ]
+          }
+        },
+        "Delete": {
+          "request": {
+            "operation": "DeleteSnapshot",
+            "params": [
+              { "target": "SnapshotName", "source": "identifier", "name": "Name" }
+            ]
+          }
+        }
+      }
+    },
+    "SubnetGroup": {
+      "identifiers": [
+        {
+         "name": "Name",
+         "memberName": "CacheSubnetGroupName"
+        }
+      ],
+      "shape": "CacheSubnetGroup",
+      "load": {
+        "request": {
+          "operation": "DescribeCacheSubnetGroups",
+          "params": [
+            {"target": "CacheSubnetGroupName", "source": "identifier", "name": "Name"}
+          ]
+        },
+        "path": "CacheSubnetGroups[0]"
+      },
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteCacheSubnetGroup",
+            "params": [
+              { "target": "CacheSubnetGroupName", "source": "identifier", "name": "Name" }
+            ]
+          }
+        }
+      }
+    },
+    "TypeSpecificParameter": {
+      "identifiers": [
+        {
+         "name": "GroupName",
+         "memberName": "CacheParameterGroupName"
+        },
+        {
+         "name": "Name",
+         "memberName": "ParameterName"
+        }
+      ],
+      "shape": "CacheNodeTypeSpecificParameter"
+    }
+  }
+}

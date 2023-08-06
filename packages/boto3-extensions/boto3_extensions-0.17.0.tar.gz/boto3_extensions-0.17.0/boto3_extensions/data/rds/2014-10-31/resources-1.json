@@ -1,0 +1,177 @@
+{
+  "service": {
+    "has": {
+      "DBInstance": {
+        "resource": {
+          "type": "DBInstance",
+          "identifiers": [
+            { "target": "Id", "source": "input" }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "DBInstances": {
+        "request": { "operation": "DescribeDBInstances" },
+        "resource": {
+          "type": "DBInstance",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "DBInstances[].DBInstanceIdentifier" }
+          ],
+          "path": "DBInstances[]"
+        }
+      },
+      "ParameterGroups": {
+        "request": { "operation": "DescribeDBParameterGroups" },
+        "resource": {
+          "type": "ParameterGroup",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "DBParameterGroups[].DBParameterGroupName" }
+          ],
+          "path": "DBParameterGroups[]"
+        }
+      },
+      "ClusterParameterGroups": {
+        "request": { "operation": "DescribeDBClusterParameterGroups" },
+        "resource": {
+          "type": "ClusterParameterGroup",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "DBClusterParameterGroups[].DBClusterParameterGroupName" }
+          ],
+          "path": "DBClusterParameterGroups[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "DBInstance": {
+      "identifiers": [{
+        "name": "Id",
+        "memberName": "DBInstanceIdentifier"
+      }],
+      "shape": "DBInstance",
+      "load": {
+        "request": {
+          "operation": "DescribeDBInstances",
+          "params": [{
+            "target": "DBInstanceIdentifier",
+            "source": "identifier",
+            "name": "Id"
+          }]
+        },
+        "path": "DBInstances[0]"
+      },
+      "hasMany": {
+        "Tags": {
+          "request": {
+            "params": [{
+              "target": "ResourceName",
+              "source": "arn"
+            }],
+            "operation": "ListTagsForResource"
+          },
+          "resource": {
+            "type": "Tag",
+            "identifiers": [{
+              "target": "Key",
+              "source": "response",
+              "path": "TagList[].Key"
+            }],
+            "path": "TagList[]"
+          }
+        }
+      }
+    },
+    "ClusterParameterGroup": {
+      "identifiers": [{
+        "name": "Id",
+        "memberName": "DBClusterParameterGroupName"
+      }],
+      "shape": "DBClusterParameterGroup",
+      "hasMany": {
+        "Parameters": {
+          "request": {
+            "params": [{
+              "target": "DBClusterParameterGroupName",
+              "source": "identifier",
+              "name": "Id"
+            }],
+            "operation": "DescribeDBClusterParameters"
+          },
+          "resource": {
+            "type": "Parameter",
+            "identifiers": [{
+              "target": "Id",
+              "source": "response",
+              "path": "Parameters[].ParameterName"
+            }],
+            "path": "Parameters[]"
+          }
+        }
+      },
+      "load": {
+        "request": {
+          "operation": "DescribeDBClusterParameterGroups",
+          "params": [{
+            "target": "DBClusterParameterGroupName",
+            "source": "identifier",
+            "name": "Id"
+          }]
+        },
+        "path": "DBClusterParameterGroups[0]"
+      }
+    },
+    "ParameterGroup": {
+      "identifiers": [{
+        "name": "Id",
+        "memberName": "DBParameterGroupName"
+      }],
+      "shape": "DBParameterGroup",
+      "hasMany": {
+        "Parameters": {
+          "request": {
+            "params": [{
+              "target": "DBParameterGroupName",
+              "source": "identifier",
+              "name": "Id"
+            }],
+            "operation": "DescribeDBParameters"
+          },
+          "resource": {
+            "type": "Parameter",
+            "identifiers": [{
+              "target": "Id",
+              "source": "response",
+              "path": "Parameters[].ParameterName"
+            }],
+            "path": "Parameters[]"
+          }
+        }
+      },
+      "load": {
+        "request": {
+          "operation": "DescribeDBParameterGroups",
+          "params": [{
+            "target": "DBParameterGroupName",
+            "source": "identifier",
+            "name": "Id"
+          }]
+        },
+        "path": "DBParameterGroups[0]"
+      }
+    },
+    "Parameter": {
+      "shape": "Parameter",
+      "identifiers": [{
+        "name": "Id",
+        "memberName": "ParameterName"
+      }]
+    },
+    "Tag": {
+      "shape": "Tag",
+      "identifiers": [{
+        "name": "Key"
+      }]
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "service": {
+    "actions": {
+      "CreateHostedZone": {
+        "request": { "operation": "CreateHostedZone" },
+        "resource": {
+          "type": "HostedZone",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "HostedZone.Id" }
+          ],
+          "path": "HostedZone"
+        }
+      }
+    },
+    "has": {
+      "HostedZone": {
+        "resource": {
+          "type": "HostedZone",
+          "identifiers": [
+            {
+              "target": "Id",
+              "source": "input"
+            }
+          ]
+        }
+      },
+      "HealthCheck": {
+        "resource": {
+          "type": "HealthCheck",
+          "identifiers": [
+            {
+              "target": "Id",
+              "source": "input"
+            }
+          ]
+        }
+      }
+    },
+    "hasMany": {
+      "HostedZones": {
+        "request": {
+          "operation": "ListHostedZones"
+        },
+        "resource": {
+          "type": "HostedZone",
+          "identifiers": [
+            {
+              "target": "Id",
+              "source": "response",
+              "path": "HostedZones[].Id"
+            }
+          ],
+          "path": "HostedZones[]"
+        }
+      },
+      "HealthChecks": {
+        "request": {
+          "operation": "ListHealthChecks"
+        },
+        "resource": {
+          "type": "HealthCheck",
+          "identifiers": [
+            { "target": "Id", "source": "response", "path": "HealthChecks[].Id" }
+          ],
+          "path": "HealthChecks[]"
+        }
+      }
+    }
+  },
+  "resources": {
+    "HealthCheck": {
+      "identifiers": [
+        { "name": "Id", "memberName": "Id" }
+      ],
+      "shape": "HealthCheck",
+      "load": {
+        "request": {
+          "operation": "GetHealthCheck",
+          "params": [
+            {
+              "target": "HealthCheckId",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "HealthCheck"
+      },
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteHealthCheck",
+            "params": [
+              {
+                "target": "HealthCheckId",
+                "source": "identifier",
+                "name": "Id" }
+            ]
+          }
+        }
+      }
+    },
+    "HostedZone": {
+      "identifiers": [
+        {
+          "name": "Id",
+          "memberName": "Id"
+        }
+      ],
+      "shape": "HostedZone",
+      "load": {
+        "request": {
+          "operation": "GetHostedZone",
+          "params": [
+            {
+              "target": "Id",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "HostedZone"
+      },
+      "hasMany": {
+        "ResourceRecordSets": {
+          "request": {
+            "params": [{
+              "target": "HostedZoneId",
+              "source": "identifier",
+              "name": "Id"
+            }],
+            "operation": "ListResourceRecordSets"
+          },
+          "resource": {
+            "type": "ResourceRecordSet",
+            "identifiers": [
+              { "target": "Name", "source": "response", "path": "ResourceRecordSets[].Name" },
+              { "target": "Type", "source": "response", "path": "ResourceRecordSets[].Type" }
+            ],
+            "path": "ResourceRecordSets[]"
+          }
+        }
+      }
+    },
+    "ResourceRecordSet": {
+      "shape": "ResourceRecordSet",
+      "identifiers": [{
+        "name": "Name"
+      },
+      {
+        "name": "Type"
+      }
+      ]
+    }
+  }
+}
+
