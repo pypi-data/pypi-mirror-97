@@ -1,0 +1,25 @@
+{% for name, group in peer_groups.items() %}
+{%     for peer in group %}
+protocol bgp as{{ peer.peer_as }}_{{ peer.name | make_variable_name }}_{{ peer.neighbor_address | make_variable_name }} {
+  neighbor as {{ peer.peer_as }};
+  neighbor {{ peer.neighbor_address }};
+
+{% if peer.local_as %}
+  local as {{ peer.local_as }};
+{% endif %}
+{% if peer.auth_password %}
+  password "{{ peer.auth_password }}";
+{% endif %}
+
+{% if peer.max_prefixes %}
+  import limit {{ peer.max_prefixes }};
+{% endif %}
+{% if peer.import_policy %}
+  import {{ peer.import_policy }};
+{% endif %}
+{% if peer.export_policy %}
+  export {{ peer.export_policy }};
+{% endif %}
+}
+{%     endfor %}
+{% endfor %}

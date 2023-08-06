@@ -1,0 +1,54 @@
+{% for name, group in peer_groups.items() %}
+group "{{ name }}" {
+{% for peer in group %}
+{% if peer.type %}
+    type {{ peer.type }}
+{% endif %}
+{% if peer.local_address %}
+    local-address {{ peer.local_address }}
+{% endif %}
+{% if peer.local_as %}
+    local-as {
+        as-number {{ peer.local_as }}
+    }
+{% endif %}
+{% endfor %}
+}
+{% endfor %}
+{% for name, group in peer_groups.items() %}
+{% for peer in group %}
+neighbor "{{ peer.neighbor_address }}" {
+{% if peer.enabled == False %}
+    admin-state disable
+{% else %}
+    admin-state enable
+{% endif %}
+{% if peer.description %}
+    description "{{ peer.description }}"
+{% endif %}
+    group "{{ name }}"
+{% if peer.auth_password %}
+    authentication-key "{{ peer.auth_password }}"
+{% endif %}
+    peer-as {{ peer.peer_as }}
+    family {
+        ipv{{ peer.neighbor_address | ip_version }} true
+    }
+{% if peer.import_policy %}
+    import {
+        policy ["{{ peer.import_policy }}"]
+    }
+{% endif %}
+{% if peer.export_policy %}
+    export {
+        policy ["{{ peer.export_policy }}"]
+    }
+{% endif %}
+{% if peer.max_prefixes %}
+    prefix-limit ipv{{ peer.neighbor_address | ip_version }} {
+        maximum {{ peer.max_prefixes }}
+    }
+{% endif %}
+}
+{% endfor %}
+{% endfor %}
