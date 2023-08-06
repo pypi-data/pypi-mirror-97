@@ -1,0 +1,145 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "type": "object",
+    "additionalProperties": {
+        "$ref": "#/definitions/LicenseValue"
+    },
+    "definitions": {
+        "LicenseValue": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "altnames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Tag"
+                    }
+                },
+                "must": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Must"
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "cannot": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Can"
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "can": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Can"
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "type": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/definitions/Tag"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "spdx": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "altnames",
+                "can",
+                "cannot",
+                "must",
+                "name",
+                "spdx",
+                "tags",
+                "type"
+            ],
+            "title": "LicenseValue"
+        },
+        "Can": {
+            "type": "string",
+            "enum": [
+                "Modify",
+                "Distribute",
+                "Commercial Use",
+                "Sublicense",
+                "Place Warranty",
+                "Private Use",
+                "Use Patent Claims",
+                "Relicense",
+                "Hold Liable",
+                "Include Copyright",
+                "Include Original",
+                "Include License",
+                "Use Trademark"
+            ],
+            "title": "Can"
+        },
+        "Must": {
+            "type": "string",
+            "enum": [
+                "Include License",
+                "Give Credit",
+                "Include Original",
+                "Disclose Source",
+                "Include Copyright",
+                "State Changes",
+                "Include Install Instructions",
+                "Include Notice",
+                "Rename",
+                "Compensate for Damages"
+            ],
+            "title": "Must"
+        },
+        "Tag": {
+            "type": "string",
+            "enum": [
+                "OSI-Approved",
+                "Permissive",
+                "Open Source",
+                "FSF-Libre",
+                "Deprecated",
+                "Copyleft",
+                "GNU",
+                "Creative Commons",
+                "Public Domain",
+                "Weak Copyleft",
+                "Viral"
+            ],
+            "title": "Tag"
+        }
+    }
+}
