@@ -1,0 +1,23 @@
+meta:
+  # we will declared products here
+  extract_product: False
+
+  # load all task.source relative to src/package_name/. If removed, relative
+  # paths in task.source will be so to the parent directory of this file.
+  source_loader:
+    module: package_name
+  
+  jupyter_hot_reload: True
+
+tasks:
+  - source: package_name.tasks.raw.get
+    product: products/raw/dataset.parquet
+  
+  - source: package_name.tasks.interim.remove_nas
+    product: products/interim/dataset.parquet
+
+  - source: package_name.tasks.clean.add_column
+    product: products/clean/dataset.parquet
+
+  - source: notebooks/plot.py
+    product: products/report.html
