@@ -1,0 +1,121 @@
+Metadata-Version: 2.1
+Name: remotedict
+Version: 0.0.1
+Summary: Remote dictionary backed up by cloud services
+Home-page: http://github.com/ipazc/remotedict
+Author: Iván de Paz Centeno
+Author-email: ipazc@unileon.es
+License: UNKNOWN
+Keywords: Dictionary remote hosted cloud Azure blobs
+Platform: UNKNOWN
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
+Requires-Dist: joblib (>=0.15.1)
+Requires-Dist: lz4 (>=3.1.3)
+Requires-Dist: azure-storage-blob (>=12.8.0)
+
+
+# REMOTE DICT
+
+**RemoteDict** is a Python library intended to host a dictionary in a cloud backend.
+Currently it is supported Azure Blob Storage.
+
+
+## USAGE - AZURE
+
+Grab a `CONNECTION_STRING` from your azure blob storage, then import the `AzureDictionary` as follows:
+
+```python
+>>> from remotedict.azure import AzureDictionary
+
+>>> remote_dict = AzureDictionary(CONNECTION_STRING, container_name="mycontainer", folder_name="myfolder")
+>>> remote_dict
+Azure Blob Storage. Container: "mycontainer"; Folder: "myfolder"; Num elements: 0
+
+>>> remote_dict["foo"] = "bar"
+>>> remote_dict["foo"]
+bar
+```
+
+`remote_dict` is an object that behaves like a python dictionary. However, it contains extensive functionality useful to dealing with large data and concurrency.
+
+## HOW IT WORKS
+
+Once `remote_dict` is instantiated, it can be used to store any kind of data:
+```python
+remote_dict['example'] = "hello"
+remote_dict['example2'] = b"binary data of any size"
+remote_dict['example3'] = 42
+remote_dict['example4'] = {"this": {"is": b"a subdictionary", "that": "holds", "any": True, "data": 42}}
+remote_dict['example5'] = ["even", "lists", "or", "numpy", "and", "pandas"]
+remote_dict['example6'] = np.random.randn(10, 3, 1)
+remote_dict['example7'] = pd.DataFrame([1,2,3,4])
+```
+
+It allows to shorten the assignments and readings in atomic operations:
+
+```python
+remote_dict[[
+    'example',
+    'example2',
+    'example3'
+]] = "hello", b"binary data", 42
+```
+
+Each entry is stored as an LZ4-compressed binary in a single file inside the specified container and folder during instantiation of `remote_dict`.
+There are no soft limits in the size a value can have.
+
+## INDEXES
+
+In **RemoteDict**, there is a concept of *Index* which allows to retrieve all the keys instantly without iterating the backend for elements.
+
+This index functionality is achieved by using a file as an indexer, ensuring that concurrency can't break it by using cloud leases on the file.
+
+For this reason, the folder "Index" in the cloud container is reserved and handled automatically by **RemoteDict**. 
+
+Rather than downloading the index file each time an index check is required, the class only checks the `etag` of the file (which is faster than downloading it). If the `etag` does not match the local `etag`, the index is redownloaded ensuring to be always up-to-date.
+
+The index is a `pd.Series` object that can be accessed as follows:
+
+```python
+>>> remote_dict.index
+example      example/example
+example2    example/example2
+example3    example/example3
+example4    example/example4
+example5    example/example5
+example6    example/example6
+example7    example/example7
+Name: name, dtype: object
+```
+
+## CONCURRENT ACCESS
+
+Concurrent readings are allowed by nature, however, concurrent writes are a bit more complex. `RemoteDict` deals with concurrency by allowing to acquire leases on custom elements.
+
+Example to lock an element:
+
+```python
+>>> remote_dict.lock_item("example", duration=15)  # duration in seconds
+```
+
+Once the element is locked, no other `remote_dict` (anywhere, even different machines) can lock or write to this item again unless the item is manually unlocked or the duration expires. 
+If another element tries to lock it, `remote_dict` will wait for it to be released (default behaviour) or raise an exception if `wait=False`.
+
+It can only be written by this object as long as the lease is conceived. 
+
+To unlock the element:
+
+```python
+>>> remote_dict.unlock_item("example") 
+```
+
+
