@@ -1,0 +1,95 @@
+# PYTHON AWS KEYSPACES CONNECTOR
+    AWS KEYSPACES Connector Package
+
+- [source](https://bitbucket.org/labunix/awskeyspaces.git)
+
+
+### Tech Core 
+   What do i need to know before using this code?
+
+- [Python 3.8](https://docs.python.org/3/whatsnew/3.8.html)
+- [Cassandra](https://cassandra.apache.org/doc/latest/)
+- [cassandra-driver](https://github.com/datastax/python-driver)
+- [AWS Keyspaces](https://aws.amazon.com/pt/keyspaces/)
+
+
+
+### TLS always on 9142
+	Port    Authentication Mechanism
+	9142    TLS client authentication, with certificates
+
+* required aws cert
+```
+curl https://www.amazontrust.com/repository/AmazonRootCA1.pem -O
+```
+
+### Cassandra Driver Performance
+* Linux Like
+```
+sudo apt install libev-dev
+sudo yum install libev-devel
+apk add libev-dev
+```
+
+* MacOS
+```
+brew install libev
+```
+Compiled is better :)
+
+### Env Vars
+	Load env vars for your cluster connection
+```
+REGION=us-east-1
+CLUSTER_KSP=my_keyspace
+CLUSTER_HOST="cassandra.${REGION}.amazonaws.com"
+CLUSTER_PORT=9142
+CLUSTER_USER="****************"
+CLUSTER_PASS="****************"
+
+export CLUSTER_KSP CLUSTER_HOST CLUSTER_USER CLUSTER_PASS CLUSTER_REGION
+```
+
+###  How to install
+* Load virtual env
+```
+python3.8 -m venv venv
+. venv/bin/activate
+```
+
+* Install package
+```
+pip install -r requirements.txt
+# or
+make init
+# or
+python setup.py install
+```
+* Why Not?
+```	
+pip install -e git+https://bitbucket.org/labunix/awskeyspaces.git@master#egg=keyspaces
+```
+
+### Connected?
+
+```
+from awskeyspaces.connection import connect
+
+@connect
+def dbsetup():
+    pass
+
+```
+
+### Contribution
+
+- quierati@labunix.dev
+
+### twine upload package
+```
+python3 -m pip install --upgrade build
+python3 -m build
+
+python3 -m pip install --user --upgrade twine
+python3 -m twine upload dist/*
+```
