@@ -1,0 +1,201 @@
+Metadata-Version: 2.1
+Name: pandapipes
+Version: 0.4.0
+Summary: A pipeflow calculation tool that complements pandapower in the simulation of multi energy grids
+Home-page: http://www.pandapipes.org
+Author: Dennis Cronbach, Daniel Lohmeier, Simon Ruben Drauz, Jolando Marius Kisse
+Author-email: dennis.cronbach@iee.fraunhofer.de, daniel.lohmeier@iee.fraunhofer.de, simon.ruben.drauz@iee.fraunhofer.de, jolando.kisse@uni-kassel.de
+License: BSD
+Description: 
+        .. image:: https://www.pandapipes.org/images/pp.svg
+           :target: https://www.pandapipes.org
+           :width: 300em
+           :alt: logo
+        
+        |
+        
+        .. image:: https://badge.fury.io/py/pandapipes.svg
+           :target: https://badge.fury.io/py/pandapipes
+           :alt: PyPI
+        
+        .. image:: https://img.shields.io/pypi/pyversions/pandapipes.svg
+           :target: https://pypi.python.org/pypi/pandapipes
+           :alt: versions
+        
+        .. image:: https://readthedocs.org/projects/pandapipes/badge/
+           :target: http://pandapipes.readthedocs.io/
+           :alt: docs
+        
+        .. image:: https://travis-ci.org/e2nIEE/pandapipes.svg?branch=master
+           :target: https://travis-ci.org/e2nIEE/pandapipes/branches
+           :alt: travis
+        
+        .. image:: https://codecov.io/gh/e2nIEE/pandapipes/branch/master/graph/badge.svg
+           :target: https://codecov.io/github/e2nIEE/pandapipes?branch=master
+           :alt: codecov
+        
+        .. image:: https://api.codacy.com/project/badge/Grade/86c876ab23fc40d98e85f7d59bdef928
+           :target: https://app.codacy.com/gh/e2nIEE/pandapipes/dashboard
+           :alt: Codacy Badge
+        
+        .. image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
+           :target: https://github.com/e2nIEE/pandapipes/blob/master/LICENSE
+           :alt: BSD
+        
+        .. image:: https://pepy.tech/badge/pandapipes
+           :target: https://pepy.tech/project/pandapipes
+           :alt: pepy
+        
+        .. image:: https://mybinder.org/badge_logo.svg
+           :target: https://mybinder.org/v2/gh/e2nIEE/pandapipes/master?filepath=tutorials
+           :alt: binder
+        
+        
+        A pipeflow calculation tool that complements `pandapower <https://www.pandapower.org>`_ in the
+        simulation of multi energy grids, in particular heat and gas networks. More information can be found on `www.pandapipes.org <https://www.pandapipes.org>`_.
+        
+        Getting started:
+        
+        - `Installation Notes <https://www.pandapipes.org/start/>`_
+        - `Documentation <https://pandapipes.readthedocs.io/en/latest/>`_
+        - `Tutorials on github <https://github.com/e2nIEE/pandapipes/tree/master/tutorials>`_
+        - `Interactive tutorials on Binder <https://mybinder.org/v2/gh/e2nIEE/pandapipes/master?filepath=tutorials>`_
+        
+        
+        
+        pandapipes is a development of the Department for Distribution System Operation at the Fraunhofer
+        Institute for Energy Economics and Energy System Technology (IEE), Kassel, and the research group
+        Energy Management and Power System Operation, University of Kassel.
+        
+        
+        .. image:: https://www.uni-kassel.de/eecs/fileadmin/datas/fb16/Fachgebiete/energiemanagement/iee.png
+            :target: https://www.iee.fraunhofer.de/en.html
+            :width: 300em
+        
+        |
+        
+        .. image:: https://www.uni-kassel.de/uni/fileadmin/sys/resources/images/logo/logo-main.svg
+            :target: https://www.uni-kassel.de/
+            :width: 300em
+        
+        |
+        
+        .. image:: https://www.uni-kassel.de/eecs/fileadmin/datas/fb16/Fachgebiete/energiemanagement/e2n.png
+            :target: https://www.uni-kassel.de/eecs/en/fachgebiete/e2n/home.html
+            :width: 200em
+        
+        |
+        
+        We welcome contributions to pandapipes of any kind - if you want to contribute, please check out
+        the `pandapipes contribution guidelines <https://github.com/e2nIEE/pandapipes/blob/develop/CONTRIBUTING.rst>`_.
+        
+        
+        Change Log
+        =============
+        
+        [0.4.0] - 2021-03-09
+        -------------------------------
+        - [ADDED] Six new tutorials.
+        - [ADDED] Adding flag in run_control if controller convergence should be checked in each level or just at the end.
+        - [ADDED] Adding variables to change collection colors more specifically.
+        - [ADDED] Added flag in fluid for constant fluid properties if warning is displayed or not in case of several input variables.
+        - [ADDED] Added function in graph_searches.py to determine junction distances.
+        - [CHANGED] Deleted one tutorial for heating networks. Another one was updated.
+        - [CHANGED] Deleted tutorial sections from the documentation. These should be available only via the corresponding homepage.
+        - [CHANGED] compressibility and der_compr for hydrogen is now for 273.15 K (instead of 293.15 K before).
+        - [CHANGED] Small updates in the pandapipes documentation.
+        - [CHANGED] Adding a maximum number of iterations when using colebrook friction model.
+        - [CHANGED] In fluids changed function name get_property into get_at_value.
+        - [CHANGED] In std_type renaming attribute type into component.
+        - [FIXED] Bugfix in controller what to do by default in case on net divergence.
+        
+        [0.3.0] - 2021-01-08
+        -------------------------------
+        - [ADDED] added bulk create functions for junctions, sinks, sources, pipes (from std_type and parameters) and valves (clean control)
+        - [ADDED] automated Testing for Python 3.8
+        - [ADDED] github action tests added
+        - [ADDED] LHV and HHV properties for fuel gases
+        - [ADDED] multinet functionality to couple a pandapower and pandapipes network
+        - [ADDED] example gas distribution grid with houses and geodata
+        - [ADDED] compressibility values for hydrogen
+        - [ADDED] create graph added to topology
+        - [CHANGED] bypassing for pumps, pressure lift = 0 for negative and very high volume flows
+        - [CHANGED] pressure lift in pumps now based on p_from (inlet-volume flow)
+        - [CHANGED] logger level for pipeflow messages is now "debug" instead of "info"
+        - [CHANGED] usage of generic functions in the create module which are mostly based on pandapower
+        - [CHANGED] renaming component_models.py into base_component.py
+        - [CHANGED] removing extract_results from pipe, heat_exchanger and valve up to the abstract file branch_models.py
+        - [CHANGED] adding initial_run to net.controller and removing initial_run and recycle from all controllers
+        - [CHANGED] updating run_control and run_timeseries in order to minimize duplicated code between pandapower and pandapipes
+        - [CHANGED] update of generic geodata creation in plotting
+        - [CHANGED] addding initial pressure and volume values as well as its chosen regression polynomial degree to each pump
+        - [FIXED] all tests pass with pandas > 1.x
+        - [FIXED] bug fix for ext_grid result extraction in case of unordered connected junctions
+        - [FIXED] problem of not converging pipeflow solved if there are no branches
+        
+        [0.2.0] - 2020-09-03
+        -------------------------------
+        - [ADDED] added the pipeflow option "reuse_internal_data" which allows to reuse the system matrix from one pipeflow to the next in combination with "only_update_hydraulic_matrix" - useful for timeseries calculations
+        - [ADDED] hydrogen properties
+        - [ADDED] Swamee-Jain friction model
+        - [ADDED] test networks (water) for Swamee-Jain friction model
+        - [ADDED] further explanation in the documentation, e.g. on heating networks and time series / controller
+        - [ADDED] heating network and time series tutorials
+        - [ADDED] enable net loading built in different pandapipes versions
+        - [ADDED] carry over new artificial coordinate functions from pandapower
+        - [ADDED] functionality to create_networkx graph for pandapipes networks
+        - [ADDED] tests for connected components searches in pandapipes networks
+        - [CHANGED] property files for bi-atomic gases
+        - [CHANGED] make ppipe_hook serializable and inherit from pp_hook by using decorators
+        - [CHANGED] changed column "controller" in controller table to "object"
+        - [CHANGED] changes in run_control/run_time_series for better pandapower code reusability like using initial_run variable instead of initial_pipeflow
+        - [CHANGED] names of parameters for regression function in pump
+        - [CHANGED] pressure lift for pumps is now always >= 0
+        - [CHANGED] on reverse flow, the pressure lift for pumps is 0
+        - [CHANGED] add_fluid_to_net is now a private function (usually the wrapper create_fluid_from_lib should be used)
+        - [FIXED] direction of pump in the water test network 'versatility' for OpenModelica
+        - [FIXED] accurate calculation of v in get_internal_results for pipes
+        - [FIXED] enable loading of nets containing controller
+        
+        [0.1.2] - 2020-06-05
+        -------------------------------
+        - [ADDED] allow pipeflow for empty net (with no results)
+        - [ADDED] tests for plotting
+        - [ADDED] new toolbox functions and tests
+        - [ADDED] get... methods for fluids
+        - [ADDED] tutorial, documentation and tests for heat networks
+        - [CHANGED] default column for controllers changed from controller to object
+        - [CHANGED] deepcopy (now in ADict) and repr of pandapipes net + fluid
+        - [CHANGED] improved plotting: respect in_service
+        - [CHANGED] for fluids, comp, molar_mass and der_comp are now read from .txt-files and are no longer hardcoded
+        - [CHANGED] pandapipes.toolbox renamed to pandapipes.internals_toolbox
+        - [FIXED] np.isclose comparison instead of 'p_from != p_to' in pipe_component to allow for computational inaccuracy
+        
+        [0.1.1] - 2020-04-03
+        -------------------------------
+        - [ADDED] badges for pypi and versions
+        - [CHANGED] result table initialization now in most cases only contains one DF creation call #42
+        - [CHANGED] from pandapower tempdir to pytest tmp_path in test
+        - [CHANGED] default orientation of sink and source collections to avoid overlapping
+        - [FIXED] missing images and typos in documentation
+        
+        [0.1.0] - 2020-03-18
+        -------------------------------
+        - first release of pandapipes
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3, <4
+Description-Content-Type: text/x-rst
+Provides-Extra: docs
+Provides-Extra: plotting
+Provides-Extra: test
