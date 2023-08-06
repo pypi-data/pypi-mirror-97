@@ -1,0 +1,44 @@
+# Copyright 2018 Etsy Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
+
+name: external_task_sensor
+operator_class: ExternalTaskSensor
+operator_class_module: airflow.operators.sensors
+schema_extends: base_sensor
+parameters_jsonschema:
+    properties:
+        external_dag_id:
+            type: string
+        external_task_id:
+            type: [string, "null"]
+        execution_delta:
+            type: integer
+        allowed_states:
+            type: array
+            items:
+                type: string
+        execution_date_fn:
+            type: string
+        check_existence:
+            type: boolean
+    required:
+        - external_dag_id
+        - external_task_id
+    additionalProperties: false
+property_preprocessors:
+    - type: to_timedelta
+      properties:
+          units: days
+      apply_to_properties:
+      - execution_delta
