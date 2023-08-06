@@ -1,0 +1,165 @@
+# Agunua
+
+Agunua is a Python library for the development of Gemini clients.
+
+## Installation
+
+You need Python 3, [netaddr](https://github.com/netaddr/netaddr) and [PyOpenSSL](https://www.pyopenssl.org/).  You
+can install the dependencies with pip `pip3 install agunua`. 
+
+## Usage
+
+```
+import Agunua
+...
+u = Agunua.GeminiUri(url)
+print(u)
+```
+
+Parameters in the `GeminiUri()` constructor (you can find their
+default values at the beginning of the file `Agunua/__init__.py`):
+
+* `url`: the URL to load
+* `insecure`: accept invalid certificates (signed by unknown CA, for
+  instance)
+* `tofu`: performs TOFU (Trust On First Use) validation. It is a
+  string, not a boolean. If empty, we disable TOFU. Otherwise, it is
+  the directory of TOFU data.
+* `accept_expired`: accept expired certificates (`insecure = True` is
+  not sufficient for that)
+* `get_content`: retrieve the actual resource (default is to get
+  metadata only)
+* `parse_content`: if it is gemtext (text/gemini), parse and extract
+  links
+* `maxlines`: if it is text, maximum number of lines retrieved. Set to
+  None if you don't want a limit
+* `maxsize`: maximum size in bytes to retrieve. Set to
+  None if you don't want a limit
+* `binary`: (automatic if the content is text). Retrieve as binary
+  content, don't play with end-of-lines
+* `follow-redirect`: automatically follow Gemini redirections
+* `redirect_depth`: maximum number of redirections followed
+* `iri`: handle IRI (URI in Unicode)
+* `force_ipv4`: use the IPv4 protocol only
+* `force_ipv6`: use the IPv6 protocol only
+* `connect_to`: use the host name in the URI for the Gemini request but
+  connect only to this host (name or address). Useful when the host is
+  multihomed.
+
+If the URL is invalid (wrong syntax), you won't get a `GeminiUri`
+object. If you get one, it does not mean the resource has been
+retrieved successfully. See the attribute `network_success` for that,
+and then the attribute `status_code` (that you have to interpret
+yourself, in most cases).
+
+Attributes of `GeminiUri` objects (not all of them will always be
+present; for instance, if you did not ask to get content, you won't
+have an attribute `size`; if the status code is not 20 - OK - you
+won't get a mediatype; etc):
+
+* `network_success`: resource was retrieved successfully
+* `status_code`: if retrieved successfully, the Gemini two-digit
+  status code
+* `error`: if `network_success` is false, this is the reason
+* `ip_address`: IP address used for the retrieval
+* `meta`: the `meta` field of the Gemini protocol. It depends on the
+ status code. Read the Gemini specification for detail.
+* `binary`: if you asked for binary access, it will be True. If you
+  asked for text access (binary=False in the constructor) and asked to
+  ge the content (get_content=True), it will be set to False if
+  decoding went well and True if the decoding failed, for instance
+  because the file did not match the announced "charset".
+* `links`: an array of the links found in the document (if you've set
+  `parse_content`)
+* `payload`: the content  
+* `size`: the size of the payload. Since Gemini does not have a way to
+  indicate at the beginning the payload size, this will be obtained
+  only if `get_content`is true, and it will be limited by the
+  parameter `maxsize`
+* `mediatype`: the media type (MIME type) of the resource, such as
+`text/gemini` or `image/jpeg`
+* `lang`: the human language of the resource, as standardized in [BCP 47](https://www.rfc-editor.org/info/bcp47)
+* `charset`: actually the encoding of the resource such as UTF-8 or US-ASCII
+* `tls_version`: the TLS version, for instance, "TLSv1.3"
+* `no_shutdown`: set to True if the server did not properly close the TLS session. It may mean that the content was truncated. Meaningful only with `get_content=True` and if you asked for the whole file.
+* The rest is related to certificates:
+* `issuer`: the CA (Certificate Authority)
+* `subject`: the name in the certificate (X.509 calls it "subject")
+* `expired`: the certificate has expired
+* `cert_not_after`: expiration date
+* `cert_not_before`: inception date
+* `cert_algo`: algorithm used by the CA
+* `cert_key_type`: algorithm of the public key
+* `keystring`: the public key
+* `cert_key_size`: size of the public key
+
+See `sample-client.py`. Agunua is used in the [Manisha monitoring
+tool](https://framagit.org/bortzmeyer/manisha/) and in the [Lupa crawler](https://framagit.org/bortzmeyer/lupa/).
+
+### Command-line client
+
+`agunua` is a simple Gemini command-line client, a bit like
+curl. You can just call:
+
+```
+agunua YOUR-URL
+```
+
+And you will get its content. Most parameters of the `GeminiUri()`
+constructor can be set via options. Important: the default value is
+not always the same with the command-line tool. For instance, it
+defaults to actually retrieving the content. Here are the options:
+
+* `--maximum-time`: maximum time in seconds before giving in if the
+  server does not respond
+* `--insecure`: do not check the certificate
+* `--no-tofu`: do not perform TOFU (Trust On First Use) validation
+* `--accept-expired-certificate`:  even with `--insecure`, expired
+  certificates are not accepted unless you use also this option
+* `--not-follow-redirect`: by default, the tool follows Gemini
+  redirections but you can use this option to avoid it
+* `--verbose`: more talkative
+* `--display-links`: instead of displaying the content, display the
+  links it contains
+* `--maxlines`: maximum number of lines to retrieve (for text
+  files). Set to 0 for "no limit"
+* `--maxsize`: maximum amount of bytes to retrieve. Set to 0 for "no limit"
+* `--connect-to`: connect to this specific host (name or IP address)
+  not to the one mentioned in the URL
+* `--binary`: even if this is a text file, download as binary
+* `--force-ipv4`: use only the IPv4 protocol
+* `--force-ipv6`: use only the IPv6 protocol
+
+## Name
+
+Agunua is a melanesian serpent god. Caduceus would have been better
+for a Python + Gemini project since there are two snakes on a caduceus
+but it was already used.
+
+## License
+
+GPL. See LICENSE.
+
+## Recent changes
+
+See the file CHANGES.
+
+## Authors
+
+Stéphane Bortzmeyer <stephane+framagit@bortzmeyer.org>.
+
+## Reference site
+
+https://framagit.org/bortzmeyer/agunua/ Use the Gitlab issue tracker to
+report bugs or wishes. But you can of course also access it with
+gemini at gemini://gemini.bortzmeyer.org/software/agunua/
+
+## Other Gemini clients in Python 
+
+* https://tildegit.org/solderpunk/gemini-demo-1 Very simple but working client
+* https://github.com/cbrews/ignition Modelled on the `requests` library so very convenient for programmers
+* https://git.carcosa.net/jmcbray/gusmobile/ Good code
+* https://git.sr.ht/~fkfd/picross 
+* https://github.com/apellis/pygemini No longer maintained
+
+
