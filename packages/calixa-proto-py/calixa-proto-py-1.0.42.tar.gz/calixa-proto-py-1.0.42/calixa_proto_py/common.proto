@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+import "integration_source.proto";
+
+option java_package = "io.calixa.domain.common";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.common;
+
+message Amount {
+    int64 micros = 1;
+    string currency = 2;
+}
+
+message Property {
+    string key = 1;
+    string value = 2;
+}
+
+enum ExternalIdType {
+    EXTERNAL_ID_TYPE_UNSPECIFIED = 0;
+    EXTERNAL_ID_TYPE_PRIMARY = 1;
+    // A link to an external ID that has a relationship to the PRIMARY Id
+    EXTERNAL_ID_TYPE_RELATIONSHIP = 2;
+    // Special case to identify EMAIL external-id going forward.
+    // We will use this when EMAIL is a primary id. We are not using the existing
+    // primary-id because EMAIL can be more than one for an external-entity and we
+    // want to handle it special.
+    EXTERNAL_ID_TYPE_EMAIL = 3;
+}
+
+/**
+
+ExternalId represents one of several things:
+
+1) The ID by which the Entity is known by a 3rd party vendor. For instance,
+   Stripe will identify an invoice with an ID (like "inv_badkfjsadfkjasdf") and
+   we must retain the external ID so that future updates to the Entity can
+   be resolved by this key. In this case, we store the ExternalId as follows:
+
+   external_id={
+     source=INTEGRATION_SOURCE_STRIPE,
+     id="inv_badkfjsadfkjasdf",
+     id_type=EXTERNAL_ID_TYPE_PRIMARY,
+     entity_type=INVOICE
+   }
+
+   When the Invoice is updated via the Stripe App, we usually receive metadata
+   that describes the Customer to which it belongs. In this case, we add a
+   related ExternalId to indicate that the Entity is related to an AccountUser:
+
+   external_id={
+     source=INTEGRATION_SOURCE_UNIVERSAL_EMAIL,
+     id="user@host.com",                        // The normalized email for the user
+     id_type=EXTERNAL_ID_TYPE_RELATIONSHIP,
+     entity_type=ACCOUNT_USER
+   }
+
+   When this ExternalId is observed on the incoming Invoice Entity, we eagerly
+   save (that is, create or update) the related AccountUser Entity. This
+   AccountUser Entity has a PRIMARY key as follows:
+
+   external_id={
+     source=INTEGRATION_SOURCE_UNIVERSAL_EMAIL,
+     id="user@host.com",
+     id_type=EXTERNAL_ID_TYPE_PRIMARY,
+     entity_type=ACCOUNT_USER
+   }
+
+   Next an edge between the Invoice and AccountUser are created using the
+   BELONGS_TO edge type.
+
+   This logic applies to the Billing Entities: Invoice, Charge and Subscription.
+
+2) A relationship to another Entity in the Graph (that might not yet exist).
+
+
+
+
+
+Invariants for ExternalID:
+If the external_id is a PRIMARY (that is, id_type==EXTERNAL_ID_TYPE_PRIMARY)
+then
+  entity_type must be the same as the Entity on which this external_id
+  exists
+
+For reference, see the Data model here:
+https://miro.com/app/board/o9J_koBKhyQ=/
+
+**/
+message ExternalId {
+    calixa.domain.integration.IntegrationSource source = 1;
+    string id = 2;
+    ExternalIdType id_type = 3;
+    EntityType entity_type = 4;
+}
+
+message Address {
+    string organization_id = 1;
+    string address_id = 2;
+    string line1 = 3;
+    string line2 = 4;
+    string city = 5;
+    string state = 6;
+    string postal_code = 7;
+    string country = 8;
+    google.protobuf.Timestamp created_at = 500;
+    google.protobuf.Timestamp updated_at = 501;
+}
+
+service AddressService {
+    rpc GetAddress (GetAddressRequest) returns (Address) {
+    }
+    rpc SaveAddress (SaveAddressRequest) returns (Address) {
+    }
+}
+
+message GetAddressRequest {
+    string organization_id = 1;
+    string address_id = 2;
+}
+
+message SaveAddressRequest {
+    Address address = 1;
+    RequestContext request_context = 3;
+}
+
+message RequestContext {
+
+    calixa.domain.integration.IntegrationSource source = 1;
+    string organization_id = 2;
+
+    // These are optionally populated based upon the nature of the request.
+    //
+    // For instance, if a request is made through the Console (source=INTEGRATION_SOURCE_CALIXA_CONSOLE),
+    // then the organization_user_id will specify the ID of the user that made the request.
+    //
+    // If the request is for one particular account, the account_id field will be populated.
+
+    string organization_user_id = 3;
+    string account_id = 4;
+    string account_user_id = 5;
+    string wal_id = 6;
+
+    // Flag 'Request' or 'Event' objects that might have been create during an
+    // integration's backfilling flow. This flag can be used to let the respective
+    // requested methods or subscribers to optionally skip those event.
+    // (e.g.: Automations should ignore events backfilled events to avoid spam)
+    bool is_backfill_event = 1000;
+    string instance_id = 1001;
+}
+
+// Domain of all entity types supported in the platform; Keep the proto field numbers in
+// sync with calixa.domain.event.Entity.
+enum EntityType {
+
+    // These fields have been removed from the Proto
+    reserved 103, 104, 303, 304, 2007, 2008;
+
+    ENTITY_TYPE_UNSPECIFIED = 0;
+
+    ORGANIZATION = 1;
+    ORGANIZATION_USER = 2;
+    reserved 3; // previously PUSH_NOTIFICATION_CONFIG
+    ACCESS_KEY = 4;
+    AUTOMATION = 5;
+
+    TREND_SEARCH = 20;
+
+    NOTE_THREAD = 50;
+    NOTE_MESSAGE = 51;
+
+    ACCOUNT = 100;
+    ACCOUNT_USER = 101;
+    ACCOUNT_USER_ROLE = 102;
+    OPPORTUNITY = 105;
+
+    INVOICE = 200;
+    PRODUCT = 201;
+    PLAN = 202;
+    SUBSCRIPTION = 203;
+    INVOICE_LINE_ITEM = 204;
+    SUBSCRIPTION_ITEM = 205;
+    CHARGE = 206;
+    SAVED_PAYMENT_METHOD = 207;
+    REFUND = 208;
+
+    CONVERSATION = 300;
+    MESSAGE = 301;
+    ATTACHMENT = 302;
+
+    EVENT = 400;
+
+    // External Domain Model Entities
+    SALESFORCE_ACCOUNT = 2000;
+    SALESFORCE_CONTACT = 2001;
+    INTERCOM_COMPANY = 2002;
+    INTERCOM_CONTACT = 2003;
+    ZENDESK_ORGANIZATION = 2004;
+    ZENDESK_USER = 2005;
+    STRIPE_CUSTOMER = 2006;
+
+    COGNITO_USER = 2009;
+    API_ACCOUNT = 2010;
+    API_USER = 2011;
+    HUBSPOT_COMPANY = 2012;
+    HUBSPOT_CONTACT = 2013;
+
+    reserved 9000; // previously PUSH_NOTIFICATION_LOG;
+
+}
+
+// Domain of all entity association types supported in the platform; Keep the proto field numbers in
+// sync with calixa.domain.event.AssociationMetadata.
+enum AssociationMetadataType {
+
+    ASSOCIATION_METADATA_TYPE_UNSPECIFIED = 0;
+
+    ASSOCIATION_METADATA_TYPE_ACCOUNT_USER_ROLE = 1;
+
+}
+
+message HealthCheckRequest {
+    string service = 1;
+}
+enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3; // Used only by the Watch method.
+}
+message HealthCheckResponse {
+    ServingStatus status = 1;
+}
+service GrpcHealthCheckService {
+    rpc Check (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
