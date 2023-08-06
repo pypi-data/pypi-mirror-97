@@ -1,0 +1,77 @@
+Metadata-Version: 2.1
+Name: jupyter_native_kernel
+Version: 0.0.1
+Summary: Minimalistic Native kernel for Jupyter
+Home-page: https://github.com/passlab/jupyter-native-kernel
+Author: Kewei Yan
+Author-email: kyan2@uncc.edu
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/passlab/jupyter-native-kernel/issues
+Description: # Minimal Native kernel for Jupyter
+        
+        The goal of this kernel is to provide a unified frontend for working with native languages from jupyter.
+        
+        It was started from the [jupyter C kernel][jupyter-c-kernel].
+        
+           [jupyter-c-kernel]: https://github.com/brendan-rius/jupyter-c-kernel
+        
+        ## Usage:
+        * %load <local file or URL> to load a file to the cell
+           
+        ```
+        //%load https://passlab.github.io/CSCE569/resources/axpy.c
+        //%compiler: gcc
+        //%cflags: -fopenmp
+        //%ldflags: -lm
+        //%args: 1024
+        
+        ```
+        
+        ## Setup
+        
+        Works only on Linux and OS X.
+        Windows is not supported yet.
+        If you want to use this project on Windows, please use Docker.
+        
+        Make sure you have the following requirements installed:
+        
+          * gcc
+          * jupyter
+          * python 3
+          * pip
+        
+        
+        ### Install (system)
+        
+        This installs the kernel at the system level. (Not tested yet.)
+        
+         1. `git clone <this repo>`
+         1. `sudo pip3 install -e jupyter-native-kernel`
+         1. `sudo install_native_kernel`
+         
+         To install on system folder, do `sudo install_native_kernel --sys-prefix`
+        
+        
+        
+        ### Install (virtualenv)
+        
+        This installs the kernel within the current virtualenv.
+        
+         1. `git clone <this repo>`
+         1. `virtualenv -p python3 venv`
+         1. `source venv/bin/activate`
+         1. `pip3 install -e jupyter-native-kernel`
+         1. `install_native_kernel --user`
+        
+        
+        ## License
+        
+        This project is released under the [MIT License](LICENSE.txt).
+        
+Keywords: jupyter,notebook,kernel,native
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
