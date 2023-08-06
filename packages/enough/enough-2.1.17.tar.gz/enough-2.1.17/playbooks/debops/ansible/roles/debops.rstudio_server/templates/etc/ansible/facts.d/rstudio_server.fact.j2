@@ -1,0 +1,26 @@
+#!{{ ansible_python['executable'] }}
+
+# {{ ansible_managed }}
+
+from __future__ import print_function
+from json import dumps
+from sys import exit
+import subprocess
+import signal
+import os
+
+output = {"installed": True}
+
+try:
+    with open(os.devnull, 'w') as devnull:
+        app_stdout = subprocess.check_output(
+            ["/usr/sbin/rstudio-server version"],
+            shell=True, stderr=devnull).decode('utf-8')
+
+except subprocess.CalledProcessError:
+    pass
+
+if app_stdout:
+    output['version'] = app_stdout.strip()
+
+print(dumps(output, sort_keys=True, indent=4))

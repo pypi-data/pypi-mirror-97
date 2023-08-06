@@ -1,0 +1,45 @@
+---
+- import_playbook: "{{ '$SHARE_DIR/molecule/enough/enough-playbook.yml' | expandvars }}"
+- name: prepare cloud environment
+  hosts: jmm-host
+
+  tasks:
+    - name: set_fact app_sh & app_dir
+      set_fact:
+        app_dir: "/srv/nextcloud/.examples/docker-compose/with-nginx-proxy/postgres/apache"
+        app_sh: "docker-compose -f docker-compose-infrastructure.yml exec -T -u www-data app"
+
+    - name: occ config:system:set cloud.manach.net
+      shell: |
+        {{ app_sh }} php -f occ config:system:set trusted_domains 3 --value cloud.manach.net
+      args:
+        chdir: "{{ app_dir }}"
+      become: False
+    
+  become: True
+
+# separate plays because of https://github.com/ansible/ansible/issues/50278
+- name: install certificate on cloud.manach.net
+  hosts: jmm-host
+
+  roles:
+    - role: enough-nginx
+      vars:
+        enough_nginx_reverse_proxy: 127.0.0.1:8080
+        enough_nginx_fqdn: "cloud.manach.net"
+        enough_nginx_sites: |
+          add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;" always;
+
+          location = /.well-known/carddav {
+             return 301 $scheme://$host:$server_port/remote.php/dav;
+          }
+          location = /.well-known/caldav {
+             return 301 $scheme://$host:$server_port/remote.php/dav;
+          }
+
+    - role: certificate
+      vars:
+        certificate_fqdn: "cloud.manach.net"
+        certificate_installer: nginx
+
+  become: True

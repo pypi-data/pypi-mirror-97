@@ -1,0 +1,16 @@
+---
+- name: prepare test clients
+  hosts: bind-client-host
+  become: True
+
+  roles:
+
+    - role: install_ssh_records
+      vars:
+        install_ssh_records_host: ns1
+
+  tasks:
+    - name: apt-get install dnsutils
+      apt:
+        name: dnsutils
+        state: present
