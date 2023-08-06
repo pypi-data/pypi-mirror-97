@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "outcome-stubs"
+version = "0.5.4"
+description = "Stub files for various python packages."
+authors = ["Outcome Engineering <engineering@outcome.co>"]
+packages = [
+  { include = "pactman-stubs", from = "src" },
+  { include = "starlette-stubs", from = "src" },
+  { include = "requests-stubs", from = "src" }
+]
+homepage = "https://github.com/outcome-co/stubs-py"
+repository = "https://github.com/outcome-co/stubs-py"
+documentation = "https://github.com/outcome-co/stubs-py#README"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.6"
+pactman = "^2.28.0"
+requests = "^2.25.1"
+fastapi = "^0.63.0"
+
+[tool.poetry.dev-dependencies]
+outcome-devkit = "^6.0.0"
+
+[tool.isort]
+skip_glob = "*/.cache/**/*"
+line_length = 130
+include_trailing_comma = true
+multi_line_output = 3
+
+[tool.coverage.run]
+branch = true
+data_file = 'coverage/data'
+source = ['src/']
+omit = [
+   "test/*"
+]
+
+[tool.coverage.report]
+fail_under = 100
+skip_empty = true
+
+[tool.coverage.html]
+show_contexts = true
+directory = 'coverage/html'
+
+[tool.black]
+line-length = 130
+include = '\.pyi?$'
+# This stops black from rewriting quotes
+skip-string-normalization = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.cache
+)/
+'''
+
+[build-system]
+requires = ["poetry==1.1.4"]
+build-backend = "poetry.masonry.api"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.5.4"
+tag_format = "v$version"
+bump_message = "chore(version): $current_version → $new_version"
+version_files = ["README.md:version-badge", "pyproject.toml:version"]
+
