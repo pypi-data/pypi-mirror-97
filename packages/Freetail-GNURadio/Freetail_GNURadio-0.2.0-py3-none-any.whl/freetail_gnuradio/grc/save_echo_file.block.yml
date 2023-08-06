@@ -1,0 +1,36 @@
+id: 'save_echo_file'
+label: 'Save echo to file'
+category: '[Radar and Sonar]'
+
+parameters:
+- id: samp_rate
+  label: 'Sample rate (sps)'
+  dtype: float
+
+- id: samples_per_pulse
+  label: 'Samples per pulse'
+  dtype: int
+
+- id: filename
+  label: 'Filename'
+  dtype: string
+
+- id: header
+  label: 'File Header'
+  dtype: string
+
+templates:
+  imports: from freetail_gnuradio.save_echo_file import save_echo_file
+  make: save_echo_file(${samp_rate}, ${samples_per_pulse}, ${filename}, ${header})
+  callbacks:
+  - set_filename(${filename})
+
+inputs:
+- domain: stream
+  dtype: float
+
+- domain: message
+  id: write_data
+
+file_format: 1
+

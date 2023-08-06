@@ -1,0 +1,40 @@
+id: 'split_gate_tracker'
+label: 'Split Gate Tracker'
+category: '[Radar and Sonar]'
+
+parameters:
+- id: gain
+  label: 'Tracking Loop Gain'
+  dtype: float
+
+- id: samples_per_pulse
+  label: 'Samples per pulse'
+  dtype: int
+
+- id: samp_rate
+  label: 'Sample rate (sps)'
+  dtype: float
+
+- id: gate_width
+  label: 'Gate width (s)'
+  dtype: float
+
+- id: initial_time
+  label: 'Initial target return time (seconds)'
+  dtype: float
+
+templates:
+  imports: from freetail_gnuradio.split_gate_tracker import split_gate_tracker
+  make: split_gate_tracker(${gain}, ${samp_rate}, ${gate_width}, ${initial_time}, ${samples_per_pulse})
+
+inputs:
+- domain: stream
+  dtype: float
+
+outputs:
+- domain: stream
+  dtype: float
+  multiplicity: 1
+
+file_format: 1
+

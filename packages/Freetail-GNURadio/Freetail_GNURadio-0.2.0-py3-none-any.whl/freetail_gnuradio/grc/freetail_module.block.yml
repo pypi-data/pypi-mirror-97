@@ -1,0 +1,43 @@
+id: 'freetail_module'
+label: 'Freetail Module'
+category: '[Radar and Sonar]'
+flags: throttle
+
+parameters:
+- id: waveform
+  label: 'Sampled Transmit Waveform'
+  dtype: complex_vector
+
+- id: f_0
+  label: 'Frequency (Hz)'
+  dtype: real
+  default: 40e3
+
+- id: sample_rate
+  label: 'Sample Rate (sps)'
+  dtype: real
+  default: samp_rate
+
+- id: samples_per_pulse
+  label: 'Samples per pulse'
+  dtype: int
+
+- id: duplexer_time
+  label: 'Duplexer switch on time (s)'
+  dtype: real
+  default: 0.0
+
+asserts:
+- ${ len(waveform) < samples_per_pulse }
+
+templates:
+  imports: from freetail_gnuradio.freetail_module import freetail_module
+  make: freetail_module(${waveform}, ${f_0}, ${sample_rate}, ${samples_per_pulse}, ${duplexer_time})
+
+outputs:
+- domain: stream
+  dtype: float
+  multiplicity: 1
+
+file_format: 1
+
