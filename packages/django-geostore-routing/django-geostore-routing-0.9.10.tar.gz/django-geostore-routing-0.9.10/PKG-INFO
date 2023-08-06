@@ -1,0 +1,169 @@
+Metadata-Version: 2.1
+Name: django-geostore-routing
+Version: 0.9.10
+Summary: PGRouting plugin for django-geostore
+Home-page: https://github.com/Terralego/django-geostore-routing.git
+Author: Makina Corpus
+Author-email: terralego-pypi@makina-corpus.com
+License: UNKNOWN
+Description: [![Build](https://github.com/Terralego/django-geostore-routing/workflows/Testing/badge.svg)](https://github.com/Terralego/django-geostore-routing/actions?query=branch%3Amaster)
+        [![codecov](https://codecov.io/gh/Terralego/django-geostore-routing/branch/master/graph/badge.svg)](https://codecov.io/gh/Terralego/django-geostore-routing)
+        [![Maintainability](https://api.codeclimate.com/v1/badges/d68cfbf250ff1bd8d91f/maintainability)](https://codeclimate.com/github/Terralego/django-geostore-routing/maintainability)
+        [![Documentation Status](https://readthedocs.org/projects/django-geostore-routing/badge/?version=latest)](https://django-geostore-routing.readthedocs.io/en/latest/?badge=latest)
+        
+        ![Python Version](https://img.shields.io/badge/python-%3E%3D%203.6-blue.svg)
+        ![Django Version](https://img.shields.io/badge/django-%3E%3D%202.2-blue.svg)
+        
+        # django-geostore-routing
+        
+        * PGRouting plugin for django-geostore
+        * Add topology creation and update on Linestring based layers
+        * Add custom fields and endpoint in django-geostore API to compute routing
+        
+        https://django-geostore-routing.readthedocs.io/en/latest/
+        
+        ## Requirements
+        
+        ### General
+        
+        * Python 3.6+
+        * Postgresql 10+
+        * PostGIS 2.4+
+        * PgRouting 2.5+
+        
+        ### Libraries
+        
+        these are debian packages required
+        
+        - libpq-dev   (psycopg2)
+        - gettext     (translations)
+        - binutils    (django.contrib.gis)
+        - libproj-dev (django.contrib.gis)
+        - gdal-bin    (django.contrib.gis)
+        
+        recommended
+        
+        - postgresql-client (if you want to use ./manage.py dbshell command)
+        
+        ## Installation
+        
+        ### from PYPI
+        
+        ```bash
+        pip install django-geostore-routing
+        ```
+        
+        ### from GitHub
+        
+        ```bash
+        git clone https://github.com/Terralego/django-geostore-routing.git
+        cd django-geostore-routing
+        python3 setup.py install
+        ```
+        
+        ### in your project settings
+        
+        ```python
+        INSTALLED_APPS = (
+            'geostore',
+            'geostore_routing',
+        )
+        ```
+        
+        ## Development
+        
+        ### with docker :
+        ```bash
+        docker-compose build
+        docker-compose up
+        docker-compose run web ./manage.py test
+        ```
+        
+        ### with pip :
+        ```bash
+        python3.6 -m venv venv
+        source activate venv/bin/activate
+        pip install -e .[dev]
+        ```
+        
+        
+        CHANGELOG
+        =========
+        
+        0.9.10         (2021-03-09)
+        ---------------------------
+        
+        * Add message no way found
+        
+        0.9.9          (2021-02-18)
+        ---------------------------
+        
+        * Fix routing without routes
+        
+        0.9.8          (2021-02-11)
+        ---------------------------
+        
+        * Fix waypoints, remove legs between waypoints and start
+        
+        0.9.7          (2020-12-15)
+        ---------------------------
+        
+        * Add waypoints with coordinates and distance to route
+        
+        0.9.6          (2020-11-06)
+        ---------------------------
+        
+        * Improve compatibility with django-geostore > 0.5.2
+        
+        0.9.5          (2020-10-30)
+        ---------------------------
+        
+        * Fix default routing layer serializer
+        * Change way to load signals
+        * Improve test coverage
+        
+        
+        0.9.4          (2020-10-28)
+        ---------------------------
+        
+        * Improve compatibility with django-geostore > 0.5.0
+        
+        
+        0.9.3          (2020-10-27)
+        ---------------------------
+        
+        * Fix release
+        
+        
+        0.9.2          (2020-10-27)
+        ---------------------------
+        
+        * Require django-geostore 0.5.0 minimum
+        
+        
+        0.9.1          (2020-10-27)
+        ---------------------------
+        
+        * Wrong release
+        
+        
+        0.9.0          (2020-10-27)
+        ---------------------------
+        
+        * First release
+        
+Platform: UNKNOWN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Description-Content-Type: text/markdown
+Provides-Extra: dev
