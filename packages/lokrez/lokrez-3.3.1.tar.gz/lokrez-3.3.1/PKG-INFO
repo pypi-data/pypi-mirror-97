@@ -1,0 +1,185 @@
+Metadata-Version: 2.1
+Name: lokrez
+Version: 3.3.1
+Summary: Smash.gg-connected top8 graphics generator for Super Smash Bros Ultimate tournaments
+Home-page: https://git.lertsenem.com/lertsenem/ssbu_lokrez
+Author: Lertsenem
+Author-email: lertsenem@lertsenem.com
+License: MIT
+Description: Lokrez
+        ======
+        
+        A smash.gg-aware local-results generator for Super Smash Brothers Ultimate.
+        
+        Usage
+        -----
+        
+        ----
+        $> lokrez -t [your-smash.gg-auth-token] top8 [tournament-slug-or-id]
+        ----
+        
+        The resulting outputs will be in +tournament-slug.lkrz+ (text version) and
+        +tournament-slug.svg+ (image version).
+        
+        Use the +--help+ option for further details.
+        
+        
+        Requirements
+        ------------
+        
+        === Modules
+        - *appdirs* is needed to find the right emplacements for config, cache and data
+          files according to the OS ;
+        - *jinja2* is needed for templating ;
+        - *requests* is needed for HTTP(s) requests ;
+        - *cairosvg* can be used for some rasterized exports (see corresponding
+          section)
+        
+        === Templates
+        The *rebootlyonXXX* templates needs the *Impact* font (available by default on
+        Windows, install +ttf-mscorefonts-installer+ on Ubuntu or Debian).
+        
+        The *rebootlyon2020* template also need the *Gobold Regular* font, available at
+        https://www.dafont.com/gobold.font (free for personnal use).
+        
+        === Exports
+        The default and preferred output format is *SVG*.
+        
+        You can also export to *PNG*, *PDF* and *PS* by using the corresponding
+        extension in the filename supplied to +--outfile+. Those exports are based on
+        the *SVG* output.
+        
+        To export in *PNG*, lokrez will first try to use *Inkscape* command line. If
+        that fails (inkscape is not installed, or lokrez can't find it in your PATH),
+        it will try to use the *cairosvg* module (which can create artefacts for some
+        SVG objects).
+        
+        To export in *PDF* or *PS*, lokrez will try to use the *cairosvg* module.
+        
+        === Images
+        The SSBU characters images are not included (since this is both copyrighted
+        work and a lot of heavy bitmaps). The +init+ command is designed to download
+        them for you and rename them according to lokrez expectations. Use it with
+        +lokrez init ssbu+. Then you can go make yourself a cup of coffee or two,
+        because that's about 3G you're going to download.
+        
+        By default, the images are 
+        
+        For reference, the images names look like :
+        
+        -----
+        {charactername}/chara_{formatnumber}_{charactername}_{skinnumber}.png
+        -----
+        
+        where:
+        - +charactername+ is the character name (see <<_SSBU_charaappendix for valid names)
+        - +formatnumber+ indicates what kind of image it is
+            * +0+ is a 128x128 head crop
+            * +1+ is a 512x512 bust crop
+            * +2+ is the stock icon
+            * +3+ is a large bust crop
+            * +4+ is the ingame portrait
+            * +5+ is the full image
+            * +6+ is the 512x256 eyes crop
+            * +7+ is a ?x300 upper bust crop
+        - +skinnumber+ indicates the character skin (00 being the default)
+        
+        Annexes
+        -------
+        
+        === SSBU Characters names
+        These are the string used to name SSBU characters.
+        
+        - +banjo & kazooie+
+        - +bayonetta+
+        - +bowser+
+        - +bowser jr+
+        - +byleth+
+        - +captain falcon+
+        - +charizard+
+        - +chrom+
+        - +cloud+
+        - +corrin+
+        - +daisy+
+        - +dark pit+
+        - +dark samus+
+        - +diddy kong+
+        - +donkey kong+
+        - +dr mario+
+        - +duck hunt+
+        - +falco+
+        - +fox+
+        - +ganondorf+
+        - +greninja+
+        - +hero+
+        - +ice climbers+
+        - +ike+
+        - +incineroar+
+        - +inkling+
+        - +isabelle+
+        - +ivysaur+
+        - +jigglypuff+
+        - +joker+
+        - +ken+
+        - +king dedede+
+        - +king k rool+
+        - +kirby+
+        - +link+
+        - +little mac+
+        - +lucario+
+        - +lucas+
+        - +lucina+
+        - +luigi+
+        - +mario+
+        - +marth+
+        - +mega man+
+        - +meta knight+
+        - +mewtwo+
+        - +min min+
+        - +mr game and watch+
+        - +ness+
+        - +olimar+
+        - +pac-man+
+        - +palutena+
+        - +peach+
+        - +pichu+
+        - +pikachu+
+        - +piranha plant+
+        - +pit+
+        - +pokemon trainer+
+        - +richter+
+        - +ridley+
+        - +rob+
+        - +robin+
+        - +rosalina and luma+
+        - +roy+
+        - +ryu+
+        - +samus+
+        - +sheik+
+        - +shulk+
+        - +simon+
+        - +snake+
+        - +sonic+
+        - +squirtle+
+        - +terry+
+        - +toon link+
+        - +villager+
+        - +wario+
+        - +wii fit trainer+
+        - +wolf+
+        - +yoshi+
+        - +young link+
+        - +zelda+
+        - +zero suit samus+
+        
+        
+Keywords: smash ultimate local results esport smashgg
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Topic :: Multimedia :: Graphics
+Classifier: Environment :: Console
+Requires-Python: >=3.5
+Description-Content-Type: text/plain
