@@ -1,0 +1,73 @@
+Metadata-Version: 1.2
+Name: cinderlib
+Version: 3.1.0
+Summary: Direct usage of Cinder Block Storage drivers without the services
+Home-page: https://docs.openstack.org/cinderlib/latest/
+Author: OpenStack
+Author-email: openstack-discuss@lists.openstack.org
+License: UNKNOWN
+Description: The Cinder Library, also known as cinderlib, is a Python library that leverages
+        the Cinder project to provide an object oriented abstraction around Cinder's
+        storage drivers to allow their usage directly without running any of the Cinder
+        services or surrounding services, such as KeyStone, MySQL or RabbitMQ.
+        
+        * Free software: Apache Software License 2.0
+        * Documentation: https://docs.openstack.org/cinderlib/latest/
+        
+        The library is intended for developers who only need the basic CRUD
+        functionality of the drivers and don't care for all the additional features
+        Cinder provides such as quotas, replication, multi-tenancy, migrations,
+        retyping, scheduling, backups, authorization, authentication, REST API, etc.
+        
+        The library was originally created as an external project, so it didn't have
+        the broad range of backend testing Cinder does, and only a limited number of
+        drivers were validated at the time.  Drivers should work out of the box, and
+        we'll keep a list of drivers that have added the cinderlib functional tests to
+        the driver gates confirming they work and ensuring they will keep working.
+        
+        Features
+        --------
+        
+        * Use a Cinder driver without running a DBMS, Message broker, or Cinder
+          service.
+        * Using multiple simultaneous drivers on the same application.
+        * Basic operations support:
+        
+          - Create volume
+          - Delete volume
+          - Extend volume
+          - Clone volume
+          - Create snapshot
+          - Delete snapshot
+          - Create volume from snapshot
+          - Connect volume
+          - Disconnect volume
+          - Local attach
+          - Local detach
+          - Validate connector
+          - Extra Specs for specific backend functionality.
+          - Backend QoS
+          - Multi-pool support
+        
+        * Metadata persistence plugins:
+        
+          - Stateless: Caller stores JSON serialization.
+          - Database: Metadata is stored in a database: MySQL, PostgreSQL, SQLite...
+          - Custom plugin: Caller provides module to store Metadata and cinderlib calls
+            it when necessary.
+        
+        
+Platform: UNKNOWN
+Classifier: Environment :: OpenStack
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Python: >=3.6
