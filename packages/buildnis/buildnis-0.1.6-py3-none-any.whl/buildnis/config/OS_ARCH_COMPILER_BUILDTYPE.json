@@ -1,0 +1,70 @@
+{
+    "file_name": "build_config",
+    "file_version": "1.0",
+    "build_type": "documentation",
+    "build_subtype": "HTML",
+    "build_tool_type": "Doxygen & Sphinx",
+    "stages": 
+    [
+        {
+            "name": "Doxygen XML",
+            "description": "WHAT_DOES_THIS_STAGE_DO",
+            "build_tool_name": "BUILD_TOOL_NAME",
+            "build_tool_out_dir": "${../../build_directory}",
+            "call_build_tool": "@FOR_EACH${sources}",
+            "sources":
+            [
+                "${../../dependencies}"
+            ],
+            "dependencies":
+            [
+                "${../../dependencies}"
+            ],
+            "results": 
+            [
+                {
+                    "type": "file_per_source",
+                    "source_name": "SOURCE_FILE1",
+                    "path_or_regexp": "REGEXP_TO_RESULT1"
+                }
+            ], 
+            "build_tool_arguments":
+            [
+                "BUILD_TOOL_ARG1",
+                "BUILD_TOOL_ARG2",
+                "${../include_paths:-I}",
+                "${../library_paths:-L}",
+                "${../libraries:-l}",
+                "${../modules:-m}"
+            ]
+        },
+        {
+            "name": "STAGE 2",
+            "description": "WHAT_DOES_THIS_STAGE_2_DO",
+            "sources": [
+                {
+                    "type": "wildcard",
+                    "path_or_regexp": "REGEXP_TO_FILES1"
+                },
+                {
+                    "type": "single_file",
+                    "path_or_regexp": "PATH_TO_FILE2"
+                }
+            ],
+            "results": [
+                {
+                    "type": "single_file",
+                    "source_name": "OBJECT_FILES",
+                    "path_or_regexp": "REGEXP_TO_RESULT1"
+                }
+            ],
+            "build_tool_working_dir": "BUILD_TOOL_WD",
+            "build_tool_env_script": "PATH_TO_BUILD_TOOL_ENV",
+            "build_tool_executable": "BUILD_TOOL_PATH",
+            "build_tool_arguments": [
+                "BUILD_TOOL_ARG1",
+                "BUILD_TOOL_ARG2"
+            ]
+        }
+    ]    
+}

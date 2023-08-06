@@ -1,0 +1,65 @@
+{
+    "file_name": "module_config",
+    "file_version": "1.0",
+    "name": "MODULE_NAME",
+    "version": "${../version}",
+    "author": "${../author}",
+    "company": "${../company}",
+    "date": "MODULE_START_DATE",
+    "description": "SHORT_MODULE_DESCRIPTION",
+    "copyright_info": "${../copyright_info}",
+    "web_url": "${../web_url}",
+    "email": "${../email}",
+    "sources": 
+    [
+        "*.cpp"
+    ],
+    "targets": 
+    [
+        {
+            "name": "static_release",
+            "alias": "static",
+            "default": true,
+            "build_type": "static_library",
+            "build_subtype": "release",
+            "build_tool_type": "C++",
+            "result": "file",
+            "result_name": "cpp_static_library",
+            "build_directory": "./build",
+            "sources": "${../sources}",
+            "include_paths": 
+            [
+                "./"
+            ],
+            "library_paths": [],
+            "libraries": [],
+            "module_paths": []
+        },
+        {
+            "name": "static_debug",
+            "alias": "static-dbg",
+            "build_type": "static_library",
+            "build_subtype": "debug",
+            "build_tool_type": "C++",
+            "result": "file",
+            "result_name": "cpp_static_library-dbg",
+            "build_directory": "./build-dbg",
+            "sources": "${../sources}",
+            "include_paths": 
+            [
+                "./"
+            ],
+            "library_paths": [],
+            "libraries": [],
+            "module_paths": []
+        },
+        {
+            "name": "install",
+            "build_type": "install",
+            "build_subtype": "file",
+            "build_tool_type": "internal",
+            "dependencies": "${@}"
+        }
+    ],
+    "supported_builds": []
+}
