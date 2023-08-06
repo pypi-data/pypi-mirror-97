@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd $(dirname "$0")
+redis-server --daemonize yes 2> /dev/null
+export FLASK_APP=$(realpath '../apps/wsgi.py')
+export FLASK_ENV=development
+export FLASK_DEBUG=1
+export NETATMOQC_CONFIG_PATH="${1:-${NETATMOQC_CONFIG_PATH}}"
+echo $NETATMOQC_CONFIG_PATH
+flask run
