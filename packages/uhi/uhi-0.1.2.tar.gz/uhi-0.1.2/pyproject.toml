@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "uhi"
+version = "0.1.2"
+description = "Unified Histogram Interface: tools to help library authors work with histograms"
+authors = [
+    "Henry Schreiner <henryschreineriii@gmail.com>",
+    "Hans Dembinski <hans.dembinski@gmail.com>",
+    "Jim Pivaski <pivarski@princeton.edu>",
+]
+maintainers = [
+    "The Scikit-HEP admins <scikit-hep-admins@googlegroups.com>",
+]
+homepage = "https://github.com/Scikit-HEP/uhi"
+repository = "https://github.com/Scikit-HEP/uhi"
+readme = "README.md"
+license = "BSD-3-Clause"
+
+classifiers = [
+  "Topic :: Scientific/Engineering",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "Typing :: Typed",
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+typing_extensions = { version = ">=3.7", python = "<3.8" }
+
+sphinx = {version = "^3.0", optional = true}
+sphinx_book_theme = { version = ">=0.0.40", optional = true }
+sphinx_copybutton = { version = ">=0.3.1", optional = true }
+pytest = { version = ">=5.2", optional = true }
+importlib_metadata = {version = ">=1.0", optional = true, python = "<3.8" }
+
+[tool.poetry.dev-dependencies]
+pytest = ">=5.2"
+importlib_metadata = {version = ">=1.0", python = "<3.8" }
+
+[tool.poetry.extras]
+docs = ["sphinx", "sphinx_book_theme", "sphinx_copybutton"]
+test = ["pytest", "importlib_metadata"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_config]
+addopts = "-rs -s -Wd"
+testpaths = [
+    "tests",
+]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
