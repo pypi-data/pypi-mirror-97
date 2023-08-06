@@ -1,0 +1,33 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="imio.history">
+
+  <five:registerPackage package="." initialize=".initialize" />
+  <i18n:registerTranslations directory="locales" />
+
+  <include package=".browser" />
+
+  <include package="Products.GenericSetup" file="meta.zcml" />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="imio.history"
+      directory="profiles/default"
+      description="Installs the imio.history package."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <adapter for="OFS.interfaces.IItem"
+           factory=".adapters.ImioWfHistoryAdapter"
+           name="workflow"
+           provides=".interfaces.IImioWfHistory" />
+
+  <adapter for="OFS.interfaces.IItem"
+           factory=".adapters.ImioRevisionHistoryAdapter"
+           name="revision"
+           provides=".interfaces.IImioRevisionHistory" />
+
+</configure>

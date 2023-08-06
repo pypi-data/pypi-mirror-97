@@ -1,0 +1,113 @@
+<div id="content" define-macro="history" i18n:domain="plone"
+     tal:condition="view/show_history"
+     tal:define="events view/getHistory;
+                 showColors  view/showColors;
+                 showRevisionInfos view/showRevisionInfos;">
+  <tal:block replace="structure view/renderCustomJS"></tal:block>
+  <tal:comment replace="nothing">Table containing the history</tal:comment>
+  <tal:history condition="events">
+  <table class="listing nosort" style="width: 100%">
+   <thead>
+    <tr>
+      <th i18n:translate="listingheader_action" width="100px">Action</th>
+      <th i18n:translate="listingheader_performed_by" width="125px">Performed by</th>
+      <th i18n:translate="listingheader_date_and_time" width="125px">Date and time</th>
+      <th i18n:translate="listingheader_comment">Comment</th>
+      <th i18n:translate="" tal:condition="showRevisionInfos"></th>
+      <th i18n:translate="" tal:condition="showRevisionInfos"></th>
+    </tr>
+   </thead>
+   <tbody>
+    <tal:event repeat="event events">
+    <tr tal:define="odd repeat/event/odd;
+                    comments event/comments|nothing;
+                    state event/review_state|event/action|nothing;
+                    isDataChange python: event['action'] == '_datachange_'"
+        tal:attributes="class python: odd and 'even' or 'odd'" valign="top">
+      <td tal:condition="isDataChange">
+        <i i18n:translate="data_change" i18n:domain="imio.history">Data change</i>
+        <form name="deleteEventForm"
+              action="delete_history_event"
+              tal:define="member context/@@plone_portal_state/member;
+                          portal_url context/@@plone_portal_state/portal_url;"
+              tal:condition="python: member.has_role('Manager')"
+              tal:attributes="action string:${context/absolute_url}/delete_history_event">
+            <input type="hidden" name="object_uid" tal:attributes="value context/UID" />
+            <input type="hidden" name="event_time" tal:attributes="value event/time" />
+            <tal:comment replace="nothing">Icon</tal:comment>
+            <img i18n:attributes="title" title="Delete"
+                 tal:attributes="src string: $portal_url/delete_icon.png"
+                 onClick="javascript:confirmDeleteObject(this)" style="cursor:pointer"/>
+        </form>
+      </td>
+      <td class="#"
+          tal:condition="not: isDataChange"
+          tal:define="actionTitle python: event['action'] and view.getTransitionTitle(event['action']) or 'Created'"
+          tal:content="actionTitle" i18n:translate=""
+          tal:attributes="class python: showColors and ('state-%s' % str(state).lower()) or ''">Action</td>
+      <td tal:define="actorid python:event.get('actor');
+                      actor python:context.portal_membership.getMemberInfo(actorid);
+                      fullname actor/fullname|nothing;
+                      username actor/username|nothing"
+          tal:content="python:fullname or username or actorid"/>
+      <td tal:content="python:context.restrictedTraverse('@@plone').toLocalizedTime(event['time'],long_format=True)"/>
+      <td tal:condition="not: isDataChange" class="history-comments">
+        <tal:renderComments condition="comments">
+         <tal:renderedComments replace="structure python: view.renderComments(event)"/>
+        </tal:renderComments>
+        <span tal:condition="not: comments" i18n:translate="no_comments" class="discreet">No comments</span>
+      </td>
+      <td tal:condition="isDataChange">
+        <tal:comment replace="nothing">
+          Display the previous values of the fields whose value were modified in this change.</tal:comment>
+        <table class="dataChanges" width="100%" i18n:domain="imio.history">
+          <tal:loop tal:repeat="change event/changes/items">
+            <tal:change define="field python:context.getField(change[0])">
+            <tr valign="top">
+              <td>
+                <i tal:content="python: context.translate(field.widget.label_msgid, domain=field.widget.i18n_domain)">Field name</i>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td tal:content="structure python: change[1]"></td>
+            </tr>
+            </tal:change>
+          </tal:loop>
+        </table>
+      </td>
+      <td tal:define="isVersion python:event['type']=='versioning'"
+          tal:condition="showRevisionInfos">
+        <tal:block define="versionIsViewable python: isVersion and view.versionIsViewable(event)"
+                   condition="isVersion">
+          <tal:versionViewable condition="versionIsViewable">
+
+            <tal:previewVersion replace="structure python: context.restrictedTraverse('@@history-version-preview')(version_id=event['version_id'])" />
+
+            <div class="historyLinks">
+              <a href=""
+                 tal:attributes="href event/preview_url"
+                 i18n:translate="title_view_revision">View</a>
+              <a href="" tal:attributes="href event/diff_current_url"
+                 tal:condition="exists:event/diff_current_url"
+                 i18n:translate="title_compare_revision">&middot; Compare to current</a>
+            </div>
+
+          </tal:versionViewable>
+        </tal:block>
+      </td>
+      <td tal:define="isVersion python:event['type']=='versioning'"
+          tal:condition="showRevisionInfos">
+        <tal:block condition="isVersion">
+          <form action="" method="post" tal:condition="event/revert_url" tal:attributes="action event/revert_url">
+            <input type="hidden" name="version_id" value="" tal:attributes="value event/version_id" />
+            <input class="standalone" type="submit" i18n:attributes="value title_revert_revision" tal:condition="exists:event/diff_current_url" value="Revert to this revision" />
+          </form>
+        </tal:block>
+      </td>
+    </tr>
+    </tal:event>
+   </tbody>
+  </table>
+  </tal:history>
+  <div tal:condition="not: events">—</div>
+</div>
