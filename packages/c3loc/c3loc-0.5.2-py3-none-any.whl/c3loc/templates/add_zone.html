@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Proximity Demo - Index{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 id="titleH1">New Zone</h1>
+    <div class="row">
+        <form>
+            <div class="row">
+                <div class="six columns">
+                    <label for="nameInput">Name</label>
+                    <input class="u-full-width" type="text" placeholder="" id="nameInput">
+                </div>
+            </div>
+            <input id="submitBtn" class="button-primary" type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+  'use strict';
+  document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById('submitBtn').addEventListener('click', function (evt) {
+          evt.preventDefault();
+          const new_name = document.getElementById('nameInput').value;
+          fetch('/api/zones', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                  name: new_name,
+              })
+          }).then(response => {
+              if (response.ok === true) {
+                  location.replace('/demo/');
+                  return;
+              }
+              alert("Add zone failed: " + response.statusText);
+          })
+      })
+  });
+</script>
+{% endblock js%}

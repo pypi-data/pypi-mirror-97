@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Proximity Demo - Index{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 id="titleH1">Editing tag #{{ tag_id }}</h1>
+    <div class="row">
+        <form>
+            <div class="row">
+                <div class="six columns">
+                    <label for="nameInput">Tag Name</label>
+                    <input class="u-full-width" type="text" placeholder="" id="nameInput">
+                </div>
+                <div class="six columns">
+                    <label for="zoneInput">Zone (location anchor use only)</label>
+                    <select class="u-full-width" id="zoneInput">
+                    </select>
+                </div>
+            </div>
+            <input id="submitBtn" class="button-primary" type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+    (function() {
+        'use strict';
+        var nameInput = document.getElementById('nameInput');
+        var zoneInput = document.getElementById('zoneInput');
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/api/zones')
+                .then(response => response.json())
+                .then(data => {
+                    let null_opt = new Option('None');
+                    null_opt.value = null;
+                    zoneInput.add(null_opt);
+                    data.forEach(zone => {
+                        let opt = new Option(zone.name);
+                        opt.value = zone.id;
+                        zoneInput.add(opt);
+                    })
+                   fetch('/api/tags/{{ tag_id }}').then(response => response.json()).then(data => {
+                       document.getElementById('titleH1').innerText =
+                           "Editing zone: " + data.name;
+                       nameInput.value = data.name;
+                       zoneInput.value = data.zone_id;
+                   });
+                });
+        });
+        const orig_name = document.getElementById('nameInput').value;
+        document.getElementById('submitBtn').addEventListener('click', function (evt) {
+            evt.preventDefault();
+            const new_name = document.getElementById('nameInput').value;
+            let new_zone = document.getElementById('zoneInput').value;
+            if (new_zone === 'null') new_zone = null;
+            fetch('/api/tags/{{ tag_id }}', {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: new_name,
+                    zone_id: parseInt(new_zone),
+                })
+            }).then(response => {
+                if (response.ok === true) {
+                    location.replace('/demo/');
+                    return;
+                }
+                alert("Update failed: " + response.statusText);
+            })
+        })
+    }());
+</script>
+{% endblock js%}
