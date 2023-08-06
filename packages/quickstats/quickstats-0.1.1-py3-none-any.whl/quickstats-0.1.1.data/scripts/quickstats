@@ -1,0 +1,46 @@
+#!python
+import sys
+import argparse
+
+
+from quickstats import __version__
+from quickstats.components import CLIParser
+
+class CLI(object):
+    _COMMAND_HELP_MESSAGE_ = {
+        'run_pulls': 'Tool for computing the impact of a given NP to a set of POIs',
+        'plot_pulls': 'Tool for creating pulls and ranking plots using results obtained from run_pulls'
+    }
+    
+    _USAGE_          = 'quickstats [-h|--help] [-v|--version] <commands> [<args>]'
+    _DESCRIPTION_    = 'Tool for HEP Statistical Analysis'    
+    
+    @staticmethod
+    def run_parser():
+        parser = CLIParser(description=CLI._DESCRIPTION_,
+                           usage=CLI._USAGE_, version=__version__)
+        parser.set_title('The most commonly used commands are')
+        command_parser = parser.add_subparsers(dest="command", parser_class=argparse.ArgumentParser)
+        for command in CLI._COMMAND_HELP_MESSAGE_:
+            command_parser.add_parser(command, help=CLI._COMMAND_HELP_MESSAGE_[command])
+            
+        args = parser.parse_args(sys.argv[1:2])
+        if (not args.command) or (not hasattr(CLI, args.command)):
+            print('Unrecognized command')
+            parser.print_help()
+            sys.exit(0)
+        getattr(CLI, args.command)(args=sys.argv[2:])
+        
+    @staticmethod    
+    def run_pulls(args=None):
+        from quickstats.components import NuisanceParameterPull
+        NuisanceParameterPull().run_parser(args)
+        
+    @staticmethod    
+    def plot_pulls(args=None):
+        from quickstats.components import NPRankingPlotter
+        NPRankingPlotter().run_parser(args)        
+
+    
+if __name__ == '__main__':
+    CLI.run_parser()
