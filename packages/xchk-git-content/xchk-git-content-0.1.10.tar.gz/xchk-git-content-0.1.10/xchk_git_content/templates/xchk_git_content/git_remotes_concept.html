@@ -1,0 +1,66 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load xchk_instructions %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/bhIAi7ZCVRI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<p>Een Git repository is als een project met een logboek. Van dat project met logboek kunnen meerdere <strong>kopieën</strong> bestaan. Dit heeft belangrijke voordelen:
+  <ul>
+    <li>minder risico op verlies van het project</li>
+    <li>collega's kunnen aanpassingen doen in hun eigen versie van het logboek
+    <ul>
+      <li>het is ook offline mogelijk</li>
+      <li>achteraf kunnen de aanpassingen weer samengevoegd worden met de andere kopieën van het logboek</li>
+      <li>dit laat ook je collega's ook toe te experimenteren zonder jouw code te beschadigen</li>
+    </ul>
+      </li>
+  </ul>
+</p>
+
+<p>
+Een <strong>remote</strong> is een kopie waarvan onze eigen Git repository op de hoogte is. Elke remote heeft een naam en een adres, zodat we kunnen spreken over een bepaalde kopie en zodat we deze kopie kunnen contacteren. Dit kan zijn om updates aan de remote in ons eigen project te integreren of om onze eigen verbeteringen te delen. De naam van een remote hoort niet bij de remote zelf; het is de manier waarop <strong>onze</strong> repository naar een andere repository verwijst.
+</p>
+
+<p class="alert alert-warning">
+Strikt gesproken *hoeft* een remote geen "kopie" te zijn. Je kan met de hand repositories toevoegen als remote, maar ik ken geen reden om dat te doen. Het zou alleen tot verwarring leiden.
+</p>
+
+<p class="alert alert-warning">
+Niet elke kopie van een repository is een remote van die repository. Als B en C allebei gestart zijn als een kopie van A, kan je zeggen dat B en C kopieën van elkaar zijn, maar ze zijn daarom niet op de hoogte van elkaars bestaan. Met andere woorden, B en C zijn kopieën, maar zijn geen remotes van elkaar.
+</p>
+{# TODO illustreer met tekening? #}
+
+<h4>Voorbeeld</h4>
+<p>
+<a href="#fig-remotes-example">Figuur 1</a> toont drie repositories. Wij zullen spreken over <code>A</code>, <code>B</code> en <code>C</code>. <code>B</code> en <code>C</code> hebben <code>A</code> als remote, maar <code>A</code> heeft geen enkele remote. Verder gebruikt <code>B</code> niet de naam "A" om te verwijzen naar <code>A</code>, maar wel "origin". <code>C</code>, daarentegen, gebruikt voor <code>A</code> de naam "MasterCopy". Dat kan omdat de naam van een remote niet bij de remote zelf hoort. <code>B</code> en <code>C</code> weten niets over elkaar, dus het zou perfect mogelijk zijn om <code>B</code> ook naar <code>A</code> te laten verwijzen als "MasterCopy" (of <code>C</code> naar <code>A</code> als "origin").
+</p>
+
+<figure id="fig-remotes-example">
+  <img src="{% static "xchk_git_content/images/remotes-example.png" %}" id="remotes-example"/>
+  <figcaption>Figuur 1: drie repositories in verbinding</figcaption>
+</figure>
+
+<h4>Speciale remote: <code>origin</code></h4>
+Vaak is er een duidelijke "master copy" van het project. Dit is bijvoorbeeld de repository op de server van het bedrijf waarin je werkt. <strong>Zuiver technisch bekeken is dit gewoon een remote zoals een andere</strong> maar ze speelt een bijzondere rol. Het is de plaats waar onze code oorspronkelijk vandaan komt en normaal ook de plaats waar we onze eigen updates terug naartoe zullen sturen. Deze remote wordt volgens afspraak <code>origin</code> genoemd.
+
+<p class="alert alert-info">
+   Deze afspraak is wijdverspreid. Als je bijvoorbeeld een eigen kopie maakt van een bestaande repository, zal die bestaande repository voor jou automatisch <code>origin</code> heten.
+</p>
+
+<p class="alert alert-danger">
+   Wij gaan er voorlopig van uit dat de repository op jouw machine maximum één remote heeft en dat deze origin heet. Zo krijgen we je sneller productief. We zullen het uitdrukkelijk zeggen wanneer deze veronderstelling niet meer van toepassing is.
+</p>
+
+{% endblock course_content %}
+
+{% block assignment %}
+{% autoescape off %}
+  {{ custom_data.rendered_mc_qs }}
+{% endautoescape %}
+<figure id="fig-remotes-assignment">
+  <img src="{% static "xchk_git_content/images/remotes-quiz.png" %}" id="remotes-assignment"/>
+  <figcaption>Figuur 2: voorbeeldopstelling remotes</figcaption>
+</figure>
+
+{% endblock assignment %}

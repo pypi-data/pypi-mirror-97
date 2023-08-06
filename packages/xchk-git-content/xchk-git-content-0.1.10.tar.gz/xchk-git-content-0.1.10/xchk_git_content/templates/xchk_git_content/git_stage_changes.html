@@ -1,0 +1,66 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load xchk_instructions %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-FzUyG5EzHo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<h4>Data definitief maken</h4>
+<p>
+Data in Git staat altijd op één van drie plaatsen:
+<ol>
+  <li>working directory</li>
+  <li>staging area</li>
+  <li>project history</li>
+</ol>
+</p>
+Data kan van elk van deze plaatsen naar elk van de andere twee plaatsen verplaatst worden. Wij bekijken hier eerst de richting die het vaakst voorkomt: van working directory naar staging area en van staging area naar project history.
+</p>
+
+<h5>Data in de working directory plaatsen</h5>
+<p>
+Hier heb je geen Git commando's voor nodig. Als je iets aanpast in een map die onder het beheer van Git staat, komt die aanpassing normaal in de working directory terecht.<sup><a href="footnote-1">1</a></sup> Dat is zelfs zo wanneer je een volledig nieuwe file aanmaakt of een bestand volledig wist.
+</p>
+
+<p>
+Om te bekijken welke files wijzigingen bevatten die nog niet in je logboek staan (zelfs niet in potlood), gebruik je het commando <code>git status -u</code>.
+</p>
+
+<h5>Data van de working directory naar de staging area verplaatsen</h5>
+<p>
+Om een wijziging "in potlood" in je logboek te noteren, moet je wel een commando van Git gebruiken. Dat commando is <code>git add</code>. Je laat dit commando volgen door de naam van het bestand waaraan je iets veranderd hebt, zelfs als je dat bestand gewist hebt. Een verkorte notatie is <code>git add --all</code>. Let op de twee mintekens. Deze notatie zet <strong>alle</strong> wijzigingen die door Git gezien worden in de staging area. Let op dat je niet te veel in je logboek zet!
+</p>
+
+<p>
+We noemen het verplaatsen van data naar de staging area ook <strong>stagen</strong>.
+</p>
+
+<h5>Data van de staging area naar de project history verplaatsen</h5>
+<p>
+Om wijzigingen "in potlood" om te zetten naar wijzigingen "in pen", gebruik je het commando <code>git commit</code>. Dit maakt één nieuwe nota in je logboek en zet alle wijzigingen over van de staging area naar de project history. <strong>Met wijzigingen die in de working directory staan, gebeurt niets!</strong>
+</p>
+
+<p>
+Wanneer je een nota in je logboek zet, moet je ook beschrijven wat de gebundelde wijzigingen doen. Als je <code>git commit</code> zo uitvoert, wordt er een text editor geopend waarin je dit bericht kan intypen. Dit is vaak wat onhandig, dus je kan ook gebruik maken van <code>-m</code> en meteen daarna het bericht tussen aanhalingstekens plaatsen. Bijvoorbeeld: <code>git commit -m "Knop voor password reset en code achter de schermen toegevoegd."</code>
+</p>
+
+<p>
+We noemen het verplaatsen naar de projectgeschiedenis <strong>committen</strong>.
+</p>
+
+<h5>Overzicht</h5>
+<figure>
+  <img src="{% static "xchk_git_content/images/git-stages-basics.png" %}" id="git-stages-basics"/>
+  <figcaption>Fasen van data</figcaption>
+</figure>
+{% endblock course_content %}
+
+{% block assignment %}
+Maak een tekstbestand (zie technische vereisten voor de naam) aan met daarin exact de tekst (zonder aanhalingstekens) "de kat krabt de krollen van de trap!" Doorloop zelf de nodige stappen om het bestand in je projectgeschiedenis te plaatsen en voer daarna <code>git push</code> uit.<sup><a href="footnote-2">2</a></sup>
+{% endblock assignment %}
+
+{% block post_content %}
+<h2>Voetnoten</h2>
+<p id="footnote-1">Hier zijn uitzonderingen op, maar ze vallen goed mee. Onthoud het voorlopig zoals het op deze pagina staat.</p>
+<p id="footnote-2">Dit laatste commando heeft te maken met een ander aspect van Git dat later aan bod komt.</p>
+{% endblock post_content %}

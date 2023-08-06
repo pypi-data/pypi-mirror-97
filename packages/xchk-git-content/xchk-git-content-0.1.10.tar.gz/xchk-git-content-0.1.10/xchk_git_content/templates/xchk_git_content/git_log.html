@@ -1,0 +1,45 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/e06Li_5Urzw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<p>Een Git repository is als een logboek. Dat houdt in dat je kan terugbladeren. Dat is ook zo. Je kan je projectgeschiedenis bekijken met het commando <code>git log</code>.</p>
+
+<p>In <a href="#figure-1">figuur 1</a> zie je de uitvoer van <code>git log</code> in de repository waarin ik de voorloper van deze cursus bijhield.</p>
+
+<figure id="#figure-1">
+  <img src="{% static "xchk_git_content/images/output-git-log.png" %}" id="output-git-log"/>
+  <figcaption>Voorbeeldoutput <code>git log</code></figcaption>
+</figure>
+
+<p>Merk de herhalende structuur op. Elk blokje is een <strong>commit</strong>. Zie dit als een tekstje in je logboek, of als een checkpoint die je hebt aangemaakt. Merk de verschillende onderdelen van één commit op (kijk telkens links van het blauwe cijfer):
+</p>
+
+<ol>
+	<li>Dit is de "<strong>commit hash</strong>". Dit is een unieke code die wordt afgeleid uit alle data in je repository op het moment dat een commit operatie wordt uitgevoerd. De commit hash is een beetje als een nummer dat een bepaald punt in je logboek uniek aanduidt. Waarom dan niet gewoon tellen vanaf 1? Dat heeft er mee te maken dat jij niet altijd de enige bent die aan je project werkt. Als jij iets toevoegt na nummer 1 en je collega voegt iets anders toe, is het niet meteen duidelijk welke aanpassingen nummer 2 moeten krijgen. Op de klok kan je niet rekenen, want twee computers hebben twee verschillende klokken.<sup><a href="#footnote-1">1</a></sup></li>
+	<li>Dit is de naam van de persoon die de commit operatie heeft uitgevoerd. Dit is de naam die je hebt ingegeven toen je Git voor het eerst hebt geconfigureerd (met het commando <code>git config</code>).</li>
+	<li>Dit is het e-mailadres dat je hebt ingegeven toen je Git voor het eerst hebt geconfigureerd. Zo kan iemand die vragen heeft bij iets dat je op een bepaald tijdstip hebt veranderd in de code je contacteren.</li>
+	<li>Dit is het tijdstip waarop de gebruiker de commit operatie heeft uitgevoerd. Ook de tijdzone staat erbij vermeld.</li>
+	<li>Dit is de <strong>commit message</strong>. Met andere woorden, het bericht dat je hebt meegegeven toen je de commit creëerde. Hoe duidelijker je commit messages, hoe makkelijker je achteraf je geschiedenis kan doorzoeken.</li>
+	<li>Dit stukje informatie kunnen we nog niet volledig uitleggen zonder te spreken over "branches" en "remotes". We bekijken meer mogelijkheden van <code>git log</code> later.</li>
+</ol>
+<p class="alert alert-info">Er is ook <code>git log --graph</code>. Dit toont je versiegeschiedenis nog duidelijker in de vorm van een tijdlijn.</p>
+{% endblock course_content %}
+
+{% block assignment %}
+<p>Antwoord op één vraag per regel. Schrijf alleen het antwoord, zonder extra commentaar en zonder nummer van de vraag.</p>
+
+<h4>Vraag 1</h4>
+<p>Hoe noemen we de code die wordt afgeleid uit de code in je repository op het moment van een commit? Antwoord in twee woorden.</p>
+
+<h4>Vraag 2</h4>
+<p>Er verschijnt een nieuw blokje in je geschiedenis na het uitvoeren van welk commando dat je al kent? Antwoord in twee woorden (het eerste is "git", zonder aanhalingstekens)</p>
+
+<h4>Vraag 3</h4>
+<p>Hoe noemen we de boodschap die uitlegt wat je op een bepaalde checkpoint hebt aangepast? Dit komt niet voor in het filmpje, maar wel in de tekst...</p>
+{% endblock assignment %}
+
+{% block post_content %}
+<p id="footnote-1">Dit is niet de enige reden waarom dit lastig zou liggen. Branches, die we later zullen zien, maken het nog moeilijker een stijgende reeks getallen te gebruiken.</p>
+{% endblock %}

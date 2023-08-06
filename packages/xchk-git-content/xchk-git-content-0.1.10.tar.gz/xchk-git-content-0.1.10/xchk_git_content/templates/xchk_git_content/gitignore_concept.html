@@ -1,0 +1,130 @@
+{% extends 'checkerapp/course_content.html' %}
+{% load static %}
+{% block course_content %}
+<h3>Videomateriaal</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/WMeMJgFqTdQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h3>Schriftelijk materiaal</h3>
+<h4>Basisprincipe</h4>
+<p>Je wil niet alle data die je produceert bijhouden in versiebeheer. Enkele voorbeelden van bestanden die je niet wil bijhouden:</p>
+
+<ul>
+  <li>tijdelijke bestanden die aangemaakt worden wanneer je een programma compileert</li>
+  <li>bestanden die je genereert uit bronbestanden</li>
+  <li>bestanden die specifiek zijn voor jouw systeem</li>
+</ul>
+
+<p>
+Omdat er in bijna elk project wel van die bestanden zijn, staat Git toe om ze uit te sluiten van versiebeheer. Dat betekent dat ze als het ware onzichtbaar zijn: ze kunnen alleen bestaan in de working directory en worden niet vermeld in berichten gegenereerd door Git.
+</p>
+
+<p>
+Om een bestand te negeren, moet je eerst een bestand <code>.gitignore</code> aanmaken. Daarin plaats je dan per regel de naam van een bestand dat niet meer zichtbaar mag zijn. Je kan ook namen van mappen schrijven (om bestanden in die mappen te negeren).
+</p>
+
+<p class="alert alert-info">
+Wij zullen voorlopig <code>.gitignore</code> altijd in de root plaatsen. Je kan ook <code>.gitignore</code>-bestanden in submappen plaatsen, maar dat is niet zonder gevolgen. Leer eerst de basis.
+</p>
+
+<p class="alert alert-warning">
+Je bestand moet letterlijk <code>.gitignore</code> heten, dus met een punt als eerste karakter en zonder bestandsextensie. In kladblok kan je dit doen door aan op te slaan als "alle bestanden" en de naam tussen aanhalingstekens te zetten. Zie <a href="https://www.youtube.com/watch?v=CIyc51xVF7U" target="_blank">hier</a> voor een demonstratie.
+</p>
+
+<p>
+Je hebt bijvoorbeeld een bestand <code>.gitignore</code> dat er als volgt uitziet:
+<pre>
+a.txt
+b.sql
+d.svg
+cache
+</pre>
+</p>
+
+<p>
+Als je dan de files <code>a.txt</code>, <code>b.sql</code>, <code>c.html</code>, <code>d.svg</code>, <code>cache/urls.txt</code>, <code>cache/names.md</code> maakt, dan kan je enkel <code>c.html</code> verplaatsen naar de staging area (en naar de projectgeschiedenis).
+</p>
+
+<p class="alert alert-danger">
+   <code>.gitignore</code> sluit alleen nieuwe bestanden uit! Als <code>a.txt</code> bijvoorbeeld al deel uitmaakte van de projectgeschiedenis *voor* <code>.gitignore</code> is aangemaakt, blijft <code>a.txt</code> deel uitmaken van de projectgeschiedenis en kan je wijzigingen aan <code>a.txt</code> stagen en committen alsof er geen <code>.gitignore</code> was.
+</p>
+
+<h4>Folderstructuur</h4>
+<p>
+Normaal gesproken matcht een patroon op elk niveau in de bestandenstructuur. Het maakt dus niet uit of een te negeren bestand in de root staat of in een submap. Als je hetzelfde bestand <code>.gitignore</code> hebt als tevoren en je hebt volgende bestandenstructuur:
+
+<pre>
+root
+├── a.txt
+├── bin
+│   ├── a.txt
+│   ├── cache
+│   │   └── e.gv
+│   └── pkg
+│       └── f.pkg
+├── b.sql
+├── cache
+│   ├── names.md
+│   └── urls.txt
+├── c.html
+└── d.svg
+</pre>
+
+Hier stellen <code>root</code>, <code>bin</code>, <code>cache</code>,... mappen voor omdat er nog structuur onder staat en omdat ze geen extensie hebben. Alle entries waar geen structuur onder staat, stellen bestanden voor.
+
+Met deze folderstructuur kan je <code>c.html</code> en <code>f.pkg</code> (in de map <code>bin/pkg</code>) stagen en committen. Je kan de files die in <code>.gitignore</code> vermeld zijn niet stagen en committen. Dus ook niet <code>e.gv</code>, want die is een onderdeel van <code>cache</code>!
+</p>
+
+<h4>Simpele wildcards</h4>
+<p>Soms wil je hele groepen bestanden negeren. Je hebt misschien een reeks <code>.png</code>-bestanden die gegenereerd worden uit <code>.svg</code>-bestanden. Dan is het een slecht idee de <code>.png</code>-bestanden in versiebeheer te plaatsen. In de plaats daarvan kan je beter alle <code>.png</code>-bestanden in dat project negeren. Om dit te doen, schrijf je "*.png" (zonder aanhalingstekens). Een "*" matcht met alles behalve het karakter "/". Je kan ook één karakter matchen (behalve de "/") met het karakter "?".</p>
+{% endblock course_content %}
+
+{% block assignment %}
+<p>
+Veronderstel dat je begint vanaf volgende bestandenstructuur:
+</p>
+
+<pre>
+root
+├── submap1
+│   ├── 1A.pdf
+│   ├── 1B.pdf
+│   ├── 1C.md
+│   └── cache
+│       └── 1.o
+├── submap2
+│   ├── cache
+│   │   └── 2.p
+│   ├── submap2A
+│   │   ├── 2Aa.pdf
+│   │   └── 2Ab.pdf
+│   └── submap2B
+│       └── 2Ba.md
+└── submap3
+    ├── cache
+    ├── submap3A
+    │   ├── 2Ba.md
+    │   └── cache
+    │       ├── 3.q
+    │       └── 4.r
+    └── submap3B
+        └── 3Ba.pdf
+</pre>
+
+<p>Schrijf een bestand met de naam gevraagd in de technische vereisten. Indien je je bestand zou hernoemen naar <code>.gitignore</code>, zou het volgende zaken doen:</p>
+
+<ul>
+  <li>alle mappen <code>cache</code> negeren, waar ze ook staan in de structuur</li>
+  <li>alle bestanden met de extensie <code>.pdf</code> negeren, waar ze ook staan in de structuur</li>
+  <li>het bestand <code>1C.md</code> negeren (waar het ook staat in de bestandenstructuur)</li>
+</ul>
+
+<p class="alert alert-warning">
+We noemen het bestand niet <code>.gitignore</code> omdat het dan ook zou functioneren als een <code>.gitignore</code>-bestand.
+</p>
+
+{% endblock assignment %}
+
+{% block post_content %}
+<p id="footnote-1">Er zijn andere (aangeraden) manieren om deze te negeren dan een <code>.gitignore</code> in je project, maar we willen niet afdwalen.</p>
+<p id="footnote-2">Het is niet absoluut onmogelijk, maar je ziet de uitzonderingen later.</p>
+<p id="footnote-3">Je kan dit gedrag veranderen, maar we willen niet afdwalen.</p>
+{% endblock %}
