@@ -1,0 +1,210 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "PKGDEV" "1" "Mar 05, 2021" "0.1" "pkgdev"
+.SH NAME
+pkgdev \- collection of tools for Gentoo development
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+pkgdev [\-h] [\-\-version] [\-\-debug] [\-q] [\-v] [\-\-color BOOLEAN] {commit,manifest,push} ...
+.SH DESCRIPTION
+.sp
+pkgdev provides a collection of tools for Gentoo development.
+.SH BASE OPTIONS
+.INDENT 0.0
+.TP
+.B \-h\fP,\fB  \-\-help
+Show this help message and exit. To get more
+information see the related man page.
+.TP
+.B \-\-version
+Show this program\(aqs version information and exit.
+.sp
+When running from within a git repo or a version
+installed from git the latest commit hash and date will
+be shown.
+.TP
+.B \-\-debug
+Enable debug checks and show verbose debug output.
+.TP
+.B \-q\fP,\fB  \-\-quiet
+Suppress non\-error, informational messages.
+.TP
+.B \-v\fP,\fB  \-\-verbose
+Increase the verbosity of various output.
+.TP
+.BI \-\-color \ BOOLEAN
+Toggle colored output support. This can be used to forcibly
+enable color support when piping output or other sitations
+where stdout is not a tty.
+.UNINDENT
+.SH SUBCOMMANDS
+.SS pkgdev commit \- create git commit
+.SS Synopsis
+.sp
+pkgdev commit [\-h] [\-\-debug] [\-q] [\-v] [\-\-color BOOLEAN] [\-m MESSAGE] [\-M [BOOLEAN]] [\-n] [\-s] [\-\-ignore\-failures] [\-u | \-a]
+.SS Optional Arguments
+.INDENT 0.0
+.TP
+.BI \-m \ MESSAGE\fR,\fB \ \-\-message \ MESSAGE
+specify commit message
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-M [BOOLEAN], \-\-mangle [BOOLEAN]
+perform file mangling
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-n\fP,\fB  \-\-dry\-run
+pretend to create commit
+.TP
+.B \-s\fP,\fB  \-\-scan
+run pkgcheck against staged changes
+.TP
+.B \-\-ignore\-failures
+forcibly create commit with QA errors
+.TP
+.B \-u\fP,\fB  \-\-update
+stage all changed files
+.TP
+.B \-a\fP,\fB  \-\-all
+stage all changed/new/removed files
+.UNINDENT
+.SS Base Options
+.INDENT 0.0
+.TP
+.B \-h\fP,\fB  \-\-help
+Show this help message and exit. To get more
+information see the related man page.
+.TP
+.B \-\-debug
+Enable debug checks and show verbose debug output.
+.TP
+.B \-q\fP,\fB  \-\-quiet
+Suppress non\-error, informational messages.
+.TP
+.B \-v\fP,\fB  \-\-verbose
+Increase the verbosity of various output.
+.TP
+.BI \-\-color \ BOOLEAN
+Toggle colored output support. This can be used to forcibly
+enable color support when piping output or other sitations
+where stdout is not a tty.
+.UNINDENT
+.SS pkgdev manifest \- update package manifests
+.SS Synopsis
+.sp
+pkgdev manifest [\-h] [\-\-debug] [\-q] [\-v] [\-\-color BOOLEAN] [\-f] [\-m] [target [target ...]]
+.SS Positional Arguments
+.INDENT 0.0
+.TP
+.B target
+Packages matching any of these restrictions will have their manifest
+entries updated. If no target is specified a path restriction is
+created based on the current working directory. In other words, if
+\fBpkgdev manifest\fP is run within an ebuild\(aqs directory, all the
+ebuilds within that directory will be manifested.
+.UNINDENT
+.SS Optional Arguments
+.INDENT 0.0
+.TP
+.B \-f\fP,\fB  \-\-force
+Force package manifest files to be rewritten. Note that this requires
+downloading all distfiles.
+.TP
+.B \-m\fP,\fB  \-\-mirrors
+Enable checking Gentoo mirrors first for distfiles. This is disabled by
+default because manifest generation is often performed when adding new
+ebuilds with distfiles that aren\(aqt on Gentoo mirrors yet.
+.UNINDENT
+.SS Base Options
+.INDENT 0.0
+.TP
+.B \-h\fP,\fB  \-\-help
+Show this help message and exit. To get more
+information see the related man page.
+.TP
+.B \-\-debug
+Enable debug checks and show verbose debug output.
+.TP
+.B \-q\fP,\fB  \-\-quiet
+Suppress non\-error, informational messages.
+.TP
+.B \-v\fP,\fB  \-\-verbose
+Increase the verbosity of various output.
+.TP
+.BI \-\-color \ BOOLEAN
+Toggle colored output support. This can be used to forcibly
+enable color support when piping output or other sitations
+where stdout is not a tty.
+.UNINDENT
+.SS pkgdev push \- run QA checks on commits and push them
+.SS Synopsis
+.sp
+pkgdev push [\-h] [\-\-debug] [\-q] [\-v] [\-\-color BOOLEAN] [\-\-ignore\-failures] [\-n]
+.SS Optional Arguments
+.INDENT 0.0
+.TP
+.B \-\-ignore\-failures
+ignore QA failures before pushing
+.TP
+.B \-n\fP,\fB  \-\-dry\-run
+pretend to push the commits
+.UNINDENT
+.SS Base Options
+.INDENT 0.0
+.TP
+.B \-h\fP,\fB  \-\-help
+Show this help message and exit. To get more
+information see the related man page.
+.TP
+.B \-\-debug
+Enable debug checks and show verbose debug output.
+.TP
+.B \-q\fP,\fB  \-\-quiet
+Suppress non\-error, informational messages.
+.TP
+.B \-v\fP,\fB  \-\-verbose
+Increase the verbosity of various output.
+.TP
+.BI \-\-color \ BOOLEAN
+Toggle colored output support. This can be used to forcibly
+enable color support when piping output or other sitations
+where stdout is not a tty.
+.UNINDENT
+.SH REPORTING BUGS
+.sp
+Please submit an issue via github:
+.sp
+\fI\%https://github.com/pkgcore/pkgdev/issues\fP
+.SH COPYRIGHT
+2021, pkgdev contributors
+.\" Generated by docutils manpage writer.
+.
