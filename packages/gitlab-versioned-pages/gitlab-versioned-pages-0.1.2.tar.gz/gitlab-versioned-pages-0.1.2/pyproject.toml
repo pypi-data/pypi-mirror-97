@@ -1,0 +1,49 @@
+[tool.black]
+line-length = 100
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | .conda
+)/
+'''
+
+[tool.coverage.run]
+omit = [
+    "*.so",
+]
+
+[tool.coverage.paths]
+source = [
+    "gitlab_versioned_pages",
+    "*/site-packages/gitlab_versioned_pages",
+]
+
+[tool.isort]
+line_length = 100
+skip = "docs,__init__.py,setup.py,devtools,.conda,env"
+default_section = "THIRDPARTY"
+known_first_party = ["gitlab_versioned_pages"]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+
+[tool.pytest.ini_options]
+python_files = "test_*.py"
+junit_family = "xunit2"
+log_cli = true
+addopts = """
+-x --ignore=setup.py --ignore=docs/ --ignore=build/ --ignore=.conda/ --ignore=env
+"""
+filterwarnings = []
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL"]
