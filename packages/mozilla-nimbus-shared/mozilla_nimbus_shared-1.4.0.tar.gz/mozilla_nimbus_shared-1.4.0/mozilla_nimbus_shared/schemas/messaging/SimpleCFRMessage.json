@@ -1,0 +1,841 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/SimpleCFRMessage",
+  "definitions": {
+    "SimpleCFRMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message"
+        },
+        "template": {
+          "type": "string",
+          "const": "cfr_doorhanger",
+          "description": "Identifier that routes the message definition to the right UI."
+        },
+        "targeting": {
+          "type": "string",
+          "description": "A JEXL expression representing targeting information"
+        },
+        "trigger": {
+          "$ref": "#/definitions/TriggerActionSchemas"
+        },
+        "priority": {
+          "type": "number",
+          "description": "If more than one message is valid, the message with the higher priority will be shown"
+        },
+        "weight": {
+          "type": "number",
+          "description": "For messages types that are randomly chosen (e.g. snippets), determines the relative probabily of a message being shown. For example, a message with a weight of 200 will show up twice as often as other messages (since the default is 100).",
+          "default": 100
+        },
+        "frequency": {
+          "type": "object",
+          "properties": {
+            "lifetime": {
+              "type": "number",
+              "description": "The maximum lifetime impressions for a message."
+            },
+            "custom": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "period": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string",
+                        "const": "daily"
+                      }
+                    ]
+                  },
+                  "cap": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "period",
+                  "cap"
+                ]
+              }
+            }
+          },
+          "description": "Definition of maximum impressions in a particular period, or groups of periods"
+        },
+        "content": {
+          "type": "object",
+          "properties": {
+            "notification_text": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "string_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "string_id"
+                  ]
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "description": "The text that shows up in the chiclet.",
+              "maxLength": 20
+            },
+            "active_color": {
+              "type": "string",
+              "description": "The background color of the chiclet as a HEX code."
+            },
+            "heading_text": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "string_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "string_id"
+                  ]
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "text": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "string_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "string_id"
+                  ]
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "icon": {
+              "type": "string",
+              "description": "The icon displayed in the pop-over. Should be 32x32px or 64x64px and png/svg"
+            },
+            "icon_dark_theme": {
+              "type": "string",
+              "description": "Dark theme variant of the icon if needed"
+            },
+            "buttons": {
+              "type": "object",
+              "properties": {
+                "primary": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "string"
+                            },
+                            "attributes": {
+                              "type": "object",
+                              "properties": {
+                                "accesskey": {
+                                  "type": "string",
+                                  "description": "A single character to be used as a shortcut key for the secondary button. This should be one of the characters that appears in the button label",
+                                  "maxLength": 1,
+                                  "minLength": 1
+                                }
+                              },
+                              "required": [
+                                "accesskey"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "value",
+                            "attributes"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "string_id": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "string_id"
+                          ]
+                        }
+                      ]
+                    },
+                    "action": {
+                      "$ref": "#/definitions/SpecialMessageActionSchemas"
+                    }
+                  },
+                  "required": [
+                    "label",
+                    "action"
+                  ],
+                  "description": "Button label and action"
+                },
+                "secondary": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "string"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {
+                                    "accesskey": {
+                                      "type": "string",
+                                      "description": "A single character to be used as a shortcut key for the secondary button. This should be one of the characters that appears in the button label",
+                                      "maxLength": 1,
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "accesskey"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "value",
+                                "attributes"
+                              ]
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "string_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "string_id"
+                              ]
+                            }
+                          ]
+                        },
+                        "action": {
+                          "$ref": "#/definitions/SpecialMessageActionSchemas"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "action"
+                      ],
+                      "description": "Button label and action"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "string"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {
+                                    "accesskey": {
+                                      "type": "string",
+                                      "description": "A single character to be used as a shortcut key for the secondary button. This should be one of the characters that appears in the button label",
+                                      "maxLength": 1,
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "accesskey"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "value",
+                                "attributes"
+                              ]
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "string_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "string_id"
+                              ]
+                            }
+                          ]
+                        },
+                        "action": {
+                          "$ref": "#/definitions/SpecialMessageActionSchemas"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "action"
+                      ],
+                      "description": "Button label and action"
+                    }
+                  ],
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "primary",
+                "secondary"
+              ],
+              "description": "The label and functionality for the buttons in the pop-over"
+            }
+          },
+          "required": [
+            "notification_text",
+            "heading_text",
+            "text",
+            "icon",
+            "buttons"
+          ],
+          "description": "Message-specific properties; each type of message template defines its own schema for content"
+        }
+      },
+      "required": [
+        "content",
+        "id",
+        "template",
+        "trigger"
+      ]
+    },
+    "TriggerActionSchemas": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openURL"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user loads a new URL that matches the provided `hosts` or `patterns`"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openArticleURL"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user loads a document that is Reader Mode compatible"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openBookmarkedURL"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user adds a bookmark from the URL bar star icon"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "frequentVisits"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time a user navigates (or switches tab to) to any of the `hosts` or `patterns` arguments but additionally provides information about the number of accesses to the matched domain."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "newSavedLogin"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user adds or updates a login"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "contentBlocking"
+            },
+            "params": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "params"
+          ],
+          "description": "Happens every time Firefox blocks the loading of a page script/asset/resource that matches the one of the tracking behaviours specifid through params. See https://searchfox.org/mozilla-central/rev/8ccea36c4fb09412609fb738c722830d7098602b/uriloader/base/nsIWebProgressListener.idl#336"
+        }
+      ]
+    },
+    "SpecialMessageActionSchemas": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "DISABLE_STP_DOORHANGERS"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Disables all STP doorhangers."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "string",
+                  "description": "The element to highlight"
+                }
+              },
+              "required": [
+                "args"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "HIGHLIGHT_FEATURE"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Highlights an element, such as a menu item"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "telemetrySource": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "telemetrySource",
+                "url"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "INSTALL_ADDON_FROM_URL"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Install an add-on from AMO"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "string",
+                  "description": "The about page. E.g. \"welcome\" for about:welcome'"
+                },
+                "where": {
+                  "type": "string",
+                  "enum": [
+                    "current",
+                    "save",
+                    "tab",
+                    "tabshifted",
+                    "window"
+                  ],
+                  "description": "Where the URL is opened",
+                  "default": "tab"
+                },
+                "entrypoint": {
+                  "type": "string",
+                  "description": "Any optional entrypoint value that will be added to the search. E.g. \"foo=bar\" would result in about:welcome?foo=bar'"
+                }
+              },
+              "required": [
+                "args",
+                "where",
+                "entrypoint"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "OPEN_ABOUT_PAGE"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Opens an about: page in Firefox"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "string",
+                  "description": "The menu name, e.g. \"appMenu\""
+                }
+              },
+              "required": [
+                "args"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "OPEN_APPLICATIONS_MENU"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Opens an application menu"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "OPEN_AWESOME_BAR"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Focuses and expands the awesome bar"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "description": "Section of about:preferences, e.g. \"privacy-reports\""
+                },
+                "entrypoint": {
+                  "type": "string",
+                  "description": "Add a queryparam for metrics"
+                }
+              },
+              "required": [
+                "category"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "OPEN_PREFERENCES_PAGE"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Opens a preference page"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "OPEN_PRIVATE_BROWSER_WINDOW"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Opens a private browsing window."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "OPEN_PROTECTION_PANEL"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Opens the protections panel"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "OPEN_PROTECTION_REPORT"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Opens the protections panel report"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "args": {
+                  "type": "string",
+                  "description": "URL to open"
+                },
+                "where": {
+                  "type": "string",
+                  "enum": [
+                    "current",
+                    "save",
+                    "tab",
+                    "tabshifted",
+                    "window"
+                  ],
+                  "description": "Where the URL is opened",
+                  "default": "tab"
+                }
+              },
+              "required": [
+                "args",
+                "where"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "OPEN_URL"
+            }
+          },
+          "required": [
+            "data",
+            "type"
+          ],
+          "description": "Opens given URL"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "PIN_CURRENT_TAB"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Pin the current tab"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "SHOW_FIREFOX_ACCOUNTS"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "entrypoint": {
+                  "type": "string",
+                  "description": "Adds entrypoint={your value} to the FXA URL"
+                },
+                "extraParams": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Adds extra parameters to the FXA URL using URLSearchParams.append e.g. {foo: \"bar\"} would result in <FXA_url>?foo=bar",
+                  "default": {}
+                }
+              },
+              "required": [
+                "entrypoint"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "data"
+          ],
+          "description": "Show Firefox Accounts"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "SHOW_MIGRATION_WIZARD"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Shows the Migration Wizard to import data from another Browser. See https://support.mozilla.org/en-US/kb/import-data-another-browser\""
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "CANCEL"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Minimize the CFR doorhanger back into the URLbar"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ACCEPT_DOH"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Accept DOH doorhanger notification"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "DISABLE_DOH"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "description": "Dismiss DOH doorhanger notification"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/PreferenceRolloutArguments",
+  "definitions": {
+    "PreferenceRolloutArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for the rollout, used in telemetry and rollbacks",
+          "pattern": "^[a-z0-9\\-_]+$"
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "preferenceName": {
+                "type": "string",
+                "description": "Full dotted path of the preference being changed"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "boolean"
+                ],
+                "description": "Value to set the preference to"
+              }
+            },
+            "required": [
+              "preferenceName",
+              "value"
+            ]
+          },
+          "description": "The preferences to change, and their values"
+        }
+      },
+      "required": [
+        "slug",
+        "preferences"
+      ],
+      "description": "Change preferences permanently"
+    }
+  }
+}

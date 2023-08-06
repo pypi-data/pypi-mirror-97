@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/MultiPreferenceExperimentArguments",
+  "definitions": {
+    "MultiPreferenceExperimentArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for this experiment",
+          "pattern": "^[A-Za-z0-9\\-_]+$"
+        },
+        "userFacingDescription": {
+          "type": "string",
+          "description": "User-facing name of the experiment",
+          "minLength": 1
+        },
+        "userFacingName": {
+          "type": "string",
+          "description": "User-facing description of the experiment",
+          "minLength": 1
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this branch of the experiment",
+                "pattern": "^[A-Za-z0-9\\-_]+$"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users that should be grouped into this branch"
+              },
+              "preferences": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "preferenceValue": {
+                      "type": [
+                        "number",
+                        "string",
+                        "boolean"
+                      ],
+                      "description": "Value for this preference when this branch is chosen"
+                    },
+                    "preferenceBranchType": {
+                      "type": "string",
+                      "enum": [
+                        "user",
+                        "default"
+                      ],
+                      "description": "Data type of the preference that controls this experiment"
+                    },
+                    "preferenceType": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "integer",
+                        "boolean"
+                      ],
+                      "description": "Data type of the preference that controls this experiment"
+                    }
+                  },
+                  "required": [
+                    "preferenceValue",
+                    "preferenceBranchType",
+                    "preferenceType"
+                  ]
+                },
+                "description": "The set of preferences to be set if this branch is chosen"
+              }
+            },
+            "required": [
+              "slug",
+              "ratio",
+              "preferences"
+            ],
+            "description": "A branch in a multi-preference experiment"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "experimentDocumentUrl": {
+          "type": "string",
+          "description": "URL of a document describing the experiment",
+          "format": "uri",
+          "default": ""
+        },
+        "isHighPopulation": {
+          "type": "boolean",
+          "description": "Marks the preference experiment as a high population experiment, that should be excluded from certain types of telemetry.",
+          "default": false
+        },
+        "isHighVolume": {
+          "type": "boolean",
+          "description": "Incorrect version of `isHighPopulation`. Included here for compatibility, but should not be used."
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        }
+      },
+      "required": [
+        "slug",
+        "userFacingDescription",
+        "userFacingName",
+        "branches"
+      ],
+      "description": "Run a feature experiment activated by a set of preferences"
+    }
+  }
+}

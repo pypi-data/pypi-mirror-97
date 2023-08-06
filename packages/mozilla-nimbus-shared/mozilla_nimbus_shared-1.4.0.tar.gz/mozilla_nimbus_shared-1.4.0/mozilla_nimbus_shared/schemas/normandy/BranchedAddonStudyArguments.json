@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/BranchedAddonStudyArguments",
+  "definitions": {
+    "BranchedAddonStudyArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Machine-readable identifier",
+          "minLength": 1
+        },
+        "userFacingName": {
+          "type": "string",
+          "description": "User-facing name of the experiment",
+          "minLength": 1
+        },
+        "userFacingDescription": {
+          "type": "string",
+          "description": "User-facing description of the experiment",
+          "minLength": 1
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this this branch of the experiment"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users who should be grouped into this branch"
+              },
+              "extensionApiId": {
+                "type": "number",
+                "description": "The record ID of the add-on uploaded to the Normandy server"
+              }
+            },
+            "required": [
+              "slug",
+              "ratio",
+              "extensionApiId"
+            ],
+            "description": "A branched add-on study branch"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        }
+      },
+      "required": [
+        "slug",
+        "userFacingName",
+        "userFacingDescription",
+        "branches"
+      ],
+      "description": "Enroll a user in an add-on experiment, with managed branches"
+    }
+  }
+}

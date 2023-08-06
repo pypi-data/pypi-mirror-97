@@ -1,0 +1,814 @@
+{
+  "Audiences": {
+    "all_english": {
+      "name": "All English users",
+      "description": "All users in en-* locales using the release channel.",
+      "targeting": "localeLanguageCode == 'en' && browserSettings.update.channel == '{firefox_channel}'",
+      "desktop_telemetry": "STARTS_WITH(environment.settings.locale, 'en')"
+    },
+    "us_only": {
+      "name": "US users (en)",
+      "description": "All users in the US with an en-* locale using the release channel.",
+      "targeting": "localeLanguageCode == 'en' && region == 'US' && browserSettings.update.channel == '{firefox_channel}'",
+      "desktop_telemetry": "STARTS_WITH(environment.settings.locale, 'en') AND normalized_country_code = 'US'"
+    },
+    "first_run": {
+      "name": "First start-up users (en)",
+      "description": "First start-up users (e.g. for about:welcome) with an en-* locale using the release channel.",
+      "targeting": "localeLanguageCode == 'en' && (isFirstStartup || '{slug}' in activeExperiments) && browserSettings.update.channel == '{firefox_channel}'",
+      "desktop_telemetry": "STARTS_WITH(environment.settings.locale, 'en') AND payload.info.profile_subsession_counter = 1"
+    }
+  },
+  "ExperimentDesignPresets": {
+    "empty_aa": {
+      "name": "A/A Experiment",
+      "description": "A design for diagnostic testing of targeting or enrollment. Fixed to 1% of the population.",
+      "preset": {
+        "targeting": "[{randomizationUnit}, \"{bucketNamespace}\"]|bucketSample({bucketStart}, {bucketCount}, {bucketTotal}) && {audienceTargeting}",
+        "proposedDuration": 28,
+        "proposedEnrollment": 7,
+        "branches": [
+          {
+            "slug": "control",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": null
+            }
+          },
+          {
+            "slug": "treatment",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": null
+            }
+          }
+        ],
+        "bucketConfig": {
+          "randomizationUnit": "normandy_id",
+          "count": 100,
+          "total": 10000
+        }
+      }
+    }
+  },
+  "experiment-recipe-samples": {
+    "cfr-82-83": {
+      "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83",
+      "schemaVersion": "1.0.0",
+      "application": "firefox_desktop",
+      "channel": "nightly",
+      "probeSets": [],
+      "startDate": null,
+      "endDate": null,
+      "proposedEnrollment": 7,
+      "referenceBranch": "control",
+      "arguments": {
+        "slug": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83",
+        "isEnrollmentPaused": false,
+        "userFacingName": "Homepage Remediation: Search Value Props Experiment",
+        "userFacingDescription": "This experiment promotes the default Firefox homepage configuration for users that switched away from it. We want to communicate the recent improvements that should lead to a better user experience.",
+        "bucketConfig": {
+          "namespace": "messaging-experiments-cfr",
+          "randomizationUnit": "normandy_id",
+          "start": 5312,
+          "count": 1000,
+          "total": 10000
+        },
+        "branches": [
+          {
+            "slug": "treatment-a",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": {
+                "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-a",
+                "group": "cfr",
+                "groups": [
+                  "cfr-experiments"
+                ],
+                "frequency": {
+                  "lifetime": 3
+                },
+                "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+                "template": "cfr_doorhanger",
+                "content": {
+                  "layout": "icon_and_message",
+                  "text": "When you use the Firefox homepage, you get the same great search experience while also supporting the only browser that’s backed by a non-profit.",
+                  "icon": "chrome://browser/skin/preferences/search.svg",
+                  "buttons": {
+                    "secondary": [
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-cancel-button"
+                        },
+                        "action": {
+                          "type": "CANCEL"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                        },
+                        "action": {
+                          "type": "OPEN_PREFERENCES_PAGE",
+                          "data": {
+                            "category": "general-cfrfeatures"
+                          }
+                        }
+                      }
+                    ],
+                    "primary": {
+                      "label": {
+                        "value": "Update Homepage",
+                        "attributes": {
+                          "accesskey": "U"
+                        }
+                      },
+                      "action": {
+                        "type": "CONFIGURE_HOMEPAGE",
+                        "data": {
+                          "homePage": "default",
+                          "newtab": "default",
+                          "layout": {
+                            "search": true,
+                            "topsites": false,
+                            "highlights": false,
+                            "topstories": false,
+                            "snippets": false
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-a",
+                  "heading_text": "Support a better web with the Firefox homepage",
+                  "info_icon": {
+                    "label": {
+                      "string_id": "cfr-doorhanger-extension-sumo-link"
+                    },
+                    "sumo_path": "extensionrecommendations"
+                  },
+                  "notification_text": {
+                    "string_id": "cfr-doorhanger-feature-notification"
+                  },
+                  "category": "cfrFeatures"
+                },
+                "trigger": {
+                  "id": "openURL",
+                  "params": [
+                    "google.com",
+                    "www.google.com"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "slug": "treatment-b",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": {
+                "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-b",
+                "group": "cfr",
+                "groups": [
+                  "cfr-experiments"
+                ],
+                "frequency": {
+                  "lifetime": 3
+                },
+                "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+                "template": "cfr_doorhanger",
+                "content": {
+                  "layout": "icon_and_message",
+                  "text": "The Firefox homepage keeps your top sites one click away with visual tiles. Save time by searching your favorite sites, bookmarks, history, and tabs from the search bar.",
+                  "icon": "chrome://browser/skin/preferences/search.svg",
+                  "buttons": {
+                    "secondary": [
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-cancel-button"
+                        },
+                        "action": {
+                          "type": "CANCEL"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                        },
+                        "action": {
+                          "type": "OPEN_PREFERENCES_PAGE",
+                          "data": {
+                            "category": "general-cfrfeatures"
+                          }
+                        }
+                      }
+                    ],
+                    "primary": {
+                      "label": {
+                        "value": "Update Homepage",
+                        "attributes": {
+                          "accesskey": "U"
+                        }
+                      },
+                      "action": {
+                        "type": "CONFIGURE_HOMEPAGE",
+                        "data": {
+                          "homePage": "default",
+                          "newtab": "default",
+                          "layout": {
+                            "search": true,
+                            "topsites": true,
+                            "highlights": false,
+                            "topstories": false,
+                            "snippets": false
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-b",
+                  "heading_text": "Type less, find more with a personalized homepage",
+                  "info_icon": {
+                    "label": {
+                      "string_id": "cfr-doorhanger-extension-sumo-link"
+                    },
+                    "sumo_path": "extensionrecommendations"
+                  },
+                  "notification_text": {
+                    "string_id": "cfr-doorhanger-feature-notification"
+                  },
+                  "category": "cfrFeatures"
+                },
+                "trigger": {
+                  "id": "openURL",
+                  "params": [
+                    "google.com",
+                    "www.google.com"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "slug": "treatment-c",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": {
+                "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-c",
+                "group": "cfr",
+                "groups": [
+                  "cfr-experiments"
+                ],
+                "frequency": {
+                  "lifetime": 3
+                },
+                "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+                "template": "cfr_doorhanger",
+                "content": {
+                  "layout": "icon_and_message",
+                  "text": "The Firefox homepage makes it easy to search the web, and serves up thought-provoking stories from Pocket right along with it.",
+                  "icon": "chrome://browser/skin/preferences/search.svg",
+                  "buttons": {
+                    "secondary": [
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-cancel-button"
+                        },
+                        "action": {
+                          "type": "CANCEL"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                        }
+                      },
+                      {
+                        "label": {
+                          "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                        },
+                        "action": {
+                          "type": "OPEN_PREFERENCES_PAGE",
+                          "data": {
+                            "category": "general-cfrfeatures"
+                          }
+                        }
+                      }
+                    ],
+                    "primary": {
+                      "label": {
+                        "value": "Activate now",
+                        "attributes": {
+                          "accesskey": "A"
+                        }
+                      },
+                      "action": {
+                        "type": "CONFIGURE_HOMEPAGE",
+                        "data": {
+                          "homePage": "default",
+                          "newtab": "default",
+                          "layout": {
+                            "search": true,
+                            "topsites": true,
+                            "highlights": true,
+                            "topstories": true,
+                            "snippets": true
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-c",
+                  "heading_text": "Get the web’s best content right on your homepage",
+                  "info_icon": {
+                    "label": {
+                      "string_id": "cfr-doorhanger-extension-sumo-link"
+                    },
+                    "sumo_path": "extensionrecommendations"
+                  },
+                  "notification_text": {
+                    "string_id": "cfr-doorhanger-feature-notification"
+                  },
+                  "category": "cfrFeatures"
+                },
+                "trigger": {
+                  "id": "openURL",
+                  "params": [
+                    "google.com",
+                    "www.google.com"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "slug": "control",
+            "ratio": 1,
+            "feature": {
+              "featureId": "cfr",
+              "enabled": true,
+              "value": {}
+            }
+          }
+        ]
+      },
+      "targeting": "browserSettings.update.channel == 'release' && localeLanguageCode == 'en' && region == 'US' && 'app.shield.optoutstudies.enabled'|preferenceValue",
+      "slug": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83",
+      "isEnrollmentPaused": false,
+      "userFacingName": "Homepage Remediation: Search Value Props Experiment",
+      "userFacingDescription": "This experiment promotes the default Firefox homepage configuration for users that switched away from it. We want to communicate the recent improvements that should lead to a better user experience.",
+      "bucketConfig": {
+        "namespace": "messaging-experiments-cfr",
+        "randomizationUnit": "normandy_id",
+        "start": 5312,
+        "count": 1000,
+        "total": 10000
+      },
+      "branches": [
+        {
+          "slug": "treatment-a",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": {
+              "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-a",
+              "group": "cfr",
+              "groups": [
+                "cfr-experiments"
+              ],
+              "frequency": {
+                "lifetime": 3
+              },
+              "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+              "template": "cfr_doorhanger",
+              "content": {
+                "layout": "icon_and_message",
+                "text": "When you use the Firefox homepage, you get the same great search experience while also supporting the only browser that’s backed by a non-profit.",
+                "icon": "chrome://browser/skin/preferences/search.svg",
+                "buttons": {
+                  "secondary": [
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-cancel-button"
+                      },
+                      "action": {
+                        "type": "CANCEL"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                      },
+                      "action": {
+                        "type": "OPEN_PREFERENCES_PAGE",
+                        "data": {
+                          "category": "general-cfrfeatures"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": {
+                    "label": {
+                      "value": "Update Homepage",
+                      "attributes": {
+                        "accesskey": "U"
+                      }
+                    },
+                    "action": {
+                      "type": "CONFIGURE_HOMEPAGE",
+                      "data": {
+                        "homePage": "default",
+                        "newtab": "default",
+                        "layout": {
+                          "search": true,
+                          "topsites": false,
+                          "highlights": false,
+                          "topstories": false,
+                          "snippets": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-a",
+                "heading_text": "Support a better web with the Firefox homepage",
+                "info_icon": {
+                  "label": {
+                    "string_id": "cfr-doorhanger-extension-sumo-link"
+                  },
+                  "sumo_path": "extensionrecommendations"
+                },
+                "notification_text": {
+                  "string_id": "cfr-doorhanger-feature-notification"
+                },
+                "category": "cfrFeatures"
+              },
+              "trigger": {
+                "id": "openURL",
+                "params": [
+                  "google.com",
+                  "www.google.com"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "slug": "treatment-b",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": {
+              "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-b",
+              "group": "cfr",
+              "groups": [
+                "cfr-experiments"
+              ],
+              "frequency": {
+                "lifetime": 3
+              },
+              "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+              "template": "cfr_doorhanger",
+              "content": {
+                "layout": "icon_and_message",
+                "text": "The Firefox homepage keeps your top sites one click away with visual tiles. Save time by searching your favorite sites, bookmarks, history, and tabs from the search bar.",
+                "icon": "chrome://browser/skin/preferences/search.svg",
+                "buttons": {
+                  "secondary": [
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-cancel-button"
+                      },
+                      "action": {
+                        "type": "CANCEL"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                      },
+                      "action": {
+                        "type": "OPEN_PREFERENCES_PAGE",
+                        "data": {
+                          "category": "general-cfrfeatures"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": {
+                    "label": {
+                      "value": "Update Homepage",
+                      "attributes": {
+                        "accesskey": "U"
+                      }
+                    },
+                    "action": {
+                      "type": "CONFIGURE_HOMEPAGE",
+                      "data": {
+                        "homePage": "default",
+                        "newtab": "default",
+                        "layout": {
+                          "search": true,
+                          "topsites": true,
+                          "highlights": false,
+                          "topstories": false,
+                          "snippets": false
+                        }
+                      }
+                    }
+                  }
+                },
+                "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-b",
+                "heading_text": "Type less, find more with a personalized homepage",
+                "info_icon": {
+                  "label": {
+                    "string_id": "cfr-doorhanger-extension-sumo-link"
+                  },
+                  "sumo_path": "extensionrecommendations"
+                },
+                "notification_text": {
+                  "string_id": "cfr-doorhanger-feature-notification"
+                },
+                "category": "cfrFeatures"
+              },
+              "trigger": {
+                "id": "openURL",
+                "params": [
+                  "google.com",
+                  "www.google.com"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "slug": "treatment-c",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": {
+              "id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-c",
+              "group": "cfr",
+              "groups": [
+                "cfr-experiments"
+              ],
+              "frequency": {
+                "lifetime": 3
+              },
+              "targeting": "!homePageSettings.isDefault && homePageSettings.isCustomUrl && homePageSettings.urls[.host == 'google.com']|length > 0 && visitsCount >= 3 && userPrefs.cfrFeatures && currentDate|date - profileAgeCreated > 15770000000",
+              "template": "cfr_doorhanger",
+              "content": {
+                "layout": "icon_and_message",
+                "text": "The Firefox homepage makes it easy to search the web, and serves up thought-provoking stories from Pocket right along with it.",
+                "icon": "chrome://browser/skin/preferences/search.svg",
+                "buttons": {
+                  "secondary": [
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-cancel-button"
+                      },
+                      "action": {
+                        "type": "CANCEL"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-never-show-recommendation"
+                      }
+                    },
+                    {
+                      "label": {
+                        "string_id": "cfr-doorhanger-extension-manage-settings-button"
+                      },
+                      "action": {
+                        "type": "OPEN_PREFERENCES_PAGE",
+                        "data": {
+                          "category": "general-cfrfeatures"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": {
+                    "label": {
+                      "value": "Activate now",
+                      "attributes": {
+                        "accesskey": "A"
+                      }
+                    },
+                    "action": {
+                      "type": "CONFIGURE_HOMEPAGE",
+                      "data": {
+                        "homePage": "default",
+                        "newtab": "default",
+                        "layout": {
+                          "search": true,
+                          "topsites": true,
+                          "highlights": true,
+                          "topstories": true,
+                          "snippets": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "bucket_id": "bug-1671620-message-homepage-remediation-search-value-props-exper-release-82-83:treatment-c",
+                "heading_text": "Get the web’s best content right on your homepage",
+                "info_icon": {
+                  "label": {
+                    "string_id": "cfr-doorhanger-extension-sumo-link"
+                  },
+                  "sumo_path": "extensionrecommendations"
+                },
+                "notification_text": {
+                  "string_id": "cfr-doorhanger-feature-notification"
+                },
+                "category": "cfrFeatures"
+              },
+              "trigger": {
+                "id": "openURL",
+                "params": [
+                  "google.com",
+                  "www.google.com"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "slug": "control",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": {}
+          }
+        }
+      ]
+    },
+    "mobile-a-a": {
+      "schemaVersion": "0.1.0",
+      "id": "mobile-a-a-example",
+      "slug": "mobile-a-a-example",
+      "application": "reference_browser",
+      "appId": "org.mozilla.reference.browser",
+      "appName": "reference_browser",
+      "featureIds": [
+        "bookmark-icon"
+      ],
+      "channel": "nightly",
+      "userFacingName": "Mobile A/A Example",
+      "userFacingDescription": "An A/A Test to validate the Rust SDK",
+      "isEnrollmentPaused": false,
+      "bucketConfig": {
+        "randomizationUnit": "nimbus_id",
+        "namespace": "mobile-a-a-example",
+        "start": 0,
+        "count": 5000,
+        "total": 10000
+      },
+      "targeting": null,
+      "startDate": null,
+      "endDate": null,
+      "proposedEnrollment": 7,
+      "referenceBranch": "control",
+      "probeSets": [],
+      "branches": [
+        {
+          "slug": "control",
+          "ratio": 1,
+          "feature": {
+            "featureId": "bookmarkId",
+            "enabled": true,
+            "value": null
+          }
+        },
+        {
+          "slug": "treatment-variation-b",
+          "ratio": 1,
+          "feature": {
+            "featureId": "bookmarkId",
+            "enabled": true,
+            "value": null
+          }
+        }
+      ]
+    },
+    "pull-factor": {
+      "schemaVersion": "0.1.0",
+      "id": "message-aboutwelcome-pull-factor-reinforcement",
+      "slug": "message-aboutwelcome-pull-factor-reinforcement",
+      "application": "firefox_desktop",
+      "appName": "firefox_desktop",
+      "appId": "firefox-desktop",
+      "channel": "nightly",
+      "userFacingName": "About:Welcome Pull Factor Reinforcement",
+      "userFacingDescription": "4 branch experiment different variants of about:welcome with a goal of testing new experiment framework and get insights on whether reinforcing pull-factors improves retention. Test deployment of multiple branches using new experiment framework",
+      "isEnrollmentPaused": true,
+      "featureIds": [
+        "cfr"
+      ],
+      "bucketConfig": {
+        "randomizationUnit": "normandy_id",
+        "namespace": "message-aboutwelcome-pull-factor-reinforcement",
+        "start": 0,
+        "count": 2000,
+        "total": 10000
+      },
+      "startDate": "2020-06-17T23:20:47.230Z",
+      "endDate": null,
+      "proposedDuration": 28,
+      "proposedEnrollment": 7,
+      "referenceBranch": "control",
+      "probeSets": [],
+      "branches": [
+        {
+          "slug": "control",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": null
+          }
+        },
+        {
+          "slug": "treatment-variation-b",
+          "ratio": 1,
+          "feature": {
+            "featureId": "cfr",
+            "enabled": true,
+            "value": null
+          }
+        }
+      ]
+    }
+  },
+  "features": {
+    "picture_in_picture": {
+      "name": "Picture-in-Picture",
+      "description": "Counts the fraction of users and the number of times that users open Picture-in-Picture\nwindows from videos. PiP can be opened by clicking on the PiP overlay or the video's context\nmenu.\n",
+      "telemetry": [
+        {
+          "kind": "event",
+          "event_category": "pictureinpicture",
+          "event_method": "create",
+          "event_object": "player"
+        }
+      ],
+      "slug": "picture_in_picture"
+    },
+    "pinned_tabs": {
+      "name": "Pinned tabs",
+      "description": "Counts the number of times that a client pinned a tab. This doesn't measure whether users\nalready had tabs pinned when observation began.\n",
+      "telemetry": [
+        {
+          "kind": "scalar",
+          "name": "browser.engagement.tab_pinned_event_count"
+        }
+      ],
+      "slug": "pinned_tabs"
+    }
+  },
+  "test-data": {
+    "food": {
+      "apple": "green",
+      "banana": "yellow",
+      "cherry": "red",
+      "daikon": "white",
+      "eggplant": "purple"
+    },
+    "slug": "test-data"
+  }
+}

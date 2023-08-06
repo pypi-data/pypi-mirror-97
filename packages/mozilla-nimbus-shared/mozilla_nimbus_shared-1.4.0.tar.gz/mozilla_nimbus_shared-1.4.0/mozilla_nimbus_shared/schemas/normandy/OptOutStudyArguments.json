@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/OptOutStudyArguments",
+  "definitions": {
+    "OptOutStudyArguments": {
+      "type": "object",
+      "properties": {
+        "addonUrl": {
+          "type": "string",
+          "description": "URL of the add-on XPI file to install",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "User-facing name of the study",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "User-facing description of the study",
+          "minLength": 1
+        },
+        "extensionApiId": {
+          "type": "number",
+          "description": "The record ID of the extension used for Normandy API calls."
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study"
+        }
+      },
+      "required": [
+        "addonUrl",
+        "name",
+        "description",
+        "extensionApiId"
+      ],
+      "description": "Enroll a user in an opt-out add-on study"
+    }
+  }
+}
