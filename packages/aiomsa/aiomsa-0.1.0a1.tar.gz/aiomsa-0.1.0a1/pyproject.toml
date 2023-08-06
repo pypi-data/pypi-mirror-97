@@ -1,0 +1,71 @@
+[tool.poetry]
+name = "aiomsa"
+version = "0.1.0a1"
+description = "Asynchronous xApp framework"
+authors = ["Facebook Connectivity"]
+license = "BSD-3-Clause"
+readme = "README.md"
+repository = "https://github.com/facebookexternal/aiomsa"
+keywords = ["xApp"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+include = ["LICENSE", "docs"]
+exclude = ["docs/_build"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+aiohttp = "^3.5.4"
+aiohttp-swagger = "^1.0.9"
+betterproto = "^2.0.0b2"
+
+furo = { version = "^2021.2.21-beta.25", optional = true }
+prometheus_async = { version = "^19.2.0", optional = true}
+sphinx = { version = "^3.4.3", optional = true }
+sphinx-autodoc-typehints = { version = "^1.11.1", optional = true }
+sphinxcontrib-openapi = { version = "^0.7.0", optional = true }
+uvloop = { version = "^0.14.0", optional = true }
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+mypy = "^0.812"
+isort = "^5.7.0"
+flake8 = "^3.8.4"
+
+[tool.poetry.extras]
+docs = ["furo", "sphinx", "sphinx-autodoc-typehints", "sphinxcontrib-openapi"]
+prometheus = ["prometheus-async"]
+speedups = ["uvloop"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+combine_as_imports = true
+include_trailing_comma = true
+line_length = 88
+lines_after_imports = 2
+skip_glob = ["*/onos_api"]
+
+[tool.black]
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | onos_api
+)/
+'''
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
