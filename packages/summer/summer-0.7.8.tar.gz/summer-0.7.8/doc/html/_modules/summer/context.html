@@ -1,0 +1,446 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>summer.context &mdash; summer 0.7.5.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> summer
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basic-concepts.html">Basic Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">summer API doc</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">summer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>summer.context</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for summer.context</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2009-2020 Martin Slouf &lt;martinslouf@users.sourceforge.net&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is a part of Summer.</span>
+<span class="c1">#</span>
+<span class="c1"># Summer is free software; you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c1"># Software Foundation; either version 3 of the License, or (at your option)</span>
+<span class="c1"># any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Module ``context`` defines an application context (:py:class:`Context`</span>
+<span class="sd">class)-- a container for (business) objects, that should be available</span>
+<span class="sd">throughout the application, application layer or module.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">l10n</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">lsf</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">sf</span>
+<span class="kn">from</span> <span class="nn">.ex</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">NoObjectFoundException</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../api-core.html#summer.context.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Context is intelligent container for your business objects, it is a core</span>
+<span class="sd">    of *summer framework*.</span>
+
+<span class="sd">    It is responsible for:</span>
+
+<span class="sd">    #. summer framework initialization</span>
+<span class="sd">    #. instantiating your business classes with their interdependencies</span>
+<span class="sd">    #. aop configuration</span>
+
+<span class="sd">    Emulates mapping type, so you can access business objects by their name</span>
+<span class="sd">    if required.</span>
+
+<span class="sd">    Usually in medium sized applications, you define single global context</span>
+<span class="sd">    somewhere in main entry point of your program.  Preferred approach is</span>
+<span class="sd">    to define top level module attribute, see accompanying examples.</span>
+
+<span class="sd">    Initialization of context is thread safe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_provider</span><span class="p">:</span> <span class="n">sf</span><span class="o">.</span><span class="n">SessionProvider</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ldap_connection_provider</span><span class="p">:</span> <span class="n">lsf</span><span class="o">.</span><span class="n">LdapConnectionProvider</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">localization</span><span class="p">:</span> <span class="n">l10n</span><span class="o">.</span><span class="n">Localization</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates and initializes context instance.  See :py:meth:`init` for more</span>
+<span class="sd">        information.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            session_provider (sf.SessionProvider): object that provides</span>
+<span class="sd">                                                   SQLAlchemy sessions when</span>
+<span class="sd">                                                   requested</span>
+
+<span class="sd">            ldap_connection_provider (lsf.LdapConnectionProvider): object</span>
+<span class="sd">                                                                   that</span>
+<span class="sd">                                                                   provides</span>
+<span class="sd">                                                                   LDAP</span>
+<span class="sd">                                                                   connections</span>
+<span class="sd">                                                                   when</span>
+<span class="sd">                                                                   requested</span>
+
+<span class="sd">            localization (l10n.Localization): localization object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_provider</span> <span class="o">=</span> <span class="n">session_provider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_connection_provider</span> <span class="o">=</span> <span class="n">ldap_connection_provider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_l10n</span> <span class="o">=</span> <span class="n">localization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Context.__del__"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.__del__">[docs]</a>    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calls :py:meth:`shutdown` to properly shutdown the context.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session_factory</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldap_session_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ldap_session_factory</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">unbind</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoObjectFoundException</span><span class="p">(</span><span class="n">object_name</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">session_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sf</span><span class="o">.</span><span class="n">SessionFactory</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Each context may have up to one instance of session factory -- access to</span>
+<span class="sd">        your database connections.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">            sf.SessionFactory: session factory instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">Context</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">SessionFactory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_provider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_factory</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ldap_session_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lsf</span><span class="o">.</span><span class="n">LdapSessionFactory</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Each context may have up to one instance of LDAP session factory --</span>
+<span class="sd">        access to your LDAP connections.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">            lsf.LdapSessionFactory: LDAP session factory instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_connection_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">Context</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span> <span class="o">=</span> <span class="n">lsf</span><span class="o">.</span><span class="n">LdapSessionFactory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ldap_connection_provider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ldap_session_factory</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">l10n</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">l10n</span><span class="o">.</span><span class="n">Localization</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Each context may have up to one instance of</span>
+<span class="sd">        :py:class:`l10n.Localization`.  You usually do not need to access</span>
+<span class="sd">        it.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">            l10n.Localization: localization instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_l10n</span>
+
+<div class="viewcode-block" id="Context.init"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main context initialization method.</span>
+
+<span class="sd">        Context initialization is executed from constructor; it is</span>
+<span class="sd">        separated into several steps:</span>
+
+<span class="sd">        #. call :py:meth:`core_init` (not indended to be overriden) which</span>
+<span class="sd">           initializes core objects and internal AOP features</span>
+
+<span class="sd">        #. call :py:meth:`orm_init` (intended to be overriden) which</span>
+<span class="sd">           initializes ORM</span>
+
+<span class="sd">        #. call :py:meth:`context_init` (intended to be overriden) -- a</span>
+<span class="sd">           place to define your business beans</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">Context</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;initializing core services&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">core_init</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;core services initialized&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;initializing orm&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orm_init</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;orm initialized&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;custom context initialization started&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context_init</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;custom context initialization done&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;context initialization done&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Context.core_init"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.core_init">[docs]</a>    <span class="k">def</span> <span class="nf">core_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes core objects.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;setting session_factory == </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_factory</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">.aop</span> <span class="k">import</span> <span class="n">transactional</span>
+            <span class="n">transactional</span><span class="o">.</span><span class="n">session_factory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_factory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldap_session_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;setting ldap_session_factory == </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldap_session_factory</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">.aop</span> <span class="k">import</span> <span class="n">ldapaop</span>
+            <span class="n">ldapaop</span><span class="o">.</span><span class="n">ldap_session_factory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldap_session_factory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">l10n</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;initializing l10n == </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l10n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l10n</span><span class="o">.</span><span class="n">init</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Context.orm_init"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.orm_init">[docs]</a>    <span class="k">def</span> <span class="nf">orm_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Should be overriden by subclasses to initialize ORM managed tables and</span>
+<span class="sd">        class mappings.</span>
+
+<span class="sd">        You should define your custom table definitions based on</span>
+<span class="sd">        :py:class:`summer.sf.AbstractTableDefinitions` and mappings based</span>
+<span class="sd">        on :py:class:`summer.sf.AbstractClassMappings`.</span>
+
+<span class="sd">        Usually you have just those lines there::</span>
+
+<span class="sd">            self.session_factory.table_definitions = MyTableDefinitions()</span>
+<span class="sd">            self.session_factory.set_class_mappings = MyClassMappings()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Context.context_init"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.context_init">[docs]</a>    <span class="k">def</span> <span class="nf">context_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Should be overriden by subclasses to initialize custom objects in</span>
+<span class="sd">        context.</span>
+
+<span class="sd">        This is the last stage of context initialization, this method gets called after</span>
+
+<span class="sd">        #. :py:meth:`core_init`</span>
+<span class="sd">        #. :py:meth:`orm_init`</span>
+
+<span class="sd">        are called.  You can safely access those properties:</span>
+
+<span class="sd">        * :py:attr:`session_factory` (:py:class:`summer.sf.SessionFactory`</span>
+<span class="sd">          instance) which provides thread-safe access to</span>
+<span class="sd">          :py:class:`sqlalchemy.session` -- any data aware object (ie. each</span>
+<span class="sd">          DAO at least) should probably have access to it -- at least those</span>
+<span class="sd">          derived from :py:class:`dao.Dao` reference it.</span>
+
+<span class="sd">        * :py:attr:`ldap_session_factory`</span>
+<span class="sd">          (:py:class:`summer.lsf.LdapSessionFactory` instance) which</span>
+<span class="sd">          provides thread-safe access to</span>
+<span class="sd">          :py:class:`summer.lsf.LdapSessionFactory.Local` instance -- a</span>
+<span class="sd">          simple wrapper around actual :py:class:`ldap3.Connection`</span>
+
+<span class="sd">        * :py:attr:`l10n` (:py:class:`summer.l10n.Localization`) instance,</span>
+<span class="sd">          not very interesting in itself, but summer&#39;s localization module</span>
+<span class="sd">          installs the famous :py:meth:`_` gettext function into global</span>
+<span class="sd">          namespace (as normal gettext module does) and configures your</span>
+<span class="sd">          localization based on whatever you have provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Context.shutdown"><a class="viewcode-back" href="../../api-core.html#summer.context.Context.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles context shutdown.  Called from :py:meth:`__del__`.  Can be overriden.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2009-2020, martinslouf@users.sourceforge.net
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

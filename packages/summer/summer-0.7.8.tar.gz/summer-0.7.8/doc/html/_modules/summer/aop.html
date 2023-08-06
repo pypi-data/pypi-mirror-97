@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>summer.aop &mdash; summer 0.7.5.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> summer
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basic-concepts.html">Basic Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">summer API doc</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">summer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>summer.aop</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for summer.aop</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2009-2020 Martin Slouf &lt;martinslouf@users.sourceforge.net&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This file is a part of Summer.</span>
+<span class="c1">#</span>
+<span class="c1"># Summer is free software; you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c1"># Software Foundation; either version 3 of the License, or (at your option)</span>
+<span class="c1"># any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</span>
+
+<span class="sd">&quot;&quot;&quot;Provides summer *AOP* functionality.</span>
+
+<span class="sd">You can find here most useful decorators :py:func:`transactional` for SQL</span>
+<span class="sd">transaction support and :py:func:`ldapaop`.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<span class="kn">from</span> <span class="nn">.sf</span> <span class="k">import</span> <span class="n">SessionFactory</span>
+<span class="kn">from</span> <span class="nn">.lsf</span> <span class="k">import</span> <span class="n">LdapSessionFactory</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="transactional"><a class="viewcode-back" href="../../api-aop.html#summer.aop.transactional">[docs]</a><span class="k">def</span> <span class="nf">transactional</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Method decorator marking method to be transactional.</span>
+
+<span class="sd">    Every decorated method behaves as follows:</span>
+
+<span class="sd">    * if no transaction is active and database is *not* in autocommit mode,</span>
+<span class="sd">      start a new transaction, doing commit/rollback at the end</span>
+
+<span class="sd">    * if there is a transaction, just simple continue within the</span>
+<span class="sd">      transaction without doing commit/rollback at the end (that is left to</span>
+<span class="sd">      the top-most transactional method)</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        method (types.FunctionType): function to be decorated</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">        (types.FunctionType): decorated function</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># mame .. method name</span>
+    <span class="c1"># mame = &quot;%s.%s&quot; % (func.im_class.__name__, func.__name__)</span>
+    <span class="n">mame</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;method </span><span class="si">%s</span><span class="s2"> decorated as transactional&quot;</span><span class="p">,</span> <span class="n">mame</span><span class="p">)</span>
+    <span class="n">transactional</span><span class="o">.</span><span class="n">session_factory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_transactional</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transactional</span><span class="o">.</span><span class="n">session_factory</span><span class="p">,</span> <span class="n">SessionFactory</span><span class="p">)</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">transactional</span><span class="o">.</span><span class="n">session_factory</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx begin with session </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">active</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx active, continue&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx not active, started&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx active, no commit&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx commit&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="c1"># session.close()  # close session in case of an exception</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;tx rollback on error&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ex</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;tx active, not closing&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># session can outlive the transaction to be reused later on</span>
+                <span class="c1"># session.close()</span>
+                <span class="c1"># logger.debug(&quot;tx closed&quot;)</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">_transactional</span></div>
+
+
+<div class="viewcode-block" id="ldapaop"><a class="viewcode-back" href="../../api-aop.html#summer.aop.ldapaop">[docs]</a><span class="k">def</span> <span class="nf">ldapaop</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Method decorator marking method to be run in LDAP session.  Analogy to</span>
+<span class="sd">    :py:func:`summer.aop.transactional` with same logic.</span>
+
+<span class="sd">    Intended use case for this decorator is to decorate</span>
+<span class="sd">    :py:class:`summer.ldapdao.LdapEntityDao` methods and then access</span>
+<span class="sd">    current *ldap3* session/connection by using</span>
+<span class="sd">    :py:attr:`summer.ldapdao.LdapDao.session` from within the *DAO* method.</span>
+<span class="sd">    Thus you can access *ldap3* session/connection (and manipulate data),</span>
+<span class="sd">    and still have the transaction boundaries defined on top of your</span>
+<span class="sd">    business methods.</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        method (types.FunctionType): function to be decorated</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">        (types.FunctionType): decorated function</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># mame .. method name</span>
+    <span class="c1"># mame = &quot;%s.%s&quot; % (func.im_class.__name__, func.__name__)</span>
+    <span class="n">mame</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;method </span><span class="si">%s</span><span class="s2"> decorated as ldapaop&quot;</span><span class="p">,</span> <span class="n">mame</span><span class="p">)</span>
+    <span class="n">ldapaop</span><span class="o">.</span><span class="n">ldap_session_factory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_ldapaop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ldapaop</span><span class="o">.</span><span class="n">ldap_session_factory</span><span class="p">,</span> <span class="n">LdapSessionFactory</span><span class="p">)</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">ldapaop</span><span class="o">.</span><span class="n">ldap_session_factory</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;lx begin with session </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">active</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;lx active, continue&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;lx not active, bounded&quot;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;lx ok&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;lx error&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ex</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">active</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;lx active, not closing&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># session can outlive single call to be reused later on</span>
+                <span class="c1"># session.unbound()</span>
+                <span class="c1"># logger.debug(&quot;lx session unbounded&quot;)</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">_ldapaop</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2009-2020, martinslouf@users.sourceforge.net
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

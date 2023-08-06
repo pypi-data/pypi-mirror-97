@@ -1,0 +1,164 @@
+Basic Concepts
+==============
+
+Summer framework provides several usefull utilities to organize your
+application.
+
+It aims to be simple, relatively straitforward and takes inspiration in
+other successful projects, such as famous Java Spring framework.
+
+Usually, in any non-trivial application, you would like to have:
+
+#. Some configuration (ie. log config, various options, ...)
+#. Separation of business logic
+#. Access some kind of a data store (ie. SQL, LDAP, ...)
+
+Summer framework provides a container to create, deploy and manage
+dependencies among your business objects with pure Python configuration.
+
+
+Configuration
+-------------
+
+Usually you should provide configuration for (1) logging, (2) summer
+framework and (3) whatever else your application requires.
+
+#. Logging in your application is configured through standard *Python*
+   utilities (``logging.cfg``) and is consumed somewhere in your code,
+   like::
+
+     # one time configuration (somewhere in __main__ module)
+     LOGGING_CFG = os.path.join(os.path.dirname(__file__), "logging.cfg")
+     logging.config.fileConfig(LOGGING_CFG)
+
+     # anytime a logger is needed (at the top of your file)
+     logger = logging.getLogger(__name__)
+
+     # log messages
+     logger.info("unexpected i/o error", error)
+
+#. Summer framework itself requires minimum configuration and you start by
+   defining a :py:class:`summer.context.Context`, recommendation is to do
+   all your config through *Python* code.  There are some configuration
+   examples in each of the :doc:`examples`.  Minimum context creation can
+   look like::
+
+     # import summer namespace
+     import summer
+     # most basic config
+     sqlalchemy_uri = "sqlite:///:memory:"
+     # create testing context
+     ctx = summer.Context(summer.DefaultSessionProvider(sqlalchemy_uri))
+
+#. (Optionally) whatever your application needs.  You can use simple
+   approach supported by summer framework.  Define your configuration
+   parameters in *Python* file with
+   :py:class:`summer.utils.ConfigValue`. In such a case you have defined
+   your default parameter values in pure Python and at the same time you
+   allow any such parameter to be overridden by your OS environment
+   variables::
+
+     import os.path
+     import summer
+
+     config_value = summer.ConfigValue()
+
+     project_topdir = os.path.abspath(os.path.join(__file__, "..", ".."))
+     sqlalchemy_uri = config_value("SQLALCHEMY_URI", "sqlite:///:memory:")
+     sqlalchemy_autocommit = config_value("SQLALCHEMY_AUTOCOMMIT", False)
+
+   In such a configuration you can easily define ``SQLALCHEMY_URI`` OS
+   environment variable with new value::
+
+     # in your OS shell / script / IDE launcher
+     export SQL_ALCHEMY_URI="postgresql://db_user:db_pass@localhost:5432/postgres"
+
+
+Business logic
+--------------
+
+You can organize your business objects any way you like, but you can use
+:py:class:`summer.context.Context` class to deploy your business objects.
+You create all the objects in one single place, managing their
+inter-dependencies.  Usually, your business objects should be designed as
+singletons and once deployed, you can easily access them from any part of
+your program.  Using dependency injection (for example via constructor
+arguments) provides safe way to use fully initialized objects without
+having a dependency on summer framework at all.
+
+So usually entry point of each of your program may look like this::
+
+  import logging
+
+  # ...
+
+  # configure logging as soon as possible
+  LOGGING_CFG = os.path.join(os.path.dirname(__file__), "logging.cfg")
+  logging.config.fileConfig(LOGGING_CFG)
+
+  # ...
+
+  # create local logger
+  logger = logging.getLogger(__name__)
+
+  # ....
+
+  # import your contex, preferably defined as module level 'singleton'
+  from .appcontext import ctx
+
+  if __name__ == "__main__":
+      logger.info("program started")
+      # obtain any business object and call whatever your program is intended to do
+      database_manager = ctx.database_manager
+      database_manager.create_database()
+      database_manager.process_data()
+
+Regardless how complex your logic is, there is usually one single entry
+point to your program ie. ``__main__`` module, which can parse for example
+command line options, start gui, process data, do both, ...
+
+Accessing data store
+--------------------
+
+While accessing any traditional data store, you are usually required to
+obtain a *connection* to such a storage (sql database connection, ldap
+session, ...), say a *resource*.  You yourself should manage such a
+*resource* in your program, so you acquire a fresh one each time you access
+it and you usually should release it once not needed anymore while handling
+any exceptional states that may arise.
+
+For example, it is not uncommon in a web application to obtain connection
+to database when you start processing a request and release it once the
+request processing ends and client is sent an output.  You may have some
+kind of a *global* variable to use it in your code -- many frameworks work
+that way.
+
+There is nothing wrong with that, but maybe you want a bit more control
+over resources consumed (why open a connection to database, if you do not
+need one in your request processing?) or you may be writing a
+console/desktop application where there is no such a notion of
+*request/response* (so you should acquire and release the resources by
+yourself) or maybe you want to write a fine grained test case or
+... whatever.
+
+Doing *resource* allocation by hand is tedious and error prone task.
+Summer framework can help you there.
+
+*First*, you can deploy a management object for your data source -- there
+is out of the box support for two resource managers -- (1) SQL Alchemy
+sessions and (2) LDAP connections.
+
+*Second*, summer framework provides :py:func:`summer.txaop.transactional`
+and :py:func:`summer.lxaop.ldapaop` method annotations as well as some
+other infrastructure classes to ease you from resource allocation.
+
+Any method annotated with this annotation will acquire the appropriate
+*resource* each time it is invoked and provide you with a local variable
+that represents this resource for you to use it, which gets properly
+released at method end.  You can issue a SQL statement or access LDAP
+session without worrying of manual resource handling.
+
+Right now, there exist one limitation -- you can have one and only one
+instance of :py:class:`summer.sf.SessionFactory` and/or
+:py:class:`summer.lsf.LdapSessionFactory` -- meaning, you can work with
+single database and / or LDAP server in your program.
