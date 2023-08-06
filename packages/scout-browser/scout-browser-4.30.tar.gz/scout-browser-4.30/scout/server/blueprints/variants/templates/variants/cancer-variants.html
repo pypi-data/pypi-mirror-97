@@ -1,0 +1,216 @@
+{% extends "layout_bs4.html" %}
+{% from "variants/components.html" import gene_cell, frequency_cell %}
+{% from "variants/utils.html" import cancer_filters, tier_cell, cell_rank, pagination_footer, pagination_hidden_div, dismiss_variants_block, filter_form_footer %}
+
+{% block title %}
+  {{ variant_type|capitalize }} cancer variants
+{% endblock %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+{% endblock %}
+
+{% block top_nav %}
+  {{ super() }}
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('cases.index') }}">Institutes</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('overview.cases', institute_id=institute._id) }}">
+      {{ institute.display_name }}
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('cases.case', institute_id=institute._id, case_name=case.display_name) }}">
+      {{ case.display_name }}
+    </a>
+  </li>
+  <li class="nav-item active">
+    <span class="navbar-text">{{ form.variant_type.data|capitalize }} Cancer Variants</span>
+  </li>
+{% endblock %}
+
+{% block content_main %}
+<div class="container-float">
+  <form method="POST" id="filters_form" action="{{url_for('variants.cancer_variants', institute_id=institute._id, case_name=case.display_name)}}">
+    {{ pagination_hidden_div(page) }}
+    <div class="card panel-default" id="accordion">
+      <div class="card-header">
+        <strong><a data-toggle="collapse" data-parent="#accordion" href="#collapseFilters">Filters</a></strong>
+      </div>
+      <!--Expand filters form if filters were used in a previous POST request or the previous POST request form was not validated-->
+      <div class="card-body panel-collapse collapse {{ 'show' if request.args.get('expand_search') == "True" or expand_search is sameas true }}" id="collapseFilters" >
+         {{ cancer_filters(form, institute, case) }}
+      </div>
+      {{ filter_form_footer(form, result_size, total_variants, more_variants, page, variants|length) }}
+    </div>
+
+  <div class="card mt-3">
+    <table class="table table-hover table-bordered" style="table-layout:fixed">
+      <thead>
+            <tr>
+              <th style="width:3%"></th>
+              <th title="Rank position">Rank</th>
+              <th title="Variant description" style="width:20%">Gene:Transcript:Exon:HGVS</th>
+              <th title="Assessments including variant tier">Tier</th>
+              <th title="Rank score">Score</th>
+              <th title="Gene">Gene</th>
+              <th title="Chromosome and genomic coordinate">Chr pos</th>
+              <th style="width:6%" title="Poulation frequency">Pop Freq</th>
+              <th title="Variant type">Type</th>
+              <th title="Functional consequence annotation" style="width:18%">Consequence</th>
+              <th data-toggle="tooltip" data-placement="top" title="Tumor alt. AF. &#013; Alt. allele count | Ref. allele count">Tumor</th>
+              <th data-toggle="tooltip" data-placement="top" title="Normal alt. AF. &#013; Alt. allele count | Ref. allele count">Normal</th>
+            </tr>
+      </thead>
+      <tbody>
+        {% for variant in variants %}
+          {% if variant.dismiss_variant %}
+            <tr class="dismiss">
+          {% elif variant._id in case.causatives %}
+            <tr class="causative">
+          {% else %}
+            <tr>
+          {% endif %}
+            <td><input type="checkbox" value="{{variant._id}}" name="dismiss" onclick="enableDismiss()"></td>
+            <td class="text-left">{{cell_rank(variant, institute, case, form, manual_rank_options)}}</td>
+            <td>
+              <a href="{{ url_for('variant.variant', institute_id=institute._id, case_name=case.display_name,
+                                  variant_id=variant._id, cancer='yes') }}">
+              {% for annotation in variant.canonical_transcripts %}
+                <div>{{ annotation }}</div>
+              {% endfor %}
+              </a>
+            </td>
+            <td>{{ tier_cell(variant, manual_rank_options, cancer_tier_options) }}</td>
+            <td>{{ score_cell(variant) }}</td>
+            <td>{{ gene_cell(variant) }}</td>
+            <td>{{ position_cell(variant) }}</td>
+            <td class="text-right">{{ frequency_cell(variant) }}</td>
+            <td>{{ variant.sub_category }}</td>
+            <td>
+              {% for annotation in variant.functional_annotations %}
+                <div>{{ annotation }}</div>
+              {% endfor %}
+            </td>
+            <td>{{ allele_cell(variant.tumor or {}) }}</td>
+            <td>{{ allele_cell(variant.normal or {}) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {{ dismiss_variants_block(dismiss_variant_options, institute, case) }}
+  </div><!-- end of card-->
+</form><!--end of form containing filters and variants' table elements -->
+</div><!--end of container-float -->
+<div class="container-fluid">
+{{ pagination_footer(more_variants, page) }}
+</div>
+{% endblock %}
+
+{% macro actions_cell(variant) %}
+  <a href="{{ url_for('variant.variant', institute_id=institute._id, case_name=case.display_name,
+                      variant_id=variant._id, cancer='yes') }}">View</a>
+  {% if variant.comments %}
+    <span class="glyphicon glyphicon-comment"></span>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro score_cell(variant) %}
+  {% if variant.rank_score %}
+    {% if variant.rank_score <= 4 %}
+      {% set label_class = 'default' %}
+    {% elif variant.rank_score == 5 %}
+      {% set label_class = 'info' %}
+    {% elif variant.rank_score == 6 %}
+      {% set label_class = 'primary' %}
+    {% elif variant.rank_score == 7 %}
+      {% set label_class = 'warning' %}
+    {% elif variant.rank_score > 8 %}
+      {% set label_class = 'danger' %}
+    {% endif %}
+  {% endif %}
+  <div class="badge badge-{{ label_class }}">{{ variant.rank_score }} </div>
+{% endmacro %}
+
+
+{% macro position_cell(variant) %}
+  {{ variant.chromosome }}<span class="text-muted">:{{ variant.position }}</span>
+{% endmacro %}
+
+{% macro allele_cell(allele) %}
+  {% if 'alt_freq' in allele %}
+    {{ allele.alt_freq|round(4)  }}
+    <br>
+    <small class="text-muted">{{ allele.alt_depth }} | {{ allele.ref_depth }}</small>
+  {% else %}
+    <span class="text-muted">N/A</span>
+  {% endif %}
+{% endmacro %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-table-headers/0.1.19/js/jquery.stickytableheaders.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.11/purify.min.js"></script>
+  <script src="{{ url_for('variants.static', filename='form_scripts.js') }}"></script>
+  <script type="text/javascript">
+
+    var startElem = document.getElementById("start");
+    var endElem = document.getElementById("end");
+    var coords=[startElem,endElem];
+
+    coords.forEach(function (item, index) {
+      item.addEventListener("input", function() {
+      eraseChromPosString()});
+    });
+
+    var chromSel = document.getElementById("chrom");
+    chromSel.addEventListener("change", function() {
+        populateCytobands({{cytobands|safe}});
+    });
+
+    var chromPosInpt = document.getElementById("chrom_pos");
+    chromPosInpt.addEventListener("change", function() {
+      populateCytobands({{cytobands|safe}});
+    })
+
+    chromPosInpt.addEventListener("input", function() {
+      updateCoordinateFields(event.target)
+    })
+
+    var cytoStart = document.getElementById("cytoband_start");
+    initSearchConstraints(cytoStart, startElem)
+
+    var cytoEnd = document.getElementById("cytoband_end");
+    initSearchConstraints(cytoEnd, endElem)
+
+    document.getElementById('hide_dismissed').onchange = function() {
+      document.getElementById('expand_search').value = "False";
+      var the_form = document.forms['filters_form'];
+      the_form.submit();
+    };
+
+    $('select[multiple]').selectpicker({
+      width: '100%'
+    });
+
+
+    window.onload=function() {
+        populateCytobands({{cytobands|safe}});
+    }
+
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="popover"]').popover({
+        sanitizeFn: function (content) {
+          return DOMPurify.sanitize(content)
+        },
+        container: 'body',
+      });
+    })
+  </script>
+{% endblock %}
