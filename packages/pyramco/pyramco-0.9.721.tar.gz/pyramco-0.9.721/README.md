@@ -1,0 +1,32 @@
+# pyramco
+A complete Python wrapper class for the RAMCO API
+
+
+version **0.9.721**
+3-9-2021
+
+
+Notes for 0.9.721 release: 
+
+- Addresses a mistake in 0.9.71 PyPi packaging that omitted the whole module. Update ASAP or use >=0.9.69
+- Added an optional "output" argument to metadata and data querying operations to return results as valid JSON: pass `output='json'` as the final argument to functions that generate substantial results to get a JSON string instead of a dict.
+
+- Removed an unnecessary argument in `parse_attribute_values` for `api_key`
+
+
+RAMCO API Documentation permalink:
+<https://api.ramcoams.com/api/v2/ramco_api_v2_doc.pdf>
+
+
+Requires the **requests** module:
+<https://pypi.org/project/requests/>
+
+
+API key will be detected as an environment variable `RAMCO_API_KEY` OR in a <a href="https://docs.python.org/3/library/configparser.html">standard config file</a> named `pyramco_config.ini`, OR can be passed as an argument `ramco_api_key` to any function.
+
+
+
+
+The contributors to Pyramco are not affiliated, associated, authorized, endorsed by, or in any way officially connected with RAMCO, The NATIONAL ASSOCIATION OF REALTORS®, or any of their subsidiaries or affiliates. The official RAMCO website can be found at https://ramcoams.com 
+
+The name RAMCO, as well as related names, marks, emblems and images are registered trademarks of their respective owners.
