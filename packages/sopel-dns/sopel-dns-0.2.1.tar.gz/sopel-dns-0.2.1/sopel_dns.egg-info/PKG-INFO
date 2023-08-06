@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: sopel-dns
+Version: 0.2.1
+Summary: A DNS lookup plugin for Sopel IRC bots
+Home-page: https://github.com/dgw/sopel-dns
+Author: dgw
+Author-email: dgw@technobabbl.es
+License: Eiffel Forum License, version 2
+Description: # sopel-dns
+        
+        A DNS lookup plugin for Sopel IRC bots
+        
+        
+        ## Usage
+        
+        Basic usage performs an 'A' record lookup:
+        
+        ```
+        <user> .dns domain.tld
+        <bot>  user: 10.10.0.1
+        ```
+        
+        To look up IPv6 addresses instead, specify the 'AAAA' record type:
+        
+        ```
+        <user> .dns domain.tld AAAA
+        <bot>  user: fd12:3456:789a:1::1
+        ```
+        
+        Other [supported record types](#supported-dns-record-types) output their
+        results in a similar fashion. Some types, such as `MX` and `TXT`, split the
+        output across multiple lines to make it easier to read, at the cost of
+        possible "spam" if there are many records attached to the queried domain.
+        
+        ### Rate limiting
+        
+        Normal users are rate-limited to one `.dns` command every 5 minutes, both to
+        control channel flood and to prevent hammering whatever DNS server Sopel's
+        host system uses to resolve the submitted queries.
+        
+        
+        ## Supported DNS record types
+        
+        * `A`
+        * `AAAA`
+        * `CNAME`
+        * `MX`
+        * `NS`
+        * `PTR`
+        * `TXT`
+        
+        If a record type you want isn't listed here, feel free to request it in an
+        [issue](https://github.com/dgw/sopel-dns/issues/new). Even better: a pull
+        request enabling that record type, including a demo of the resulting output.
+        
+        
+        Version 0.2.1
+        =============
+        
+        Fixed error when a DNS query has no answer (no results).
+        
+        
+        Version 0.2.0
+        =============
+        
+        Added support for choosing DNS record type to look up. Currently understands
+        `A`, `AAAA`, `CNAME`, `MX`, `NS`, `PTR` (for IP addresses only), and `TXT`.
+        
+        
+        Version 0.1.0
+        =============
+        
+        Initial release with support for querying a domain's `A` records.
+        
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: Eiffel Forum License (EFL)
+Classifier: License :: OSI Approved :: Eiffel Forum License
+Classifier: Topic :: Communications :: Chat :: Internet Relay Chat
+Description-Content-Type: text/markdown
