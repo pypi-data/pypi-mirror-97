@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by USER (KSZ-BCSS) -->
+<!-- ============================================================================================================
+         * File Name :   			UnemployementDataV2.xsd
+         * Author :        			Groenveldt Choukri
+         * Owner :            	  	KSZ / CBSS
+         * Creation date :     	22/04/2015
+         * Status :                  Planned
+         * Description :             A service to consult the allowance for a people
+         * Current version :         0.4
+         * Revision History : 
+		                 - 0.2 Update of an enumeration for the family situation (before EMPLOYEE_WITH_DEPENDANTS, now HOUSEHOLDER)
+						 - 0.3 Added new legal context and more data for the payment in the operation consultSituation
+						 - 0.4 Update paidAmount with minimal value 0 in place of 1 and comment cleaning
+						 - 0.5 Suppress enumeration restriction for the legalContext
+						 - 0.6 SanctionType - the sanction period choice become optional
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://kszbcss.fgov.be/types/UnemploymentData/v2" xmlns:tns="http://kszbcss.fgov.be/types/UnemploymentData/v2" xmlns:common="http://kszbcss.fgov.be/types/common/v3" targetNamespace="http://kszbcss.fgov.be/types/UnemploymentData/v2" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2016-03-02">
+	<xsd:import namespace="http://kszbcss.fgov.be/types/common/v3" schemaLocation="be/fgov/kszbcss/types/common/CommonV3.xsd"/>
+	<!--=== Provide a detail of the paid allowance by month for a person ===-->
+	<xsd:complexType name="ConsultPaidSumsRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByPeriod"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultPaidSumsResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByPeriod"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="paidSums" type="PaidSumsResponseType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Operation especialy defined in Unemployment - Usually used by PCSA and SPP-IS. ===-->
+	<!--=== It provides more options than the L035 like the concatenation of this rights and payment.  ===-->
+	<xsd:complexType name="ConsultSituationRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultSituationResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="situation" type="SituationType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Provides all information about the rights for a people ===-->
+	<xsd:complexType name="ConsultRightsRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultRightsResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="rights" type="RightsType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Provides all information about the payments for a people === -->
+	<xsd:complexType name="ConsultPaymentsRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultPaymentsResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByDateType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="payment" type="PaymentType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Provides all information about activation payments  ===-->
+	<xsd:complexType name="ConsultActivationPaidSumsRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByQuarterForActivationPaidExtentedType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultActivationPaidSumsResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByQuarterForActivationPaidExtentedType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="activationAllowances" type="ActivationAllowancesType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Provides a grid than contains the detail of allowance by allowance paid day ===-->
+	<xsd:complexType name="ConsultScheduledPaymentRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByQuarterBaseType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultScheduledPaymentResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByQuarterBaseType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="scheduledPayment" type="ScheduledPaymentType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Provides a all information about carreer interruptions ===-->
+	<xsd:complexType name="ConsultCareerBreakRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByPeriodForCareerInterruptionAndCreditTimeType"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConsultCareerBreakResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="AbstractResponseCustomerType">
+				<xsd:sequence>
+					<xsd:element name="searchCriteria" type="SearchCriteriaByPeriodForCareerInterruptionAndCreditTimeType"/>
+					<xsd:element name="status" type="common:StatusType"/>
+					<xsd:element name="careerBreaks" type="CareerBreaksType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=== Redefined common type  ===-->
+	<xsd:complexType name="AbstractRequestCustomerType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Base complex type for all request messages.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="informationCustomer" type="common:InformationCustomerType"/>
+			<xsd:element name="informationCBSS" type="common:InformationCBSSType" minOccurs="0"/>
+			<xsd:element name="legalContext" type="UnemploymentDataLegalContextType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractResponseCustomerType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Base complex type for all request messages.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="informationCustomer" type="common:InformationCustomerType"/>
+			<xsd:element name="informationCBSS" type="common:InformationCBSSType"/>
+			<xsd:element name="legalContext" type="UnemploymentDataLegalContextType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--=== Redefined searchCriteriaType - Different time criteria are needed for all the operations ===-->
+	<xsd:complexType name="SearchCriteriaByDateType">
+		<xsd:sequence>
+			<xsd:element name="ssin" type="common:SsinType"/>
+			<xsd:element name="date" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>In the case where the date is not defined the last situation found is searched</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SearchCriteriaByQuarterBaseType">
+		<xsd:sequence>
+			<xsd:element name="ssin" type="common:SsinType"/>
+			<xsd:element name="quarterCriteria" type="QuarterCriteriaType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SearchCriteriaByQuarterForActivationPaidExtentedType">
+		<xsd:complexContent>
+			<xsd:extension base="SearchCriteriaByQuarterBaseType">
+				<xsd:sequence>
+					<xsd:element name="allAllowance" type="AllAllowanceType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SearchCriteriaByPeriod">
+		<xsd:sequence>
+			<xsd:element name="ssin" type="common:SsinType"/>
+			<xsd:element name="period" type="common:PeriodType"/>
+			<xsd:element name="allAllowance" type="AllAllowanceType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SearchCriteriaByPeriodForCareerInterruptionAndCreditTimeType">
+		<xsd:sequence>
+			<xsd:element name="ssin" type="common:SsinType"/>
+			<xsd:element name="period" type="common:PeriodType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="QuarterCriteriaType">
+		<xsd:sequence>
+			<xsd:element name="quarter" type="QuarterType"/>
+			<xsd:element name="year" type="xsd:gYear"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PaidSumsResponseType">
+		<xsd:sequence>
+			<xsd:element name="paidSum" type="PaidSumType" maxOccurs="48">
+				<xsd:annotation>
+					<xsd:documentation>If any the paidAmount is lower than 1 the tag is skipped</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SanctionType">
+		<xsd:sequence>
+			<xsd:element name="beginDate" type="xsd:date"/>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Only one of these fields may be filled</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="endDate" type="xsd:date"/>
+				<xsd:element name="nbrOfWeeksSanction">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:int">
+							<xsd:minInclusive value="1"/>
+							<xsd:maxInclusive value="999"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="article" type="ArticleCode" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ExclusionType">
+		<xsd:sequence>
+			<xsd:element name="beginDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RightsEndType">
+		<xsd:sequence>
+			<xsd:element name="beginDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NoRightType">
+		<xsd:complexContent>
+			<xsd:extension base="NoRightBaseType">
+				<xsd:sequence>
+					<xsd:element name="admissibilityArticle" minOccurs="0" maxOccurs="6">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="8"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="indemnisabilityArticle" minOccurs="0" maxOccurs="6">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="8"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="triggerDate" type="xsd:date" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NoRightBaseType">
+		<xsd:choice>
+			<xsd:annotation>
+				<xsd:documentation>Only one of these fields may be filled</xsd:documentation>
+			</xsd:annotation>
+			<xsd:element name="sanction" type="SanctionType"/>
+			<xsd:element name="exclusion" type="ExclusionType"/>
+			<xsd:element name="rightsEnd" type="RightsEndType"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="RightType">
+		<xsd:sequence>
+			<xsd:element name="theoricDailyAllowanceAmount" type="EurocentGreaterEqualZeroAmountType"/>
+			<xsd:element name="rightStartingDate" type="xsd:date"/>
+			<xsd:element name="unemploymentCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="99"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="familyState" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="SOLITARY"/>
+						<xsd:enumeration value="COHABITING"/>
+						<xsd:enumeration value="HOUSEHOLDER"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="indemnificationRegime" type="IndemnificationRegimeType" minOccurs="0"/>
+			<xsd:element name="unemployedWorkerStatus" type="UnemployedWorkerStatus" minOccurs="0"/>
+			<xsd:element name="theoricRightsEndingDate" type="xsd:date" minOccurs="0"/>
+			<xsd:element name="selfEmploymentSupplement" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PaymentType">
+		<xsd:sequence>
+			<xsd:element name="paidMonth" type="xsd:gYearMonth"/>
+			<xsd:element name="theoricDailyAllowanceAmount" type="EurocentGreaterEqualZeroAmountType"/>
+			<xsd:element name="nbrOfAllowances" type="NbrOfAllowanceType" minOccurs="0"/>
+			<xsd:element name="unemploymentCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="99"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="indemnificationRegime" type="IndemnificationRegimeType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SituationType">
+		<xsd:sequence>
+			<xsd:element name="payment" type="PaymentType" minOccurs="0"/>
+			<xsd:element name="rights" type="RightsType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PaidSumType">
+		<xsd:sequence>
+			<xsd:element name="relatedMonth" type="xsd:gYearMonth"/>
+			<xsd:element name="paidAmount" type="EurocentGreaterEqualZeroAmountType"/>
+			<xsd:element name="acceptedAmount" type="EurocentGreaterEqualZeroAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Defined only when the dossierStatus has the value 1 or 2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dossierStatus" type="DossierStatusType"/>
+			<xsd:element name="nbrOfAllowances" type="NbrOfAllowanceType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RightsType">
+		<xsd:choice>
+			<xsd:annotation>
+				<xsd:documentation>Only one of these fields may be filled</xsd:documentation>
+			</xsd:annotation>
+			<xsd:element name="right" type="RightType" maxOccurs="2"/>
+			<xsd:element name="noRight" type="NoRightType"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ActivationAllowanceType">
+		<xsd:sequence>
+			<xsd:element name="paymentMonth" type="xsd:gYearMonth"/>
+			<xsd:element name="activationAllowanceAmount" type="EurocentGreaterEqualZeroAmountType"/>
+			<xsd:element name="activationAllowanceCode" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="10"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="EmployersType">
+		<xsd:sequence maxOccurs="5">
+			<xsd:element name="cbeNumber" type="common:CbeNumberType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ActivationAllowancesType">
+		<xsd:sequence>
+			<xsd:element name="activationAllowance" type="ActivationAllowanceType" maxOccurs="3"/>
+			<xsd:element name="employers" type="EmployersType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CareerBreakType">
+		<xsd:sequence>
+			<xsd:element name="beginDate" type="xsd:date"/>
+			<xsd:element name="endDate" type="xsd:date"/>
+			<xsd:element name="complementaryActivityCode" type="ComplementaryActivityType" minOccurs="0"/>
+			<xsd:element name="careerBreakCode" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="2"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="allowanceAmount" type="EurocentGreaterEqualZeroAmountType" minOccurs="0"/>
+			<xsd:element name="careerBreakType" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="careerBreakReason" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CareerBreaksType">
+		<xsd:sequence>
+			<xsd:element name="benifitiaryInformation" type="BenifitiaryInformationType"/>
+			<xsd:element name="careerBreak" type="CareerBreakType" minOccurs="0" maxOccurs="50"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BenifitiaryInformationType">
+		<xsd:sequence>
+			<xsd:element name="ssin" type="common:SsinType"/>
+			<xsd:element name="creationDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DailyDataType">
+		<xsd:sequence>
+			<xsd:element name="day">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:maxInclusive value="31"/>
+						<xsd:minInclusive value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="unemploymentCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="99"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MonthlyDataType">
+		<xsd:sequence>
+			<xsd:element name="month">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1"/>
+						<xsd:maxInclusive value="12"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="dailyData" type="DailyDataType" maxOccurs="31"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ScaleDataType">
+		<xsd:sequence>
+			<xsd:element name="scaleCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="validityDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ScheduledPaymentType">
+		<xsd:sequence>
+			<xsd:element name="monthlyData" type="MonthlyDataType" maxOccurs="3"/>
+			<xsd:element name="scaleData" type="ScaleDataType" maxOccurs="12"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--=== Simple with all the legal context usable for this service ===-->
+	<xsd:simpleType name="UnemploymentDataLegalContextType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--=== Boolean than defined if the client want all the allowance ===-->
+	<xsd:simpleType name="AllAllowanceType">
+		<xsd:restriction base="xsd:int">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EurocentGreaterThanZeroAmountType">
+		<xsd:annotation>
+			<xsd:documentation>Eurocent Amount in interval [1,9999999]</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="common:EurocentPositiveAmountType">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxExclusive value="10000000"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EurocentGreaterEqualZeroAmountType">
+		<xsd:annotation>
+			<xsd:documentation>Eurocent Amount in interval [0,9999999]</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="common:EurocentPositiveAmountType">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxExclusive value="10000000"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DossierStatusType">
+		<xsd:annotation>
+			<xsd:documentation>Type defining the status of the payment concerning the month</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="COMPLETED"/>
+			<xsd:enumeration value="PROVISIONAL"/>
+			<xsd:enumeration value="NOT_STARTED"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NbrOfAllowanceType">
+		<xsd:annotation>
+			<xsd:documentation>Type defining the number of benefits received [0,99.5]. Is an integer or integer+0.5</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="99.5"/>
+			<xsd:pattern value="[\d]*([\.]5|.0)?"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="IndemnificationRegimeType">
+		<xsd:annotation>
+			<xsd:documentation>Type defining the regime of benefits [0.5,6] and with a decimal value rounded to 0.0 or 0.5</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:pattern value="[\d]*([\.]5|.0)?"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ComplementaryActivityType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="INDEPENDENT"/>
+			<xsd:enumeration value="EMPLOYEE"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="QuarterType">
+		<xsd:restriction base="xsd:int">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UnemployedWorkerStatus">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="UNEMPLOYMENT_ALLOCATION"/>
+			<xsd:enumeration value="INSERTION_ALLOCATION"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ArticleCode">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="9"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

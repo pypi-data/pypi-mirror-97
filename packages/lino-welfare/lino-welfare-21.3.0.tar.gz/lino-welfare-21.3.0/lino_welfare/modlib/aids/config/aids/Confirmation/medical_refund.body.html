@@ -1,0 +1,168 @@
+{% extends "aids/Confirmation/certificate.body.html" %}
+
+{% block what %}
+<p>
+
+{%- if language == 'de' -%}
+
+    {%- if obj.start_date or obj.end_date %}
+    für den Zeitraum <b>{{when}}</b> 
+    {%- endif %}
+    Anrecht auf Übernahme folgender <b>Arzt- und/oder Medikamentenkosten</b>
+    durch das ÖSHZ {{iif(obj.is_past(), "hatte", "hat")}}:
+
+{%- else -%}
+
+    {{iif(obj.is_past(), "avait", "a")}} droit 
+    {%- if obj.start_date or obj.end_date %}
+    pour la période <b>{{when}}</b> 
+    {%- endif %}    
+    à la prise en charge par le CPAS des <b>frais médicaux</b> suivants:
+    
+{%- endif -%}
+
+<ul>
+{%- if obj.doctor -%}
+<li>
+{%- if language == 'de' -%}
+    <b>Arzthonorare</b> in Höhe der LIKIV-Tarife für die Visite
+    {%- if obj.doctor_type_id %}
+    beim {{obj.doctor_type}} {% else %} bei
+    {% endif -%}
+    <b>{{obj.doctor.get_full_name()}}</b>.
+{%- else -%}
+    <b>honoraires de médecin</b> conforméments aux tarifs de l'INAMI pour la visite 
+    {%- if obj.doctor_type_id %}
+    chez le {{obj.doctor_type}} {% else %} chez
+    {% endif -%}
+    <b>{{obj.doctor.get_full_name()}}</b>.
+{%- endif -%}
+</li>
+{%- endif -%}
+{%- if obj.pharmacy -%}
+<li>
+{%- if language == 'de' -%}
+    <b>Arzneikosten</b> für die durch
+    {%- if obj.doctor %}
+    <b>{{obj.doctor.get_full_name()}}</b> verschriebenen und
+    {% endif -%}
+    <b>{{obj.pharmacy.get_full_name()}}</b> ausgehändigten Medikamente.
+{%- else -%}
+    <b>frais de médicaments</b> 
+    {%- if obj.doctor %}
+    prescrits par <b>{{obj.doctor.get_full_name()}}</b> et
+    {% endif -%}
+    délivrés par la pharmacie
+    <b>{{obj.pharmacy.get_full_name()}}</b>.
+{%- endif -%}
+</li>
+{%- endif -%}
+</ul>
+
+<p>
+{% if language == "de" %}
+Falls weitere Behandlungen notwendig sind, benötigen wir unbedingt
+einen Kostenvoranschlag. Danke.
+{%- else -%}
+Si des traîtements supplémentaires sont nécessaires, il nous faut 
+absolument un devis des frais.
+{%- endif -%}
+</p>
+
+{% if obj.granting.aid_type.short_name == "DMH" %}
+<p>
+{% if language == "de" %}
+<b>im Rahmen der dringenden medizinischen Hilfe.
+Bitte in jedem Fall die SIS-Karte prüfen und mit der Krankenkasse
+abrechnen.
+<br/>Bitte die beigefügte Bescheinigung ausgefüllt an das ÖSHZ zurück
+senden!</b>
+{% else %}
+<b>dans le cadre de l'aide médicale urgente. Veuillez 
+en tout cas vérifier la carte SIS afin d'assurer le remboursement par la mutuelle.
+<br/>Veuillez renvoyer au CPAS le formulaire en annexe dûment complété!
+</b>
+{% endif %}
+</p>
+{% endif %}
+
+<p>
+{% if language == "de" %}
+
+Falls für {{obj.client.mf("den Inhaber", "die Inhaberin", "den/die Inhaber/in")}}  eine medizinische Karte besteht, kommt
+das ÖSHZ Eupen lediglich für Arzt- und Medikamentenkosten auf, die in
+einer Privatpraxis entstehen.
+
+{% else %}
+
+Le CPAS intervient uniquement dans les frais médicaux et
+pharmaceutiques qui résultent d’une consultation dans un cabinet privé
+pour les personnes ayant une carte médicale.
+
+{% endif %}
+</p>
+
+{% endblock %}
+
+{% block trailer %}
+{% if this.owner.get_urgent_granting() %}
+
+{% if this.owner.doctor %}
+<h1 class="PageBreakHeader">Attestation</h1>
+<p>Je sousigné, {{this.owner.doctor}},
+<br>
+<br>docteur en médecine, 
+<br>
+<br>déclare avoir reçu en consultation en date du {{fds(this.owner.date)}}
+<br>
+<br>{{this.owner.client.get_full_name()}}
+<br>
+<br>domicilié{{this.owner.client.mf('', 'e', '(e)')}} à 
+<b>{{', '.join(this.owner.client.address_location_lines())}}</b>
+
+<br>dans le cadre de l'aide médicale urgente accordée conformément à
+l'article 57, §2, de la loi du 8 juillet 1976 organique des CPAS aux
+demandeurs d'asile déboutés ou à d'autres étrangers en séjour illégal
+dans le Royaume et qui se trouvent dans un état d'indigence.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>................................................
+<br>(signature et cachet du médecin)
+</p>
+{% endif %}
+
+{% if this.owner.pharmacy %}
+<h1 class="PageBreakHeader">Attestation</h1>
+<p>Je sousigné, ....................................
+<br>
+<br>pharmacien à {{this.owner.pharmacy}}
+<br>
+<br>déclare avoir remis des médicaments le {{fds(this.owner.date)}}
+<br>
+<br>à {{this.owner.client.get_full_name()}}
+<br>
+<br>domicilié{{this.owner.client.mf('', 'e', '(e)')}} à 
+<b>{{', '.join(this.owner.client.address_location_lines())}}</b>
+<br>dans le cadre de l'aide médicale urgente accordée conformément à
+l'article 57, §2, de la loi du 8 juillet 1976 organique des CPAS aux
+demandeurs d'asile déboutés ou à d'autres étrangers en séjour illégal
+dans le Royaume et qui se trouvent dans un état d'indigence.
+<br>
+<br>Je joins un relevé des médicaments.
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>................................................
+<br>(signature et cachet du pharmacien)
+</p>
+{% endif %}
+
+{% endif %}
+{% endblock %}
