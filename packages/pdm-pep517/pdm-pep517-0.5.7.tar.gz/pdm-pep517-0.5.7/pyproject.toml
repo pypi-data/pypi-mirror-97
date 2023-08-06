@@ -1,0 +1,117 @@
+[project]
+# PEP 621 project metadata
+# https://www.python.org/dev/peps/pep-0621
+name = "pdm-pep517"
+version = "0.5.7"
+description = "A PEP 517 backend for PDM that supports PEP 621 metadata"
+authors = [
+  {name = "Frost Ming", email = "mianghong@gmail.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.6"
+readme = "README.md"
+includes = ["pdm"]
+keywords = ["packaging", "PEP 517", "build"]
+dynamic = ["version", "classifiers"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Topic :: Software Development :: Build Tools",
+]
+
+dependencies = []
+dev-dependencies = [
+  "pytest",
+  "pytest-cov",
+  "towncrier",
+  "pytest-xdist",
+  "vendoring; python_version~=3.8"
+]
+
+[project.urls]
+homepage = "https://pdm.fming.dev"
+repository = "https://github.com/frostming/pdm-pep517"
+
+[build-system]
+requires = []
+build-backend = "pdm.pep517.api"
+backend-path = "."
+
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.mypy_cache
+  | build
+  | dist
+  | __pypackages__
+  | pdm/pep517/_vendor
+)/
+'''
+
+[tool.vendoring]
+destination = "pdm/pep517/_vendor/"
+requirements = "pdm/pep517/_vendor/vendor.txt"
+namespace = "pdm.pep517._vendor"
+
+protected-files = ["__init__.py", "README.md", "vendor.txt"]
+patches-dir = "vendors/patches"
+
+[tool.vendoring.transformations]
+substitute = []
+drop = [
+    "bin/",
+    "*.so",
+    "typing.*",
+    "*/tests/",
+    "spdx/data/*.txt"
+]
+
+[tool.vendoring.typing-stubs]
+
+[tool.vendoring.license.directories]
+
+[tool.vendoring.license.fallback-urls]
+
+[tool.towncrier]
+package = "pdm"
+filename = "CHANGELOG.md"
+issue_format = "[#{issue}](https://github.com/frostming/pdm-pep517/issues/{issue})"
+directory = "news/"
+title_format = "Release v{version} ({project_date})"
+template = "news/towncrier_template.md"
+underlines = "-~^"
+
+  [[tool.towncrier.type]]
+  directory = "feature"
+  name = "Features & Improvements"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "bugfix"
+  name = "Bug Fixes"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "doc"
+  name = "Improved Documentation"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "dep"
+  name = "Dependencies"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "removal"
+  name = "Removals and Deprecations"
+  showcontent = true
+
+  [[tool.towncrier.type]]
+  directory = "misc"
+  name = "Miscellany"
+  showcontent = true
+
+
