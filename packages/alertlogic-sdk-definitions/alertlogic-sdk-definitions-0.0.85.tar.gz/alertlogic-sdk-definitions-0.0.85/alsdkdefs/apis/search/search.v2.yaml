@@ -1,0 +1,311 @@
+openapi: 3.0.2
+info:
+  title: Alert Logic Universal Search Service
+  version: '2.0'
+  description: "Service for submitting searches and getting their results.\nThis API is datatype-agnostic as the selection of which datatype to search over is now done in the SQL via the FROM part of the query. "
+servers:
+  - url: 'https://api.global-services.global.alertlogic.com'
+    description: production
+    x-alertlogic-session-endpoint: true
+  - url: 'https://api.global-integration.product.dev.alertlogic.com'
+    description: integration
+    x-alertlogic-session-endpoint: true
+paths:
+  '/search/v2/{account_id}/searches':
+    post:
+      summary: Execute Search
+      tags: []
+      responses:
+        '201':
+          description: The search has been created and is executing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchCreated'
+              examples:
+                Create Search Response Example:
+                  value:
+                    search_uuid: 001737AE-B6BB-4DC4-9AE0-7CF363B6836E
+                    progress: 0
+                    search_status: pending
+                    start_ts: 1527509673
+                    status_details: pending
+                    update_ts: 1527509673
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                Bad SQL Response Example:
+                  value:
+                    error: "Unknown keyword 'SELECTA'"
+      operationId: start_query_execution
+      description: |-
+        Request the execution of a new search.
+
+        Use the text/plain media type with an SQL statement to execute http request.
+        The documentation for AL SQL statements will be coming soon.
+      security:
+        - X-AIMS-Auth-Token: []
+      parameters:
+        - name: search_type
+          schema:
+            type: string
+            enum:
+              - auto
+              - batch
+              - report
+            default: auto
+          in: query
+        - name: timeframe
+          in: query
+          description: 'A number of seconds back from the current time to query.  I.e. a value of 3600 indicates that the
+                        query should start from 1 hour ago (3600 seconds ago) until now.'
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 31622400   # NOTE: This comes from MAX_TIMEFRAME in search_lib
+        - name: start
+          in: query
+          description: 'The start of the time period to search as a Unix epoch timestamp.'
+          schema:
+            $ref: '#/components/schemas/EpochTimestamp'
+        - name: end
+          in: query
+          description: 'The end of the time period to search as a Unix epoch timestamp.'
+          schema:
+            $ref: '#/components/schemas/EpochTimestamp'
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              description: The SQL statement to execute
+            x-alertlogic-schema:
+              name: query_string
+        description: ''
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+  '/search/v2/{account_id}/searches/{query_execution_id}':
+    get:
+      summary: Get Search Results
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '301':
+          description: This search failed but successfully retried.  This response redirects to the successful retry of this search.
+        '404':
+          description: Not Found
+      operationId: get_query_results
+      security:
+        - X-AIMS-Auth-Token: []
+      parameters:
+        - name: details
+          schema:
+            type: boolean
+            enum:
+              - 'true'
+              - 'false'
+            default: 'false'
+          in: query
+          description: Return search execution details
+        - name: offset
+          schema:
+            type: integer
+          in: query
+          description: offset within a set of results
+        - name: limit
+          schema:
+            type: integer
+            default: '100'
+          in: query
+          description: Limit the number of elements in the response
+        - name: next_token
+          schema:
+            type: string
+          in: query
+          description: A `next_token` from a previous request to continue paging results
+      description: 'Returns the results of a query execution specified by {search_uuid}'
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+      - name: query_execution_id
+        schema:
+          type: string
+        in: path
+        required: true
+  '/search/v1/{account_id}/messages/{datatype}':
+    post:
+      summary: Read Messages
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesResponse'
+      operationId: read_messages
+      description: |-
+        Read a set of messages from storage by ID
+      security:
+        - X-AIMS-Auth-Token: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - name: datatype
+          schema:
+            type: string
+            enum:
+              - logmsgs
+          in: path
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagesParams'
+        description: Read Messages Input Parameters
+        required: true
+components:
+  parameters:
+    AccountId:
+      name: account_id
+      schema:
+        type: string
+      in: path
+      required: true
+      description: AIMS Account Id
+  schemas:
+    EpochTimestamp:
+      type: integer
+      minimum: 0
+    MessagesParams:
+      title: MessagesParams
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+        fields:
+          type: string
+        tokens_offsets:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+          default: 'false'
+        properties:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+          default: 'false'
+    MessagesResponse:
+      title: Messages
+      type: array
+      required:
+        - id
+        - fields
+      items:
+        type: object
+        properties:
+          id:
+            type: object
+            properties:
+              msgid:
+                type: string
+              aid:
+                type: integer
+              account:
+                type: integer
+          fields:
+            type: object
+          error:
+            type: object
+    SearchCreated:
+      title: SearchCreated
+      type: object
+      properties:
+        search_uuid:
+          type: string
+          description: The unique id for the search request
+    SearchDetails:
+      title: SearchDetails
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search requested query after applying of defaults
+        search_type:
+          type: string
+          enum:
+            - batch
+            - interactive
+            - report
+        start_ts:
+          type: integer
+          description: Start time of the search in Epoch
+        update_ts:
+          type: integer
+          description: Last update to the search in Epoch
+        stats:
+          $ref: '#/components/schemas/SearchStats'
+    SearchFailed:
+      title: SearchFailed
+      type: object
+      properties:
+        search_status:
+          type: string
+          enum:
+            - failed
+        status_details:
+          type: string
+          description: 'User friendly status '
+        details:
+          $ref: '#/components/schemas/SearchDetails'
+    SearchStats:
+      title: SearchStats
+      type: object
+      properties:
+        fetchers_executed:
+          type: integer
+        filtered_batches:
+          type: integer
+        filtered_bytes:
+          type: integer
+        filtered_compressed_bytes:
+          type: integer
+        filtered_records:
+          type: integer
+        filters_executed:
+          type: integer
+        filters_scheduled:
+          type: integer
+        input_scanned_bytes:
+          type: integer
+        input_scanned_packets:
+          type: integer
+        input_scanned_records:
+          type: integer
+        output_records:
+          type: integer
+        recurse_sorts:
+          type: integer
+        sort_recurse_time:
+          type: integer
+        sorts_executed:
+          type: integer
+  securitySchemes:
+    X-AIMS-Auth-Token:
+      name: X-AIMS-Auth-Token
+      type: apiKey
+      in: header
+      description: AIMS Authentication Token
