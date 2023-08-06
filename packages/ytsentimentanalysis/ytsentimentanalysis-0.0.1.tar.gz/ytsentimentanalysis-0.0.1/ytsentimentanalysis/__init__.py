@@ -1,0 +1,2 @@
+from ytsentimentanalysis import YTSentimentAnalysis
+from .YTSentimentAnalysis import YTSentimentAnalysis
