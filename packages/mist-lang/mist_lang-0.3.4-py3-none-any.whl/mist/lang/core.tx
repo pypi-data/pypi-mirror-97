@@ -1,0 +1,145 @@
+Program:
+  commands*=Command
+;
+
+Command:
+  IncludeCommand | SaveListCommand | DataCommand | IfCommand |
+  WatchCommand | FunctionDefinition | SetCommand | EndCommand |
+  FunctionCall | ReturnCommand | ImportCommand
+;
+
+IncludeCommand:
+  'include' files+=STRING[eolterm]
+;
+
+ImportCommand:
+  'import' files+=STRING[eolterm]
+;
+
+DataCommand:
+  'data' name=ID '{'
+    params*=ID
+  '}'
+;
+
+Param:
+    key=ID '<=' value=IDorSTRING
+;
+
+CustomList:
+  '['(components+=IDorSTRING[','])? ']'
+;
+
+CustomDict:
+  '{' (entries+=DictEntry[','])? '}'
+;
+
+DictEntry:
+  key=STRING ':' value=IDorSTRING
+;
+
+NamedArg:
+    key=ID '=' value=IDorSTRING
+;
+
+StringData:
+  data=/(?ms)\'{3}(.*?)\'{3}/
+;
+
+VarReference:
+  id=ID('.'childs+=ID['.'])?
+;
+
+ListDictReference:
+  id=ID '[' member=IDorSTRING ']'
+;
+
+ExtParameter:
+  '%' param=ID
+;
+
+EnvVariable:
+  '$' var=ID
+;
+
+Source:
+  (':' source=ID) | ('::' sourceIndirect=ID)
+;
+
+IDorSTRING:
+  value=ListDictReference | value=FunctionCall | value=CustomList |
+  value=CustomDict | value=StringData | value=VarReference | value=STRING |
+  value=INT | value=ExtParameter | value=EnvVariable | value=Source
+;
+
+SetLHS:
+  ListDictReference | ID
+;
+
+SetCommand:
+  key=SetLHS '=' value=IDorSTRING
+;
+
+FunctionCall:
+  name=ID ('()' | '(' (namedArgs+=NamedArg[','] | args+=IDorSTRING[',']) ')') ('{'
+      commands*=Command
+    '}')? ('=>' targetStream=ID)?
+;
+
+FunctionDefinition:
+  'function' name=ID '(' args*=ID[','] ')' '{'
+    commands*=Command
+  '}'
+;
+
+ReturnCommand:
+  'return ' (value=IDorSTRING)? | 'return'
+;
+
+OutputId:
+  source=ID ('(' fields+=ID ')' '=>' target=ID)?
+;
+
+SaveListCommand:
+  'putlist' list=ID ('(' selectors+=ID ')')? sources*=IDorSTRING '=>' target=ID ('(' params*=ID ')')?
+;
+
+WatchCommand:
+  'watch' var=ID '=>' name=ID '{'
+    commands*=Command
+  '}'
+;
+
+IfCommand:
+  main=IfBranch elsifs*=ElsifBranch (default=ElseBranch)?
+;
+
+IfBranch:
+  'if' '(' condition=BoolExpr ')' '{'
+    commands+=Command
+  '}'
+;
+
+ElsifBranch:
+'elsif' '(' condition=BoolExpr ')' '{'
+  commands+=Command
+'}'
+;
+
+ElseBranch:
+  'else' '{'
+    commands+=Command
+  '}'
+;
+
+BoolExpr:
+  cond=IDorSTRING
+;
+
+EndCommand:
+  'done'
+;
+
+Comment:
+  /#.*$/
+;
