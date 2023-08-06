@@ -1,0 +1,157 @@
+Metadata-Version: 2.1
+Name: godkjenn
+Version: 2.0.1
+Summary: Approval testing for Python3
+Home-page: http://bitbucket.org/sixty-north/godkjenn
+Author: Sixty North AS
+Author-email: austin@sixty-north.com
+License: MIT
+Platform: any
+Classifier: Development Status :: 3 - Alpha
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Framework :: Pytest
+Requires-Dist: click
+Requires-Dist: exit-codes
+Requires-Dist: fitb (<4.0.0,>=3.0.0)
+Requires-Dist: graphtage
+Requires-Dist: toml
+Provides-Extra: dev
+Requires-Dist: bumpversion ; extra == 'dev'
+Requires-Dist: twine ; extra == 'dev'
+Provides-Extra: pytest-plugin
+Requires-Dist: pytest ; extra == 'pytest-plugin'
+Provides-Extra: test
+Requires-Dist: hypothesis ; extra == 'test'
+Requires-Dist: pytest ; extra == 'test'
+
+========
+godkjenn
+========
+
+ godkjenn
+    /go:kjen/
+    Approve (Norwegian)
+
+Approval testing for Python3.
+
+Quickstart
+==========
+
+Install the package::
+
+    pip install .
+
+and the pytest plugin dependencies::
+
+    pip install .[pytest-plugin]
+
+(This is probably not strictly necessary since the only plugin dependency is ``pytest``).
+
+Then you can use it in your pytest tests with the ``godkjenn`` fixture:
+
+.. code-block:: python
+
+    def test_my_test(godkjenn):
+        new_output = my_function()
+        godkjenn.verify(new_output)  # new_output must be a bytes object
+
+``godkjenn`` will look for an existing *accepted* value for that test function. If accepted data is found and it matches
+the new data, then the test passes. Otherwise the test fails.
+
+If your test fails, this could mean either a) your code is actually broken or b) you want to accept the new output in
+place of the previous accepted value (if any). godkjenn will instruct you on how to proceed in that case.
+
+Principle
+=========
+
+The principle of approval testing simple. Given a function or program that you consider correct, you store its output
+for a given input. This is the *accepted* or *golden* version of its output. Then, as you change your code, you
+reproduce the output (we call this *received* output) and compare it to the accepted version. If they match, then the
+test passes. Otherwise, it fails.
+
+A test failure can mean one of two things. First, it could mean that you actually broke you program and need to fix it
+so that the received output matches the accepted. Second, it could mean the received output is now correct, the accepted
+output is now out of date, and you need to update the accepted output with the received.
+
+As an approval testing tool, ``godkjenn`` aims to streamline and simplify this kind of testing.
+
+Core elements
+=============
+
+There are a few core elements to ``godkjenn``. These are the parts of the approval testing system that are independent
+of any particular testing framework. Generally speaking, you won't need to work with these directly; the integration
+with your testing framework with hide most of the low-level details.
+
+Vaults
+------
+
+Vaults are where the accepted outputs are stored. (The term vault is a bit of a play on words: the accepted output is
+"golden", and you keep gold in vaults.)
+
+The vault abstraction defines an API for storing and retrieving accepted (and received) output.
+
+``godkjenn`` provides a simple vault, ``FSVault``, that stores its data on the filesystem. Other vaults can be provided
+via a plugin system.
+
+Verification
+------------
+
+The core verification algorithm compares new received data with the accepted data for a given test. If there's a
+mismatch or if not accepted output exists, this triggers test failure and instructs the user on what to do next.
+
+Diffing
+-------
+
+When an approval test fails, ``godkjenn`` tries to provide a diff showing the user how the received outputs differs from
+the accepted. The user can provide a diffing algorithm for producing this diff.
+
+Configuration
+=============
+
+Internally godkjenn uses a simple ``dict`` for holding its configuration information. Top-level values
+are stored as keys in the ``dict``. Each plugin type has a top-level entry pointing to a ``dict`` mapping
+plugin names to plugin-specific configurations. So for example, the configuration might look like this::
+
+    {
+        'vault': {
+            'fs-vault': {
+                ... configuration for fs-vault plugin
+            }
+        }
+    }
+
+Since testing frameworks provide different configuration methods, godkjenn leaves it up to each test framework
+integration to figure out how to load the configuration. Ideally, godkjenn will have sane-enough defaults to work
+without explicit configuration; this is an aspiration, and may not be practical in all cases.
+
+For examples of hwo to configure godkjenn, see the "examples" directory.
+
+Configuration with pytest
+-------------------------
+
+The pytest integration looks for a "godkjenn_config" entry in the pytest INI configuration. `Pytest configuration is
+fairly complex <https://docs.pytest.org/en/latest/customize.html>`_, so we'll let its documentation tell you how to
+specify an INI file. In the end, though, the "godkjenn_config" entry should contain the filename of a TOML file
+containing the godkjenn configuration. This path is interpreted relative to the pytest root directory; if it's not
+specified, godkjenn looks for "godkjenn.toml" (again in the pytest root directory). A missing config file is OK and is
+not treated as an error.
+
+For example, your ``pytest.ini`` might look like this::
+
+    [pytest]
+    godkjenn_config = godkjenn.toml
+
+Then your ``godkjenn.toml`` file might look like this::
+
+    [godkjenn]
+    vault_type = 'fs-vault'
+
+This would specify that you want to use the 'fs-vault' plugin for storing results. If there were configuration options
+for the 'fs-vault' plugin, the TOML file might also include something like this::
+
+    [godkjenn.vault.fs-vault]
+    option_a = 42
+    option_b = "so long and thanks for all the fish"
+
