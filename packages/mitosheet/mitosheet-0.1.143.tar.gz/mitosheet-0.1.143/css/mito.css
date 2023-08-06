@@ -1,0 +1,107 @@
+
+
+/* 
+    We override the the overflow behavior on the jupyter-widgets class, which 
+    seems to only be applied to the container of the widgets themselves (e.g.
+    which Mito is). 
+    
+    Specifically, we want overflow to be hidden. This keeps the Mitosheet, and
+    all other things inside the box. 
+
+    NOTE: do not change the name of this class. We didn't decide it, we inherited
+    it. 
+
+    To see where this class is used by Jupyter, search for it in the HTML. It is in
+    the parent of the parent of the .mito-container div!
+*/
+.jupyter-widgets {
+    overflow: hidden !important;
+}
+
+.mito-container {
+    height: 515px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/*
+    When the container is fullscreen, we expand it so it fills the 
+    entire view point. We do webkit as well, so it works on safari
+*/
+.mito-container:fullscreen .mito-container:-webkit-full-screen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contains the Toolbar, Mito Sheet, and Taskpane*/ 
+.mito-main-sheet-div {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+/* 
+    Contains the toolbar and Mito Sheet. This div should take up the entire width of 
+    mito-main-sheet-div when the taskpane is closed and only 70% when the taskpane is opened. 
+*/ 
+.mito-formula-bar-and-mitosheet-div {
+    /* Note that this is the whole height, less the height of the sheet tabs */
+    height: calc(100% - 30px);
+    width: 100%;
+    transition: width 1s;
+}
+
+.mito-formula-bar-and-mitosheet-div-taskpane-open {
+    height: calc(100% - 30px);
+    width: 70%;
+}
+
+.mito-default-taskpane {
+    height: 100%;
+    width: 0%;
+    visibility: hidden;
+    transition-delay: visibility 10s;
+} 
+
+.mito-default-taskpane-open {
+    visibility: visible;
+    width: 30%;
+}
+
+/* shade toolbar grey and set to the length of the mito sheet */
+.toolbar {
+    background-color: #C2C2C2;
+    width: 100%;
+}
+
+/* Note this only works with one div, p, etc. at a time. */
+.vertical-align-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}    
+
+.vertical-line {
+    border-left: 2px solid #999696;
+    height: 25px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.sheet-bottom {
+    display: flex;
+    justify-content: space-between;
+    background-color: #ebebeb;
+    overflow-x: auto;
+    overflow-y: clip;
+    /* Stops the sheet tabs from wrapping text, and forces it to display in one line */
+    white-space: nowrap;
+
+    border-bottom: 1px solid #C2C2C2;
+    border-right: 1px solid #C2C2C2;
+    box-sizing: border-box;
+}

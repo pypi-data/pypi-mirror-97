@@ -1,0 +1,129 @@
+:root {
+    --replay-analysis-saved-analyses-container-height: 40%;
+}
+
+.saved-analyses-container {
+    display: flex;
+    flex-direction: column;
+
+    height: var(--replay-analysis-saved-analyses-container-height);
+    overflow-y: scroll;
+}
+
+.saved-analysis-divider-line-container {
+    width: 100%;
+    align-items: center;
+}
+
+.saved-analysis-divider-line {
+    width: 90%;
+    background-color: #343434;
+    color: #343434;
+    border-radius: .1px;
+}
+
+.saved-analysis-selected-analysis-title {
+    color: #343434;
+    font-size: 16px;
+
+    overflow-x: scroll;
+}
+
+.saved-analysis-card {
+    /* 
+        Position as relative, so that the popup popups up 
+        in the correct place.
+    */
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+
+    margin-bottom: 5px;
+
+    padding-right: 15px;
+    padding-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.saved-analysis-card:hover {
+    background-color: #e4e2e2
+}
+
+.saved-analysis-card-analysis-name {
+    /* Give the min-width of 70% to make it easy to click */ 
+    min-width: 70%;
+    color: #343434;
+    font-size: 16px;
+    text-align: left;
+}
+
+.saved-analysis-card-dropdown-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+
+.replay-analysis-rename-error {
+    color: red;
+}
+
+/* 
+    As a bit of technical debt, we also recreate and restyle the step
+    components, as they are different in the standard step list
+*/
+.saved-analysis-taskpane-step-container {
+    display: flex;
+    flex-direction: column;
+
+    height: calc(95% - var(--replay-analysis-saved-analyses-container-height)); 
+
+    position: relative;
+    width: 95%;
+
+    overflow-y: scroll;
+}
+
+/* 
+    Stylizes the text displayed when no analysis description is displayed
+    or there are no saved analyses
+*/
+.saved-analysis-taskpane-empty-section-text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    height: calc(95% - var(--replay-analysis-saved-analyses-container-height)); 
+
+    text-align: center;
+    font-size: 12px;
+}
+
+.saved-analysis-taskpane-step {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    margin-right: 5px;
+}
+
+.saved-analysis-taskpane-step-icon {
+    min-width: 30px;
+    margin-top: 6px;
+}
+
+.saved-analysis-step-text-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100%;
+
+    /* The subtext can get long, so we allow users to scroll the subtext in this case */
+    overflow-x: scroll;
+    white-space: nowrap;
+    padding-bottom: 10px;
+}
