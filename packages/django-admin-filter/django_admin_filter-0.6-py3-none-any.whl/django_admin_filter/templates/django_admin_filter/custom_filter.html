@@ -1,0 +1,72 @@
+{% load i18n django_admin_filter %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+<li>
+    <a href="{% urlpath %}" title="{% trans "Create a new filter" %}">{% trans "New filter" %}</a>
+</li>
+{% if choices %}
+{% for choice in choices|slice:":1" %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+        <a href="{{ choice.query_string|iriencode }}" title="{{ choice.display }}">{{ choice.display }}</a>
+    </li>
+{% endfor %}
+{% with persistent_everyone=choices|persistent_everyone persistent_personal=choices|persistent_personal history=choices|history %}
+{% if persistent_everyone %}
+    <li><h3 style="padding-left:0">{% trans "Global filters" %}</h3></li>
+    {% for choice in persistent_everyone %}
+        <li{% if choice.selected %} class="selected"{% endif %} style="display:flex;justify-content:space-between;">
+            <a style="display:inline;" href="{{ choice.query_string|iriencode }}" title="{{ choice.filter.description }}">{{ choice.filter.name }}</a>
+            {% if choice.has_global_perm %}
+                <div class="filter-actions">
+                    <a class="filter-action async-filter-update" style="display:inline;" data-csrftoken="{{choice.csrftoken}}" href="{% urlpath %}{{choice.filter.id}}/">✎</a>
+                    <a class="filter-action async-filter-delete" style="display:inline;" data-csrftoken="{{choice.csrftoken}}" href="{% urlpath %}{{choice.filter.id}}/">✖</a>
+                </div>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endif %}
+{% if persistent_personal %}
+    <li><h3 style="padding-left:0">{% trans "Personal filters" %}</h3></li>
+    {% for choice in persistent_personal %}
+        <li{% if choice.selected %} class="selected"{% endif %} style="display:flex;justify-content:space-between;">
+            <a style="display:inline;" href="{{ choice.query_string|iriencode }}" title="{{ choice.filter.description }}">{{ choice.filter.name }}</a>
+            <div class="filter-actions">
+	            <a class="filter-action async-filter-update" style="display:inline;" data-csrftoken="{{choice.csrftoken}}" href="{% urlpath %}{{choice.filter.id}}/">✎</a>
+	            <a class="filter-action async-filter-delete" style="display:inline;" data-csrftoken="{{choice.csrftoken}}" href="{% urlpath %}{{choice.filter.id}}/">✖</a>
+	        </div>
+        </li>
+    {% endfor %}
+{% endif %}
+{% if history %}
+    <li><h3 style="padding-left:0">{% trans "History" %}</h3></li>
+    {% for choice in history %}
+        <li{% if choice.selected %} class="selected"{% endif %}>
+        	<a style="display:inline;" href="{{ choice.query_string|iriencode }}" title="{{ choice.filter.description }}">{{ choice.filter.name }}</a>
+        </li>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+{% endif %}
+</ul>
+<script>
+(function($) {
+$( document ).ready(function() {
+    $('.async-filter-delete').click(function(e) {
+    	e.preventDefault();
+    	if (!confirm('{% trans "Confirm deletion?" %}'))
+    		return;
+        var a = this;
+        $.ajax({
+            url: a.href,
+            type: 'DELETE',
+            headers: { 'X-CSRFToken': a.getAttribute("data-csrftoken") },
+            dataType: 'json',
+            success: function() { $(a).parents('li').first().remove() },
+            error: function(xhr, msg, exp) {
+                console.log('Something went wrong: ' + msg + ' ' + exp)
+            },
+        });
+    });
+})
+})(django.jQuery);
+</script>
