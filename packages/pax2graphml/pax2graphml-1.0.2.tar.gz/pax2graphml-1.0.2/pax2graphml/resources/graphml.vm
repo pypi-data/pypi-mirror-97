@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+<!-- node property keys -->
+
+  <key id="biopaxType" for="node" attr.name="biopaxType" attr.type="string" />
+  <key id="color" for="node" attr.name="color" attr.type="string" />
+
+  <key id="description" for="node" attr.name="description" attr.type="string" />
+  <key id="input" for="node" attr.name="input" attr.type="long" />
+
+  <key id="name" for="node" attr.name="name" attr.type="string" />
+  <key id="pk" for="node" attr.name="pk" attr.type="string" />
+  <key id="shape" for="node" attr.name="shape" attr.type="string" />
+
+
+ <key id="spaimCase" for="node" attr.name="spaimCase" attr.type="string" />
+ <key id="patternTag" for="node" attr.name="patternTag" attr.type="string" />
+
+ <key id="provider" for="node" attr.name="provider" attr.type="string" />
+ <key id="evidence" for="node" attr.name="evidence" attr.type="string" />
+ <key id="alias" for="node" attr.name="alias" attr.type="string" />
+
+ <key id="uniprot" for="node" attr.name="uniprot" attr.type="string" />
+ <key id="uri" for="node" attr.name="uri" attr.type="string" />
+ <key id="organism" for="node" attr.name="organism" attr.type="string" />
+
+ <key id="hgnc" for="node" attr.name="hgnc" attr.type="string" />
+ <key id="chebi" for="node" attr.name="chebi" attr.type="string" />
+ <key id="generic" for="node" attr.name="generic" attr.type="string" />
+
+
+<!-- edge property keys -->
+
+  <key id="interaction" for="edge" attr.name="interaction" attr.type="string" />
+  <key id="spaim" for="edge" attr.name="spaim" attr.type="string" />
+  <key id="debug" for="edge" attr.name="debug" attr.type="string" />
+
+
+  <graph id="$graphname" edgedefault="directed" parse.nodeids="free" parse.edgeids="free" parse.order="nodesfirst">
+
+<!-- graph properties -->
+
+<!-- vertices -->
+
+
+#foreach( $n in $nodes )
+  #if($n.export==true)
+        $n.defaultVal()
+        
+        <node id="$n.numid">
+
+           <data key="biopaxType">$n.biopaxType</data>
+           <data key="name">$n.safeLabel</data>
+           <data key="alias">${n.pv($n.alias)}</data>	       
+           <data key="provider">${n.pv($n.provider)}</data>
+           <data key="uri">${n.pv($n.uri)}</data>
+           <data key="uniprot">${n.pv($n.uniprot)}</data>
+           <data key="hgnc">${n.pv($n.hgnc)}</data>
+           <data key="chebi">${n.pv($n.chebi)}</data>
+           <data key="organism">${n.pv($n.organism)}</data>
+           <data key="color">$n.color</data>
+           <data key="input">$n.input</data>
+           <data key="shape">$n.shape</data>
+           <data key="spaimCase">$n.spaimCaseFlat</data>
+           <data key="evidence">$n.evidence</data>
+           <data key="generic">$n.generic</data>
+##<data key="description">$n.safeDescription</data>
+##<data key="patternTag">$n.patternTagFlat</data>
+##<data key="pk">$n.pk</data> 
+        </node>
+
+  #end	
+#end
+   
+<!-- edges -->
+                   
+ 
+
+#foreach( $e in $edges )
+  #if($e.export==true)
+        $e.defaultVal() 
+        <edge id=""  source="$e.source" target="$e.target">
+          
+           ## <data key="SUID">$e.SUID</data>
+           ## <data key="shared name">$e.shared_name</data>
+           ## <data key="shared interaction">$e.shared_interactione</data>
+           ## <data key="selected">$e.selected</data>
+           ## <data key="name">$e.name</data> 
+
+            <data key="spaim">$e.spaim</data>
+            ##<data key="debug">$e.debug</data>
+            <data key="interaction">$e.interaction</data>
+        </edge>
+	
+  #end
+#end
+
+ 
+
+
+
+    </graph>
+</graphml>
+
