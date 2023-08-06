@@ -1,0 +1,21 @@
+[console_scripts]
+owm = owmeta_core.cli:main
+
+[owmeta_core.commands]
+bundle.remote.add.http = owmeta_core.bundle.loaders.http:http_remote
+bundle.remote.add.https = owmeta_core.bundle.loaders.http:https_remote
+bundle.remote.add.sftp = owmeta_core.bundle.loaders.sftp:sftp_remote [sftp]
+bundle.remote.update.http = owmeta_core.bundle.loaders.http:http_remote
+bundle.remote.update.https = owmeta_core.bundle.loaders.http:https_remote
+bundle.remote.update.sftp = owmeta_core.bundle.loaders.sftp:sftp_remote [sftp]
+
+[owmeta_core.loaders]
+file_loader = owmeta_core.bundle.loaders.local:FileBundleLoader
+http_loader = owmeta_core.bundle.loaders.http:HTTPBundleLoader
+http_uploader = owmeta_core.bundle.loaders.http:HTTPBundleUploader
+sftp_uploader = owmeta_core.bundle.loaders.sftp:DumbSFTPUploader [sftp]
+
+[rdf.plugins.store]
+agg = owmeta_core.agg_store:AggregateStore
+owmeta_core_bds = owmeta_core.bundle_dependency_store:BundleDependencyStore
+
