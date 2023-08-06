@@ -1,0 +1,245 @@
+<!-- Use html for django include, template & static compatibility -->
+<script type="text/javascript">
+
+// _____________________________________________________________________________
+//
+// Utils
+//
+
+
+// content size.
+function len(item) {
+	if (typeof item === 'string' || item instanceof String) {
+		return item.length;
+	} else if (typeof item === 'object' || item instanceof Object) {
+		return Object.keys(item).length;
+	} else if (typeof item === 'array' || item instanceof Array) {
+		return item.length;
+	}
+}
+
+// parse int function.
+function int(item) {
+	if (item == "NaN") {
+		return item
+	} else if (item.instance() == 'String') {
+		return parseInt(item)
+	} else if (item.instance(true) == 'Float') {
+		return Math.round(value * 1) / 1	
+	} else if (item.instance(true) == "Integer" || item.instance() == "Number") {
+		return item
+	} else if (item.instance() == 'Boolean') {
+		if (item == true) {
+			return 1
+		} else {
+			return 0
+		}
+	} else if (item.instance() == 'Object') {
+		return Object.keys(item).length;
+	} else if (item.instance() == 'Array') {
+		return item.length;
+	}
+}
+
+// parse float function.
+function float(item) {
+	if (item == "NaN") {
+		return item
+	} else if (item.instance() == 'String') {
+		return parseFloat(item)
+	} else if (item.instance(true) == 'Float') {
+		return value
+	} else if (item.instance(true) == 'Integer' || item.instance() == "Number") {
+		return parseFloat(item)
+	} else if (item.instance() == 'Boolean') {
+		if (item == true) {
+			return 1
+		} else {
+			return 0
+		}
+	} else if (item.instance() == 'Object') {
+		return parseFloat(Object.keys(item).length);
+	} else if (item.instance() == 'Array') {
+		return parseFloat(item.length);
+	}
+}
+
+// parse bool function.
+function bool(item) {
+	if (item == true || item == "True" || item == "true" || item == "TRUE" || item == 1 || item == 1.0) {
+		return true	
+	} else {
+		return false
+	}
+}
+
+// get a timestamp dd-mm-yy
+function timestamp() {
+	let date_ob = new Date()
+	let date = ("0" + date_ob.getDate()).slice(-2)
+	let month = ("0" + (date_ob.getMonth() + 1)).slice(-2)
+	let year = date_ob.getFullYear()
+	return year + "-" + month + "-" + date
+}
+
+// urlencode dictionary.
+function urlencode(data) {
+	return Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&')
+}
+
+// set defaults when undefined & return full parameters.
+function __default_args__(params={}, defaults={}) {
+	Object.entries(defaults).forEach(function([key, default_]) {
+		if (params[key] == null) {
+			params[key] = default_
+		}
+	})
+	return params
+}
+
+// _____________________________________________________________________________
+//
+// R3sponse.
+//
+
+// Response object class.
+class R3sponse {
+
+	// init.
+	constructor() {
+		this.parameters = null // should be filled after init.
+	}
+
+	// success response.
+	success(message, args={}) {
+		var response = this.default()
+		response.success = true
+		response.message = message
+		Object.entries(args).forEach(function([key, value]) {
+			response[key] = value
+		});
+		return response
+	}
+
+	// error response.
+	error(error) {
+		var response = this.default()
+		response.error = error
+		return response
+	}
+
+	// default response.
+	default() {
+		return {
+			"success":false,
+			"message":null,
+			"error":null,
+		}
+	}
+
+	// log to console.
+	log(item) {
+		if (typeof item === 'string' || item instanceof String) {
+			console.log(item)
+		} else if (typeof item === 'array' || item instanceof Array) {
+			try {
+				return console.log(JSON.stringify(item));
+			} catch(e) {
+				console.log(item)
+			}
+		} else if (typeof item === 'object' || item instanceof Object) {
+			if (response.success == true || response.success == "True") {
+				console.log(response.message)
+			} else {
+				console.log("Error: "+response.error)
+			}
+		}
+	}
+
+	// dump response to string.
+	dump(response) {
+		try {
+			return JSON.stringify(response)
+		} catch(e) {
+			return response
+		}
+	}
+
+	// serialize response object to js object.
+	serialize(response) {
+		var new_response = {}
+		Object.entries(response).forEach(function([key, value]) {
+			if (typeof value === 'string' || value instanceof String) {
+				if (value == "None" || value == "null") { value = null }
+				else if (value == "False" || value == "false") { value = false }
+				else if (value == "True" || value == "true") { value = true }
+				else {
+					try {
+						if (value.includes(".") || value.includes(",")) {
+							value = parseFloat(value)
+						} else {
+							value = parseInt(value)
+						}
+					} catch(e) {
+						a=1
+					}
+				}
+			}
+			new_response[key] = value
+		});
+		return new_response
+	}
+
+}
+
+// parameters object class.
+class Parameters {
+
+	// init.
+	constructor(Response) {
+		this.Response = Response
+	}
+
+	// check if a parameter is defined if not return & return succes / error response.
+	check(params={}, required=true, default_=null) {
+		Object.entries(params).forEach(function([key, value]) {
+			if (value == null && required == true) {
+				return Response.error(`Define parameter: [${key}]`)
+			}
+		})
+		return Response.success("Successfully checked the parameters.")
+	}
+
+	// set defaults when undefined & return full parameters.
+	defaults(params={}, defaults={}) {
+		Object.entries(defaults).forEach(function([key, default_]) {
+			if (params[key] == null) {
+				params[key] = default_
+			}
+		})
+		return params
+	}
+
+	// get url parameters.
+	get(id, format="string") {
+		var url = new URL(window.location.href);
+		var value = url.searchParams.get(id);
+		if (format == Boolean || format.lowercase() == "bool" || format.lowercase() == "boolean") {
+			return bool(value)
+		} else if (format.lowercase() == "int" || format.lowercase() == "integer") {
+			return int(value)
+		} else if (format == Number || format.lowercase() == "float" || format.lowercase() == "number") {
+			return float(value)
+		} else {
+			return value
+		}
+
+	}
+
+}
+
+// initialize classes.
+const Response = new R3sponse();
+Response.parameters = new Parameters(Response);
+
+</script>
