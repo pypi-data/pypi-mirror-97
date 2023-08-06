@@ -1,0 +1,22 @@
+{% extends 'hemlock/form-group.html' %}
+
+{% block content %}
+    {% block input %}
+        {% set value = q.response if q.has_responded else q.default %}
+        {% if value is none %}
+            {% set value = "" %}
+        {% endif %}
+        <input id="{{ q.key }}" name="{{ q.key }}" {{ q.input_attrs.to_html() | safe }} value="{{ value }}"/>
+    {% endblock %}
+{% endblock %}
+{% block form_text %}
+    <small>
+        {% if q.prepend is not none %}
+        {{ q.prepend | safe -}}
+        {%- endif -%}
+        <span id="{{ q.key }}-value"></span>
+        {%- if q.append is not none -%}
+        {{- q.append | safe}}
+        {% endif %}
+    </small>
+{% endblock %}
