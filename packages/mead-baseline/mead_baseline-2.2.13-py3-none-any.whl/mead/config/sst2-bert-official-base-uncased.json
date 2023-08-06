@@ -1,0 +1,39 @@
+{
+  "task": "classify",
+  "basedir": "./sst2-bert",
+  "batchsz": 12,
+  "features": [
+    {
+      "name": "bert",
+      "vectorizer": {
+        "label": "bert-base-uncased",
+        "dtype": "int32"
+      },
+      "embeddings": {
+        "label": "bert-base-uncased-pooled-tf"
+      }
+    }
+  ],
+  "preproc": {
+    "mxlen": 100
+  },
+  "backend": "tensorflow",
+  "dataset": "SST2",
+  "loader": {
+    "reader_type": "default"
+  },
+  "unif": 0.25,
+  "model": {
+    "model_type": "fine-tune"
+  },
+  "train": {
+    "epochs": 2,
+    "optim": "adam",
+    "eta": 4.0e-5,
+    "early_stopping_metric": "acc",
+    "verbose": {
+      "console": true,
+      "file": "sst2-cm.csv"
+    }
+  }
+}

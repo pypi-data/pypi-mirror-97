@@ -1,0 +1,67 @@
+{
+    "task": "tagger",
+    "modules": ["hub:v1:addons:embed_elmo_tf"],
+    "batchsz": 20,
+    "conll_output": "wnut-elmo-results.conll",
+    "charsz": 16,
+    "unif": 0.1,
+    "preproc": {
+        "mxlen": 60,
+        "mxwlen": 40,
+        "lower": true
+    },
+    "features": [
+    {
+      "name": "word",
+      "vectorizer": {
+        "type": "dict1d",
+	"transform": "baseline.lowercase"
+      },
+      "embeddings": {
+        "label": "glove-42B"
+      }
+    },
+    {
+      "name": "elmo",
+      "vectorizer": {
+        "type": "dict_elmo"
+      },
+      "embeddings": {
+        "label": "elmo-small-tf"
+      }
+    }, {
+      "name":"char",
+        "vectorizer": {"type":"dict2d"},
+        "embeddings": {"dsz":16,"wsz":10,"cfiltsz":[3],"type":"char-conv"}
+    }
+  ],
+    "backend": "tensorflow",
+    "dataset": "wnut",
+    "loader": {
+    "reader_type": "default",
+        "named_fields": {
+            "0":"text",
+            "-1":"y"
+        }
+    },
+    "model": {
+        "model_type": "default",
+        "hsz": 512,
+        "wsz": 10,
+        "dropout": 0.5,
+        "rnntype": "blstm",
+        "constrain_decode": true,
+        "crf": 1
+    },
+    "train": {
+        "epochs": 60,
+        "optim": "sgd",
+        "decay": 0,
+        "eta": 0.01,
+        "mom": 0.9,
+        "patience": 20,
+        "early_stopping_metric": "f1",
+        "span_type": "bio",
+        "clip": 5.0
+    }
+}
