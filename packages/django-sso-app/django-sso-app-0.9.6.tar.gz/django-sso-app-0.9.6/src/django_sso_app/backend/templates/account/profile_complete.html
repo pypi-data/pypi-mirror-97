@@ -1,0 +1,55 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load i18n %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}User: {{ user.username }}{% endblock head_title %}
+
+{% block inner %}
+{% if user.is_authenticated %}
+    <h1>
+    {{ user.username }}
+    </h1>
+
+    <form enctype="multipart/form-data" class="form" method="post" action="{% url 'profile.complete' %}">
+        {% csrf_token %}
+        {%comment%} {{ form|crispy }} {%endcomment%}
+        {% for field in form %}
+            {% if field.name == 'latitude' %}
+                <div id="addressMap"></div>
+            {% endif %}
+            {{ field|as_crispy_field }}
+        {% endfor %}
+
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-primary btn-lg float-right">{% trans "Update" %}</button>
+            </div>
+        </div>
+    </form>
+{% else %}
+    <h1>
+    {% blocktrans %}You are not logged in.{% endblocktrans %}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+            <a class="btn btn-primary" href="{% url 'account_login' %}" role="button">
+            {% trans "Login" %}
+            </a>
+        </div>
+
+        <div class="col-sm-12">
+            <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">
+            {% trans "Register" %}
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock inner %}
+
+{% block javascript %}
+{{ block.super }}
+{% include 'account/partials/mapbox_initscript.html' %}
+{% endblock javascript %}

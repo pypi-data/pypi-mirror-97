@@ -1,0 +1,84 @@
+version: '3'
+
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_traefik: {}
+  django-sso-app-tmp: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: django_sso_app_production_django
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+    volumes:
+      - django-sso-app-tmp:/tmp/  # unix socket
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: django_sso_app_production_postgres
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+#  traefik:
+#    build:
+#      context: .
+#      dockerfile: ./compose/production/traefik/Dockerfile
+#    image: django_sso_app_production_traefik
+#    depends_on:
+#      - django
+#    volumes:
+#      - production_traefik:/etc/traefik/acme
+#    ports:
+#      - "0.0.0.0:80:80"
+#      - "0.0.0.0:443:443"
+#      - "0.0.0.0:5555:5555"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/production/nginx/Dockerfile
+    image: django_sso_app_production_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - django-sso-app-tmp:/tmp/  # unix socket
+      - ./public/:/data/public/
+      - ./private/:/data/private/
+    restart: always
+    depends_on:
+      - django
+
+  redis:
+    image: redis:5.0
+
+  celeryworker:
+    <<: *django
+    image: django_sso_app_production_celeryworker
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: django_sso_app_production_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: django_sso_app_production_flower
+    command: /start-flower
+
+

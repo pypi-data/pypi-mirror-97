@@ -1,0 +1,45 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+
+<div class="container">
+    <ul class="nav nav-pills justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            {% if I18N_PATH_ENABLED %}
+                <a class="" href="{% url 'about-'|add:LANGUAGE_CODE %}">About</a>
+            {% else %}
+                <a class="" href="{% url 'about' %}">About</a>
+            {% endif %}
+        </li>
+        {% if request.user.is_authenticated %}
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a class="nav-link" href="{% url 'profile' %}">{% trans "Profile" %}</a>
+        </li>
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a class="nav-link" href="{% url 'profile.update' %}">{% trans "Update Profile" %}</a>
+        </li>
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a class="nav-link" href="{% url 'account_email' %}">{% trans "Change E-mail" %}</a>
+        </li>
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+        </li>
+        <li class="nav-item">
+        {# URL provided by django-allauth/account/urls.py #}
+            <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
