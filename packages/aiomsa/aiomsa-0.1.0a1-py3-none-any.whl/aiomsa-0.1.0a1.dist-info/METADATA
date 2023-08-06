@@ -1,0 +1,92 @@
+Metadata-Version: 2.1
+Name: aiomsa
+Version: 0.1.0a1
+Summary: Asynchronous xApp framework
+Home-page: https://github.com/facebookexternal/aiomsa
+License: BSD-3-Clause
+Keywords: xApp
+Author: Facebook Connectivity
+Requires-Python: >=3.7,<4.0
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Provides-Extra: docs
+Provides-Extra: prometheus
+Provides-Extra: speedups
+Requires-Dist: aiohttp (>=3.5.4,<4.0.0)
+Requires-Dist: aiohttp-swagger (>=1.0.9,<2.0.0)
+Requires-Dist: betterproto (>=2.0.0b2,<3.0.0)
+Requires-Dist: furo (>=2021.2.21-beta.25,<2022.0.0); extra == "docs"
+Requires-Dist: prometheus_async (>=19.2.0,<20.0.0); extra == "prometheus"
+Requires-Dist: sphinx (>=3.4.3,<4.0.0); extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints (>=1.11.1,<2.0.0); extra == "docs"
+Requires-Dist: sphinxcontrib-openapi (>=0.7.0,<0.8.0); extra == "docs"
+Requires-Dist: uvloop (>=0.14.0,<0.15.0); extra == "speedups"
+Project-URL: Repository, https://github.com/facebookexternal/aiomsa
+Description-Content-Type: text/markdown
+
+# aiomsa
+[![build](https://github.com/facebookexternal/aiomsa/workflows/build/badge.svg)](https://github.com/facebookexternal/aiomsa/actions?query=workflow%3Abuild)
+[![style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+*aiomsa* is a Python 3.7+ framework built using `asyncio`. At its core, *aiomsa*
+provides a simple and standardized way to write xApps that can be deployed as
+microservices in Python.
+
+## Installation
+*aiomsa* can be installed from PyPI.
+```bash
+pip install aiomsa
+```
+
+You can also get the latest code from GitHub.
+```bash
+poetry add git+https://github.com/facebookexternal/aiomsa
+```
+
+## Getting Started
+The follwing example shows how to use *aiomsa* to create a simple xApp for subscribing
+to the E2T service for a particular custom service model.
+
+```python
+import asyncio
+import json
+
+from aiomsa import init
+from aiomsa.e2 import E2
+
+from .models import MyModel
+
+
+async def consume(queue):
+   while True:
+      record = await queue.get()
+      print(record)
+
+async def produce(queue):
+   conns = await E2.list_nodes()
+   subscription_id = await E2.subscribe(
+      conns[0],
+      service_model_id="mymodel_v1",
+      trigger=bytes(MyModel(param="foo")),
+      queue=queue,
+   )
+
+async def async_main():
+   """Create an asyncio.Queue to pub/sub records."""
+
+   queue = asyncio.Queue()
+   await asyncio.gather(produce(queue), consume(queue))
+
+
+if __name__ == "__main__":
+   with open("./config.json") as f:
+      config = json.load(f)
+
+   E2.configure(**config)
+   init(lambda: async_main())
+```
+
