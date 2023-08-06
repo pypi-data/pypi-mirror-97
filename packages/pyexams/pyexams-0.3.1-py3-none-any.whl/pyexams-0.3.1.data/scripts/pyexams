@@ -1,0 +1,119 @@
+#!python
+# -*- coding: utf-8 -*-
+import subprocess
+import sys
+import os
+import shutil
+import csv
+import argparse
+
+#import logging
+#logging.basicConfig()
+#logger = logging.getLogger()
+from pyexams.pyexams import Exams
+from pyexams.send import send_emails
+from jupyter_client.kernelspec import NoSuchKernel
+
+description = \
+"""
+Takes a tex source file and randomly generates a statement and solution for each student in a list.
+"""
+
+help_help = \
+"""
+show this help message and exit
+"""
+
+epilog = \
+"""
+EXAMPLES:
+
+* Compile statement for student in student.sty
+
+    pyexams source.tex
+    pyexams source.tex -statement
+
+* Compile solution for student in student.sty
+
+    pyexams source.tex -solution
+
+* Compile statement and solution for student in student.sty
+
+    pyexams source.tex -both
+
+* Add -all option to compile statement and/or solution for each of the students
+  in the list students.csv
+
+    pyexams source.tex -all
+
+"""
+
+def make_parser():
+    parser = argparse.ArgumentParser(
+        description=description, epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False)
+    parser.add_argument(dest='tex_file', nargs='?')
+    parser.add_argument('-h', '--help',
+                        dest='help', action='store_true',
+                        default=False,
+                        help=help_help)
+#    parser.add_argument('--log', dest='log', default=None,
+#                        help='one of [DEBUG, INFO, ERROR, WARNING, CRITICAL]')
+    #pdf options
+    parser.add_argument('-statement',
+                        dest='statement', action='store_true',
+                        default=False)
+    parser.add_argument('-solution',
+                        dest='solution', action='store_true',
+                        default=False)
+    parser.add_argument('-both',
+                        dest='both', action='store_true',
+                        default=False)
+    parser.add_argument('-all',
+                        dest='all', action='store_true',
+                        default=False,
+                        help=help_help)
+    #Email options
+    parser.add_argument('-send', nargs=2, dest='send')
+    parser.add_argument('-dry-run', dest='dryrun', action='store_true', default=False)
+    #Moodle options
+    parser.add_argument('-moodle',
+                        dest='moodle', action='store_true',
+                        default=False)
+    parser.add_argument('-n', dest='ncopies', default=1, type=int)
+    return parser
+
+def parse_args():
+    parser = make_parser()
+    opts = parser.parse_args(sys.argv[1:])
+    opts.with_statement = opts.statement or opts.both or not opts.solution
+    opts.with_solution = opts.solution or opts.both
+    opts.output_format = 'moodle' if opts.moodle else 'pdf'
+    return opts
+
+def do_process(opts):
+    if opts.send:
+        config_file, body_file = opts.send
+        send_emails(config_file, body_file, dryrun=opts.dryrun)
+        return
+    # tex source file
+    if not os.path.exists(opts.tex_file):
+        print('File "%s" not found'%opts.tex_file)
+        sys.exit(1)
+    ex = Exams(opts.tex_file)
+    # First collect exercise, examdata and other metadata.
+#    MetadataCollector.collect(tex_source)
+    if opts.output_format=='pdf':
+        ex.to_pdf(opts.with_statement, opts.with_solution, opts.all, shufflechoices=False)
+    elif opts.output_format=='moodle':
+        ex.to_moodle(opts.ncopies)
+
+if __name__ == '__main__':
+    #tex_file, with_statement, with_solution, do_all, output_format, ncopies = parse_args()
+    opts = parse_args()
+    try:
+        #do_process(tex_file, output_format, with_statement, with_solution, do_all, n=ncopies)
+        do_process(opts)
+    except NoSuchKernel as e:
+        print('Kernel "%s" specified in file "%s" is not installed in this system as a jupyter kernel'%(e.name, opts.tex_file))
