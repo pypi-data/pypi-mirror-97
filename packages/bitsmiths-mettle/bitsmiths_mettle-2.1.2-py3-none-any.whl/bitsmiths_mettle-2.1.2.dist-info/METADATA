@@ -1,0 +1,89 @@
+Metadata-Version: 2.1
+Name: bitsmiths-mettle
+Version: 2.1.2
+Summary: a 3-tier systems code generator that targets serveral databases and languages
+Home-page: https://bitbucket.org/bitsmiths_za/mettle.git
+Author: Nicolas Milicevic, Steven van Niekerk, Darrly Daniels
+Author-email: nicolas@bitsmiths.co.za, steven@bitsmiths.co.za, darryl@bitsmiths.co.za
+License: MIT
+Project-URL: Source, https://bitbucket.org/bitsmiths_za/mettle.git
+Keywords: generators,libraries
+Platform: unix
+Platform: linux
+Platform: osx
+Platform: cygwin
+Platform: win32
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Code Generators
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml (>=5.0.0)
+Requires-Dist: sqlparse (>=0.4.1)
+Requires-Dist: stringcase (>=1.2.0)
+Provides-Extra: postgresql_async
+Requires-Dist: asyncio (>=3.4.0) ; extra == 'postgresql_async'
+Requires-Dist: databases[postgres] (>=0.4.1) ; extra == 'postgresql_async'
+Provides-Extra: sqlalchemy
+Requires-Dist: sqlalchemy ; extra == 'sqlalchemy'
+Requires-Dist: psycopg2 ; extra == 'sqlalchemy'
+Requires-Dist: asyncpg (>=0.21.0) ; extra == 'sqlalchemy'
+Provides-Extra: sqlite_async
+Requires-Dist: asyncio (>=3.4.0) ; extra == 'sqlite_async'
+Requires-Dist: databases[sqlite] (>=0.4.1) ; extra == 'sqlite_async'
+
+# Mettle #
+
+Bitsmiths-Mettle is the supporting code generators and python libraries for the Mettle project.
+
+See our <a href="https://bitbucket.org/bitsmiths_za/mettle.git">repo</a> and main *README* for more details!
+
+
+## Requirements ##
+
+Python 3.7+
+
+
+## Installation ##
+
+```console
+$ pip install bitsmiths-mettle
+
+---> 100%
+```
+
+## Change History ##
+
+### 2.1.2 ###
+
+| Type | Description |
+| ---- | ----------- |
+| Bug  | All python database drivers now return empty strings instead of None from null columns. |
+
+
+### 2.1.1 ###
+
+| Type   | Description |
+| ------ | ----------- |
+| Bug    | Fixed generated python queries without input parameters not generating exec() methods. |
+| Change | The `lock()` methods for database connectors now accept a `Stmnt` object, generated code updated to pass this in. |
+| Change | The C++ `connect()` that takes arguments has changed to be more generic. |
+| New    | Added `psycopg2` connector. |
+
+
+
+## License ##
+
+This project is licensed under the terms of the MIT license.
+
+
