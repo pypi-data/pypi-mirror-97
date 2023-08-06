@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head>
+	<meta charset="utf-8">
+	<title>📝🎉 {{ title }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.7">
+	<link href="/.cpr/mde.css" rel="stylesheet">
+	<link href="/.cpr/deps/mini-fa.css" rel="stylesheet">
+	<link href="/.cpr/deps/easymde.css" rel="stylesheet">
+</head>
+<body>
+	<div id="mw">
+		<div id="mn"></div>
+		<div id="ml">
+			<div style="text-align:center;margin:5em 0">
+				<div style="font-size:2em;margin:1em 0">Loading</div>
+				if you're still reading this, check that javascript is allowed
+			</div>
+		</div>
+		<div id="m">
+			<textarea id="mt" style="display:none" autocomplete="off">{{ md }}</textarea>
+		</div>
+	</div>
+	<script>
+
+var last_modified = {{ lastmod }};
+var md_opt = {
+	link_md_as_html: false,
+	allow_plugins: {{ md_plug }},
+	modpoll_freq: {{ md_chk_rate }}
+};
+
+var lightswitch = (function () {
+	var fun = function () {
+		var dark = !!!document.documentElement.getAttribute("class");
+		document.documentElement.setAttribute("class", dark ? "dark" : "");
+		if (window.localStorage)
+			localStorage.setItem('darkmode', dark ? 1 : 0);
+	};
+	if (window.localStorage && localStorage.getItem('darkmode') == 1)
+		fun();
+	
+	return fun;
+})();
+
+	</script>
+    <script src="/.cpr/util.js"></script>
+	<script src="/.cpr/deps/easymde.js"></script>
+	<script src="/.cpr/mde.js"></script>
+</body></html>
