@@ -1,0 +1,122 @@
+#!python
+
+"""
+given some input data, scale it by some user specified method
+and then save the scaled data and also the scaling functions
+
+examples
+
+./pugna_scale_data --input-data /Volumes/ancient/pugna/test_data/results/ts/amp/train/X.npy --verbose  --scale-method MinMaxScaler --output-dir amp/train
+./pugna_scale_data --input-data /Volumes/ancient/pugna/test_data/results/ts/amp/train/y.npy --verbose  --scale-method MinMaxScaler --output-dir amp/train
+
+./pugna_scale_data --input-data /Volumes/ancient/pugna/test_data/results/ts/amp/val/X.npy --verbose  --scale-method MinMaxScaler --output-dir amp/val
+./pugna_scale_data --input-data /Volumes/ancient/pugna/test_data/results/ts/amp/val/y.npy --verbose  --scale-method MinMaxScaler --output-dir amp/val
+
+"""
+
+import os
+import sys
+from pathlib import Path
+import argparse
+import numpy as np
+
+import pugna.logger
+import pugna.data
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("--output-dir", type=str, default='output',
+                        help="directory to save data")
+
+    parser.add_argument("--input-data", type=str, required=True,
+                        help="""
+                        domain data, column formatted.
+                        shape=(N,M)
+                        N: number of samples
+                        M: number of features
+                        """)
+
+    parser.add_argument("-v", "--verbose",
+                        help="""
+                        increase output verbosity
+                        no -v: WARNING
+                        -v: INFO
+                        -vv: DEBUG
+                        """,
+                        action='count', default=0)
+
+    # scaling options
+    parser.add_argument("--scale-method",
+                        type=str,
+                        help="method to scale data",
+                        required=False,
+                        choices=['MinMaxScaler', 'StandardScaler'])
+
+    parser.add_argument("--scalers",
+                        type=str,
+                        help="""path to .npy file container the scalers.
+                        Use this to apply scalers derived from the training
+                        set and apply them to the validation set.""",
+                        required=False)
+
+    args = parser.parse_args()
+
+    # https://stackoverflow.com/questions/14097061/easier-way-to-enable-verbose-logging
+    level = min(2, args.verbose)  # capped to number of levels
+    logger = pugna.logger.init_logger(level=level)
+    logger.info(f"current file: {__file__}")
+    logger.info(f"verbosity turned on at level: {level}")
+
+    if args.scalers is None and args.scale_method is None:
+        logger.error("please provide either --scale-method or --scalers. Exiting")
+        sys.exit()
+
+
+    #output_dir = os.path.join(args.output_dir, args.scale_method)
+    output_dir = args.output_dir
+
+    logger.info(f"making dir: {output_dir}")
+    os.makedirs(f"{output_dir}", exist_ok=True)
+
+    name = Path(args.input_data).stem
+    ext = Path(args.input_data).suffix
+    logger.info(f"name: {name}")
+    logger.info(f"ext: {ext}")
+
+    if ext == '.npy':
+        logger.info("using np.load")
+        data = np.load(args.input_data)
+    else:
+        logger.info("using np.genfromtxt")
+        data = np.genfromtxt(args.input_data)
+
+    logger.info(f"data.shape: {data.shape}")
+
+    if args.scalers:
+        logger.info("scalers given")
+        logger.info(f"loading: {args.scalers}")
+        scalers = pugna.data.load_scalers(args.scalers)
+    elif args.scale_method:
+        logger.info(f"scale method: {args.scale_method}")
+        scalers = pugna.data.make_scalers(data, method=args.scale_method)
+    else:
+        logger.error("should never get here. Exiting")
+        sys.exit()
+
+
+    logger.info("appling scalers to data")
+    data_scaled = pugna.data.apply_scaler(data, scalers)
+
+    outname = os.path.join(output_dir, f"{name}_scalers.npy")
+    logger.info("saving scalers")
+    logger.info(f"path: {outname}")
+    pugna.data.save_scalers(scalers, outname)
+
+    outname = os.path.join(output_dir, f"{name}_scaled.npy")
+    logger.info("saving scaled data")
+    logger.info(f"path: {outname}")
+    np.save(outname, data_scaled)
+
+    logger.info("done!")
