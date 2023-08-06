@@ -1,0 +1,34 @@
+{% extends "base/plain" %}
+{% block body %}
+<nav class='navbar shadow bg-dark'>
+    <div class='container-fluid'>
+        <a href='{{ url('/') }}' class='navbar-brand'>Kyokusui</a>
+    </div>
+</nav>
+<div class='container'>
+    <h2 class='mt-5'>権限設定</h2>
+    <form method="POST">
+        <table class='table'>
+            <tr>
+                <td></td>
+                {% for role in roles %}
+                <th>
+                    {{ role.name }}
+                </th>
+                {% endfor %}
+            </tr>
+            {% for permission in permissions %}
+            <tr>
+                <th>{{ permission.name }}</th>
+                {% for role in roles %}
+                <td>
+                    <input type='checkbox' name='permissions.{{ permission.screen_name }}' value='{{ role.screen_name }}' {% if role in permission.roles %}checked{% endif %} />
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <button class='btn btn-primary'>保存</button>
+    </form>
+</div>
+{% endblock %}
