@@ -1,0 +1,122 @@
+{% extends "base.jinja2" %}
+
+{# PRE-HEADER#}
+{% block pre_header %}
+
+    {% include 'charts/chart_preheader.jinja2' %}
+
+{% endblock pre_header %}
+
+{# BREADCRUMBS #}
+{% block breadcrumbs %}
+
+    {% set page_title='Dashboard' %}
+    {% include 'breadcrumb/breadcrumbs.jinja2' %}
+
+{% endblock breadcrumbs %}
+
+{# SIDEBAR #}
+{% block sidebar %}
+
+    {% include 'sidebar.jinja2' %}
+
+{% endblock sidebar %}
+
+{# PAGE-CONTENT #}
+{% block page_content %}
+    {% set project = entity %}
+    <div class="widget-box transparent invoice-box">
+       {% include 'project/view/project_header.jinja2' %}
+        <div class="widget-body">
+            <div class="widget-main">
+
+                <div class="row-fluid">
+                    {% include 'project/view/project_summary.jinja2' %}
+                </div>
+                <div class="row-fluid">
+                    {% include 'project/dialog/project_roles.jinja2' %}
+                </div>
+                <div class="space-20"></div>
+
+                {% set budget = project.get_active_budget() %}
+                {% if has_permission('Read_Budget') %}
+                    {% if budget != None %}
+                         <div class="row-fluid">
+                            {% include 'budget/view/budget_summary.jinja2' %}
+                        </div>
+                        <div class="row-fluid">
+                            {% include 'budget/view/budget_totals.jinja2' %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="row-fluid">
+                    <div class="span9">
+                        <div class="tabbable"
+                             style="background-color: rgba(255,255,255,.7)">
+                            <ul class="nav nav-tabs">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#notes-tab">
+                                        <i class="green icon-list-alt bigger-120"></i>
+                                        News Feed
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a id="brief_tab" data-toggle="tab" href="#brief-tab">
+                                        <i class="orange icon-envelope-alt bigger-120"></i>
+                                        Brief
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content no-border no-padding">
+                                <div class="space-24"></div>
+                                <div id="notes-tab"
+                                     class="tab-pane in active">
+                                    {% set note_type="Simple Text" %}
+                                    {% include 'note/dialog/add_note_dialog.jinja2' %}
+
+                                </div>
+                                <!--/#brief-tab-->
+                                <div id="brief-tab"
+                                     class="tab-pane">
+                                    {% set inline_update_url='/projects/%s/update/inline' % entity.id%}
+                                    {% include 'components/description.jinja2' %}
+                                </div>
+                                <!--/#brief-tab-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3">
+                        <div class="row-fluid">
+                            {% include 'project/view/project_timing.jinja2' %}
+                        </div>
+                        <div class="row-fluid">
+                            {% include 'client/view/client_card.jinja2' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock page_content %}
+
+{% block extrascripts %}
+    <script>
+        $(document).ready(function () {
+            {% set budget = entity.get_active_budget() %}
+            {% if budget %}
+                var total_msrp = {{ budget.get_generic_text_attr('total_msrp') }};
+                var total_cost = {{ budget.get_generic_text_attr('total_cost') }};
+                var total_price = {{ budget.get_generic_text_attr('total_price') }};
+                var approved_total_price = {{ budget.get_generic_text_attr('approved_total_price') }};
+
+                calculateSummaryTotals(total_msrp, total_cost, total_price, approved_total_price);
+        {% endif %}
+    });
+    </script>
+
+{% endblock extrascripts %}

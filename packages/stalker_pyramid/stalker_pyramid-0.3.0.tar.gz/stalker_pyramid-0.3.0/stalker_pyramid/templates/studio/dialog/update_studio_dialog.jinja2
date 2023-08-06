@@ -1,0 +1,120 @@
+{% extends 'base.jinja2' %}
+
+{# PRE-HEADER #}
+{% block pre_header %}
+
+    <meta name="description" content="3 styles with inline editable feature" />
+
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/chosen.min.css") }}'/>
+
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/jquery-ui-1.10.3.custom.min.css") }}'/>
+{#    <link rel="stylesheet"#}
+{#          href='{{ request.static_url("stalker_pyramid:static/ace/css/bootstrap-editable.css") }}'/>#}
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/jquery.gritter.css") }}'/>
+{#    <link rel="stylesheet"#}
+{#          href='{{ request.static_url("stalker_pyramid:static/ace/css/bootstrap-editable.css") }}'/>#}
+
+
+
+{% endblock pre_header %}
+
+{# SIDEBAR #}
+{% block sidebar %}
+
+    {% if entity %}
+        {% include 'sidebar.jinja2' %}
+    {% endif %}
+
+{% endblock sidebar %}
+
+{# BREADCRUMBS #}
+{% block breadcrumbs %}
+
+    {% set page_title='Update' %}
+    {% include 'breadcrumb/breadcrumbs.jinja2' %}
+
+{% endblock breadcrumbs %}
+
+{# PAGE-CONTENT #}
+{% block page_content %}
+
+    {% set page_title='Update' %}
+    {% include 'page_header.jinja2' %}
+
+      <div class="row-fluid">
+        <div class="widget-box span12">
+            <div class="widget-header widget-header-small header-color-grey">
+                <h4 class="smaller">
+                    <i class="icon-info-sign"></i>
+                </h4>
+
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="row-fluid">
+                        <div class="span3">
+                            {% include 'components/avatar.jinja2' %}
+                        </div>
+                        <div class="span9">
+
+                            {% set mode='Update' %}
+                            {% include 'studio/dialog/studio_basic_information_form.jinja2' %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-fluid">
+                    <div class="form-actions">
+
+                        <button id='submit_button' type="button"
+                                class='btn btn-success pull-right'>
+                            <i class="icon-edit"></i> Update
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock page_content %}
+
+{# EXTRA-SCRIPTS #}
+{% block extrascripts %}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var submit_button = $('#submit_button');
+            submit_button.on('click', function (e) {
+
+                e.stopPropagation();
+                e.preventDefault();
+                submit_button.button('loading');
+
+                var studio_update_form = $("#studio_form");
+
+                let form_data = studio_update_form.serialize();
+                $.post('/studios/{{ entity.id}}/update', form_data)
+                    .done(function (response_text) {
+                        bootbox.alert(response_text);
+                        window.location.assign('{{ came_from }}');
+                        submit_button.button('reset');
+                    }).fail(function (jqXHR) {
+                        bootbox.alert(jqXHR.responseText);
+                        submit_button.button('reset');
+                    });
+            });
+        });
+
+
+    </script>
+
+
+
+{% endblock extrascripts %}
+

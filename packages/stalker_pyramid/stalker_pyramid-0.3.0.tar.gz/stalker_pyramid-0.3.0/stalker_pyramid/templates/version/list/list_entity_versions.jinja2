@@ -1,0 +1,134 @@
+{% extends "base.jinja2" %}
+
+{# PRE-HEADER#}
+{% block pre_header %}
+
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/fullcalendar.css") }}'/>
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/bootstrap-timepicker.css") }}'/>
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/datepicker.css") }}'/>
+    <link rel="stylesheet"
+          href='{{ request.static_url("stalker_pyramid:static/ace/css/daterangepicker.css") }}'/>
+
+
+
+{% endblock pre_header %}
+
+{#SIDEBAR#}
+{% block sidebar %}
+
+    {% include 'sidebar.jinja2' %}
+
+{% endblock sidebar %}
+
+
+{# BREADCRUMBS #}
+{% block breadcrumbs %}
+
+    {% set page_title='Versions' %}
+    
+   {% include 'breadcrumb/breadcrumbs.jinja2' %}
+
+{% endblock breadcrumbs %}
+
+{#PAGE-CONTENT#}
+{% block page_content %}
+
+{#    {% set page_title='Versions' %}#}
+{#    {% include 'page_header.jinja2' %}#}
+    <!--/.page-header-->
+    {% set add_button_title='Create' %}
+
+    {% if entity.entity_type != 'User' %}
+        {% set add_button_address=request.route_url('create_version_dialog', tid=entity.id, _query={'came_from': request.current_route_path()}) %}
+    {% endif %}
+
+    {% set list_item_type='Version' %}
+    {% include 'components/data_table.jinja2' %}
+    <!--PAGE CONTENT ENDS-->
+
+{% endblock page_content %}
+
+<!--page specific plugin scripts-->
+{#EXTRA-SCRIPTS#}
+{% block extrascripts %}
+
+    {# ***************************************************************************************#}
+    {# Table Template#}
+
+    {% raw %}
+    <script id="tmpl_itemThead" type="text/x-dot-template">
+
+            <tr>
+                <th>Updated Date</th>
+                <th>Task Name</th>
+                <th>Take | #</th>
+                <th>Is Published</th>
+                <th>Created By</th>
+                <th>Created With</th>
+                <th>Description</th>
+                <!--<th>Parent Version</th>-->
+                <th>Path</th>
+            </tr>
+    </script>
+    {% endraw %}
+
+
+    {# ***************************************************************************************#}
+    {# Task Row Template#}
+
+    {% raw %}
+    <script id="tmpl_itemRow" type="text/x-dot-template">
+
+        <tr {{=it.is_published? 'class="green"' : '' }}>
+            <td style="width:70px;">{{= it.date_created}} </td>
+            <td><a href="/tasks/{{= it.task.id }}/view">
+                    {{=it.task.name }}
+                </a>
+            </td>
+            <td><a href="/versions/{{= it.id }}/view" {{=it.is_published? 'class="green"' : '' }}>
+                    {{= it.take_name }} | {{= '000'.substring(0, 3 - it.version_number.toString().length) + it.version_number.toString() }}
+                </a>
+            </td>
+            <td>{{= it.is_published }}</td>
+            <td>
+                <a href="/users/{{= it.created_by.id }}/view">
+                    {{= it.created_by.name}}
+                </a>
+            </td>
+            <td>
+                {{= it.created_with}}
+            </td>
+            <td>
+                {{= it.description}}
+            </td>
+            <!--<td>{{? it.parent }}-->
+                    <!--<a href='/versions/{{= it.parent.id }}/view'>-->
+                        <!--{{= it.parent.take_name }} | {{= it.parent.version_number }}-->
+                    <!--</a>-->
+                <!--{{?}}-->
+            <!--</td>-->
+            <td>
+                <a class="green"
+                   href='javascript:copyToClipboard("{{= it.absolute_full_path }}")'>
+                    <i class="icon-copy bigger-130"></i>
+                </a>
+            </td>
+        </tr>
+    </script>
+    {% endraw %}
+
+    <script>
+        var tableParameters = {"aoColumns": [null,null,  null, null, null, null,null,null]};
+        var sortingParameters = [[0, 'desc']];
+        var tableDataAddress = '{{ request.route_path('get_entity_versions', id=entity.id) }}';
+        {% if entity.entity_type == 'User' %}
+            tableDataAddress = '{{ request.route_path('get_user_versions', id=entity.id) }}';
+        {% endif %}
+
+    </script>
+
+{% endblock extrascripts %}
+
