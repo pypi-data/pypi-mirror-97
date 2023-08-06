@@ -1,0 +1,87 @@
+Metadata-Version: 2.1
+Name: fw-storage
+Version: 0.2.0
+Summary: Unified storage interface.
+Home-page: https://gitlab.com/flywheel-io/tools/lib/fw-storage
+License: MIT
+Keywords: Flywheel,file,object,storage
+Author: Flywheel
+Author-email: support@flywheel.io
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Provides-Extra: all
+Provides-Extra: gs
+Provides-Extra: s3
+Requires-Dist: boto3 (>=1.17.7,<2.0.0); extra == "s3" or extra == "all"
+Requires-Dist: diskcache (>=5.2.1,<6.0.0)
+Requires-Dist: fw-utils (>=0.1.0,<0.2.0)
+Requires-Dist: google-cloud-storage (>=1.36.1,<2.0.0); extra == "gs" or extra == "all"
+Requires-Dist: memoization (>=0.3.2,<0.4.0)
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-storage
+Description-Content-Type: text/markdown
+
+# fw-storage
+
+Unified file storage interface tuned for simple filtering, memory-efficiency and
+performance to support processing large datasets in Flywheel imports and exports.
+
+Supported storage backends:
+
+- `fs://` - Local file-system
+- `gs://` - Google Cloud Storage (`pip install fw-storage[gs]`)
+- `s3://` - Amazon S3 (`pip install fw-storage[s3]`)
+
+## Installation
+
+Add as a `poetry` dependency to your project:
+
+```bash
+poetry add fw-storage
+```
+
+## Usage
+
+```python
+from fw_storage import get_storage
+
+# instantiate storage with URL
+fs = get_storage("fs:///tmp")
+
+# set objects from bytes, filepaths or open files
+fs.set("test/file1.dat", b"content")
+fs.set("test/file2.dat", "/tmp/test/file1.dat")
+fs.set("test/file3.dat", open("/tmp/test/file2.dat"))
+
+# list objects, filtering with expressions
+files = list(fs.ls("test", include=["size<1kB"], exclude=["path!~file3"]))
+len(files) == 2
+
+# get object info with path, size, created and modified
+info = fs.stat("test/file1.dat")
+info.size == 7
+
+# read object contents
+file = fs.get("test/file1.dat")
+file.read() == b"content"
+
+# remove one or more objects
+fs.rm("test", recurse=True)
+```
+
+## Development
+
+Install the project using `poetry` and enable `pre-commit`:
+
+```bash
+poetry install
+pre-commit install
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
