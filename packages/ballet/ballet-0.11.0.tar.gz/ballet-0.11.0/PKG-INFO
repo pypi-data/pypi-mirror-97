@@ -1,0 +1,249 @@
+Metadata-Version: 2.1
+Name: ballet
+Version: 0.11.0
+Summary: Core functionality for lightweight, collaborative data science projects
+Home-page: https://github.com/HDI-Project/ballet
+Author: Micah Smith
+Author-email: micahs@mit.edu
+License: MIT license
+Description: [![PyPI Shield](https://img.shields.io/pypi/v/ballet.svg)](https://pypi.org/project/ballet)
+        [![Run Tests](https://github.com/HDI-Project/ballet/workflows/Run%20Tests/badge.svg)](https://github.com/HDI-Project/ballet/actions?query=workflow%3A%22Run+Tests%22)
+        [![codecov Shield](https://codecov.io/gh/HDI-Project/ballet/branch/master/graph/badge.svg)](https://codecov.io/gh/HDI-Project/ballet)
+        
+        
+        # ballet
+        
+        A **light**weight framework for collaborative, open-source data science
+        projects through **feat**ure engineering.
+        
+        - Free software: MIT license
+        - Documentation: https://hdi-project.github.io/ballet
+        - Homepage: https://github.com/HDI-Project/ballet
+        
+        ## Overview
+        
+        Do you develop machine learning models? Do you work by yourself or on a team?
+        Do you share notebooks or are you committing code to a shared repository? In
+        contrast to successful, massively collaborative, open-source projects like
+        the Linux kernel, the Rails framework, Firefox, GNU, or Tensorflow, most
+        data science projects are developed by just a handful of people. But think if
+        the open-source community could leverage its ingenuity and determination to
+        collaboratively develop data science projects to predict the incidence of
+        disease in a population, to predict whether vulnerable children will be evicted
+        from their homes, or to predict whether learners will drop out of online
+        courses.
+        
+        Our vision is to make collaborative data science possible by making it more
+        like open-source software development. Our approach is based on decomposing the
+        data science process into modular patches - standalone units of contribution -
+        that can then be intelligently combined, representing objects like "feature",
+        "labeling function", or "prediction task definition". Collaborators work in
+        parallel to write patches and submit them to a repo. Our software framework
+        provides the underlying functionality to merge high-quality contributions,
+        collect modules from the file system, and compose the accepted contributions
+        into a single product. It also provides a familiar notebook-based development
+        experience that is friendly to data scientists and other inexperienced
+        open-source contributors. We don't require any computing infrastructure beyond
+        that which is commonly used in open-source software development.
+        
+        Currently, Ballet focuses on supporting collaboratively developing
+        *feature engineering pipelines*, an important part of many data science
+        projects. Individual features are represented as separate Python modules,
+        declaring the subset of a dataframe that they operate on and a
+        scikit-learn-style learned transformer that extracts feature values from the
+        raw data. Ballet collects individual features and composes them into a
+        feature engineering pipeline. At any point, a project built on Ballet can be
+        installed for end-to-end feature engineering on new data instances for the
+        same problem. How do we ensure the feature engineering pipeline is always
+        useful? Ballet thoroughly validates proposed features for correctness and
+        machine learning performance, using an extensive test suite and a novel
+        streaming feature definition selection algorithm. Accepted features can be
+        automatically merged by the ballet GitHub app into projects.
+        
+        <img src="./docs/_static/feature_lifecycle.png" alt="Ballet Feature Lifecycle" width="400" />
+        
+        ## Next steps
+        
+        *Are you a data owner or project maintainer that wants to organize a
+        collaboration?*
+        
+        👉 Check out the [Ballet Maintainer Guide](https://hdi-project.github.io/ballet/maintainer_guide.html)
+        
+        *Are you a data scientist or enthusiast that wants to join a collaboration?*
+        
+        👉 Check out the [Ballet Contributor Guide](https://hdi-project.github.io/ballet/contributor_guide.html)
+        
+        *Want to learn about how Ballet enables Better Feature Engineering™️?*
+        
+        👉 Check out the [Feature Engineering Guide](https://hdi-project.github.io/ballet/feature_engineering_guide.html)
+        
+        *Want to see a demo collaboration in progress and maybe even participate yourself?*
+        
+        👉 Check out the [ballet-predict-house-prices](https://github.com/HDI-Project/ballet-predict-house-prices) project
+        
+        
+        # History
+        
+        ## 0.11.0 (2021-03-04)
+        
+        * Allow validation to be run from topic branches locally
+        
+        ## 0.10.0 (2021-02-23)
+        
+        * Add `Project.version` property
+        
+        ## 0.9.0 (2021-02-16)
+        
+        * Add support for managed branching via `ballet start-new-feature --branching` (defaults to enabled)
+        * Remove confusing `ballet.project.config` attribute
+        * Implement `ballet.project.load_config` as a better alternative, and use this in the project template's `load_data`
+        
+        ## 0.8.2 (2021-02-16)
+        
+        * Fix bug with `str(t)` or `repr(t)` for `DelegatingRobustTransformer`
+        
+        ## 0.8.1 (2021-02-16)
+        
+        * Fix bug with `str(t)` or `repr(t)` for `SimpleFunctionTransformer`
+        
+        ## 0.8.0 (2021-02-02)
+        
+        * Fix bug with detecting updates to Ballet due to PyPI API outage
+        * Fix some dependency conflicts
+        * Reference ballet-assemble in project template
+        * Bump feature_engine to 1.0
+        
+        ## 0.7.11 (2020-09-16)
+        
+        * Reduce verbosity of conversion approach logging by moving some messages to TRACE level
+        * Implement "else" transformer for `ConditionalTransformer`
+        * Improve GFSSF iteration logging
+        
+        ## 0.7.10 (2020-09-08)
+        
+        * Fix bug with different treatment of y_df and y; now, y_df is passed to the feature engineering pipeline, and y is passed to the feature validation routines as applicable.
+        * Switch back to using Gitter
+        
+        ## 0.7.9 (2020-08-15)
+        
+        * Add give_advice feature for FeatureAPICheck and other checks to log message on how to fix failure
+        * Improve logging of GFSSFAccepter and GFSSFPruner
+        * Improve `__str__` for DelegatingRobustTransformer and consequently consumers
+        * Change default log format to SIMPLE_LOG_FORMAT
+        * Various bug fixes and improvements
+        
+        ## 0.7.8 (2020-08-13)
+        
+        * Add CanTransformNewRowsCheck to feature API checks
+        
+        ## 0.7.7 (2020-08-12)
+        
+        * Support `None` as the transformer in a `Feature`, it will be automatically converted to an `IdentityTransformer`
+        * Implement `ColumnSelector`
+        * Update docs
+        * Various bug fixes and improvements
+        
+        ## 0.7.6 (2020-08-12)
+        
+        * Re-export feature engineering primitives from various libraries
+        * Show type annotations in docs
+        * Update guides
+        * Various bug fixes and improvements
+        
+        ## 0.7.5 (2020-08-03)
+        
+        * Make validator parameters configurable in ballet.yml file (e.g. λ_1 and λ_2 for GFSSF algorithms)
+        * Support dynaconf 3.x
+        
+        ## 0.7.4 (2020-07-22)
+        
+        * Accept logger names, as well as logger instances, in `ballet.util.log.enable`
+        * Updated docs
+        
+        ## 0.7.3 (2020-07-21)
+        
+        * Add `load_data` method with built-in caching to project API
+        * Fix bug in GFSSF accepter
+        * Always use encoded target during validation
+        * Various bug fixes and improvements
+        
+        ## 0.7.2 (2020-07-21)
+        
+        * Add sample analysis notebook to project template
+        * Add binder url/badge to project template
+        * Fix bug with enabling logging with multiple loggers
+        
+        ## 0.7.1 (2020-07-20)
+        
+        * Add client for easy interactive usage (`ballet.b`)
+        * Add binder setup to project template
+        
+        ## 0.7 (2020-07-17)
+        
+        * Revamp project template: update project structure, create single API via FeatureEngineeringProject, use and add support for pyinvoke, revamp build into engineer_features, support repolockr bot
+        * Improve ballet.project.Project: can create by ascending from given path, can create from current working directory, can resolve arbitrary project symbol, exposes project's API
+        * Check for and notify of new release of ballet during project update (`ballet update-project-template`)
+        * Add ComputedValueTransformer to ballet.eng
+        * Move stacklog to separate project and install it
+        * Add validators that {never,always} accept submissions
+        * Add feature API checks to ensure that the feature can fit and transform a single row
+        * Add feature engineering guide to documentation and significantly expand contributor guide
+        * Add bot installation instructions to maintainer guide
+        * Add type annotations throughout
+        * Drop support for py35, add support for py38
+        * Deprecate modeling code
+        * Various bug fixes and improvements
+        
+        ## 0.6 (2019-11-12)
+        
+        * Implement GFSSF validators and random validators
+        * Improve validators and allow validators to be configured in ballet.yml
+        * Improve project template
+        * Create ballet CLI
+        * Bug fixes and performance improvements
+        
+        ## 0.5 (2018-10-14)
+        
+        * Add project template and ballet-quickstart command
+        * Add project structure checks and feature API checks
+        * Implement multi-stage validation routine driver
+        
+        ## 0.4 (2018-09-21)
+        
+        * Implement `Modeler` for versatile modeling and evaluation
+        * Change project name
+        
+        ## 0.3 (2018-04-28)
+        
+        * Implement `PullRequestFeatureValidator`
+        * Add `util.travis`, `util.modutil`, `util.git` util modules
+        
+        ## 0.2
+        
+        * Implement `ArrayLikeEqualityTestingMixin`
+        * Implement `collect_contrib_features`
+        
+        ## 0.1
+        
+        * First release on PyPI
+        
+Keywords: ballet
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6.1
+Description-Content-Type: text/markdown
+Provides-Extra: test
+Provides-Extra: dev
+Provides-Extra: category_encoders
+Provides-Extra: feature_engine
+Provides-Extra: featuretools
+Provides-Extra: skits
+Provides-Extra: tsfresh
+Provides-Extra: all
