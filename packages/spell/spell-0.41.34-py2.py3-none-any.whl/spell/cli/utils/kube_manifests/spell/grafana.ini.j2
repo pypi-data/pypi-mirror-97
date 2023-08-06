@@ -1,0 +1,29 @@
+# Additional Configuration Settings for Grafana
+# Adapted from the default grafana.ini in this image by Spell
+
+[server]
+# The public facing domain name used to access grafana from a browser
+domain = {{ model_serving_url }}
+
+# The full public facing url you use in browser, used for redirects and emails
+# If you use reverse proxy and sub path specify full url (with sub path)
+root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/
+
+# Serve Grafana from subpath specified in `root_url` setting. By default it is set to `false` for compatibility reasons.
+serve_from_sub_path = true
+
+[analytics]
+
+check_for_updates = false
+
+[security]
+# default admin user, created on startup
+admin_user = {{ cluster_name }}
+
+[dashboards]
+
+default_home_dashboard_path = /spell/spell-grafana-home-dashboard.json
+
+[users]
+
+login_hint = spell cluster name

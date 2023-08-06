@@ -1,0 +1,20 @@
+# This file tells Prometheus that Ambassador exists.
+# More info: https://www.getambassador.io/docs/latest/howtos/prometheus/
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ambassador-monitor
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  namespaceSelector:
+    matchNames:
+    - ambassador
+  selector:
+    matchLabels:
+      service: ambassador-admin
+  endpoints:
+  - port: ambassador-admin
+    interval: 1s  # Tell prometheus to read from /metrics every 1s
