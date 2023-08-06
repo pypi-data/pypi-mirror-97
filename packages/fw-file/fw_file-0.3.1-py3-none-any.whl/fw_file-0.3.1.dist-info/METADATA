@@ -1,0 +1,172 @@
+Metadata-Version: 2.1
+Name: fw-file
+Version: 0.3.1
+Summary: Unified data-file interface
+Home-page: https://gitlab.com/flywheel-io/tools/lib/fw-file
+License: MIT
+Keywords: Flywheel,parse,medical,file,metadata,extract,DICOM,ParaVision,Bruker,PARREC,Philips,PFile,GE
+Author: Flywheel
+Author-email: support@flywheel.io
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: fw-meta (>=0.2.0,<0.3.0)
+Requires-Dist: pydantic (>=1.7.3,<2.0.0)
+Requires-Dist: pydicom (>=2.1.1,<3.0.0)
+Requires-Dist: python-dateutil (>=2.8.1,<3.0.0)
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-file
+Description-Content-Type: text/markdown
+
+# fw-file
+
+Unified interface for reading medical file types, exposing parsed fields as dict
+keys as well as attributes and for saving any modifications to disk or a buffer.
+
+DICOM support - built on top of `pydicom` - is the primary goal of the library.
+`fw-file` also provides helpers for parsing DICOMs containing non-standard tags
+and utilities for organizing datasets and extracting metadata.
+
+Additional file types supported:
+
+- PAR/REC (Philips MR RAW)
+- ParaVision (Bruker)
+- PFile (GE MR RAW)
+- PTD (Siemens PET RAW)
+
+## Installation
+
+Add as a `poetry` dependency to your project:
+
+```bash
+poetry add fw-file
+```
+
+## Usage
+
+### Opening
+
+```python
+from fw_file.dicom import DICOM
+dcm = DICOM("dataset.dcm")  # also works with any readable file-like object
+```
+
+### Fields
+
+**Attribute access** on DICOMs works similarly to that in `pydicom`:
+
+```python
+dcm.PatientAge == "060Y"
+dcm.patientage == "060Y"   # attrs are case-insensitive
+dcm.patient_age == "060Y"  # and snake_case compatible
+```
+
+**Key access** also returns values instead of `pydicom.DataElement`:
+
+```python
+dcm["PatientAge"] == "060Y"
+dcm["patientage"] == "060Y"   # keys are case-insensitive too
+dcm["patient_age"] == "060Y"  # and snake_case compatible
+dcm["00101010"] == "060Y"
+dcm["0010", "1010"] == "060Y"
+dcm[0x00101010] == "060Y"
+dcm[0x0010, 0x1010] == "060Y"
+```
+
+**Private tags** can be accessed as keys when including the creator:
+
+```python
+dcm["AGFA", "Zoom factor"] == 2
+dcm["AGFA", "0019xx82"] == 2
+```
+
+**Assignment and deletion** works with attributes and keys alike:
+
+```python
+dcm.PatientAge = "065Y"
+del dcm["PatientAge"]
+```
+
+### Meta
+
+Flywheel upload metadata is available on a file's `meta` property. To customize
+fields - eg. to parse group/project info from a routing string - init files with
+a [`MetaExtractor`](https://gitlab.com/flywheel-io/tools/lib/fw-meta) instance:
+
+```python
+from fw_file.dicom import DICOM
+from fw_meta import MetaExtractor
+extractor = MetaExtractor(patterns={"[fw://]{group}[/{project}]": "StudyComments"})
+dcm = DICOM("dataset.dcm", extractor=extractor)
+dcm.meta == {
+    "group._id": "neuro",  # from StudyComments="fw://neuro/Amnesia"
+    "project.label": "Amnesia",
+    "subject.label": "PatientID",
+    "session.label": "StudyDescription",
+    "acquisition.label": "SeriesDescription",
+    # and much, much more...
+}
+```
+
+### Saving
+
+```python
+dcm.save()              # save to the original location
+dcm.save("edited.dcm")  # save to a given filepath
+dcm.save(io.BytesIO())  # save to any writable object
+```
+
+### Private dictionary
+
+In addition to the private tags included in
+[`pydicom`](https://github.com/pydicom/pydicom/blob/v2.1.2/pydicom/_private_dict.py),
+`fw-file` ships with an [extended dictionary](fw_file/dicom/dcmdict.py#L63) to
+make accessing even more private tags that much simpler.
+
+The private dictionary can be further extended by creating a DCMTK-style
+[data dict](https://github.com/DCMTK/dcmtk/blob/master/dcmdata/data/private.dic)
+file and setting the
+[`DCMDICTPATH`](https://support.dcmtk.org/docs/file_envvars.html)
+environment variable to it's path.
+
+### `DataElement` decoding
+
+DICOMs are often saved with non-standard and/or corrupt data elements. To enable
+loading these datasets, `fw-file` provides fixes for some common problems:
+
+- Fix `VM=1` strings that contain `\` by replacing with `_` (default: enabled)
+- Fix `VR` for known data elements encoded as explicit `UN` (default: enabled)
+- Extend/improve handling of data elements with a `VR` mismatch (default: disabled)
+
+These fixes can also be enabled/disabled via environment variables:
+
+```bash
+FW_DCM_REPLACE_UN_WITH_KNOWN_VR=false
+FW_DCM_FIX_VM1_STRINGS=false
+FW_DCM_FIX_VR_MISMATCH=true
+```
+
+To track any changes like `VR` inferences on (raw) data elements DICOMs can be
+instantiated with `track=True`:
+
+```python
+dcm = DICOM("dataset.dcm", decode=True, track=True)
+dcm.tracker.data_elements[0].events == ["Replace VR: UN -> CS"]
+```
+
+## Development
+
+Install the project using `poetry` and enable `pre-commit`:
+
+```bash
+poetry install
+pre-commit install
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
