@@ -1,0 +1,1 @@
+from rqattribution_campisi.analyzer import CampisiAttribution
