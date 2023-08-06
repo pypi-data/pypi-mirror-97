@@ -1,0 +1,61 @@
+[tool]
+[tool.poetry]
+name = "xeauth"
+version = "0.1.3"
+homepage = "https://github.com/jmosbacher/xeauth"
+description = "Top-level package for xeauth."
+authors = ["Yossi Mosbacher <joe.mosbacher@gmail.com>"]
+readme = "README.rst"
+license =  "MIT"
+classifiers=[
+    'Development Status :: 2 - Pre-Alpha',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Natural Language :: English',
+
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+]
+packages = [
+    { include = "xeauth" },
+    { include = "tests", format = "sdist" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+click = "*"
+Authlib = "^0.15.3"
+panel = "^0.11"
+httpx = "^0.16.1"
+appdirs = "^1.4.4"
+
+[tool.poetry.dev-dependencies]
+bumpversion = "*"
+coverage = "*"
+flake8 = "*"
+invoke = "*"
+isort = "*"
+pylint = "*"
+pytest = "*"
+sphinx = "*"
+tox = "*"
+yapf = "*"
+sphinx-material = "*"
+nbsphinx = "*"
+
+[tool.poetry.plugins] 
+[tool.poetry.plugins."eve_panel.auth"]
+"XenonAuth" = "xeauth.integrations.eve_panel:XenonEveAuth"
+
+[tool.poetry.scripts]
+xeauth = 'xeauth.cli:main'
+
+[build-system]
+requires = ["poetry>=0.12", "setuptools"]
+build-backend = "poetry.masonry.api"
+
+[tool.dephell.main]
+versioning = "semver"
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
