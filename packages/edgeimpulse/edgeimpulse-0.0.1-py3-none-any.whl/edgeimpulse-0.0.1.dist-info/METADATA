@@ -1,0 +1,63 @@
+Metadata-Version: 2.1
+Name: edgeimpulse
+Version: 0.0.1
+Summary: Python runner for real-time ML classification
+Home-page: https://github.com/pypa/sampleprojecthttps://github.com/edgeimpulse/edgeimpulse/edit/linux-node-sdk/linux/python
+Author: EdgeImpulse
+Author-email: mauricio@edgeimpulse.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/edgeimpulse/edgeimpulse/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# Edge Impulse Linux SDK for Python
+
+This library lets you run machine learning models and collect sensor data on Linux machines using Python. This SDK is part of [Edge Impulse](https://www.edgeimpulse.com) where we enable developers to create the next generation of intelligent device solutions with embedded machine learning. [Start here to learn more and train your first model](https://docs.edgeimpulse.com).
+
+
+`pip install -i https://test.pypi.org/simple/ edgeimpulse`
+
+## runner.py
+
+Implements the `ImpulseRunner`
+
+## use:
+
+```
+from edgeimpulse.runner import ImpulseRunner
+import signal
+runner = None
+
+def signal_handler(sig, frame):
+    print('Interrupted')
+    if (runner):
+        runner.stop()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+...
+runner = ImpulseRunner(modelfile)
+model_info = runner.init()
+...
+res = runner.classify(features[:window_size].tolist())
+```
+
+## examples:
+
+```
+/camera
+/microphone
+```
+
+### camera
+Classifies frames grabbed directly from the webcam.
+
+### microphone
+Classifies audio acquired directly from the audio interface.
+
+
