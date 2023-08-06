@@ -1,0 +1,88 @@
+[tool.poetry]
+name = "outcome-utils"
+version = "5.0.8"
+description = "A collection of python utils."
+authors = ["Douglas Willcocks <douglas@outcome.co>"]
+license = "ISC"
+packages = [
+  { include = "outcome", from = "src" }
+]
+homepage = "https://github.com/outcome-co/utils-py"
+repository = "https://github.com/outcome-co/utils-py"
+documentation = "https://github.com/outcome-co/utils-py#README"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.6"
+jinja2 = "^2.11.2"
+colored = "^1.4.2"
+toml = "^0.10.1"
+rich = ">=6.2,<10.0"
+semver = "^2.10.2"
+makefun = "^1.9.3"
+asgiref = "^3.2.10"
+requests = "^2.24.0"
+"dogpile.cache" = "^1.0.2"
+cachetools = "^4.1.1"
+python-dotenv = "^0.15.0"
+pydantic = "^1.7.3"
+
+[tool.poetry.dev-dependencies]
+pytest-asyncio = "^0.14.0"
+ansicolors = "^1.1.8"
+pyfakefs = "^4.3.1"
+outcome-devkit = "6.4.1"
+
+[tool.poetry.scripts]
+otc-utils = 'outcome.utils.bin.otc_utils:main'
+
+[tool.coverage.run]
+branch = true
+data_file = 'coverage/data'
+source = ['src/outcome/utils']
+omit = [
+   "test/*"
+]
+
+[tool.coverage.report]
+fail_under = 100
+skip_empty = true
+
+[tool.coverage.html]
+show_contexts = true
+directory = 'coverage/html'
+
+[tool.black]
+line-length = 130
+include = '\.pyi?$'
+# This stops black from rewriting quotes
+skip-string-normalization = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.cache
+)/
+'''
+
+[tool.isort]
+skip_glob = "*/.cache/**/*"
+line_length = 130
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "5.0.8"
+tag_format = "v$version"
+bump_message = "chore(version): $current_version → $new_version"
+version_files = ["pyproject.toml:version", "README.md:version-badge"]
+
+[build-system]
+requires = ["poetry==1.1.4"]
+build-backend = "poetry.masonry.api"
