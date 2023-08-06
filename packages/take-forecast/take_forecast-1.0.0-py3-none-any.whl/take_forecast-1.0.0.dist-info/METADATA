@@ -1,0 +1,108 @@
+Metadata-Version: 2.1
+Name: take-forecast
+Version: 1.0.0
+Summary: This module performs time series forecasting using Kedro pipelines.
+Home-page: UNKNOWN
+Author: Squad XD
+Author-email: analytics.dar@take.net
+License: MIT License
+Keywords: time series,forecast
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Requires-Dist: kedro (==0.15.9)
+Requires-Dist: kedro-viz (<4.0,>=3.2.0)
+Requires-Dist: nbstripout (==0.3.3)
+Requires-Dist: python-dateutil (==2.8.0)
+Requires-Dist: pytest-cov (<3.0,>=2.8.1)
+Requires-Dist: pytest-mock (<2.0,>=1.7.1)
+Requires-Dist: pytest (<4.0,>=3.4)
+Requires-Dist: six (==1.14.0)
+Requires-Dist: twine
+Requires-Dist: wheel (==0.32.2)
+Requires-Dist: matplotlib (==3.1.3)
+Requires-Dist: pandas (<=0.25.3)
+Requires-Dist: seaborn
+Requires-Dist: sklearn
+Requires-Dist: statsmodels (>=0.11.1)
+Requires-Dist: pyodbc
+Provides-Extra: docs
+Requires-Dist: sphinx (<2.0,>=1.6.3); extra == 'docs'
+Requires-Dist: sphinx-rtd-theme (==0.4.1); extra == 'docs'
+Requires-Dist: nbsphinx (==0.3.4); extra == 'docs'
+Requires-Dist: nbstripout (==0.3.3); extra == 'docs'
+Requires-Dist: recommonmark (==0.5.0); extra == 'docs'
+Requires-Dist: sphinx-autodoc-typehints (==1.6.0); extra == 'docs'
+Requires-Dist: sphinx-copybutton (==0.2.5); extra == 'docs'
+Requires-Dist: jupyter-client (<6.0,>=5.1.0); extra == 'docs'
+Requires-Dist: tornado (<6.0,>=4.2); extra == 'docs'
+Requires-Dist: ipykernel (<5.0,>=4.8.1); extra == 'docs'
+Provides-Extra: notebook
+Requires-Dist: ipython (<8.0,>=7.13.0); extra == 'notebook'
+Requires-Dist: jupyter (<2.0,>=1.0.0); extra == 'notebook'
+Requires-Dist: jupyter-client (<6.0,>=5.1.0); extra == 'notebook'
+Requires-Dist: jupyterlab (==0.31.1); extra == 'notebook'
+
+# Take Forecast
+
+A time series forecasting library that uses Kedro pipelines.
+
+For performing the forecast, there are four main steps:
+
+- **Tune:** Analyse the time series to find seasonality, unit roots,
+  memory lags and stochastic process lags.
+
+- **Fit:** Fit a SARIMA model with hyperparameters obtained 
+  in the last step and input data.
+
+- **Predict:** Make forecast using the fitted model. 
+  Also provide upper and lower boundaries for confidence interval.
+
+- **Evaluate:** Assess the model quality by error metrics evaluated
+  in train and test sets.
+
+
+# Installation
+
+Use [pip](https://pypi.org/project/take-forecast/) to install:
+
+```shell script
+pip install take-forecast
+```
+
+# Usage
+
+A simple example using ``take_forecast``.
+
+```python
+import numpy as np
+import pandas as pd
+from take_forecast import ProjectContext
+np.random.seed(0)
+samples = 60
+x = 100 + 80 * np.linspace(0, 1, samples) + 20 * np.random.randn(samples)
+y = x[:-3] + x[1:-2] + x[2:-1] + x[3:]
+date_end = pd.Timestamp.now()
+date_start = date_end - pd.Timedelta(len(y) - 1, 'd')
+index = pd.date_range(date_start, date_end, freq='d')
+ts = pd.Series(y, index)
+context = ProjectContext()
+results = context.run_forecast(ts)
+```
+
+The ``results`` are informed as a report in a dict with following keys:
+
+- *forecast*: Prediction
+- *forecast_lower*: Lower limit
+- *forecast_upper*: Upper limit
+- *alpha*: Significance level
+- *error_metrics_report*: Train and test error metrics
+- *model*: Fitted SARIMA model
+
+
+# Author
+
+Take Blip - Data & Analytics - Research Tribe - Squad XD
+
+
