@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /products/:
+    get:
+      operationId: products_list
+      description: ''
+      parameters:
+      - in: query
+        name: all_values
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: category
+        schema:
+          type: string
+          enum:
+          - A
+          - B
+        description: some category description
+      - in: query
+        name: custom_filter
+        schema:
+          type: boolean
+      - in: query
+        name: custom_underspec_filter
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - A
+            - B
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: in_categories
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - A
+            - B
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: int_id
+        schema:
+          type: integer
+      - in: query
+        name: is_free
+        schema:
+          type: boolean
+      - in: query
+        name: max_price
+        schema:
+          type: number
+          format: float
+        description: highest price
+      - in: query
+        name: max_sub_price
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: model_multi_cat
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - A
+            - B
+        description: some category description
+        explode: true
+        style: form
+      - in: query
+        name: model_multi_cat_relation
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: model_single_cat
+        schema:
+          type: string
+          enum:
+          - A
+          - B
+        description: some category description
+      - in: query
+        name: number_id
+        schema:
+          type: number
+        description: some injected help text
+      - in: query
+        name: number_id_ext
+        schema:
+          type: number
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -in_stock
+            - -price
+            - in_stock
+            - price
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: other_sub_product__uuid
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: price_range_max
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: price_range_min
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: sub
+        schema:
+          type: integer
+      - in: query
+        name: subproduct__sub_price
+        schema:
+          type: number
+          format: float
+      tags:
+      - products
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          description: ''
+  /products/{id}/:
+    get:
+      operationId: products_retrieve
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+components:
+  schemas:
+    CategoryEnum:
+      enum:
+      - A
+      - B
+      type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          description: some category description
+        in_stock:
+          type: boolean
+        price:
+          type: number
+          format: float
+        other_sub_product:
+          type: integer
+      required:
+      - category
+      - id
+      - in_stock
+      - other_sub_product
+      - price
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Session

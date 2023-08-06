@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /persons/:
+    get:
+      operationId: persons_list
+      description: ''
+      tags:
+      - persons
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+          description: ''
+    post:
+      operationId: persons_create
+      description: ''
+      tags:
+      - persons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+  /persons/{id}/:
+    get:
+      operationId: persons_retrieve
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this person.
+        required: true
+      tags:
+      - persons
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+    put:
+      operationId: persons_update
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this person.
+        required: true
+      tags:
+      - persons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+    patch:
+      operationId: persons_partial_update
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this person.
+        required: true
+      tags:
+      - persons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPerson'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPerson'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPerson'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+    delete:
+      operationId: persons_destroy
+      description: ''
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this person.
+        required: true
+      tags:
+      - persons
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    LegalPerson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        company_name:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+          maxLength: 30
+        board:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+          readOnly: true
+      required:
+      - address
+      - board
+      - company_name
+      - id
+    NaturalPerson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+          maxLength: 30
+        supervisor_id:
+          type: integer
+          nullable: true
+      required:
+      - address
+      - first_name
+      - id
+      - last_name
+      - supervisor_id
+    PatchedLegalPerson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        company_name:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+          maxLength: 30
+        board:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+          readOnly: true
+    PatchedNaturalPerson:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        address:
+          type: string
+          maxLength: 30
+        supervisor_id:
+          type: integer
+          nullable: true
+    PatchedPerson:
+      oneOf:
+      - $ref: '#/components/schemas/PatchedLegalPerson'
+      - $ref: '#/components/schemas/PatchedNaturalPerson'
+      discriminator:
+        propertyName: resourcetype
+        mapping:
+          legal: '#/components/schemas/PatchedLegalPerson'
+          natural: '#/components/schemas/PatchedNaturalPerson'
+    Person:
+      oneOf:
+      - $ref: '#/components/schemas/LegalPerson'
+      - $ref: '#/components/schemas/NaturalPerson'
+      discriminator:
+        propertyName: resourcetype
+        mapping:
+          legal: '#/components/schemas/LegalPerson'
+          natural: '#/components/schemas/NaturalPerson'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: Session
