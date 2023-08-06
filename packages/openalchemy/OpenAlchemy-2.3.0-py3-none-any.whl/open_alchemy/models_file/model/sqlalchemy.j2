@@ -1,0 +1,55 @@
+
+
+class T{{ artifacts.name }}({{ artifacts.parent_cls }}):
+    """{{ artifacts.docstring }}"""
+
+    # SQLAlchemy properties
+    __table__: sqlalchemy.Table
+    __tablename__: str
+    query: orm.Query{% if not artifacts.empty %}
+
+    # Model properties{% for column in artifacts.columns %}
+    {{ column.name }}: 'sqlalchemy.Column[{{ column.type }}]'{% endfor %}{% endif %}
+
+    def __init__(self{{ arg_init_source }}) -> None:
+        """{{ artifacts.init_docstring }}"""
+        ...
+
+    @classmethod
+    def from_dict(cls{{ arg_from_dict_source }}) -> "T{{ artifacts.name }}":
+        """{{ artifacts.from_dict_docstring }}"""
+        ...
+
+    @classmethod
+    def from_str(cls, value: str) -> "T{{ artifacts.name }}":
+        """
+        Construct from a JSON string (eg. a POST payload).
+
+        Returns:
+            Model instance based on the JSON string.
+
+        """
+        ...
+
+    def to_dict(self) -> {{ artifacts.name }}Dict:
+        """
+        Convert to a dictionary (eg. to send back for a GET request).
+
+        Returns:
+            Dictionary based on the model instance.
+
+        """
+        ...
+
+    def to_str(self) -> str:
+        """
+        Convert to a JSON string (eg. to send back for a GET request).
+
+        Returns:
+            JSON string based on the model instance.
+
+        """
+        ...
+
+
+{{ artifacts.name }}: typing.Type[T{{ artifacts.name }}] = models.{{ artifacts.name }}  # type: ignore
