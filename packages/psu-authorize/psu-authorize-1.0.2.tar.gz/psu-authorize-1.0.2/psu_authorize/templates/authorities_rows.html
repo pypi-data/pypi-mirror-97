@@ -1,0 +1,15 @@
+{% load base_taglib %}
+{%for auth in authorities%}
+    <tr class="row-{{auth.id}}">
+        <td class="auth-code">{{auth.code}}</td>
+        <td class="auth-title">{{auth.title}}</td>
+        <td class="auth-description">{{auth.description}}</td>
+        <td class="auth-act">
+            {%if global_access%}
+                <button id="DeleteButton" type="button" onclick="delete_authority({{auth.id}});" class="btn btn-danger btn-sm">
+                    {%fa fa-trash-o title="Delete authority"%}
+                </button>
+            {%endif%}
+        </td>
+    </tr>
+{%endfor%}

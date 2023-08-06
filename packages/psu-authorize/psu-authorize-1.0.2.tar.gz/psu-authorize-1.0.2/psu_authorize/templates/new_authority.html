@@ -1,0 +1,150 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Manage New Authorities{%endblock%}}</title>
+    {% block scripts %}
+        <link rel="stylesheet" href="{% static_content_url%}/wdt/datatables/datatables.min.css" />
+        <script src="{% static_content_url%}/wdt/datatables/datatables.min.js"></script>
+    {% endblock %}
+</head>
+
+<body>
+    {% block pagecontent %}
+    <div id="authority-form" >
+    <h1>Add New Authorities</h1>
+    <table style="width: 100%;max-width:800px;">
+        <tr>
+            <td>
+                <label for="auth_code">Authority Code:</label>
+            </td>
+            <td>
+                 <input type="text" name="authority_code" id="auth_code" class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="auth_title">Title:</label>
+            </td>
+            <td>
+                 <input type="text" name="title" id="auth_title" class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="auth_desc">Description:</label>
+            </td>
+            <td>
+                <input type="text" name="description" id="auth_desc" class="form-control" />
+            </td>
+        </tr>
+    </table>
+
+    <button type="button" class="btn btn-success" id="new-authority-btn" onclick="new_authority();">
+        Submit
+    </button>
+    </div>
+    <br><br>
+    <table id="authority_table" class="table table-condensed table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Authority Code</th>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% include 'authorities_rows.html' with authorities=authorities%}
+    </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var authority_table = $('#authority_table').DataTable( {
+                "pageLength": 50,
+                "pagingType": "full_numbers"
+            } );
+            //Focus on the search box on page load
+            $('#authority_table_filter').find('input[type=search]').focus();
+        } );
+
+
+        function new_authority(){
+            var auth_form = $('#authority-form');
+            var authority_code = auth_form.find('#auth_code').val();
+            var title = auth_form.find('#auth_title').val();
+            var description = auth_form.find('#auth_desc').val();
+            var authority_button = auth_form.find('#new-authority-btn');
+            $.ajax({
+                    type:   "POST",
+                    url:    "{%url 'authorize:new_authorities'%}",
+                    data:   {
+                        title: title, authority_code: authority_code, description: description,
+                        csrfmiddlewaretoken: '{{csrf_token}}'
+                    },
+                     beforeSend:function(){
+                        authority_button.after(getAjaxLoadImage());},
+                    success:function(data){
+                        console.log('Successfully created an authority');
+                        console.log(data);
+                        console.log(description);
+                        var table = $('#authority_table');
+                        table.find('tr:first').after(data);
+                        new_row = table.find('tr').eq(1);
+                        table.DataTable().row.add(new_row).draw();
+                    },
+                    error:function(){
+                        console.log("failed to create an authority");},
+                    complete:function(){
+                        clearAjaxLoadImage(authority_button.parent());
+                    }
+                    });
+            }
+
+        {% if global_access%}
+        function delete_authority(id){
+            try{
+                var table = $('#authority_table').DataTable();
+                var rows = $('.row-'+id);
+                var code = rows.first().find('.auth-code').html();
+                var msg = 'Deleting will revoke all the assigned permissions to the '+code+' authority. Are you sure you want to delete?';
+
+                if(confirm(msg)){
+                    console.log(msg);
+                    $.ajax({
+                        type:   "POST",
+                        url:    "{%url 'authorize:delete_authority'%}/"+id+"/",
+                        data:   { csrfmiddlewaretoken: '{{csrf_token}}'},
+                        beforeSend:function(){
+                            rows.find('.auth-act').append(getAjaxLoadImage());
+                        },
+                        success:function(data){
+                            console.log('data');
+                            rows.each(function(){
+                                var thisRow = $(this);
+                                table.row(thisRow).remove();
+                                });
+                            rows.remove();
+                            table.draw();
+                        },
+                        error:function(){
+                            clearAjaxLoadImage();
+                            rows.find('.pp-act').html(getAjaxSaveFailedIcon("Deleting an authority failed"));
+                        },
+                        complete:function(){
+                        }
+                    });
+                }
+            }
+            catch(ee){
+                alert(ee);
+            }
+         }
+         {%endif%}
+    </script>
+    {% endblock %}
+</body>
+</html>

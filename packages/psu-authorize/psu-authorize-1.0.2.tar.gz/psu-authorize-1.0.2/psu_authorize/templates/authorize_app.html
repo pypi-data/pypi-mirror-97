@@ -1,0 +1,192 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Permissions for {{app_info.app_title}}{%endblock%}}</title>
+    {% block scripts %}
+        <link rel="stylesheet" href="{% static_content_url%}/wdt/datatables/datatables.min.css" />
+        <script src="{% static_content_url%}/wdt/datatables/datatables.min.js"></script>
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Manage Permissions</h1>
+    <button type="button" class="btn btn-success" id="grant-permission-btn" onclick="toggle_grant_form();">
+        {%fa fa-unlock%}
+        Grant Permission
+    </button>
+    <div id="grant-permission-form" class="hidden">
+            <b>Grant Permission:</b>
+            <table style="width: 100%;max-width:800px;">
+                <tr>
+                    <td>
+                        <label for="grant_application">Application:</label>
+                    </td>
+                    <td>
+                        {%if has_app_options%}
+                            {%select_menu name="app_code" id="grant_application" options=application_options class="form-control" value=app_code%}
+                        {%else%}
+                            {{app_code}}
+                        {%endif%}
+                    </td>
+                    <td rowspan="3">
+                        <button type="button" class="btn btn-success" id="grant-permission-btn" onclick="grant_permission();">
+                            Submit
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="grant_authority">Authority:</label>
+                    </td>
+                    <td>
+                        {%select_menu name="authority_id" id="grant_authority" options=app_permissions.authority_options class="form-control"%}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="grant_grantee">Grantee:</label>
+                    </td>
+                    <td>
+                        <input type="text" name="grantee" id="grant_grantee" class="form-control" />
+                    </td>
+                </tr>
+            </table>
+    </div>
+
+    <br />
+    <br />
+
+    <table id="permission_table" class="table table-condensed table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Level</th>
+            <th scope="col">Authority</th>
+            <th scope="col">User</th>
+            <th scope="col">Via</th>
+            <th scope="col">Date Assigned</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% include '_app_permission_rows.html' with permissions=app_permissions.granted_authorities.items %}
+    </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var permission_table = $('#permission_table').DataTable( {
+                "pageLength": 50,
+                "pagingType": "full_numbers"
+            } );
+
+            //Focus on the search box on page load
+            $('#permission_table_filter').find('input[type=search]').focus();
+        } );
+
+        function toggle_grant_form(){
+            var btn = $('#grant-permission-btn');
+            var form = $('#grant-permission-form');
+            if(form.hasClass('hidden')){
+                form.removeClass('hidden');
+                btn.addClass('hidden');
+            }
+            else{
+                form.addClass('hidden');
+                btn.removeClass('hidden');
+            }
+        }
+
+        function grant_permission(){
+            var grant_form = $('#grant-permission-form');
+            var app_code = grant_form.find('#grant_application').val();
+            var authority_id = grant_form.find('#grant_authority').val();
+            var grantee = grant_form.find('#grant_grantee').val();
+            var grant_button = grant_form.find('#grant-permission-btn');
+
+            $.ajax({
+                    type:   "POST",
+                    url:    "{%url 'authorize:grant_permission'%}",
+                    data:   {
+                        app_code: app_code, authority_id: authority_id, grantee: grantee,
+                        csrfmiddlewaretoken: '{{csrf_token}}'
+                    },
+                    beforeSend:function(){
+                        grant_button.after(getAjaxLoadImage());
+                        grant_button.addClass('hidden');
+                    },
+                    success:function(data){
+                        console.log('Successful grant');
+                        console.log(data);
+                        var table = $('#permission_table');
+                        table.find('tr:first').after(data);
+                        new_row = table.find('tr').eq(1);
+                        table.DataTable().row.add(new_row).draw();
+                    },
+                    error:function(){
+                    },
+                    complete:function(){
+                        grant_button.removeClass('hidden');
+                        clearAjaxLoadImage(grant_button.parent());
+                    }
+                });
+        }
+
+        function revoke_permission(id){
+            try{
+                var table = $('#permission_table').DataTable();
+                var rows = $('.row-'+id);
+                var num_users = rows.length;
+                var authority = rows.first().find('.pp-auth').html();
+                if(num_users > 1){
+                    var assignee = rows.first().find('.pp-via').html();
+                }
+                else{
+                    var assignee = rows.first().find('.pp-user').html();
+                }
+
+                var msg = 'Revoke '+authority+' from '+assignee+'?';
+                if(num_users > 1){
+                    msg += ' This will affect '+num_users+' users.';
+                }
+                if(confirm(msg)){
+                    console.log(msg);
+                    $.ajax({
+                        type:   "POST",
+                        url:    "{%url 'authorize:revoke_permission_tbd'%}/"+id+"/",
+                        data:   { csrfmiddlewaretoken: '{{csrf_token}}' },
+                        beforeSend:function(){
+                            rows.find('.pp-act').append(getAjaxLoadImage());
+                        },
+                        success:function(data){
+                            console.log('Success');
+                            rows.each(function(){
+                                var thisRow = $(this);
+                                table.row(thisRow).remove();
+                            });
+                            rows.remove();
+                            table.draw();
+                        },
+                        error:function(){
+                            clearAjaxLoadImage();
+                            rows.find('.pp-act').html(getAjaxSaveFailedIcon("Revoke failed"));
+                        },
+                        complete:function(){
+                        }
+                    });
+                }
+            }
+            catch(ee){
+                alert(ee);
+            }
+        }
+    </script>
+
+    {% endblock %}
+</body>
+</html>

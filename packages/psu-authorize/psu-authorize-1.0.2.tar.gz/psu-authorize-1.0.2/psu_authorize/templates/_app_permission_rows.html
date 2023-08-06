@@ -1,0 +1,23 @@
+{% load base_taglib %}
+
+    {%for descriptor, detail_map in permissions%}
+        {%for pp in detail_map.new%}
+            {% include '_app_permission.html' with pp=pp %}
+        {%endfor%}
+
+        {%for pp in detail_map.local.direct%}
+            {% include '_app_permission.html' with pp=pp %}
+        {%endfor%}
+
+        {%for pp in detail_map.local.indirect%}
+            {% include '_app_permission.html' with pp=pp %}
+        {%endfor%}
+
+        {%for pp in detail_map.global.direct%}
+            {% include '_app_permission.html' with pp=pp %}
+        {%endfor%}
+
+        {%for pp in detail_map.global.indirect%}
+            {% include '_app_permission.html' with pp=pp %}
+        {%endfor%}
+    {%endfor%}

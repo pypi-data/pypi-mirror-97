@@ -1,0 +1,17 @@
+{% load base_taglib %}
+<tr class="row-{{pp.id}}">
+    <td class="pp-app">{{pp.app_code}}</td>
+    <td class="pp-auth">{{pp.authority_title}}</td>
+    <td class="pp-user">{{pp.username}}</td>
+    <td class="pp-via">{{pp.via}}</td>
+    <td><span title="{{pp.date_assigned.banner_date_time}}">{{pp.date_assigned.banner_date}}<span></td>
+    {% if not global_access and pp.app_code == "GLOBAL" %}
+        <td class="pp-act">Not permitted</td>
+    {%else%}
+        <td class="pp-act">
+            <button type="button" onclick="revoke_permission({{pp.id}});" class="btn btn-danger btn-sm">
+                {%fa fa-trash-o title="Revoke Permission"%}
+            </button>
+        </td>
+    {% endif %}
+</tr>

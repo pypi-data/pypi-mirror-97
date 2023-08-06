@@ -1,0 +1,97 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Manage New Applications{%endblock%}}</title>
+    {% block scripts %}
+        <link rel="stylesheet" href="{% static_content_url%}/wdt/datatables/datatables.min.css" />
+        <script src="{% static_content_url%}/wdt/datatables/datatables.min.js"></script>
+    {% endblock %}
+</head>
+
+<body>
+    {% block pagecontent %}
+    <div id="application-form" >
+    <h1>Add New Applications</h1>
+    <table style="width: 100%;max-width:800px;">
+        <tr>
+            <td>
+                <label for="app_code">Application:</label>
+            </td>
+            <td>
+                 <input type="text" name="app_code" id="app_code" class="form-control" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="app_title">Application Title:</label>
+            </td>
+            <td>
+                <input type="text" name="title" id="app_title" class="form-control" />
+            </td>
+        </tr>
+    </table>
+
+    <button type="button" class="btn btn-success" id="new-application-btn" onclick="new_application();">
+        Submit
+    </button>
+    </div>
+    <br><br>
+    <table id="applications_table" class="table table-condensed table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Application</th>
+            <th scope="col">Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% include 'application_rows.html' with apps=apps%}
+    </tbody>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var application_table = $('#applications_table').DataTable( {
+                "pageLength": 50,
+                "pagingType": "full_numbers"
+            } );
+            //Focus on the search box on page load
+            $('#application_table_filter').find('input[type=search]').focus();
+        } );
+
+        function new_application(){
+            var app_form = $('#application-form');
+            var app_code = app_form.find('#app_code').val();
+            var app_title = app_form.find('#app_title').val();
+            var application_button = app_form.find('#new-application-btn');
+            $.ajax({
+                    type:   "POST",
+                    url:    "{%url 'authorize:new_applications'%}",
+                    data:   {
+                        app_title: app_title, app_code: app_code,
+                        csrfmiddlewaretoken: '{{csrf_token}}'
+                    },
+                     beforeSend:function(){
+                        application_button.after(getAjaxLoadImage());},
+                    success:function(data){
+                        console.log('Successful');
+                        console.log(data);
+                        var table = $('#applications_table');
+                        table.find('tr:first').after(data);
+                        new_row = table.find('tr').eq(1);
+                        table.DataTable().row.add(new_row).draw();
+                        },
+                    error:function(){
+                        console.log("failed");},
+                    complete:function(){
+                        clearAjaxLoadImage(application_button.parent());
+                    }
+                    });
+            }
+
+    </script>
+    {% endblock %}
+</body>
+</html>
