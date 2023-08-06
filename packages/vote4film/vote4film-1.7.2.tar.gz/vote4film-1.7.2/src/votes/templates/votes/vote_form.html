@@ -1,0 +1,34 @@
+{% extends "web/base.html" %}
+
+
+{% block secondary_nav %}
+  {% with u=request.resolver_match.view_name %}
+    {% if is_vote_available %}
+      <a tabindex="5"
+        class="nav__item nav__item--secondary {% if u == 'votes:vote-create' %}nav__item--selected{% endif %}"
+         href="{% url 'votes:vote-create' %}">
+        Vote For Films
+        <span class="nav__highlight">&ensp;</span>
+      </a>
+    {% endif %}
+  {% endwith %}
+{% endblock secondary_nav %}
+
+
+{% block content %}
+  {% if vote %}
+    <h1>Update Your Vote</h1>
+  {% else %}
+    <h1>Vote for a Film</h1>
+  {% endif %}
+
+  {% include "votes/includes/film_card.html" with film=film is_voting=1 only %}
+
+  <form class="form--one-line" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="button"
+           type="submit"
+           value="{% if vote %}Revote{% else %}Vote{% endif %}">
+  </form>
+{% endblock content %}

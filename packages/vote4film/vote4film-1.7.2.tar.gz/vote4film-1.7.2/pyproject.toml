@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "vote4film"
+version = "1.7.2"
+description = "Easy scheduling for regular film nights"
+homepage = "https://github.com/Fustra/vote4film/"
+repository = "https://github.com/Fustra/vote4film/"
+readme = "README.md"
+authors = ["QasimK <noreply@QasimK.io>"]
+license = "AGPL-3.0"
+classifiers = [
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: No Input/Output (Daemon)",
+    "Natural Language :: English",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+]
+packages = [
+    { include = "calender", from = "src"},
+    { include = "films", from = "src" },
+    { include = "schedule", from = "src" },
+    { include = "vote4film", from = "src" },
+    { include = "votes", from = "src" },
+    { include = "web", from = "src" },
+    { include = "manage.py", from = "src" },
+]
+
+[tool.poetry.scripts]
+manage = 'manage:main'
+
+[tool.poetry.dependencies]
+python = "^3.8"
+django = "^2.2.17"
+django-environ = "^0.4.5"
+django-extensions = "^3.0.9"
+requests = "^2.24"
+lxml = "^4.6.2"
+xdg = "^5.0"
+psycopg2 = {version = "^2.8", optional = true}
+pyhumps = "^1.6.1"
+bbfcapi = "^3.0.1"
+sentry-sdk = {version = "^0.19.2", optional = true}
+
+[tool.poetry.dev-dependencies]
+# Checks
+autoflake = "^1.4"
+black = {version = "=20.8b1", allow-prereleases = true}
+isort = "^5.6"
+bandit = "^1.6"
+pyflakes = "^2.2"
+safety = "^1.9"
+# Development helpers
+django-debug-toolbar = "^3.1"
+werkzeug = "^1.0"
+# Tests
+pytest = "^6.1"
+pytest-django = "^4.1"
+responses = "^0.12"
+factory_boy = "^3.1"
+
+[tool.poetry.extras]
+postgres = ["psycopg2"]
+sentry = ["sentry-sdk"]
+
+[tool.black]
+target-version = ['py38']
+
+[tool.isort]
+ensure_newline_before_comments = true
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+use_parentheses = true
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

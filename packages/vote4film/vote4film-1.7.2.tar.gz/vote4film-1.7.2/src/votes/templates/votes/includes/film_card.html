@@ -1,0 +1,159 @@
+{% comment %}
+Takes in:
+  - {{ film }} = Film
+  - {{ film.score }} = int
+  - {{ film.vote_set.user }}
+  - {{ film.has_user_voted }} = Bool
+  - {{ film.user_vote }} = Vote
+  - {{ is_voting }} = Bool
+{% endcomment %}
+
+{% load static films_extras %}
+
+<section class="films-card
+  {% if not film.is_available %}
+    films-card--unavailable
+  {% endif %}
+  {% if film.is_watched %}
+    films-card--watched
+  {% endif %}
+">
+  <a class="films-img-link" href="{{ film.poster_url }}">
+    <img
+      class="films-img"
+      src="{{ film.poster_url }}"
+      {# Use average height while loading - cards vary in height #}
+      width="150" height="222"
+      {# Most common size = 150x222 #}
+      {# TODO: we should use the actual size to improve content reflow #}
+    />
+  </a>
+  <section class="films-content">
+    <h2 class="films-title">
+      {{ film.title }}
+      {% if film.is_watched %}
+        <span title="We've already watched this film">👀</span>
+      {% endif %}
+    </h2>
+
+    <section class="films-tags">
+      <div class="films-tag films-tag__year">
+        ({{ film.year }})
+      </div>
+
+      <div class="film-tags-group">
+        <div class="films-tag">
+          <a
+            title="Find out more about the age rating on BBFC"
+            href="{{ film.bbfc_search }}">
+            <img
+              class="films-icon"
+              src="
+                {% if film.age_rating == "U" %}
+                  {% static "web/images/bbfc_u.svg" %}
+                {% elif film.age_rating == "PG" %}
+                  {% static "web/images/bbfc_pg.svg" %}
+                {% elif film.age_rating == "12" %}
+                  {% static "web/images/bbfc_12.svg" %}
+                {% elif film.age_rating == "15" %}
+                  {% static "web/images/bbfc_15.svg" %}
+                {% elif film.age_rating == "18" %}
+                  {% static "web/images/bbfc_18.svg" %}
+                {% elif film.age_rating is None %}
+                  {% static "web/images/bbfc_unknown.svg" %}
+                {% endif %}
+              "
+              width="24" height="24"
+            />
+          </a>
+        </div>
+        <div class="films-tag">
+          ·
+          <a
+            title="Read more about the film on IMDB"
+            href="{{ film.imdb }}">
+            <img
+              class="films-icon"
+              src="https://ia.media-imdb.com/images/G/01/imdb/images/favicon-2165806970"
+              width="24" height="24"
+            /><span class="films-icon-text" style="
+                {# red - green linear gradient between 6.0 and 8.0 #}
+                {% widthratio film.imdb_rating 10 100 as rating %}
+                {% with subrating=rating|add:-60 %}
+                  {% if subrating < 0 %}
+                    background-color: hsl(0, 100%, 80%);
+                  {% elif subrating > 20 %}
+                    background-color: hsl(120, 100%, 80%);
+                  {% else %}
+                    {% widthratio subrating 20 120 as ratio %}
+                    background-color: hsl({{ ratio }}, 100%, 80%);
+                  {% endif %}
+                {% endwith %}
+            ">&thinsp;{{ film.imdb_rating }}&thinsp;
+            </span>
+          </a>
+        </div>
+        <div class="films-tag">
+          ·
+          <a
+            title="Watch the film's trailer on YouTube"
+            href="{{ film.youtube_search }}">
+            <img
+              class="films-icon"
+              src="{% static "web/images/yt_icon.svg" %}"
+              width="24" height="24"
+              />
+          </a>
+        </div>
+      </div>
+      <div style="display: block">
+        <div style="display: inline;" class="films-tag">
+          <em>{{ film.genre }}</em>
+        </div>
+        <div class="films-tag">
+          ·
+          <em>{{ film.runtime_mins|duration_format }}</em>
+        </div>
+      </div>
+    </section>
+
+    <p>{{ film.plot }}
+
+    <p>
+      {% if not film.is_voting and film.has_user_voted %}
+        {% for vote in film.vote_set.all %}
+          <span class="
+            {% if vote.choice == 2 %}
+              votes-upup
+            {% elif vote.choice == 1 %}
+              votes-up
+            {% elif vote.choice == -1 %}
+              votes-down
+            {% elif vote.choice == -2 %}
+              votes-downdown
+            {% endif %}
+          ">
+              &thinsp;
+              {% if vote.choice == 2 %}
+                <i class="fas fa-angle-double-up"></i>
+              {% elif vote.choice == 1 %}
+                <i class="fas fa-angle-up"></i>
+              {% elif vote.choice == -1 %}
+                <i class="fas fa-angle-down"></i>
+              {% elif vote.choice == -2 %}
+                <i class="fas fa-angle-double-down"></i>
+              {% endif %}
+              {{ vote.user.username|slice:":3" }}
+          </span>
+        {% endfor %}
+        &nbsp;
+        {% if film.user_vote %}
+          <a href="{% url 'votes:vote-update' film.user_vote.0.pk %}">(Change Vote)</a>
+        {% endif %}
+      {% elif not is_voting and not film.is_watched %}
+        <a href="{% url 'votes:vote-create' %}">Vote for films</a>
+      {% endif %}
+      <a href="{% url 'films:film-update' film.pk %}">(Edit Film)</a>
+  </section>
+  <div style="clear: left; height: 1px;"></div>
+</section>

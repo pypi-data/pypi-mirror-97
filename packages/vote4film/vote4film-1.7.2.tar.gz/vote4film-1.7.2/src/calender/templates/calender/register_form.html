@@ -1,0 +1,13 @@
+{% extends "web/base.html" %}
+{% load humanize %}
+
+
+{% block content %}
+  <form class="form--one-line" method="post">
+    <h2>The next event is {{ event.date|naturalday|capfirst }}</h2>
+    <h3>Will you be there?</h3>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="button" type="submit" value="Update">
+  </form>
+{% endblock content %}
