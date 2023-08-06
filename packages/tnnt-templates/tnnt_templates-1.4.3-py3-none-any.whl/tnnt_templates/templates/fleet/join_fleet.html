@@ -1,0 +1,57 @@
+{% extends 'fleet/base.html' %}
+
+{% load i18n %}
+{% load humanize %}
+
+{% block page_title %}{% translate "Create fleet" %}{% endblock %}
+
+{% block extra_css %}
+    {% include 'fleet/bundles/multi-select-css.html' %}
+    {% include 'fleet/bundles/slim-select-css.html' %}
+{% endblock %}
+
+{% block fleet_block %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <div class="panel-title">
+                {% translate "Fleet invitation" %}
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <form class="form-signin" role="form" action="" method="POST">
+                        {% csrf_token %}
+
+                        </br>
+                        <label for="character_ids">{% translate "Select the characters to invite" %}</label>
+                        <select class="multiselect-ui" multiple="multiple" name="character_ids" id="character_ids">
+                             {% for character in characters %}
+                                <option value="{{ character.character_id }}" >{{ character.character_name }}</option>
+                             {% endfor %}
+                        </select>
+                        </br>
+
+                        <button class="btn btn-primary btn-block" style="margin-top: 10px;"type="submit">{% translate "Send fleet invite(s)" %}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_javascript %}
+    {% include 'fleet/bundles/slim-select-js.html' %}
+
+    <script type="application/javascript">
+        new SlimSelect({
+            select: "#character_ids",
+            hideSelectedOption: true
+        });
+    </script>
+{% endblock %}
+
+{% block extra_script %}
+
+{% endblock %}
