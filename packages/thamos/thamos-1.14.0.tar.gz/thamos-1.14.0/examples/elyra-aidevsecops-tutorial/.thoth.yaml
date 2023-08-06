@@ -1,0 +1,45 @@
+host: test.thoth-station.ninja
+tls_verify: true
+requirements_format: pipenv
+
+runtime_environments:
+  - name: download_dataset
+    operating_system:
+      name: rhel
+      version: "8"
+    python_version: "3.8"
+    recommendation_type: latest
+
+  - name: training
+    operating_system:
+      name: rhel
+      version: "8"
+    python_version: "3.8"
+    recommendation_type: performance
+
+  - name: test_model
+    operating_system:
+      name: rhel
+      version: "8"
+    python_version: "3.8"
+    recommendation_type: security
+
+
+managers:
+  - name: pipfile-requirements
+  - name: update
+    configuration:
+      labels: [bot]
+  - name: info
+  - name: version
+    configuration:
+      maintainers:
+        - pacospace
+        - sesheta
+        - goern
+        - fridex
+      assignees:
+        - sesheta
+      labels: [bot]
+      changelog_file: true
+      changelog_smart: true
