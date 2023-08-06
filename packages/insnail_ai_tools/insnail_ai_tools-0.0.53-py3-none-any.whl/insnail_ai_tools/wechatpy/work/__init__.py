@@ -1,0 +1,3 @@
+from .department_child import WeChatDepartmentChild
+from .external_contact_child import WeChatExternalContactChild
+from .external_contact_group_chat import WeChatExternalContactGroupChat
