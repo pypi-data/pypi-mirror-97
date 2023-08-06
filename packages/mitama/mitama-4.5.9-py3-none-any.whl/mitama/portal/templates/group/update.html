@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %} {% block content %}
+{% if error == None %}
+{% set post = request.post() %}
+{% else %}
+{% set post = {} %}
+{% endif %}
+<form method='POST' action='' enctype='multipart/form-data' class="inner tight">
+    <div id='content' class='container'>
+        <h2 class='mt-4 mb-3'>{{ group.name }}の設定</h2>
+        <div class='mb-3'>
+            <label class='form-label'>アイコン</label>
+            <div id='image-form'>
+                <img src="{{ dataurl(icon) }}" class="group-icon" style='width: 80px; height: 80px'/>
+                <label class='btn btn-primary' style='margin-left: 24px'>
+                    <input type='file' name='icon' accept='image/*' onchange="previewImage(this)" style='display: none' />
+                    画像を選択
+                </label>
+                <script>
+                    function previewImage(dom) {
+                        document.querySelector("#image-form img").src=URL.createObjectURL(dom.files[0])
+                    }
+                </script>
+            </div>
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>ドメイン名</label>
+            <input class='form-control' type='text' name='screen_name' placeholder='ドメイン名' value='{{ screen_name }}'/>
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>名前</label>
+            <input class='form-control' type='text' name='name' placeholder='名前' value='{{ name }}'/>
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>親チーム</label>
+            <select class='form-select' name='parent'>
+                <option value=''></option>
+                {% for group_ in all_groups %}
+                <option value='{{group_._id}}' {% if group._id == group_._id %}selected{% endif %}>{{group_.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% if permission("admin", request.user) %}
+        <div class='mb-3'>
+            <label class='form-label'>役割</label>
+            {% for role in roles %}
+            <div class='form-check'>
+                <input class='form-check-input' type='checkbox' name='roles' value='{{ role.screen_name }}' {% if role in group.roles %}checked{% endif %}/>
+                <label class='form-check-label'>
+                    {{ role.name }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <button type='submit' class='btn btn-primary'>設定を変更</button>
+        {% if error %}
+            <p class='error'>{{ error }}</p>
+        {% endif %}
+        {% if message %}
+            <p class='message'>{{ message }}</p>
+        {% endif %}
+    </div>
+    <div class='container mb-4 mt-4'>
+        <h3 class="mt-3 mb-3 d-flex">
+            参加中
+        </h3>
+        <div class='user-list mt-2 mb-2'>
+            {% for user in group.users %}
+            <div class='container'>
+                <div class='d-flex justify-content-between'>
+                    {{ lists.userItem(user, id='user_'+user._id) }}
+                    <div class='d-flex justify-content-end'>
+                        <button type='button' data-bs-toggle='collapse' data-bs-target='#user_{{user.screen_name}}' class='btn bi bi-gear-fill'></button>
+                    </div>
+                </div>
+                <div class='mt-2 collapse' id='user_{{user.screen_name}}'>
+                    <input type='hidden' name='users' value='{{user._id}}'/>
+                    {% for inner_role in inner_roles %}
+                    <div class='form-check form-check-inline'>
+                        <input
+                            class='form-check-input'
+                            id='inner_role_{{user.screen_name}}_{{inner_role.screen_name}}'
+                            type='checkbox'
+                            name='inner_roles.{{user._id}}'
+                            value='{{inner_role.screen_name}}'
+                            {% if inner_role.exists(group, user) %}
+                            checked
+                            {% endif %}
+                            />
+                        <label class='form-check-label' for='inner_role_{{user.screen_name}}_{{inner_role.screen_name}}'>{{ inner_role.name }}</label>
+                    </div>
+                    {% endfor %}
+                    {% if permission('update_group', request.user) or inner_permission('remove_user', group, request.user) %}
+                    <div class='d-flex'>
+                        <button class='ms-auto btn btn-danger' onclick='exclude("{{user._id}}")'>外す</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <script>
+            function exclude(uid) {
+                const user_list = document.querySelector("#user_"+uid)
+                user_list.parentNode.removeChild(user_list)
+            }
+        </script>
+        <button class='btn btn-primary'>メンバーを更新</button>
+        <div class='row mt-3'>
+            <div class='col-8'>
+                <select name='new_user' class='form-select'>
+                    {% for user in all_users %}
+                    <option value='{{user._id}}'>{{user.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class='col'>
+                <button class='btn btn-primary'>追加</button>
+            </div>
+        </div>
+    </div>
+    {{ forms.csrf(request) }}
+</form>
+{% endblock %}
