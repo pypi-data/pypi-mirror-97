@@ -1,0 +1,112 @@
+{% extends "django_registration/registration_base.html" %}
+
+{% load staticfiles %}
+{% load i18n %}
+{% block title %}{% trans "Register for an account" %}{% endblock %}
+{% block content %}
+
+<script>
+    setTimeout(function() {
+        document.getElementById("privacy_policy_acceptance").addEventListener( 'change', function() {
+            if(this.checked) {
+                document.getElementById("submit_authorization").classList = 'button_base';
+                document.getElementById("submit_authorization").removeAttribute('disabled');
+            } else {
+                document.getElementById("submit_authorization").classList = 'disabled';
+                document.getElementById("submit_authorization").disabled = true;
+            }
+        });
+    }, 1000);
+</script>
+
+<div class="no-sidebar container" id="splash">
+  <div class="flex">
+    <div class="block_log">
+        <figure class="img_log">
+            <img src="{% static 'coopstarter/img/contributor.png' %}" alt="Create your account">
+        </figure>
+        
+      <form method='post' action=''>
+          {% csrf_token %}
+          {% if form.errors %}
+            <p class="error">
+               {% blocktrans %}
+               You have some errors in your form. Please complete the form according to the helptexts. Avoid spaces and special characters in the username.
+               {% endblocktrans %}
+               <br><br>
+               {% blocktrans %}
+               Please use the <b>forget password</b> link if you think you already had an account.
+               {% endblocktrans %}
+            </p>
+          {% endif %}
+          <sib-form-label-text>
+              <label>
+                  <div>
+                      {{ form.username.label_tag }}
+                  </div>
+              </label>
+              {{ form.username }}
+          </sib-form-label-text>
+          
+          <div class="helptext">
+            {% blocktrans %}
+            Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only. No spaces please.
+            {% endblocktrans %}
+          </div>
+          
+          <sib-form-label-text>
+              <label>
+                  <div>
+                      {{ form.email.label_tag }}
+                  </div>
+              </label>
+              {{ form.email }}
+          </sib-form-label-text>
+
+          <sib-form-label-text>
+              <label>
+                  <div>
+                      {{ form.password1.label_tag }}
+                  </div>
+              </label>
+              {{ form.password1 }}
+          </sib-form-label-text>
+
+          <sib-form-label-text>
+              <label>
+                  <div>
+                      {{ form.password2.label_tag }}
+                  </div>
+              </label>
+              {{ form.password2 }}
+          </sib-form-label-text>
+
+          <div class="helptext">
+            {% blocktrans %}
+            Enter the same password as before, for verification.
+            {% endblocktrans %}
+          </div>
+
+          <div class="checkbox">
+            <label for="privacy_policy_acceptance">
+                <input type="checkbox" id="privacy_policy_acceptance" value="privacy_policy_acceptance">
+                {% blocktrans %}
+                I hereby agree to the <a href="https://coopseurope.coop/privacy-policy" target="_blank">Cooperatives Europe privacy policy</a>
+                {% endblocktrans %}
+            </label>
+          </div>
+          
+          <input type="submit" class="disabled" disabled="true" id="submit_authorization" value="{% trans 'Send activation email' %}" />
+      </form>
+    </div>
+  </div>
+
+  {# Assumes you setup the password_reset view in your URLconf #}
+  <p class="flex">
+      <a href="{% url 'password_reset' %}">
+          Lost password?
+      </a>
+  </p>
+
+</div>
+{% endblock %}

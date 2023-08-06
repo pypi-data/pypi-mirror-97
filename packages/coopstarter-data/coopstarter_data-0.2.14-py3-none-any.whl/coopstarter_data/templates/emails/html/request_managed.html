@@ -1,0 +1,28 @@
+{% load staticfiles %}
+{% load i18n %}
+<h2 class="title_lead">
+    {% trans  "Notification from your collaborative Coopedia Knowledge Base" %} 
+</h2>
+
+<p>
+    {% trans  "Hello" %} {{request.submitter.name}}
+</p>
+
+<p>
+    {{request.reviewer.name|safe}} ({{request.reviewer.email}}) {% trans  "has dealt with the request for resource you posted:"  %}
+    <ul>
+        <li>
+            {% trans  "Title:" %} {{request.name}}
+        </li>
+        <li>
+            {% trans  "Description:" %} {{request.description}}
+        </li>
+    </ul>
+</p>
+
+<footer style="margin-top:10px;font-size:small;color:#777">
+    {% blocktrans %}
+    Have a nice day,<br>
+    The Coopedia Knowledge Base Team.
+    {% endblocktrans %}
+</footer>
