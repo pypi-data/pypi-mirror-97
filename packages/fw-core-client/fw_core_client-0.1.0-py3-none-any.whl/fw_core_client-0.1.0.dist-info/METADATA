@@ -1,0 +1,61 @@
+Metadata-Version: 2.1
+Name: fw-core-client
+Version: 0.1.0
+Summary: Flywheel Core HTTP API client
+Home-page: https://gitlab.com/flywheel-io/tools/lib/fw-core-client
+License: MIT
+Keywords: Flywheel,API,Core,HTTP,client
+Author: Flywheel
+Author-email: support@flywheel.io
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: fw-http-client (>=0,<1)
+Requires-Dist: memoization (>=0.3.1,<0.4.0)
+Requires-Dist: packaging (>=20.8,<21.0)
+Requires-Dist: pydantic (>=1.6.1,<2.0.0)
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-core-client
+Description-Content-Type: text/markdown
+
+# fw-core-client
+
+Flywheel Core HTTP API client.
+
+## Installation
+
+Add as a [`poetry`](https://python-poetry.org/docs/) dependency to your project:
+
+```bash
+poetry add fw-core-client
+```
+
+## Usage
+
+```python
+from fw_core_client import get_client
+
+core_client = get_client(
+    client_name="my-app",
+    client_version="1.0",
+    api_key="site.flywheel.io:699uxdIh2wmqtdDyLJ",
+)
+projects = core_client.get("/projects")
+project_labels = [proj.label for proj in projects]
+```
+
+## Development
+
+Install the project with dependencies using `poetry` and enable [`pre-commit`](https://pre-commit.com/):
+
+```bash
+poetry install
+pre-commit install
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
