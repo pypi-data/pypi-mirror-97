@@ -1,0 +1,15 @@
+<{{form.form_tag}}{{ form.attrs }}>{% if not form.is_nested_form and form.attrs.method == 'post' %}<input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}"/>{% endif %}
+
+    {{ form.h_tag }}
+
+    {% block before_fields %}{% endblock %}
+
+    {{ form.errors }}
+    {{ form.render_fields }}
+    {% comment %}
+    For now we do not supported actions in child forms.
+    {% endcomment %}
+    {% if not form.is_nested_form %}
+    {{ form.render_actions }}
+    {% endif %}
+</{{form.form_tag}}>
