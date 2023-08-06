@@ -1,0 +1,98 @@
+Metadata-Version: 2.1
+Name: mayan-document-classifier
+Version: 1.0.2
+Summary: Document classifier
+Home-page: https://gitlab.com/mayan-edms/document-classifier-app
+Author: Roberto Rosario
+Author-email: roberto.rosario@mayan-edms.com
+License: Apache 2.0
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI :: Application
+Classifier: Topic :: Communications :: File Sharing
+Requires-Python: !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*
+Requires-Dist: google-cloud-aiplatform (==0.4.0)
+
+===========
+Description
+===========
+
+Mayan EDMS machine learning document classifier.
+
+
+=======
+License
+=======
+
+This project is open sourced under the `Apache 2.0 License`_.
+
+.. _`Apache 2.0 License`: https://gitlab.com/mayan-edms/dropbox/raw/master/LICENSE
+
+
+============
+Installation
+============
+
+#. Install from PyPI in the same ``virtualenv`` where you installed Mayan EDMS.
+   Or if using the Docker image, pass ``mayan-document-classifier`` to the
+   ``MAYAN_PIP_INSTALLS`` environment variable.
+
+   .. code-block:: console
+
+       pip install mayan-document-classifier
+
+#. Add ``document_classifier`` to the ``COMMON_EXTRA_APPS`` setting, either as an
+   environment variable, from a Python settings modules, or from the UI
+   via the ``config.yaml`` configuration file.
+
+   Python settings module example:
+
+   .. code-block:: console
+
+       INSTALLED_APPS += (
+           'document_classifer',
+       )
+
+#. Run the migrations for the app (not required for the Docker image):
+
+   .. code-block:: console
+
+       mayan-edms.py migrate
+
+
+============
+Requirements
+============
+
+- **Mayan EDMS version 3.4**
+
+
+1.0.2 (2021-03-04)
+==================
+- Fix Google AI library dependency definition.
+
+1.0.1 (2021-03-04)
+==================
+- Add missing Google AI library dependency.
+
+1.0.0 (2021-01-06)
+==================
+- Initial release
+
+
