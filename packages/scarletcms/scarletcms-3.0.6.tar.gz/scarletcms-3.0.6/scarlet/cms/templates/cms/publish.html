@@ -1,0 +1,14 @@
+{% extends base %}
+{% load cms %}
+{% block main_content %}
+    <p>{% if obj.is_published %}Currently live{% else %}Currently not live{% endif %}<br/>
+    {{ obj.status_line }}</p>
+    <form action="{{ action_url }}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <div class="button-group button-group--submit">
+            <a class="button button--secondary" href="{{ done_url }} ">Cancel</a>
+            <input class="button button--primary" type="submit" name="publish" value="Publish" />
+        </div>
+    </form>
+{% endblock %}

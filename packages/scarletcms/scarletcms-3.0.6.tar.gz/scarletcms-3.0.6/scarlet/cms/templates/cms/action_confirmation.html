@@ -1,0 +1,33 @@
+{% extends base %}
+{% load cms %}
+{% block main_content %}
+    <form action="{{ action_url }}" method="post">
+        {% csrf_token %}
+
+    {% bundle_url bundle "main_list" as cancel_url %}
+    {% if not errors %}
+
+        {% ifequal queryset|length 1 %}
+            <p>{{ conf_msg }} <strong class="object-name">{{ queryset.0 }}</strong></p>
+        {% else %}
+            <p>{{ conf_msg }}</p>
+            <ul>
+            {% for obj in queryset %}
+                <li class="object-name">{{ obj }} <em>{{ obj.status_line }}</em></li>
+            {% endfor %}
+            </ul>
+        {% endifequal %}
+        <div class="button-group button-group--submit">
+            <a class="button button--secondary" href="{{ cancel_url }} ">Cancel</a>
+            <input class="button button--primary" type="submit" name='modify' value="{{ action }}" />
+        </div>
+    {% else %}
+        <p>{{ error_msg }}</p>
+
+        {% for e in errors %}
+        <p>{{ e }}</p>
+        {% endfor %}
+        <a class="button button--primary" href="{{ cancel_url }} ">OK</a>
+    {% endif %}
+    </form>
+{% endblock %}
