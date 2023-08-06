@@ -1,0 +1,181 @@
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Initialiser template used to bring up the install ServiceCatalog-Factory
+  {"version": "latest", "framework": "servicecatalog-factory", "role": "initialiser"}
+
+Parameters:
+  EnabledRegions:
+    Type: String
+    Description: |
+      Space or comma seperated list of AWS Regions for which your Factory should operate in
+
+Resources:
+  InitialiserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Initialiser
+      Path: /servicecatalog-factory/
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess"
+      Tags:
+        - Key: "ServiceCatalogFactory:Actor"
+          Value: "Framework"
+
+  InitialiserProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: servicecatalog-product-factory-initialiser
+      Description: "Initialiser for the factory"
+      ServiceRole: !GetAtt InitialiserRole.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: linuxContainer
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/python:3.7.1
+        EnvironmentVariables:
+          - Name: ENABLED_REGIONS
+            Type: PLAINTEXT
+            Value: !Join [ ',', !Split [ ', ', !Ref EnabledRegions]]
+      Source:
+        Type: NO_SOURCE
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+              commands:
+                - pip install aws-service-catalog-factory --upgrade
+                - servicecatalog-factory --info set-regions ${ENABLED_REGIONS}
+            build:
+              commands:
+                - servicecatalog-factory --info bootstrap
+
+      TimeoutInMinutes: 60
+      Tags:
+        - Key: "ServiceCatalogFactory:Actor"
+          Value: "Framework"
+
+  StartInstallRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: StartFactoryInstallRole
+      Path: /servicecatalog-factory/
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AWSCodeBuildDeveloperAccess"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Tags:
+        - Key: "ServiceCatalogFactory:Actor"
+          Value: "Framework"
+
+  StartInstallLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt StartInstallRole.Arn
+      Handler: "index.handler"
+      Description: Lambda for starting Factory CodeBuild Job
+      Runtime: python3.7
+      Timeout: 900
+      Tags:
+        - Key: "ServiceCatalogFactory:Actor"
+          Value: "Framework"
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import logging
+          import time
+          from urllib.request import Request, urlopen
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def handler(event, context):
+              request_type = event['RequestType']
+              codebuild_projectname = event.get('ResourceProperties').get('ProjectName')
+
+              try:
+                  logger.info(request_type)
+                  if request_type in ['Create', 'Update']:
+                      codebuild_client = boto3.client('codebuild')
+                      logger.info("Starting CodeBuild Job: {}".format(codebuild_projectname))
+                      codebuild_response = codebuild_client.start_build(
+                          projectName = codebuild_projectname
+                      )
+                      build_id = codebuild_response.get('build').get('id')
+                      build_status = 'IN_PROGRESS'
+                      while build_status == 'IN_PROGRESS':
+                          time.sleep(5)
+                          build = codebuild_client.batch_get_builds(ids=[build_id]).get('builds')[0]
+                          build_status = build.get('buildStatus')
+                      if build_status != 'SUCCEEDED':
+                          raise Exception(f"Build did not SUCCEED. Status: {build_status}")
+                      send_response(event, context, "SUCCESS",
+                                    {"Message": "Updated"})
+
+                  elif request_type == 'Delete':
+                      send_response(event, context, "SUCCESS",
+                                    {"Message": "Deleted"})
+
+                  else:
+                      send_response(event, context, "FAILED",
+                                    {"Message": "Unexpected"})
+
+              except Exception as ex:
+                  logger.error(ex)
+                  send_response(event, context,"FAILED",
+                                    {"Message": "Exception"})
+
+          def send_response(e, c, rs, rd):
+              r = json.dumps({
+                  "Status": rs,
+                  "Reason": "CloudWatch Log Stream: " + c.log_stream_name,
+                  "PhysicalResourceId": c.log_stream_name,
+                  "StackId": e['StackId'],
+                  "RequestId": e['RequestId'],
+                  "LogicalResourceId": e['LogicalResourceId'],
+                  "Data": rd
+              })
+              d = str.encode(r)
+              h = {
+                  'content-type': '',
+                  'content-length': str(len(d))
+              }
+              req = Request(e['ResponseURL'], data=d, method='PUT', headers=h)
+              r = urlopen(req)
+              logger.info("Status message: {} {}".format(r.msg, r.getcode()))
+
+  StartInstall:
+    Type: Custom::CustomResource
+    DependsOn: InitialiserProject
+    Properties:
+      ServiceToken: !GetAtt StartInstallLambda.Arn
+      ProjectName: !Ref InitialiserProject
+
+Outputs:
+  ServiceCatalogFactoryRepoConsoleURL:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/codesuite/codecommit/repositories/ServiceCatalogFactory/browse"
+  ServiceCatalogFactoryRepoCloneURLSSH:
+    Value: !Sub "ssh://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/ServiceCatalogFactory"
+  ServiceCatalogFactoryRepoCloneURLHTTPS:
+    Value: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/ServiceCatalogFactory"
