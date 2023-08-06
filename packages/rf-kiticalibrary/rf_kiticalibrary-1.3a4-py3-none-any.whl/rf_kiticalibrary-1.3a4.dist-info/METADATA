@@ -1,0 +1,88 @@
+Metadata-Version: 2.1
+Name: rf-kiticalibrary
+Version: 1.3a4
+Summary: Test Library for Devicepool Support.
+Home-page: https://github.com/MainSystemDev/kitica
+Author: Joshua Kim Rivera
+Author-email: joshua.rivera@mnltechnology.com
+License: Type license() to see the full license text
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: Testing
+Classifier: Framework :: Robot Framework
+Classifier: Framework :: Robot Framework :: Library
+Description-Content-Type: text/markdown
+Requires-Dist: requests (>=2.22.0)
+Requires-Dist: robotframework (>=3.2.2)
+Requires-Dist: robotframework-pythonlibcore (>=2.1.0)
+
+KiticaLibrary
+================
+
+Library Scope: __GLOBAL__  
+Created: __02/04/2020 14:55 UTC-8__  
+
+
+Author: __Joshua Kim Rivera | email:joshua.rivera@mnltechnology.com__
+
+Company: [__Spiralworks Technologies Inc.__](http://www.spiralwrks.com/)
+
+
+### Contents:
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Generating Documentation](#generating-documentation)
+
+
+### Introduction
+**KiticaLibrary** is a [Robotframework](https://www.robotframework.org) Test Library for Devicepool support.  
+
+It is a Robot Framework third party library that enables test to borrow available user from a device pool. These allows test to run in CI server without user conflict and lessen setup and maintenance on a project.  
+![PyPI](https://img.shields.io/pypi/v/rf-kiticalibrary?style=for-the-badge)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/rf-kiticalibrary?style=for-the-badge)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/rf-kiticalibrary?style=for-the-badge)
+
+View the latest keyword [Documentation here.](https://mainsystemdev.github.io/kitica/)  
+
+### Installation
+Install using pypi, run:
+```bash
+pip install rf-kiticalibrary
+```
+
+### Usage
+To use UserpoolLibrary in Robot Framework tests, the library needs to
+first be imported using the `Library` setting as any other library.  
+
+```robotframework
+*** Settings ***
+Documentation                               Demo file for KiticaLibrary
+
+Library                                     KiticaLibrary
+...                                         http://kitica.api
+
+*** Test Case ***
+Test Borrow
+    [Documentation]                         Sample Borrow Device.
+    ${device}                               Borrow Android Device
+    Set Global Variable                     ${device}
+
+Test Return
+    [Documentation]                         Test Return Device
+    Log To Console                          ${device}
+    Return Device                           ${device}
+```
+
+### Generating Documentation
+To Generate the keyword Documentation, simple run:
+```bash
+python -m robot.libdoc KiticaLibrary documentation.html
+```
+> Where documentation.html is the name of the documentation file to be generated.  
+Note that the library must first be installed before generating a documentation.
+
+
