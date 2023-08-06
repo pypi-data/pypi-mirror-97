@@ -1,0 +1,91 @@
+from sys import argv
+import os
+from dotenv import load_dotenv
+
+from .init import init_layer
+from .update import update_layer
+from .deploy import deploy_layer
+from .helpers import find_dotenv, get_service_name, get_runtime
+
+usage_str = """
+Usage:  awslayer [OPTION] COMMAND [environment]
+
+A simple AWS Lambda Layer manager.
+
+Options:
+  -h, --help    Print usage string.
+
+Commands:
+  init          Initialize AWS Lambda Layer.
+  deploy        Deploy layer to AWS Lambda.
+  update        Update layer requirements.
+  
+Parameters:
+  environment   Specify environment to deploy your layer into. Will look for corresponding .env file. Defaults to
+                .env and development .env respectively.
+
+\033[1mTo get more help with this package, contact the repo owner.\033[0m"""
+
+
+def main():
+    if len(argv) < 2:
+        print(f"\033[91mMissing command.\033[0m")
+        print(usage_str)
+        exit()
+
+    service = get_service_name()
+    runtime = get_runtime()
+    environment = argv[2] if len(argv) == 3 else None
+    path = None
+
+    try:
+        path = find_dotenv(environment)
+    except RuntimeError as e:
+        print(f'\033[91m{e}\033[0m')
+        exit()
+
+    load_dotenv(dotenv_path=path)
+
+    environment = os.getenv('ENVIRONMENT')
+
+    if not environment:
+        print(f"\033[91mThe ENVIRONMENT variable is not specified in the {path} file\033[0m")
+        exit()
+
+    if argv[1] in ['-h', '--help']:
+        print(usage_str)
+    elif argv[1] == 'init':
+        if os.path.isdir('layer')\
+                and os.path.isdir('layer/package')\
+                and os.path.isfile('layer/serverless.yml')\
+                and os.path.isfile('layer/package/aws_requirements.txt'):
+            print("\033[91mLayer initialized.\033[0m",
+                  "\033[91mPlease run `awslayer update` to update requirements and the serverless yaml.\033[0m")
+            print(usage_str)
+        else:
+            init_layer(service, runtime, environment)
+    elif argv[1] == 'deploy':
+        if not os.path.isdir('layer') \
+                or not os.path.isdir('layer/package') \
+                or not os.path.isfile('layer/serverless.yml') \
+                or not os.path.isfile('layer/package/aws_requirements.txt'):
+            print("\033[91mLayer not initialized. Please run `awslayer init`.\033[0m")
+            print(usage_str)
+        else:
+            deploy_layer(runtime)
+    elif argv[1] == 'update':
+        if not os.path.isdir('layer') \
+                or not os.path.isdir('layer/package') \
+                or not os.path.isfile('layer/serverless.yml') \
+                or not os.path.isfile('layer/package/aws_requirements.txt'):
+            print("\033[91mLayer not initialized. Please run `awslayer init`.\033[0m")
+            print(usage_str)
+        else:
+            update_layer(service, runtime, environment)
+    else:
+        print(f"\033[91mUnrecognized command: {argv[1]}.\033[0m")
+        print(usage_str)
+
+
+if __name__ == "__main__":
+    main()
