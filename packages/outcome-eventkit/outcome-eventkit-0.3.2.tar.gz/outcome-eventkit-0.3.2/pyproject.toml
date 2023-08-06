@@ -1,0 +1,80 @@
+[tool.poetry]
+name = "outcome-eventkit"
+version = "0.3.2"
+description = "A toolkit for emitting and handling events, following the CloudEvent spec."
+authors = ["Outcome Engineering <engineering@outcome.co>"]
+packages = [
+  { include = "outcome", from = "src" }
+]
+homepage = "https://github.com/outcome-co/eventkit-py"
+repository = "https://github.com/outcome-co/eventkit-py"
+documentation = "https://github.com/outcome-co/eventkit-py#README"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.8.6"
+pydantic = "^1.7.2"
+requests = "^2.24.0"
+lark-parser = ">=0.10.1,<0.12.0"
+outcome-utils = "^5.0.0"
+pendulum = "^2.1.2"
+
+[tool.poetry.dev-dependencies]
+outcome-devkit = "^5.6.3"
+
+
+[tool.coverage.run]
+branch = true
+data_file = 'coverage/data'
+source = ['src/outcome/eventkit/']
+omit = [
+   "test/*"
+]
+parallel = true
+
+[tool.coverage.report]
+fail_under = 100
+skip_empty = true
+
+[tool.coverage.html]
+show_contexts = true
+directory = 'coverage/html'
+
+[tool.black]
+line-length = 130
+include = '\.pyi?$'
+# This stops black from rewriting quotes
+skip-string-normalization = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.cache
+)/
+'''
+
+[tool.isort]
+skip_glob = "*/.cache/**/*"
+line_length = 130
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.3.2"
+tag_format = "v$version"
+bump_message = "chore(version): $current_version → $new_version"
+version_files = ["README.md:version-badge", "pyproject.toml:version"]
+
+[pypi]
+name = "otc"
+url = "https://pypi.pkg.outcome.co/simple/"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
