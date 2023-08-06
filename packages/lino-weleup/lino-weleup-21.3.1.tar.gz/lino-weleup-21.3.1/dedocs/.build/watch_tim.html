@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>watch_tim &#8212; Lino für ÖSHZ</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/linodocs.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="author" title="Über dieses Dokument" href="about.html" />
+    <link rel="index" title="Stichwortverzeichnis" href="genindex.html" />
+    <link rel="search" title="Suche" href="search.html" />
+    <link rel="next" title="Kalender" href="cal.html" />
+    <link rel="prev" title="Partner" href="partner.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Stichwortverzeichnis"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="cal.html" title="Kalender"
+             accesskey="N">weiter</a> |</li>
+        <li class="right" >
+          <a href="partner.html" title="Partner"
+             accesskey="P">zurück</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Lino für ÖSHZ</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="handbuch.html" accesskey="U">Lino Welfare Benutzerhandbuch</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">watch_tim</a></li> 
+      </ul>
+    </div>
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  
+  <div class="section" id="watch-tim">
+<span id="welfare-watch-tim"></span><h1>watch_tim<a class="headerlink" href="#watch-tim" title="Link zu dieser Überschrift">¶</a></h1>
+<p>Diese Seite ist die offizielle Dokumentation der Synchronisierung von
+TIM nach Lino, einer Funktionalität, die ausschließlich im ÖSHZ Eupen
+genutzt wird.</p>
+<div class="contents local topic" id="inhalt">
+<ul class="simple">
+<li><p><a class="reference internal" href="#partner-und-watch-tim" id="id1">Partner und watch_tim</a></p>
+<ul>
+<li><p><a class="reference internal" href="#partnerattribute" id="id2">Partnerattribute</a></p></li>
+<li><p><a class="reference internal" href="#anrede" id="id3">Anrede</a></p></li>
+<li><p><a class="reference internal" href="#die-inss" id="id4">Die INSS</a></p></li>
+<li><p><a class="reference internal" href="#bearbeitungszustand" id="id5">Bearbeitungszustand</a></p></li>
+<li><p><a class="reference internal" href="#veraltete-partner" id="id6">Veraltete Partner</a></p></li>
+<li><p><a class="reference internal" href="#sonstiges" id="id7">Sonstiges</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#begleitungen" id="id8">Begleitungen</a></p>
+<ul>
+<li><p><a class="reference internal" href="#primare-begleitung" id="id9">Primäre Begleitung</a></p></li>
+<li><p><a class="reference internal" href="#begleitungsdienst" id="id10">Begleitungsdienst</a></p></li>
+<li><p><a class="reference internal" href="#regeln" id="id11">Regeln</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#krankenkassen-und-apotheken-klientenkontakte" id="id12">Krankenkassen und Apotheken (Klientenkontakte)</a></p></li>
+<li><p><a class="reference internal" href="#technisches" id="id13">Technisches</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cannot-create-client-0000023756-from-pxs" id="id14">Cannot create Client 0000023756 from PXS</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="partner-und-watch-tim">
+<h2><a class="toc-backref" href="#id1">Partner und watch_tim</a><a class="headerlink" href="#partner-und-watch-tim" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Sowohl in TIM als auch in Lino gibt es eine Tabelle der <strong>Partner</strong>.
+Die Partnernummer ist die Gleiche in TIM wie in Lino.
+Im Hintergrund läuft ständig ein Programm namens <cite>watch_tim</cite>,
+das alle Änderungen in TIM automatisch nach Lino synchronisiert.</p>
+<p>Partner mit einer Nummer zwischen 200000 und 299999
+sind <strong>in Lino erstellt</strong> worden und existieren also nicht in TIM.
+Alle anderen Partner sind <strong>importierte</strong> Partner, und die haben
+die meisten Datenfelder in Lino schreibgeschützt.</p>
+<p>Lino <em>unterteilt</em> Partner etwas anders als TIM.</p>
+<p>TIM unterscheidet vier „Partnerarten“:</p>
+<ul class="simple">
+<li><p>S Sozialhilfeempfänger</p></li>
+<li><p>A APH-Bewohner</p></li>
+<li><p>V Verschiedene</p></li>
+<li><p>I Inaktive Partner</p></li>
+</ul>
+<p>Bei der Synchronisierung wird nach folgenden Regeln entschieden, wer
+wo hin kommt:</p>
+<ul class="simple">
+<li><p>Wenn mindestens eines der Felder
+<cite>PAR-&gt;NB2</cite> (INSS) oder <cite>PAR-&gt;NB1</cite> (Gesdos-Nr)
+unleer ist, oder wenn <em>Partnerattribut N (Neuzugang)</em>
+gesetzt ist, dann wird es ein
+<cite>Klient &lt;pcsw.Client&gt;</cite>.
+Wobei zu beachten ist, dass <cite>PAR-&gt;NB2</cite> (INSS) als leer gilt, wenn es
+nur eine  Null („0“)  enthält.
+Ausnahme:
+Wenn <cite>PAR-&gt;NoTva</cite> unleer ist und <cite>PAR-&gt;NB2</cite> (INSS) leer,
+dann wird es <em>trotzdem kein</em> Klient
+(sondern eine Organisation, s.h. nächster Punkt).</p></li>
+<li><p><strong>Ansonsten</strong>, wenn <cite>PAR-&gt;NoTva</cite> unleer ist, wird es eine
+<cite>Organisation &lt;contacts.Company&gt;</cite>.</p></li>
+<li><p><strong>Ansonsten</strong>, wenn <cite>PAR-&gt;Allo</cite> (Anrede) einen der Werte „Eheleute“,
+„Herr und Frau“ enthält, dann wird es ein
+<cite>Haushalt &lt;households.Household&gt;</cite></p></li>
+<li><p>Ansonsten wird es eine <cite>Person &lt;contacts.Person&gt;</cite>.</p></li>
+</ul>
+<p>Zusatzregel:</p>
+<ul class="simple">
+<li><p>um Klient oder Person werden zu können, muss ein Partner außerdem
+auch einen <em>Vornamen</em> haben, d.h. <cite>PAR-&gt;Firme</cite> muss mindestens ein
+Leerzeichen enthalten.  Hat er das nicht, wird er zum einfachen
+Partner, und eventuelle Information in <cite>PAR-&gt;NB1</cite> oder <cite>PAR-&gt;NB2</cite>
+werden ignoriert.</p></li>
+</ul>
+<p>Ob eine Organisation auch Kursanbieter
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">welfare.courses.CourseProvider</span></code>) und/oder Stellenabieter
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">welfare.jobs.JobProvider</span></code>) ist, wird lediglich in Lino (durch
+Ankreuzen des antsprechenden Feldes im Detail-Fenster) entschieden.
+TIM kennt diese Information nicht.</p>
+<div class="section" id="partnerattribute">
+<h3><a class="toc-backref" href="#id2">Partnerattribute</a><a class="headerlink" href="#partnerattribute" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Hier eine Liste der möglichen Partnerattribute in TIM, und was Lino daraus macht.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 45%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attrib</p></th>
+<th class="head"><p>Bezeichnung in TIM</p></th>
+<th class="head"><p>in Lino</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>H</p></td>
+<td><p>Versteckt</p></td>
+<td><p>wird ignoriert</p></td>
+</tr>
+<tr class="row-odd"><td><p>W</p></td>
+<td><p>Warnung bei Auswahl</p></td>
+<td><p><cite>veraltet</cite> im Reiter <cite>Sonstiges</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>R</p></td>
+<td><p>Schreibgeschützt</p></td>
+<td><p>wird ignoriert</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>als Nebenpartner ignorieren</p></td>
+<td><p>wird ignoriert</p></td>
+</tr>
+<tr class="row-even"><td><p>A</p></td>
+<td><p>Altfall (automatisch)</p></td>
+<td><p>wird ignoriert</p></td>
+</tr>
+<tr class="row-odd"><td><p>E</p></td>
+<td><p>Eingeschlafener Debitor (automatisch)</p></td>
+<td><p>wird ignoriert</p></td>
+</tr>
+<tr class="row-even"><td><p>N</p></td>
+<td><p>Neuzugang</p></td>
+<td><p>Klient im Bearbeitungszustand „Neuantrag“</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Partnerattribut W</strong> bewirkt in Lino das Gleiche
+wie <strong>Partnerart „Inaktive“</strong>, nämlich dass dieser Partner
+das Feld <cite>veraltet</cite> angekreuzt kriegt.</p>
+<p>Das <strong>Partnerattribut A</strong> (Altfall) aus TIM ist eine rein buchhalterische
+Information (Partner hat seit dd.mm.yyyy keine buchhalterische Bewegung gehabt),
+die momentan in Lino nicht importiert wird.
+Falls sie mal in Lino sichtbar werden soll,
+sollte sie als ein eigenes schreibgeschütztes Ankreuzfeld da stehen.</p>
+<p>Hier einige mögliche Überraschungseffekte</p>
+<ul class="simple">
+<li><p>Ein existierender Klient kann in Lino verschwunden scheinen,
+weil er versehentlich als veraltet  markiert wurde
+(siehe <a class="reference internal" href="#veraltete-partner">Veraltete Partner</a>).
+(siehe <a class="reference internal" href="#partnerattribute">Partnerattribute</a>).
+Also nachprüfen, ob er in TIM das <strong>Partnerattribut W</strong> gesetzt hat.
+Oder gar unter Partnerart „Inaktive“ steht.</p></li>
+<li><p>„Ich sehe in „meiner“ Liste in Lino einen bestimmten aus TIM importierten
+Klienten, den ich schon seit Langem nicht mehr begleite.“
+–&gt; Um einen aus TIM importierten Klienten
+nicht mehr „in meiner Liste“ zu sehen, muss in TIM entweder
+das Feld <cite>PAR-&gt;IdUser</cite> geändert,
+die Partnerart auf Inaktiv gesetzt
+oder das Partnerattribut W eingeschaltet werden.</p></li>
+</ul>
+</div>
+<div class="section" id="anrede">
+<h3><a class="toc-backref" href="#id3">Anrede</a><a class="headerlink" href="#anrede" title="Link zu dieser Überschrift">¶</a></h3>
+<p><cite>PAR-&gt;Allo</cite> geht nach <code class="xref py py-attr docutils literal notranslate"><span class="pre">Person.title</span></code> oder <code class="xref py py-attr docutils literal notranslate"><span class="pre">Company.prefix</span></code>.
+Außer wenn <cite>PAR-&gt;Allo</cite> es einen der Werte „Eheleute“,
+„Herr und Frau“ enthält, dann wird es ein Haushalt.</p>
+<p><cite>PAR-&gt;Name2</cite> wird ins Feld „Adresszeile vor Straße“ importiert.</p>
+</div>
+<div class="section" id="die-inss">
+<h3><a class="toc-backref" href="#id4">Die INSS</a><a class="headerlink" href="#die-inss" title="Link zu dieser Überschrift">¶</a></h3>
+<ul class="simple">
+<li><p>Es kann Klienten ohne INSS geben.
+Die sind dann allerdings „inoffiziell“ bzw. „nicht integriert“ bzw. „ohne Akte beim Ministerium“.
+In TIM haben diese Klienten entweder eine leere INSS oder eine 0 dort stehen.
+Die 0 wird als „leer“ übertragen, denn
+in Lino kann es nicht zwei Klienten mit der gleichen INSS geben.</p></li>
+<li><p>Lino lässt auch ungültige INSS zu.</p></li>
+<li><p>Ein „Numéro bis“ ist eine provisorische INSS,
+die z.B. auch 680000 formatiert ist.
+So eine Bis-Nummer kann also dann auch irgendwann mal ändern.</p></li>
+</ul>
+</div>
+<div class="section" id="bearbeitungszustand">
+<h3><a class="toc-backref" href="#id5">Bearbeitungszustand</a><a class="headerlink" href="#bearbeitungszustand" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Der Bearbeitungszustand eines Klienten kann sein:</p>
+<ul>
+<li><p><strong>Neuantrag</strong> :
+Die Person hat Antrag auf Begleitung gestellt.
+Antrag wird überprüft und der Klient muss einem Sachbearbeiter
+oder Sozi zugewiesen werden.</p>
+<p>Im Detail-Reiter
+<code class="xref std std-screen docutils literal notranslate"><span class="pre">Neuanträge</span></code>
+kann man einem Neuzugang
+einen <strong>Begleiter zuweisen</strong>, wodurch der Klient ins Stadium „Begleitet“ wechelt.</p>
+</li>
+<li><p><strong>Abgelehnt</strong> :
+Die Prüfung des Antrags hat ergeben, dass diese Person kein Anrecht
+auf Begleitung durch unser ÖSHZ hat.</p></li>
+<li><p><strong>Begleitet</strong> :
+Es gibt im ÖSHZ mindestens eine Person, die „sich um die Person kümmert“.
+Damit ein Klient im Status „Begleitet“ sein kann, muss mindestens
+eine aktive Begleitung existieren.</p></li>
+<li><p><strong>Ehemalig</strong> :
+War mal begleitet, aber jetzt nicht mehr.
+Es existieren Begleitungen, aber keine davon ist <em>aktiv</em>.
+Falls es ein importierter Partner ist,
+hatte er in TIM entweder das Attribut <cite>W (Warnung bei Auswahl)</cite>
+oder die Partnerart <cite>I (Inaktive)</cite>.</p></li>
+</ul>
+<div class="graphviz"><img src="_images/graphviz-5dd65fe0a858a427e0cbe5be802fccf0e518427f.png" alt="digraph foo {
+   newcomer -&gt; refused [label=&quot;Neuantrag ablehnen&quot;];
+   newcomer -&gt; coached [label=&quot;Begleiter zuweisen&quot;];
+   refused -&gt; newcomer [label=&quot;Neuantrag wiederholen&quot;];
+   coached -&gt; newcomer [label=&quot;Begleitung abbrechen&quot;];
+   coached -&gt; former [label=&quot;Begleitung beenden&quot;];
+
+   newcomer [label=&quot;Neuantrag&quot;];
+   refused [label=&quot;Abgelehnt&quot;];
+   former [label=&quot;Ehemalig&quot;];
+   coached [label=&quot;Begleitet&quot;];
+}" class="graphviz" /></div>
+<p>Bemerkung:
+Wie alle Partner haben auch Klienten (im Reiter „Sonstiges“)
+ein Ankreuzfeld „veraltet“,
+das unabhängig vom <a class="reference internal" href="#bearbeitungszustand">Bearbeitungszustand</a> existiert.
+Siehe <a class="reference internal" href="#veraltete-partner">Veraltete Partner</a>.</p>
+</div>
+<div class="section" id="veraltete-partner">
+<h3><a class="toc-backref" href="#id6">Veraltete Partner</a><a class="headerlink" href="#veraltete-partner" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Bei importierten Partnern ist
+das Ankreuzfeld
+<cite>veraltet &lt;contacts.Partner.is_obsolete&gt;</cite>
+schreibgeschützt.
+Es ist eingeschaltet, wenn diese Person in TIM
+entweder in <strong>Partnerart „Inaktive“</strong> steht oder
+das <strong>Partnerattribut W</strong> eingeschaltet hat.</p>
+</div>
+<div class="section" id="sonstiges">
+<h3><a class="toc-backref" href="#id7">Sonstiges</a><a class="headerlink" href="#sonstiges" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Im Reiter <span class="guilabel">Sonstiges</span> gibt es drei Ankreuzfelder</p>
+<ul class="simple">
+<li><p>Sozialhilfeempfänger (<cite>is_cpas</cite>) : Angekreuzt , wenn in TIM Partnerart S war.</p></li>
+<li><p>Altenheim (<cite>is_senior</cite>) : Angekreuzt , wenn in TIM Partnerart A war.</p></li>
+<li><p>veraltet (<cite>is_obsolete</cite>) : Angekreuzt , wenn in TIM Partneraattribut W gesetzt war.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="begleitungen">
+<h2><a class="toc-backref" href="#id8">Begleitungen</a><a class="headerlink" href="#begleitungen" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Eine <strong>Begleitung</strong> ist, wenn sich ein bestimmter Mitarbeiter des ÖSHZ
+um einen bestimmten Klienten während einer bestimmten Periode
+„kümmert“.
+Ein Klient kann mehrere Begleitungen auf einmal haben,
+z.B. eine im ASD und eine andere im DSBE.</p>
+<p>Begleitungen werden entweder manuell erzeugt
+durch <cite>Einfügen</cite> in der Tabelle „Begleitungen“,
+oder indirekt durch das <strong>Zuweisen</strong> eines verfügbaren Begleiters.</p>
+<p>Die Felder <strong>von</strong> und <strong>bis</strong> einer Begleitung definieren die <strong>Begleitungsperiode</strong>.
+Das Feld <cite>von</cite> einer Begleitung kann nicht leer sein.
+Ein leeres Feld <cite>bis</cite> einer Begleitung bedeutet, dass das Ende nicht bekannt ist.
+Eine Begleitung ist (an einem gegebenen Datum <cite>heute</cite>) aktiv,
+wenn <cite>von</cite> <strong>&lt;=</strong> <cite>heute</cite> und <cite>bis</cite> entweder leer oder <strong>&gt;=</strong> <cite>heute</cite> ist.</p>
+<div class="section" id="primare-begleitung">
+<h3><a class="toc-backref" href="#id9">Primäre Begleitung</a><a class="headerlink" href="#primare-begleitung" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Lino kann pro Klient mehrere Begleitungen haben,
+aber in TIM haben wir nur den „hauptverantwortlichen Sozialarbeiter“ (<cite>PAR-&gt;IdUsr</cite>).
+Deshalb gibt es das Konzept der <strong>primären</strong> Begleitung.
+In Lino kann pro Klient eine Begleitung primär sein.
+Diese entspricht dem Feld <cite>PAR-&gt;IdUsr</cite> aus TIM.</p>
+<p>Für die primäre Begleitung eines <em>importierten</em> Klienten gilt:</p>
+<ul>
+<li><p>Die Felder <cite>primär</cite>, <cite>bis</cite> und <cite>Benutzer</cite> sind schreibgeschützt und wie folgt belegt:</p>
+<ul class="simple">
+<li><p><cite>primär</cite> = angekreuzt</p></li>
+<li><p><cite>Benutzer</cite> : der in TIM angegebene Benutzer</p></li>
+<li><p><cite>bis</cite> : entweder leer (wenn es eine aktive Begleitung ist)
+oder 01.01.1990 (wenn es ein Neuzugang oder ehemaliger Klient ist)</p></li>
+</ul>
+<p>Diese Angaben können also nur über TIM verändert werden.</p>
+</li>
+<li><p>Die Felder <cite>von</cite> und <cite>Dienst</cite> dagegen können manuell geändert werden,
+und <cite>watch_tim</cite> geht dann nicht mehr daran.
+Beim ersten Erstellen gibt <cite>watch_tim</cite> ihnen folgende Werte:</p>
+<ul class="simple">
+<li><p><cite>Dienst</cite> = Begleitdienst des Begleiters zu diesem Zeitpunkt</p></li>
+<li><p><cite>von</cite> = Erstelldatum des Partners in TIM</p></li>
+</ul>
+</li>
+</ul>
+<p>Also man kann auf importierten Klienten in Lino zusätzliche Begleitungen
+erstellen, aber diese können nicht primär sein.
+An diese sekundären Begleitungen geht <cite>watch_tim</cite> nicht ran.</p>
+</div>
+<div class="section" id="begleitungsdienst">
+<span id="welfare-clients-coachingtype"></span><h3><a class="toc-backref" href="#id10">Begleitungsdienst</a><a class="headerlink" href="#begleitungsdienst" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Jede Begleitung findet zwingend im Rahmen eines bestimmten
+<strong>Dienstes</strong> statt.</p>
+</div>
+<div class="section" id="regeln">
+<h3><a class="toc-backref" href="#id11">Regeln</a><a class="headerlink" href="#regeln" title="Link zu dieser Überschrift">¶</a></h3>
+<ul class="simple">
+<li><p>Ein Neuantrag kann keine Begleitungen haben.
+(Ein Klient mit Begleitungen, selbst abgeschlossene,
+kann nicht wieder zum Neuantrag werden.
+Höchstens zu einem Ehemaligen.)</p></li>
+<li><p>Wenn ein Klient ins Stadium Ehemalig wechselt, werden automatisch
+alle laufenden Begleitungen beendet.
+Ein Ehemaliger kann keine <em>laufenden</em> Begleitungen haben.</p></li>
+<li><p>Nur Benutzer mit einem unleeren Feld
+<cite>Begleitungsart (Dienst)</cite> in den Benutzereinstellungen
+dürfen manuell Begleitungen erstellen.</p></li>
+<li><p>Importierte Klienten haben eine importierte primäre
+Begleitung, die nicht geändert werden kann.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="krankenkassen-und-apotheken-klientenkontakte">
+<h2><a class="toc-backref" href="#id12">Krankenkassen und Apotheken (Klientenkontakte)</a><a class="headerlink" href="#krankenkassen-und-apotheken-klientenkontakte" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Die Felder PXS-&gt;IdMut (Krankenkasse) und PXS-&gt;Apotheke (Apotheke)
+werden nach Lino synchronisiert als <cite>Klientenkontakte
+&lt;coachings.ClientContact&gt;</cite>.</p>
+<p><em>Importierte</em> Klienten sollten in ihren
+<cite>Klientenkontakten &lt;coachings.ClientContact&gt;</cite>
+deshalb maximal <em>eine</em> Krankenkasse und <em>eine</em> Apotheke haben.
+Sonst findet <cite>watch_tim</cite>, dass er nicht dafür
+zuständig ist und synchronisiert nichts
+(schreibt lediglich eine Warnung in die <cite>system.log</cite>)</p>
+<p>Alle anderen Klientenkontaktarten sind egal,
+davon dürfen auch importierte Klienten so viele haben wie sie wollen.</p>
+<p>Apotheken sind in TIM normale Partner, aber
+Krankenkassen sind Adressen aus <cite>ADR</cite> mit <cite>ADR-&gt;Type == ‚MUT‘</cite>.
+Sie erscheinen in Lino als Organisation,
+werden aber nicht mehr automatisch synchronisiert.
+Also falls des eine in TIM erstellt wird, muss die entsprechende
+Organisation in Lino manuell erstellt werden.
+Dabei ist zu beachten, dass das <cite>id</cite> einer Krankenasse
+beim ersten Import (<cite>initdb_tim</cite>)
+wie folgt ermittelt wurde:</p>
+<blockquote>
+<div><p>id = val(ADR-&gt;IdMut) + 199000</p>
+</div></blockquote>
+<p>Beim Synchronisieren sind folgende Fehlermeldungen denkbar
+(die falls sie auftreten per E-Mail an die Administratoren geschickt werden):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ERROR</span> <span class="n">Client</span> <span class="c1">#20475 (u&quot;MUSTERMANN Max (20475)&quot;) : Pharmacy or Health Insurance 199630 doesn&#39;t exist</span>
+<span class="n">ERROR</span> <span class="n">Client</span> <span class="c1">#20475 (u&quot;MUSTERMANN Max (20475)&quot;) : Pharmacy or Health Insurance 0000086256 doesn&#39;t exist</span>
+</pre></div>
+</div>
+<p>Die erste Meldung bedeutet, dass die Krankenkasse fehlt (Nr. 199xxx sind Krankenkassen), also
+dass man in TIM in der ADR.DBF die Nr 630 raussucht und diese manuell in Lino als Organisation
+199630 anlegt.</p>
+<p>Die zweite Meldung ist eine fehlende Apotheke. Da reicht es, in TIM mal auf diese
+Apotheke 86256 zu gehen und irgendwas zu ändern,
+um manuell eine Synchronisierung auszulösen.
+Kann auch sein, dass es in TIM keinen Partner 86256 gibt
+(TIM lässt es fälschlicherweise zu, Apotheken zu löschen die anderswo referenziert werden):
+dann muss der Klient 20475 sein Feld PXS-&gt;Apotheke auf
+leer gesetzt bekommen (oder auf eine andere existierende
+Apotheke).</p>
+</div>
+<div class="section" id="technisches">
+<h2><a class="toc-backref" href="#id13">Technisches</a><a class="headerlink" href="#technisches" title="Link zu dieser Überschrift">¶</a></h2>
+<p>In der <a class="reference external" href="https://www.lino-framework.org/admin/settings.html#xfile-settings.py" title="(in The Lino Book v20.1)"><code class="xref std std-xfile docutils literal notranslate"><span class="pre">settings.py</span></code></a> gibt es folgende Optionen,
+die für die Synchronisierung von Belang sind:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_imported_partner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="c1">#if obj.id == 3999:</span>
+    <span class="c1">#    return False</span>
+    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;</span> <span class="mi">200000</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="mi">299999</span>
+
+
+
+<span class="k">def</span> <span class="nf">TIM2LINO_LOCAL</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Hook for local special treatment on instances</span>
+<span class="sd">    that have been imported from TIM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+<span class="k">def</span> <span class="nf">TIM2LINO_USERNAME</span><span class="p">(</span><span class="n">userid</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">userid</span> <span class="o">==</span> <span class="s2">&quot;WRITE&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">userid</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="cannot-create-client-0000023756-from-pxs">
+<h3><a class="toc-backref" href="#id14">Cannot create Client 0000023756 from PXS</a><a class="headerlink" href="#cannot-create-client-0000023756-from-pxs" title="Link zu dieser Überschrift">¶</a></h3>
+<p>Die Meldung kommt, wenn in TIM in der PXS eines Partners etwas
+verändert wurde, und dieser Partner in Lino nicht existiert
+(was anormal ist, aber z.B. durch frühere Bugs oder Pannen kommen kann).
+Zu tun: manuell für diesen Partner in der PAR etwas verändern, um
+eine Synchronisierung zu triggern.</p>
+</div>
+</div>
+</div>
+
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_web3.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Inhalt</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tour/index.html">Lino-Tour</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="handbuch.html">Benutzerhandbuch</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="klienten.html">Klienten</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coachings.html">Begleitungen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partner.html">Partner</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">watch_tim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cal.html">Kalender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html">Allgemeines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="excerpts.html">Auszüge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aids.html">Beihilfen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contracts.html">Verträge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html">Systemkonfigurierung</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help/index.html">Selbsthilfe</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changes/index.html">Release-Notizen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testlauf.html">Allgemeine Testanweisungen</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">Über Lino Welfare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kontakt.html">Kontakt</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Schnellsuche</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Los" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script><p align="center">
+<a href="https://github.com/lsaffre/lino-welfare" target="_blank">GitHub</a>
+<a href="http://pypi.python.org/pypi/lino-welfare" target="_blank">pypi</a>
+</p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Stichwortverzeichnis"
+             >Index</a></li>
+        <li class="right" >
+          <a href="cal.html" title="Kalender"
+             >weiter</a> |</li>
+        <li class="right" >
+          <a href="partner.html" title="Partner"
+             >zurück</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Lino für ÖSHZ</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="handbuch.html" >Lino Welfare Benutzerhandbuch</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">watch_tim</a></li> 
+      </ul>
+    </div>
+
+
+    <div class="footer">
+        &copy; Copyright 2012-2018 Rumma &amp; Ko OÜ.
+      Zuletzt aktualisiert am März 08, 2021.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.4.2.
+    <a href="https://raw.github.com/lino-framework/welcht/master/dedocs/watch_tim.rst"
+           rel="nofollow">Quellcode anzeigen</a>.
+    <a href="http://de.welfare.lino-framework.org/watch_tim.html">Online Link</a>.
+    </div>
+  </body>
+</html>

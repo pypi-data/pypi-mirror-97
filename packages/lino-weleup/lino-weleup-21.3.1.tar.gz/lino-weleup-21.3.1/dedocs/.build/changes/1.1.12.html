@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Version 1.1.12 (coming) &#8212; Lino für ÖSHZ</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/linodocs.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="author" title="Über dieses Dokument" href="../about.html" />
+    <link rel="index" title="Stichwortverzeichnis" href="../genindex.html" />
+    <link rel="search" title="Suche" href="../search.html" />
+    <link rel="next" title="Kommende Version" href="coming.html" />
+    <link rel="prev" title="Lino-Welfare 1.1.1" href="1.1.1.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Stichwortverzeichnis"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="coming.html" title="Kommende Version"
+             accesskey="N">weiter</a> |</li>
+        <li class="right" >
+          <a href="1.1.1.html" title="Lino-Welfare 1.1.1"
+             accesskey="P">zurück</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Lino für ÖSHZ</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Release-Notizen</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="old.html" accesskey="U">Alte Release-Notizen</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Version 1.1.12 (coming)</a></li> 
+      </ul>
+    </div>
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  
+  <div class="section" id="version-1-1-12-coming">
+<span id="welfare-1-1-12"></span><h1>Version 1.1.12 (coming)<a class="headerlink" href="#version-1-1-12-coming" title="Link zu dieser Überschrift">¶</a></h1>
+<p>Beschreibung der Neuerungen und Änderungen in Lino</p>
+<div class="section" id="eid-karten">
+<h2>eID-Karten<a class="headerlink" href="#eid-karten" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Der Quick-Link <strong>eID-Karte einlesen</strong> auf der Startseite ist wieder
+da.</p>
+<p>Wenn man die eID-Karte des Klienten hat, sollte man diesen Link
+benutzen.  Zuerst Karte einlegen, dann auf den Link klicken. Lino
+schaut nach, ob dieser Klient schon existiert und springt dann
+entweder auf den existierenden Datensatz, oder fragt „Neuen Klienten
+anlegen?“.</p>
+</div>
+<div class="section" id="dublettenkontrolle">
+<h2>Dublettenkontrolle<a class="headerlink" href="#dublettenkontrolle" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Wenn ein (angeblich) neuer Kunde kommt, soll man idealerweise einfach
+die eid-Karte lesen. Im Normalfall haben wir die NR-Nummer, also gibt
+es keinen Zweifel.</p>
+<p>Neue Klienten manuell (ohne eID-Karte) anzulegen sollte man
+theoretisch vermeiden.  Aber die Praxis sieht ja oft anders aus…</p>
+<p>Wenn der Klient keine eId-Karte hat: in Lino suchen, ob es einen
+ähnlichen und nicht gefunden werden kann, darf er ruhig zunächst mal
+angelegt werden.</p>
+<p>Lino probiert, Dubletten zu erkennen. Bei ziemlich genauer
+Namensübereinstimmung funktioniert das sogar:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Es gibt schon 1 Personen mit ähnlichem Namen:</div>
+<div class="line">Frau Martha MUSTERMANN (200007)</div>
+<div class="line">Sind Sie sicher, dass Sie einen neuen Datensatz für Person Martha MUSTERMANN erstellen möchten?</div>
+</div>
+</div></blockquote>
+<p>Neue Klienten sind zunächst mal im Status „Neuantrag“.  Bevor man
+einen Neuantrag zuweist, kann man jetzt die neue Tabelle „Ähnliche
+Personen“ (SimilarPersons) konsultieren, um eventuelle Dubletten zu
+erkennen.</p>
+</div>
+<div class="section" id="mehrere-adressen-pro-partner">
+<h2>Mehrere Adressen pro Partner<a class="headerlink" href="#mehrere-adressen-pro-partner" title="Link zu dieser Überschrift">¶</a></h2>
+<ul>
+<li><p>Man kann jetzt <strong>mehrere Adressen</strong> pro Klient erfassen. Pro Adresse
+wird erfasst:</p>
+<ul class="simple">
+<li><p>Adressart (Referenzadresse, Reelle, Offizieller Wohnsitz, Sonstige)</p></li>
+<li><p>Button „zur Hauptadresse machen“. Wenn man diesen Button ankreuzt,
+wird er automatisch bei der eventuellen vorigigen Hauptadresse
+abgeschaltet, und die Adressfelder der Partnerstammdaten werden
+aktualisiert.</p></li>
+</ul>
+<p>Die vom Personalausweis eingelesene Adresse steht als „Offizielle“
+Adresse in dieser Liste und kann nicht bearbeitet werden (aber
+braucht nicht unbedingt die Primäradresse zu sein).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="historie">
+<h2>Historie<a class="headerlink" href="#historie" title="Link zu dieser Überschrift">¶</a></h2>
+<ul class="simple">
+<li><p>Jedes druckbare Dokument, das mit Lino erstellt wurde (Verträge,
+Lebenläufe, …) , kommt jetzt in eine „Historie der Auszüge“
+rein. Dort kann man also sehen, wer wann welches Dokument für einen
+Klienten ausgestellt hat.</p></li>
+<li><p>„Auszug“ hat hier nichts zu tun mit dem „Kontoauszug“ einer Bank,
+sondern ist als „Datenbank-Auszug“ zu verstehen. Es ist ein
+Dokument, das eine bestimmte Information zu einem bestimmten
+Zeitpunkt bescheinigt.</p></li>
+</ul>
+</div>
+<div class="section" id="beziehungen-und-haushalte">
+<h2>Beziehungen und Haushalte<a class="headerlink" href="#beziehungen-und-haushalte" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Die „Beziehungen“ aus TIM wurden importiert.  Lino macht es etwas
+genauer als TIM, er unterscheidet zwischen „Beziehungen“ und
+„Haushalten“.</p>
+<p>Eine <strong>Beziehung</strong> ist z.B. „Person A ist Mutter von Person B“ oder
+„Person A ist verheiratet mit Person B“.  Ein <strong>Haushalt</strong> ist, wenn
+mehrere Leute zusammen wohnen. Diese beiden haben ja heutzutage längst
+nicht mehr unbedingt etwas miteinander zu tun.</p>
+<ul class="simple">
+<li><p>Tipp: Bei neuen Klienten zuerst alle Beziehungen erfassen, und dann
+erst auf „Haushalt erstellen“ klicken, denn Lino füllt einen neuen
+Haushalt automatisch aufrund der Beziehungen aus.</p></li>
+</ul>
+<p>Um eine Beziehung zu erstellen, klicke auf den betreffenden Link
+„Beziehung erstellen als (…)“ im Panel Beziehungen.</p>
+<ul class="simple">
+<li><p>Tipp: Um Beziehungen zu Leuten zu erfassen, die kein Klient sind. Im
+Dialogfenster die entsprechende Combobox leer lassen und auf die
+Lupe neben dem Eingabefeld klicken.</p></li>
+</ul>
+<p>Im Panel „ZDSS“ des Reiters „Beziehungen“ sieht man einen Auszug der
+letzten (mit Lino gemachten) Tx25. Das ist gedacht um zu vergleichen,
+ob die Situation mit der offiziellen Version übereinstimmt.</p>
+<ul class="simple">
+<li><p>Tipp: Minderjährige Kinder eines Klienten brauchen in Lino nicht
+unbedingt als Klienten erfasst zu werden, sondern ein Eintrag als
+Person genügt.</p></li>
+</ul>
+</div>
+<div class="section" id="bescheinigungen">
+<h2>Bescheinigungen<a class="headerlink" href="#bescheinigungen" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Lino kann jetzt die ersten <strong>Bescheinigungen</strong> (Sozialsekretariat)
+drucken.</p>
+<ul class="simple">
+<li><p>Zum Beispiel eine Anwesenheitsbescheinigung wird erstellt, indem
+man im Kalender auf eine Anwesenheit geht und dort „Bescheinigung
+ausstellen“ klickt. Die Zeit der Anwesenheit wird nicht mehr
+manuell erfasst, weil Lino sie ja schon kennt.</p></li>
+<li><p>Oder eine Einkommensbescheinigung kann erstellt werden, indem ein
+entsprechender Eintrag in der Liste der <em>Hilfen</em> des Klienten
+erstellt wird. Dieser Eintrag enthält alle Informationen der
+Bescheinigung, die in TIM jedesmal manuell ins Dokument eingetragen
+wurden.</p></li>
+<li><p>Lebensläufe und „Inhalt-eID“ sind jetzt keine Ereignis/Notiz mehr,
+sondern ebenfalls Bescheinigungen. Bei der Migration wurden bestehende
+Lebenläufe konvertiert.</p></li>
+</ul>
+</div>
+<div class="section" id="bankkonten">
+<h2>Bankkonten<a class="headerlink" href="#bankkonten" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Statt einer festen Anzahl von vordefinierten Feldern in TIM (Konto 1,
+Konto 2, System I, …) hat Lino jetzt eine eigene Tabelle mit
+Bankkoonten pro Partner.</p>
+<ul class="simple">
+<li><p>Pro Konto muss man sagen, welche Art es hat: Giro, Spar, Termin, Sonstige…</p></li>
+<li><p>Pro Konto kann man ankreuzen, ob es „vom ÖSHZ verwaltet“ ist oder
+nicht.</p></li>
+</ul>
+</div>
+<div class="section" id="detail-ansicht-der-klienten">
+<h2>Detail-Ansicht der Klienten<a class="headerlink" href="#detail-ansicht-der-klienten" title="Link zu dieser Überschrift">¶</a></h2>
+<p>Angesichts vieler Erweiterungen in der Struktur war es nötig, die
+Gesamtstruktur teilweise neu zu überdenken. Ich hoffe, dass ihr euch
+schnell damit anfreundet. Verbesserungsvorschläge sind willkommen.</p>
+</div>
+<div class="section" id="diverse">
+<h2>Diverse<a class="headerlink" href="#diverse" title="Link zu dieser Überschrift">¶</a></h2>
+<ul class="simple">
+<li><p>Die Liste <span class="menuselection">Empfang ‣ Klienten</span> hatte bisher ein
+eigenes Detail-Layout. Jetzt nicht mehr.</p></li>
+<li><p>Das Benutzerprofil „ASD“ war bisher nicht brauchbar (hatte fast
+keine Zugriffsrechte).
+Kurse / Sprachen jetzt auch für Benutzer vom ASD.</p></li>
+<li><p>Schuldnerberatung : In der Kolonne <span class="guilabel">Gerichtsvollzieher</span>
+eines Budgets (<cite>debts.Entry</cite>) können jetzt nicht mehr nur ein
+Gerichtsvollzieher, sondern auch ein <strong>Inkassounternehmen</strong> zugewiesen
+werden.</p></li>
+<li><p>Die Partnernummer in Klammern (und ggf. ein <code class="docutils literal notranslate"><span class="pre">*</span></code> für veraltete
+Partner), die bisher hinter dem Namen eines Klienten stand, steht
+jetzt generell hinter dem Namen von <em>allen</em> Partnern (also auch
+Haushalte, Organisationen, Personen,…)</p></li>
+<li><p>Ereignisse/Notizen haben jetzt ein neues Feld „Uhrzeit“.</p></li>
+</ul>
+</div>
+</div>
+
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo_web3.png" alt="Logo"/>
+            </a></p>
+<h3><a href="../index.html">Inhalt</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tour/index.html">Lino-Tour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../handbuch.html">Benutzerhandbuch</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Release-Notizen</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="19.11.0.html">19.11.0 (coming)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20181025.html">2018-10-25</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="old.html">Alte Release-Notizen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coming.html">Kommende Version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../testlauf.html">Allgemeine Testanweisungen</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">Über Lino Welfare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kontakt.html">Kontakt</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Schnellsuche</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Los" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script><p align="center">
+<a href="https://github.com/lsaffre/lino-welfare" target="_blank">GitHub</a>
+<a href="http://pypi.python.org/pypi/lino-welfare" target="_blank">pypi</a>
+</p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="Stichwortverzeichnis"
+             >Index</a></li>
+        <li class="right" >
+          <a href="coming.html" title="Kommende Version"
+             >weiter</a> |</li>
+        <li class="right" >
+          <a href="1.1.1.html" title="Lino-Welfare 1.1.1"
+             >zurück</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Lino für ÖSHZ</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Release-Notizen</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="old.html" >Alte Release-Notizen</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Version 1.1.12 (coming)</a></li> 
+      </ul>
+    </div>
+
+
+    <div class="footer">
+        &copy; Copyright 2012-2018 Rumma &amp; Ko OÜ.
+      Zuletzt aktualisiert am März 08, 2021.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.4.2.
+    <a href="https://raw.github.com/lino-framework/welcht/master/dedocs/changes/1.1.12.rst"
+           rel="nofollow">Quellcode anzeigen</a>.
+    <a href="http://de.welfare.lino-framework.org/changes/1.1.12.html">Online Link</a>.
+    </div>
+  </body>
+</html>
