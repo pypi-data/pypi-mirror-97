@@ -1,0 +1,20 @@
+<!doctype html>
+<html ng-app="gassmanApp" lang="{{LOCALE}}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GASsMan</title>
+        <link ng-if="gassman.loggedUser.profile.rss_feed_id" rel="alternate" type="application/rss+xml" title="RSS" ng-href="/rss/{{! gassman.loggedUser.profile.rss_feed_id }}" />
+        <link href="static/css/app.min.css" rel="stylesheet">
+        <link href="static/css/hover.min.css" rel="stylesheet">
+    </head>
+    <body>
+		<div class="loading" ng-if="!appLoaded">
+            <div class="message">Un attimo di pazienza&hellip;</div>
+            <div class="mask"></div>
+		</div>
+        <div ui-view ></div>
+        <script src="/static/js/app.min.js"></script>
+        <script src="/static/js/angular-locale_{{LOCALE.lower().replace('_', '-')}}.js"></script>
+    </body>
+</html>
