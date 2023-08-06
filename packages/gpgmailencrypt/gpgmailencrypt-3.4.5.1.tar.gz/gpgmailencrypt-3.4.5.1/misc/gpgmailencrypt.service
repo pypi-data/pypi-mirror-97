@@ -1,0 +1,17 @@
+[Unit]
+Description=gpgmailencrypt
+After=network.target mysql.service postgresql.service
+Wants=mysql.service postgresql.service
+
+[Service]
+Type=simple
+
+
+User=gpg-mailencrypt
+ExecStart=/usr/local/bin/gme.py --daemon
+StandardOutput=inherit
+TimeoutStartSec=5
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
