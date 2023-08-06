@@ -1,0 +1,365 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "DEBOPS.AUTHORIZED_KEYS" "5" "Mar 04, 2021" "v2.2.1" "DebOps"
+.SH NAME
+debops.authorized_keys \- Manage SSH public keys using Ansible
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBdebops service/authorized_keys\fP [\fB\-\-limit\fP \fIgroup,host,\fP\&...] [\fB\-\-diff\fP] [\fB\-\-check\fP] [\fB\-\-tags\fP \fItag1,tag2,\fP\&...] [\fB\-\-skip\-tags\fP \fItag1,tag2,\fP\&...] [<\fBansible\-playbook\fP options>] ...
+.SH DESCRIPTION
+.sp
+The \fBdebops.authorized_keys\fP role can be used to manage SSH keys centrally in
+the \fB/etc/ssh/authorized_keys/\fP directory. The role only manages the keys
+themselves, you should configure the \fBsshd\fP service to use them separately,
+for example by using the debops.sshd Ansible role.
+.SH GETTING STARTED
+.SS Security considerations
+.sp
+The \fBdebops.authorized_keys\fP role is designed to manage files in
+\fB/etc/ssh/authorized_keys/\fP directory which contain SSH public keys for user
+accounts.
+.sp
+By default, role modifies the ownership and permissions of these files after
+the Ansible \fBauthorized_key\fP changes them, so that the owner of these files
+is \fBroot\fP account, and the file group, either named after the specified
+username, set as an \fBitem.group\fP parameter or \fBroot\fP if the previous
+entries don\(aqt result in an existing group present on a given system. This
+assumes that each user account has a primary group of the same name as their
+account, and they are the only members of that group.
+.sp
+The file attributes will be set as \fB640\fP to allow read only access to the SSH
+public key files. This should ensure that user accounts can be logged into the
+specific SSH public keys, but they cannot be modified by their respective
+users.
+.sp
+Unfortunately, it seems that the Ansible \fBauthorized_key\fP module
+\fI\%enforces the "600" file permissions\fP <\fBhttps://github.com/ansible/ansible-modules-core/blob/devel/system/authorized_key.py#L298-L302\fP>
+on any file change, therefore there exists a window of opportunity between the
+given user file being updated by the \fBauthorized_key\fP module and permissions
+being enforced again by the \fBfile\fP Ansible module. At the moment there\(aqs no
+good solution to this issue, perhaps in the future the \fBauthorized_key\fP
+module will be updated to allow for setting custom file ownership and
+permissions similarly to the \fBfile\fP module. However, if there are no updates
+to the user files, the permissions are not changed.
+.SS SSH service configuration
+.sp
+The \fBdebops.authorized_keys\fP role does not manage the \fBsshd\fP service
+configuration by itself. Instead, you are expected to configure the \fBsshd\fP
+daemon to use the authorized keys from its directory, either by hand or by an
+Ansible role.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+The debops.sshd role enables use of the SSH public keys managed by the
+\fBdebops.authorized_keys\fP automatically.
+.UNINDENT
+.UNINDENT
+.sp
+To enable the \fBsshd\fP service to use the configured public keys, you should
+change the configuration in the \fB/etc/ssh/sshd_config\fP file to something like
+this:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# /etc/ssh/sshd_config
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u %h/.ssh/authorized_keys
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The above configuration will enable use of the configured keys by all
+subsequent SSH connections.
+.sp
+You can use the \fBMatch\fP keyword to restrict the use of the authorized keys to
+a particular hosts, users, groups or IP addresses/subnets as needed. For
+example, if you want to check these authorized keys only for users in
+a specific subnet, you can do it like this:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# /etc/ssh/sshd_config
+Match Address 192.0.2.0/24
+      AuthorizedKeysFile /etc/ssh/authorized_keys/%u %h/.ssh/authorized_keys
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Alternatively, you can use different conditions to restrict the SSH public keys
+checked by the \fBsshd\fP daemon to only the authorized keys maintained by this
+role. For example, to restrict a particular system group to only use these
+authorized keys for authentication, you can do it like this:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# /etc/ssh/sshd_config
+Match Group sftponly
+      AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Example inventory
+.sp
+This role is included by default in the \fBcommon.yml\fP DebOps playbook, so you
+don\(aqt need to do anything to enable it.
+.SS Example playbook
+.sp
+If you are using this role without DebOps, here\(aqs an example Ansible playbook
+that uses the \fBdebops.authorized_keys\fP role:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-\-\-
+
+\- name: Manage SSH public keys
+  collections: [ \(aqdebops.debops\(aq, \(aqdebops.roles01\(aq,
+                 \(aqdebops.roles02\(aq, \(aqdebops.roles03\(aq ]
+  hosts: [ \(aqdebops_all_hosts\(aq, \(aqdebops_service_authorized_keys\(aq ]
+  become: True
+
+  environment: \(aq{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}\(aq
+
+  roles:
+
+    \- role: authorized_keys
+      tags: [ \(aqrole::authorized_keys\(aq, \(aqskip::authorized_keys\(aq ]
+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH DEFAULT VARIABLE DETAILS
+.sp
+Some of \fBdebops.authorized_keys\fP default variables have more extensive
+configuration than simple strings or lists, here you can find documentation and
+examples for them.
+.SS authorized_keys__list
+.sp
+The \fBauthorized_keys__list\fP, \fBauthorized_keys__group_list\fP,
+\fBauthorized_keys__host_list\fP and \fBauthorized_keys__dependent_list\fP
+variables are used to define what SSH keys should be present in each user
+file located in \fB/etc/ssh/authorized_keys/\fP directory. Each list entry is
+a YAML dictionary with specific parameters:
+.INDENT 0.0
+.TP
+.B \fBname\fP
+Required. Name of the user account to configure. This will be used as the
+name of the file located in the \fB/etc/ssh/authorized_keys/\fP directory.
+.UNINDENT
+.sp
+These parameters are related to SSH public key management:
+.INDENT 0.0
+.TP
+.B \fBsshkeys\fP
+Optional. String containing either a SSH public key, or an URL to a resource
+which returns a file with SSH public keys (only one URL is allowed at the
+moment), or a YAML list of SSH public keys.
+.TP
+.B \fBgithub\fP
+Optional. String with the name of a GitHub account. SSH public keys belonging
+to this account will be added to, or removed from, the specified user file.
+The SSH keys will be downloaded from: \fBhttps://github.com/<username>.keys\fP
+Only one GitHub account is allowed at a time.
+.TP
+.B \fBoptions\fP
+Optional. String or list of SSH options which should be set for each key
+specified on the \fBsshkeys\fP list. You can find more about available options
+in \fI\%authorized_keys(5)\fP <\fBhttps://manpages.debian.org/authorized_keys(5)\fP>\&.
+.sp
+If this parameter is not specified, SSH public keys will use options set in
+the \fBauthorized_keys__default_options\fP variable. To override this variable
+for a particular entry, set the \fBitem.options\fP parameter as empty string or
+list.
+.sp
+The specified SSH key options are applied to all keys specified in the
+\fBsshkeys\fP or \fBgithub\fP parameters in this specific entry. To use different
+key options for different SSH keys, specify them in separate entries on the
+list.
+.TP
+.B \fBkey_options\fP
+Optional. Additional set of options to add to the SSH public keys. This can
+be used with \fBitem.options\fP parameter to easily combine a list of options
+from another variable with a custom additional options. For example:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+authorized_keys__list:
+  \- name: \(aquser\(aq
+    github: \(aquser\(aq
+    options: \(aq{{ authorized_keys__options_map.strict }}\(aq
+    key_options: \(aqcommand="ls \-l /home/user"\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.TP
+.B \fBexclusive\fP
+Optional, boolean. If defined and \fBTrue\fP, role will remove all other SSH
+public keys located in the user file and set only the SSH public keys present
+in the \fBitem.sshkeys\fP or \fBitem.github\fP parameters.
+.TP
+.B \fBstate\fP
+Optional. If undefined or \fBpresent\fP, the SSH public keys specified in the
+\fBitem.sshkeys\fP or \fBitem.github\fP parameters will be added to the user
+file. If \fBabsent\fP, the specified SSH public keys will be removed from the
+user file.
+.UNINDENT
+.sp
+These parameters are related to the files located in the
+\fB/etc/ssh/authorized_keys/\fP directory:
+.INDENT 0.0
+.TP
+.B \fBreadonly\fP
+Optional, boolean. If defined and \fBTrue\fP, or if the corresponding
+\fBauthorized_keys__readonly\fP variable is \fBTrue\fP, the role will set the
+owner and group of the user file as \fBroot:<item.group|primary group of user|root>\fP and
+its permissions will be set to \fB0640\fP, so that the respective users being
+in their own groups can still access the file and use it for authentication,
+but they cannot change it.
+.sp
+If this parameter is set to \fBFalse\fP or the corresponding
+\fBauthorized_keys__readonly\fP variable is \fBFalse\fP, to role will not modify
+the file ownership or permissions set by the \fBauthorized_key\fP Ansible
+module.
+.TP
+.B \fBowner\fP
+Optional. Set the owner of the user file. If the owner account does not
+exist, \fBroot\fP will become the owner.
+.TP
+.B \fBgroup\fP
+Optional. Name of the primary group of a given user file. If the specified
+group does not exist, it will be automatically created by the role.
+.sp
+If the \fBitem.group\fP parameter is not specified, the role will try to set
+the group of the file the same as the specified user in \fBitem.name\fP
+parameter with the assumption that the corresponding primary group exists. If
+it does not exist, the primary group of the user file will be \fBroot\fP\&.
+.TP
+.B \fBsystem\fP
+Optional, boolean. If undefined or \fBTrue\fP, the group created by the role
+will be a "system" group, with GID < 1000. If \fBFalse\fP, the created group
+will be a "normal" group with GID >= 1000. The existing groups are not
+modified.
+.TP
+.B \fBgid\fP
+Optional. Specify the GID a given group should use.
+.TP
+.B \fBmode\fP
+Optional. Set the mode of the user file. If not specified, mode \fB0640\fP or
+\fB0600\fP will be set depending on read only configuration parameters.
+.TP
+.B \fBfile_state\fP
+Optional. If undefined or \fBpresent\fP, the user file will be present. If
+\fBabsent\fP, the user file will be removed.
+.UNINDENT
+.SS Examples
+.sp
+Ensure that given SSH public keys are present in the user file:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+authorized_keys__list:
+  \- name: \(aquser1\(aq
+    sshkeys: [ \(aqssh\-rsa AAAAB3NzaC1yc2EAAAA...\(aq, \(aqssh\-rsa AAAAB3NzaC1yc2EAAAA...\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Add SSH public keys from specified URL:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+authorized_keys__list:
+  \- name: \(aquser2\(aq
+    sshkeys: \(aqhttps://auth.example.com/api/ssh/user2\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Add SSH keys from two GitHub accounts to specified user account:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+authorized_keys__list:
+
+  \- name: \(aqapp1\(aq
+    github: \(aquser\-one\(aq
+
+  \- name: \(aqapp1\(aq
+    github: \(aquser\-two\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Set SSH keys from a file on Ansible Controller as the only keys on a given user
+account:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+authorized_keys__list:
+  \- name: \(aquser3\(aq
+    sshkeys: \(aq{{ lookup("file", "/path/to/user3.pub") }}\(aq
+    exclusive: True
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Maciej Delmanowski
+.SH COPYRIGHT
+2014-2021, Maciej Delmanowski, Nick Janetakis, Robin Schneider and others
+.\" Generated by docutils manpage writer.
+.

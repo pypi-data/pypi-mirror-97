@@ -1,0 +1,274 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "DEBOPS.PRESEED" "5" "Mar 04, 2021" "v2.2.1" "DebOps"
+.SH NAME
+debops.preseed \- Manage Debian Preseeding configuration with Ansible
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH SYNOPSIS
+.sp
+\fBdebops service/preseed\fP [\fB\-\-limit\fP \fIgroup,host,\fP\&...] [\fB\-\-diff\fP] [\fB\-\-check\fP] [\fB\-\-tags\fP \fItag1,tag2,\fP\&...] [\fB\-\-skip\-tags\fP \fItag1,tag2,\fP\&...] [<\fBansible\-playbook\fP options>] ...
+.SH DESCRIPTION
+.sp
+\fI\%Preseeding\fP <\fBhttps://wiki.debian.org/DebianInstaller/Preseed\fP> is a way to configure the Debian Installer non\-interactively.
+During installation, a special text file can be downloaded over HTTP, this file
+can provide answers to the installer questions.
+.sp
+After installation, a custom shell script will be downloaded and run in the
+target environment to prepare host for remote use (an admin account will be
+created, SSH keys will be configured, optionally a Salt Minion will be
+installed and will start on the next boot).
+.SH GETTING STARTED
+.SS Example inventory
+.sp
+To configure the Preseed server, you can add a host to
+\fB[debops_service_preseed]\fP group:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+[debops_service_preseed]
+hostname
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Default configuration will prepare Preseed files for Debian Wheezy and Debian
+Jessie, which system administrator account named after either
+\fBansible_ssh_user\fP or the username present on Ansible Controller host.
+.SS Example playbook
+.sp
+Here\(aqs an example playbook which uses \fBdebops.preseed\fP role:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\-\-\-
+
+\- name: Provide Debian Preseed configuration files over HTTP
+  collections: [ \(aqdebops.debops\(aq, \(aqdebops.roles01\(aq,
+                 \(aqdebops.roles02\(aq, \(aqdebops.roles03\(aq ]
+  hosts: [ \(aqdebops_service_preseed\(aq ]
+  become: True
+
+  environment: \(aq{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}\(aq
+
+  roles:
+
+    \- role: keyring
+      tags: [ \(aqrole::keyring\(aq, \(aqskip::keyring\(aq, \(aqrole::nginx\(aq ]
+      keyring__dependent_apt_keys:
+        \- \(aq{{ nginx__keyring__dependent_apt_keys }}\(aq
+
+    \- role: apt_preferences
+      tags: [ \(aqrole::apt_preferences\(aq, \(aqskip::apt_preferences\(aq ]
+      apt_preferences__dependent_list:
+        \- \(aq{{ nginx_apt_preferences_dependent_list }}\(aq
+
+    \- role: ferm
+      tags: [ \(aqrole::ferm\(aq, \(aqskip::ferm\(aq ]
+      ferm__dependent_rules:
+        \- \(aq{{ nginx_ferm_dependent_rules }}\(aq
+
+    \- role: python
+      tags: [ \(aqrole::python\(aq, \(aqskip::python\(aq ]
+      python__dependent_packages3:
+        \- \(aq{{ nginx__python__dependent_packages3 }}\(aq
+      python__dependent_packages2:
+        \- \(aq{{ nginx__python__dependent_packages2 }}\(aq
+
+    \- role: nginx
+      tags: [ \(aqrole::nginx\(aq, \(aqskip::nginx\(aq ]
+      nginx_servers: \(aq{{ preseed__nginx__servers }}\(aq
+
+    \- role: preseed
+      tags: [ \(aqrole::preseed\(aq, \(aqskip::preseed\(aq ]
+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS How to use Debian Preseed configuration
+.sp
+\fBdebops.preseed\fP will use debops.nginx role to set up a webserver for the
+Preseed files. They will be served on a separate subdomain, by default
+\fBseed\fP\&. The FQDN given the \fBexample.org\fP domain will be for example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+debian.seed.example.org
+debian\-vm.seed.example.org
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+You will need to define these subdomains in your DNS server, preferably as
+a \fBCNAME\fP records pointed to the Preseed server.
+.sp
+If you have correctly configured DHCP server, which advertises your domain, you
+will be able to access the Preseed configuration using a shorter form:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+debian.seed
+debian\-vm.seed
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The Debian Installer will automatically add your domain to the specified URL to get
+the Preseed files.
+.sp
+To enable Preseeded installation, after starting the Debian Installer (tested
+with Wheezy and Jessie),
+navigate the menu to "Advanced options" \-> "Automated Install".
+.sp
+Next, press the \fB<Tab>\fP key, this will let you enter additional boot options. Now
+you can specify the URL of the Preseed file.
+.sp
+An example boot command line in Debian Installer:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+auto=true url=debian.seed hostname=<host>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+After you press \fB<Enter>\fP, the Debian Installer should start the installation
+process. If you specified \fBdebian.seed\fP as the Preseed file, the Debian Installer
+should pause during the installation and let you configure the disk partitions
+as you see fit. After configuring the partitions, the automatic installation will
+resume and when it\(aqs finished the host will be automatically rebooted. After that
+you should be able to SSH to it using the configured admin account.
+.sp
+The alternative Pressed configuration, \fBdebian\-vm.seed\fP is configured to
+automatically partition and format the first hard drive with its full capacity,
+without asking the user. This Preseed configuration is designed primary for
+virtual machines, which usually have 1 partition stored in an image file or
+a block device.
+.sp
+If you are not able to add \fI*.seed\fP to your DNS, you might use
+\fBpreseed__base_domain\fP to make the server listen on a hostname
+available via DNS. For this case the boot command line in Debian
+Installer would require a different URL, like in this example (for
+jessie):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+auto url=<myhost>/debian/d\-i/jessie hostname=<host>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH DEFAULT VARIABLE DETAILS
+.sp
+Some of \fBdebops.preseed\fP default variables have more extensive configuration
+than simple strings or lists, here you can find documentation and examples for
+them.
+.SS preseed__configs
+.sp
+This is a list of Preseed configuration files offered by the webserver to the
+clients.
+.sp
+To make custom changes easier, preseed configuration file as well as the
+post\-install script have default stored in the templates themselves, a subset
+of the available default variables is exposed in the \fBdefaults/main.yml\fP
+file, however more esoteric variables were left out to keep the list of
+variables short.
+.sp
+You can also configure the Preseed files using dict keys and values, the
+variable naming scheme is:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+preseed__debian_<key> \- item.<key>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Some more important keys:
+.INDENT 0.0
+.TP
+.B \fBname\fP
+Name of the Preseed configuration, should be limited to alphanumeric
+characters and a hyphen (\fB\-\fP) character. Will be used in the DNS do export
+the configuration to the clients
+.TP
+.B \fBtype\fP
+Specify the set of Preseed templates to use for this configuration.
+Determines among other things the distribution which will be configured
+.TP
+.B \fBrelease\fP
+Specify the distribution release to configure. By default the current host
+release is used if none is specified
+.UNINDENT
+.SS Examples
+.sp
+Example Preseed configuration with custom mirror and list of additional
+packages to install:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+preseed__configs:
+
+  \- name: \(aqdebian\-mail\(aq
+    release: \(aqwheezy\(aq
+    mirror_hostname: \(aqftp.us.debian.org\(aq
+    packages: [ \(aqpostfix\(aq, \(aqdovecot\-imapd\(aq, \(aqmutt\(aq ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Maciej Delmanowski, Robin Schneider
+.SH COPYRIGHT
+2014-2021, Maciej Delmanowski, Nick Janetakis, Robin Schneider and others
+.\" Generated by docutils manpage writer.
+.
