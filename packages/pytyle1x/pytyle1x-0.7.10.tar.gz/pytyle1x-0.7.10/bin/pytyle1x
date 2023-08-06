@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+import time, sys, os, traceback, pathlib
+
+from PyTyle.Config import Config
+from PyTyle.State import State
+from PyTyle.Probe import PROBE
+from PyTyle.Debug import DEBUG
+from PyTyle.Desktop import Desktop
+from PyTyle.Window import Window
+from PyTyle.Event import Event
+from PyTyle.Tile import Tile
+
+
+def reload_tilers():
+    for module in Config.misc('tilers'):
+        tmp = __import__('PyTyle.Tilers.' + module, fromlist = [''])
+        Config.TILERS[module] = tmp.CLASS
+
+
+def reload_config():
+    conPath = str(pathlib.Path.home()) + '/.pytylerc'
+    try:
+        with open(conPath, 'r') as conFile:
+            exec(conFile.read())
+    except FileNotFoundError:
+        DEBUG.write('Configuration file ~/.pytylerc does not exist')
+
+
+while not PROBE.is_wm_running():
+    time.sleep(1)
+time.sleep(1)
+
+
+reload_config()
+
+
+try:
+    reload_tilers()
+    State.register_hotkeys()
+    Desktop.load_desktops()
+    Window.load_new_windows()
+    State.reload_active()
+
+    while True:
+        if State.needs_reload():
+            reload_config()
+            reload_tilers()
+            State.unregister_hotkeys()
+            State.register_hotkeys()
+            Desktop.reload_desktops()
+            State.did_reload()
+
+        if State.queue_has_screens():
+            while State.queue_has_screens():
+                screen = State.dequeue_screen()
+                Tile.dispatch(screen.get_tiler(), 'tile')
+            time.sleep(Config.misc('timeout'))
+
+        e = Event()
+        if e.is_keypress():
+            try:
+                Tile.dispatch(
+                    State.get_desktop()._VIEWPORT._SCREEN.get_tiler(),
+                    None,
+                    e.get_keycode(),
+                    e.get_masks()
+                )
+            except:
+                DEBUG.write('Could not complete key press request')
+                DEBUG.write(traceback.format_exc())
+        elif e.is_active_change():
+            State.reload_active()
+        elif e.is_desktop_change():
+            time.sleep(Config.misc('timeout'))
+            State.reload_active(None, True)
+        elif e.is_windowlist_change():
+            time.sleep(Config.misc('timeout'))
+
+            try:
+                Window.load_new_windows()
+            except:
+                DEBUG.write('Could not tile new window - could be a popup?')
+                DEBUG.write(traceback.format_exc())
+                continue
+
+            try:
+                newwins = State.scan_all_windows()
+                # FIXME RuntimeError: dictionary changed size during iteration
+                for win in State.get_windows().values():
+                    if int(win.id, 0) not in newwins:
+                        win.delete()
+            except:
+                DEBUG.write('Could not properly handle window destruction')
+                DEBUG.write(traceback.format_exc())
+                continue
+        elif e.is_window_change() or e.is_state_change():
+            try:
+                if e.get_window_id() in State.get_windows():
+                    State.get_windows()[e.get_window_id()].refresh()
+            except:
+                DEBUG.write('Could not properly handle window/state change')
+                DEBUG.write(traceback.format_exc())
+        elif e.is_workarea_change():
+            time.sleep(Config.misc('timeout'))
+
+            try:
+                Desktop.refresh_desktops()
+            except:
+                DEBUG.write('Could not properly handle workarea change')
+                DEBUG.write(traceback.format_exc())
+        elif e.is_screen_change():
+            DEBUG.write('Wiping the current state...')
+
+            time.sleep(3)
+
+            try:
+                State.wipe()
+                Desktop.load_desktops()
+                Window.load_new_windows()
+                State.reload_active()
+            except:
+                DEBUG.write('Could not properly handle screen change')
+                DEBUG.write(traceback.format_exc())
+except:
+    DEBUG.write('Fatal error!')
+    DEBUG.write(traceback.format_exc())
+    sys.exit(1)
