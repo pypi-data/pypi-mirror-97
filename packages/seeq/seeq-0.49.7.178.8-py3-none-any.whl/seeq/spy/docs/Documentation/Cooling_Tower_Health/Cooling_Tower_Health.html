@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">    
+</head>
+<body>
+<div class="container">
+
+    <div class="row page-header img-rounded" style="background-color: #467e9c; color: #FFFFFF;">
+        <div class="col-xs-6 rounded">
+            <h1>Cooling Tower Health</h1>
+            <p class="lead">North American Operations</p>
+        </div>
+        <div class="col-xs-6 rounded" style="height: 100px;">
+            <img class="pull-right" style="max-width:150px; margin: auto; position: absolute; top: 0; left: 0; bottom: 0; right: 0;" src="${image('Seeq_Logo_URL_White.png')}">
+        </div>
+    </div>
+    
+    <hr>
+
+    <div class="panel panel-default">
+      <div class="panel-heading" style="background-color: #6090B0; color: #FFFFFF;"><h3>Incident Map</h3></div>
+      <div class="panel-body" style="background-color: #EEEEEE; position: relative;">
+% for area in asset.Areas().assets():
+        <div class="panel panel-default" style="position: absolute; left: ${area.map_position[0]}; top: ${area.map_position[1]};">
+          <div class="panel-heading" style="background-color: #888888; color: #FFFFFF;"><strong>Area ${area['Name']}</strong></div>
+          <div class="panel-body" style="background-color: #CCCCCC;">
+          ${display(area.Incident_Display(), date_range=asset.Last_Two_Months(), width=22, height=43)}
+          </div>
+        </div>
+% endfor
+        <img class="center-block" style="max-width:80%;" src="${image('United_States_Map.png')}">
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading" style="background-color: #70A0C0; color: #FFFFFF;"><h3>Details</h3></div>
+      <div class="panel-body" style="background-color: #F9F9F9;">
+% for area in sorted(asset.Areas().assets(), key=lambda a: a['Name']):
+        <div class="container-fluid" style="border:1px solid #cecece; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-left-radius:10px; border-bottom-right-radius:10px; background-color: #F2F2F2; margin: .5em;">
+            <div class="row img-rounded-top" style="background-color: #80B0D0; border-top-left-radius:10px; border-top-right-radius:10px;">
+                <div class="col-xs-6" style="color: #FFFFFF; padding: 1em;">
+                    <h3>Area ${area['Name']}</h3>
+                </div>
+                <div class="col-xs-6" style="color: #EEEEEE; padding: 1em;">
+                    <h3>Notes</h3>
+                </div>
+            </div>
+            <div class="row" style="border-bottom-left-radius:10px; border-bottom-right-radius:10px;">
+                <div class="col-xs-6 center-block" style="padding: 1em;">
+                    ${display(area.Detail(), date_range=asset.Last_Week(), width=700, height=400)}
+                </div>
+                <div class="col-xs-6" style="padding: 1em;">
+                    <ul>
+                        <li><em>Enter notes here...</em></li>
+                    </ul>
+                </div>                
+            </div>
+        </div>
+% endfor
+      </div>
+    </div>  
+    
+</div> <!-- /container -->
+</body>
+</html>
