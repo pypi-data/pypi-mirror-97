@@ -1,0 +1,73 @@
+Metadata-Version: 2.1
+Name: ezfintech
+Version: 0.0.3
+Summary: get stock data from different APIs
+Home-page: https://github.com/YizheZhang-Ervin/EZFintech
+Author: Yizhe Zhang
+Author-email: ervinzhang319@gmail.com
+License: MIT
+Description: # ezfintech
+          
+        ## Introduction  
+        沪深股票数据API:
+        - 数据  
+            日数据(当日、4日数据)  
+            年数据(一年的数据)  
+            周期数据(日/周/月数据)  
+            区间数据(起止日期内的数据)  
+            实时数据(未开发)  
+            多只股票合表数据(未开发)  
+        - 数据来源包括: Netease,Sohu,StockStar  
+        - 数据可视化: K线图  
+          
+        ## 依赖包  
+        pandas,requests,mplfinance  
+          
+        ## 使用方式
+        ### 安装  
+        python pip install ezfintech  
+          
+        ### 导入   
+        import ezfintech.stockData as ezd    
+        import ezfintech.stockAnalysis as eza  
+          
+        ### 日数据  
+        ezd.getStockByDay(stockCode,day="today",source="126")  
+        stockCode:"XXXXXXX"
+        day: "today" / "4d"  
+        source: "126"  
+          
+        ## 年数据  
+        ezd.getStockByYear(stockCode,year="2020",adjust="klinederc",source="126")  
+        stockCode:"XXXXXXX"
+        year: "YYYY"   
+        adjust: "kline" / "klinederc"    
+        source: "126"  
+          
+        ### 周期数据  
+        ezd.getStockByPeriod(stockCode,period="week",adjust="klinederc",source="126")  
+        stockCode:"XXXXXXX"
+        period: "day" / "week" / "month"  
+        adjust: "kline" / "klinederc"   
+        source: "126" / "stockstar"  
+          
+        ### 区间数据  
+        ezd.getStockByTwoDate(stockCode,startDate="20210301",endDate="20210308",source="sohu")  
+        stockCode:"XXXXXX"
+        startDate: "YYYYMMDD"  
+        endDate: "YYYYMMDD"  
+        source: "sohu"  
+          
+        ### K线图  
+        eza.plotKLine(data,movingAvg=(3,6,9),plotType="candle",startDate="",endDate="")  
+        data: pd.Dataframe  
+        movingAvg: (X1,X2,X3) or X1    
+        plotType: "candle" / "line" / "renko" / "pnf"  
+        startDate: "YYYY-MM-DD"  
+        endDate: "YYYY-MM-DD"  
+          
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
