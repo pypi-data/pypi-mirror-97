@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import sys
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(prog='jasper',
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description="JASPER is a program for prediction of virus's host",
+                                     epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                            "Check my github: github.com/777moneymaker", )
+
+    subparser = parser.add_subparsers(dest="subparser_name")
+    subparser.required = True
+
+    # Blast parser
+    parser_b = subparser.add_parser(name='blast',
+                                    description="JASPER is a program for prediction of virus's host. This module is "
+                                                "performing genome-genome blast query with given data and config."
+                                                "WARNING: For different number of threads for BLAST, please pass the blast file",
+                                    epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                           "Check my github: github.com/777moneymaker",
+                                    usage="jasper-vh blast [-h] --virus VIRUS_DIR [--config BLASTN_CONFIG_JSON] (--use-db "
+                                          "DB_NAME) |  (--create-db DB_NAME --host HOST_DIR) [--clear] [--output FILE]")
+    parser_b._optionals.title = "arguments"
+    parser_b.add_argument("--virus",
+                          required=True,
+                          type=str,
+                          dest='virus_dir',
+                          help='directory containing virus seq files.')
+    parser_b.add_argument("--config",
+                          required=False,
+                          type=str,
+                          dest='blastn_config',
+                          help='File containing megablast config used in genome-genome query.')
+    parser_b.add_argument("--clear",
+                          action='store_true',
+                          dest='clear_after',
+                          help='Specifies if the database files should be deleted after analysis.')
+    parser_b.add_argument('--output',
+                          required=False,
+                          type=str,
+                          dest="output_file",
+                          default="blast.csv",
+                          help="Output file with final results.")
+
+    group_b = parser_b.add_argument_group()
+    group_b.add_argument("--use-db",
+                         type=str,
+                         dest='use_db_name',
+                         help='Name for a existing database that will be used.')
+    group_b.add_argument("--create-db",
+                         type=str,
+                         dest='create_db_name',
+                         help='Name for a new database that will be created.')
+    group_b.add_argument("--host",
+                         type=str,
+                         dest='host_dir',
+                         help='directory containing host seq files.')
+
+    # Crispr parser
+    parser_c = subparser.add_parser(name='crispr',
+                                    description="JASPER is a program for prediction of virus's host. This module is "
+                                                "performing crispr spacers analysis which is "
+                                                "vir_genome-spacer blast query with given data and config."
+                                                "WARNING: For different number of threads for BLAST, please pass the config file",
+                                    epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                           "Check my github: github.com/777moneymaker",
+                                    usage="jasper-vh crispr [-h] -host HOST_DIR [--config BLASTN_CONFIG_JSON] (--use-db "
+                                          "USE_DB_NAME) |  (--create-db CREATE_DB_NAME --virus VIRUS_DIR) [--max-mismatches NUMBER_MISMATCHES]"
+                                          "[--clear] [--output FILE]")
+    parser_c._optionals.title = "arguments"
+    parser_c.add_argument("--host",
+                          type=str,
+                          required=True,
+                          dest='host_dir',
+                          help='directory containing host seq files.')
+    parser_c.add_argument("--config",
+                          required=False,
+                          type=str,
+                          dest='short_config',
+                          help='File containing megablast config used in genome-genome query.')
+    parser_c.add_argument("--max-mismatches",
+                          required=False,
+                          type=int,
+                          default=1,
+                          dest='allowed_mis',
+                          help='Number of allowed mismatches between vir genome and crispr spacer in blast query.')
+    parser_c.add_argument("--clear",
+                          action='store_true',
+                          dest='clear_after',
+                          help='Specifies if the database files should be deleted after analysis.')
+    parser_c.add_argument('--output',
+                          required=False,
+                          type=str,
+                          dest="output_file",
+                          default="crispr.csv",
+                          help="Output file with final results.")
+
+    group_c = parser_c.add_argument_group()
+    group_c.add_argument("--use-db",
+                         type=str,
+                         dest='use_db_name',
+                         help='Name for a existing database that will be used.')
+    group_c.add_argument("--create-db",
+                         type=str,
+                         dest='create_db_name',
+                         help='Name for a new database that will be created.')
+    group_c.add_argument("--virus",
+                         type=str,
+                         dest='virus_dir',
+                         help='directory containing virus seq files.')
+
+    # Merge parser
+    parser_m = subparser.add_parser(name='merge',
+                                    description="JASPER is a program for prediction of virus's host. "
+                                                "This module is merging results from individual modules "
+                                                "and producing final output.",
+                                    usage="usage: jasper-vh merge [-h] files [files ...] [--output FILE]",
+                                    epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                           "Check my github: github.com/777moneymaker")
+    parser_m.add_argument('files',
+                          nargs='+',
+                          type=str,
+                          help="Files to be merged")
+    parser_m.add_argument('--output',
+                          required=False,
+                          type=str,
+                          default="merged_jasper_results.csv",
+                          dest="output",
+                          help="Files to be merged")
+
+    # Trna parser
+    parser_t = subparser.add_parser(name='trna',
+                                    description="JASPER is a program for prediction of virus's host. This module is "
+                                                "performing tRNA scan and blast query with retrieved tRNAs."
+                                                "WARNING: For different number of threads for BLAST, please pass the config file",
+                                    epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                           "Check my github: github.com/777moneymaker",
+                                    usage="jasper-vh trna [-h] --virus VIRUS_DIR --host HOST_DIR [--config BLASTN_CONFIG]"
+                                          "[--output FILE] [--num_threads NUM_THREADS] [--clear]")
+    parser_t._optionals.title = "arguments"
+    parser_t.add_argument("--virus",
+                          required=True,
+                          type=str,
+                          dest='virus_dir',
+                          help='directory containing virus seq files.')
+    parser_t.add_argument("--host",
+                          type=str,
+                          dest='host_dir',
+                          help='directory containing host seq files.')
+    parser_t.add_argument("--config",
+                          required=False,
+                          type=str,
+                          dest='blastn_config',
+                          help='File containing megablast config used in genome-genome query.')
+    parser_t.add_argument('--output',
+                          required=False,
+                          type=str,
+                          dest="output_file",
+                          default="trna.csv",
+                          help="Output file with final results.")
+    parser_t.add_argument('--num-threads',
+                          required=False,
+                          type=int,
+                          default=1,
+                          dest="num_threads",
+                          help="Num of threads tRNA-scan will use")
+    parser_t.add_argument("--clear",
+                          required=False,
+                          action="store_true",
+                          dest='clear_after',
+                          help='Specifies if the database files should be deleted after analysis.')
+
+    # wish parser
+    parser_w = subparser.add_parser(name='wish',
+                                    description="JASPER is a program for prediction of virus's host. This module is "
+                                                "performing alignment-free analysis.",
+                                    epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                           "Check my github: github.com/777moneymaker")
+    parser_w._optionals.title = "arguments"
+    parser_w.add_argument("--host",
+                          type=str,
+                          required=False,
+                          dest='host_dir',
+                          help='directory containing host seq files.')
+    parser_w.add_argument("--virus",
+                          type=str,
+                          required=True,
+                          dest='virus_dir',
+                          help='directory containing virus seq files.')
+    parser_w.add_argument("--output",
+                          type=str,
+                          required=False,
+                          default="wish.csv",
+                          dest='results_file',
+                          help='directory for results files.')
+    parser_w.add_argument("--num-threads",
+                          type=int,
+                          required=False,
+                          default=os.cpu_count(),
+                          dest='threads',
+                          help='number of threads')
+    parser_w.add_argument("--use-model",
+                          required=False,
+                          type=str,
+                          dest='model_dir',
+                          help='pre-computed model. ')
+    parser_w.add_argument("--clear",
+                          required=False,
+                          action="store_true",
+                          dest='clear_after',
+                          help='if model directory should be deleted. Can be re-used')
+
+    # mash parser
+    parser_msh = subparser.add_parser(name='mash',
+                                      description="JASPER is a program for prediction of virus's host. This module is "
+                                                  "performing alignment-free analysis.",
+                                      epilog="Made by Milosz Chodkowski 2020, PUT Poznan. "
+                                             "Check my github: github.com/777moneymaker")
+    parser_msh._optionals.title = "arguments"
+    parser_msh.add_argument("--host",
+                            type=str,
+                            required=False,
+                            dest='host_dir',
+                            help='directory containing host seq files.')
+    parser_msh.add_argument("--virus",
+                            type=str,
+                            required=True,
+                            dest='virus_dir',
+                            help='directory containing virus seq files.')
+    parser_msh.add_argument("--output",
+                            type=str,
+                            required=False,
+                            default="mash.csv",
+                            dest='results_file',
+                            help='directory for results files.')
+    parser_msh.add_argument("--num-threads",
+                            type=int,
+                            required=False,
+                            default=os.cpu_count(),
+                            dest='threads',
+                            help='number of threads.')
+    parser_msh.add_argument("--clear",
+                            required=False,
+                            action="store_true",
+                            dest='clear_after',
+                            help='if sketch files should be deleted.')
+
+    args = parser.parse_args()
+    if args.subparser_name == 'blast':
+        if args.use_db_name and any([args.create_db_name, args.host_dir]):
+            parser.error("Mutually exclusive argument groups were used. Check usage.")
+        if not args.use_db_name and not all([args.create_db_name, args.host_dir]):
+            parser.error("You must specify database name and a host files directory. Check usage.")
+
+    if args.subparser_name == 'crispr':
+        if args.use_db_name and any([args.create_db_name, args.virus_dir]):
+            parser.error("Mutually exclusive argument groups were used. Check usage.")
+        if not args.use_db_name and not all([args.create_db_name, args.virus_dir]):
+            parser.error("You must specify database name and a virus files directory. Check usage.")
+
+    if args.subparser_name == 'wish':
+        if args.host_dir and args.model_dir:
+            parser.error("You can't specify host dir for model creation if model is present.")
+        if not any([args.host_dir, args.model_dir]):
+            parser.error("You must specify model or host directory for model creation.")
+
+    return args
+
+
+if __name__ == '__main__':
+    if not sys.version_info >= (3, 7):
+        raise EnvironmentError("Python version is not >= 3.7")
+
+    args = parse_args()
+    subparser_name = args.subparser_name
+    if subparser_name == 'blast':
+        from jasper import blast
+
+        blast.main(args)
+    elif subparser_name == 'crispr':
+        from jasper import crispr
+
+        crispr.main(args)
+    elif subparser_name == 'merge':
+        from jasper import merge
+
+        merge.main(args)
+    elif subparser_name == 'wish':
+        from jasper import wish
+
+        wish.main(args)
+    elif subparser_name == 'trna':
+        from jasper import trna
+
+        trna.main(args)
+    elif subparser_name == 'mash':
+        from jasper import mash
+
+        mash.main(args)
