@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="res.group" id="group_newsletter">
+            <field name="name">Newsletter</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_newsletter">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_newsletter"/>
+        </record>
+
+        <record model="ir.ui.icon" id="newsletter_icon">
+            <field name="name">tryton-newsletter</field>
+            <field name="path">icons/tryton-newsletter.svg</field>
+        </record>
+
+        <menuitem name="Newsletter" id="menu_newsletter" sequence="3" icon="tryton-newsletter"/>
+        <record model="ir.ui.menu-res.group" id="menu_newsletter_group_newsletter">
+            <field name="menu" ref="menu_newsletter"/>
+            <field name="group" ref="group_newsletter"/>
+        </record>
+
+        <record model="ir.ui.view" id="newsletter_view_form">
+            <field name="model">newsletter</field>
+            <field name="type">form</field>
+            <field name="name">newsletter_form</field>
+        </record>
+        <record model="ir.ui.view" id="newsletter_view_tree">
+            <field name="model">newsletter</field>
+            <field name="type">tree</field>
+            <field name="name">newsletter_tree</field>
+        </record>
+        <record model="ir.action.act_window" id="act_newsletter_form">
+            <field name="name">Newsletters</field>
+            <field name="res_model">newsletter</field>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_newsletter_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="newsletter_view_tree"/>
+            <field name="act_window" ref="act_newsletter_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_newsletter_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="newsletter_view_form"/>
+            <field name="act_window" ref="act_newsletter_form"/>
+        </record>
+        <menuitem parent="menu_newsletter" action="act_newsletter_form"
+            id="menu_newsletter_form"/>
+
+        <record model="ir.model.access" id="access_newsletter">
+            <field name="model" search="[('model', '=', 'newsletter')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_newsletter_admin">
+            <field name="model" search="[('model', '=', 'newsletter')]"/>
+            <field name="group" ref="group_newsletter"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.action.act_window" id="act_newsletter_form2">
+            <field name="name">Subscriptions</field>
+            <field name="res_model">newsletter.subscription</field>
+            <field name="domain"
+                eval="[('newsletters', 'in', Eval('active_ids'))]"
+                pyson="1"/>
+        </record>
+        <record model="ir.action.keyword" id="act_open_newsletter_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">newsletter,-1</field>
+            <field name="action" ref="act_newsletter_form2"/>
+        </record>
+
+        <record model="ir.ui.view" id="newsletter_subscription_view_form">
+            <field name="model">newsletter.subscription</field>
+            <field name="type">form</field>
+            <field name="name">subscription_form</field>
+        </record>
+        <record model="ir.ui.view" id="newsletter_subscription_view_tree">
+            <field name="model">newsletter.subscription</field>
+            <field name="type">tree</field>
+            <field name="name">subscription_tree</field>
+        </record>
+        <record model="ir.action.act_window" id="act_newsletter_subscription_form">
+            <field name="name">Subscriptions</field>
+            <field name="res_model">newsletter.subscription</field>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_newsletter_subscription_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="newsletter_subscription_view_tree"/>
+            <field name="act_window" ref="act_newsletter_subscription_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_newsletter_subscription_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="newsletter_subscription_view_form"/>
+            <field name="act_window" ref="act_newsletter_subscription_form"/>
+        </record>
+        <menuitem parent="menu_newsletter" action="act_newsletter_subscription_form"
+            id="menu_newsletter_subscription"/>
+
+        <record model="ir.model.access" id="access_newsletter_subscription">
+            <field name="model" search="[('model', '=', 'newsletter.subscription')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_newsletter_subscription_admin">
+            <field name="model" search="[('model', '=', 'newsletter.subscription')]"/>
+            <field name="group" ref="group_newsletter"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+    </data>
+</tryton>
