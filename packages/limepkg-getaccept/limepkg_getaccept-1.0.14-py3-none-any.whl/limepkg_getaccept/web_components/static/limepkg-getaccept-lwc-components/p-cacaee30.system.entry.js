@@ -1,0 +1,1 @@
+System.register(["./p-6089d0c4.system.js"],(function(t){"use strict";var n;return{setters:[function(t){n=t.r}],execute:function(){var o=t("lwc_getaccept_loader",function(){function t(t){n(this,t)}t.prototype.componentWillLoad=function(){};t.prototype.componentDidUnload=function(){};t.prototype.componentWillUpdate=function(){};return t}())}}}));

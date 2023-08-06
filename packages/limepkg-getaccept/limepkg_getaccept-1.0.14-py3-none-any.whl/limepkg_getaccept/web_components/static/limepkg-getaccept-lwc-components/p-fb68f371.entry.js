@@ -1,0 +1,1 @@
+import{r as t,h as e}from"./p-d2227a7a.js";const i=class{constructor(e){t(this,e),this.icon="nothing_found"}render(){return e("div",{class:"empty-state"},e("limel-icon",{name:this.icon}),e("p",null,this.text))}};i.style=".empty-state{margin-top:1.5rem;font-style:italic;text-align:center;opacity:0.8}.empty-state limel-icon{width:3rem;height:3rem}";export{i as empty_state}

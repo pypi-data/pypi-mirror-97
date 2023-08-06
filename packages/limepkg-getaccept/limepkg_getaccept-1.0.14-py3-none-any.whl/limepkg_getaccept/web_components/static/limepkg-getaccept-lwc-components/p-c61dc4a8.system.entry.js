@@ -1,0 +1,1 @@
+System.register(["./p-6089d0c4.system.js"],(function(e){"use strict";var n,r;return{setters:[function(e){n=e.r;r=e.h}],execute:function(){var t="limel-spinner{margin:1rem 0;color:#f49132}";var i=e("ga_loader",function(){function e(e){n(this,e)}e.prototype.render=function(){return r("limel-flex-container",{justify:"center"},r("limel-spinner",null))};return e}());i.style=t}}}));

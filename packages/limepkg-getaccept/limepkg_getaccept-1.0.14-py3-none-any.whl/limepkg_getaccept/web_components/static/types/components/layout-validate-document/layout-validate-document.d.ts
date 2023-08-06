@@ -1,0 +1,38 @@
+import { IDocument } from '../../types/Document';
+import { ISession } from '../../types/Session';
+import { LimeWebComponentPlatform } from '@limetech/lime-web-components-interfaces';
+import { IListItem } from '../../types/ListItem';
+import { EventEmitter } from '../../stencil-public-runtime';
+import { ICustomField } from '../../types/CustomField';
+export declare class LayoutValidateDocument {
+    document: IDocument;
+    template: IListItem;
+    limeDocument: IListItem;
+    fields: ICustomField[];
+    platform: LimeWebComponentPlatform;
+    session: ISession;
+    isSealed: boolean;
+    isSending: boolean;
+    documentCompleted: EventEmitter<boolean>;
+    errorHandler: EventEmitter<string>;
+    isSendingDocument: EventEmitter<boolean>;
+    private isLoading;
+    private recipients;
+    private errorList;
+    private sentDocument;
+    constructor();
+    componentWillLoad(): Promise<void>;
+    render(): any;
+    private hasTemplateRoles;
+    private handleUploadDocument;
+    private handleCreateDocument;
+    private sealDocument;
+    private handleOpenGetAccept;
+    private validateDocument;
+    private haveSigner;
+    private recipientsWithOnlyPhoneExists;
+    private recipientMissingEmailAndPhoneExists;
+    private hasProperty;
+    private openInNewTab;
+    private toggleLoading;
+}
