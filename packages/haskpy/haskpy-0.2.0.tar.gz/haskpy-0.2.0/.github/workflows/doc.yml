@@ -1,0 +1,36 @@
+name: documentation
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the source repository
+      uses: actions/checkout@v2
+    - name: Check out the branch for the docs
+      uses: actions/checkout@v2
+      with:
+        ref: 'gh-pages'
+        path: 'doc/build/html'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: |
+        pip install .[doc]
+    - name: Build and publish
+      run: |
+        cd doc
+        make html
+        cd build/html
+        touch .nojekyll
+        git add .
+        git config user.email '<>'
+        git config user.name 'GitHub Actions'
+        git commit -m "Build documentation"
+        git push
