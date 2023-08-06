@@ -1,0 +1,118 @@
+Metadata-Version: 2.1
+Name: Apache-TrafficControl
+Version: 3.0.0
+Summary: Python API Client for Traffic Control
+Home-page: https://trafficcontrol.apache.org/
+Author: Apache Software Foundation
+Author-email: dev@trafficcontrol.apache.org
+License: http://www.apache.org/licenses/LICENSE-2.0
+Keywords: Apache TrafficControl Traffic Control Client TrafficOps Ops
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.6
+Requires-Dist: future (>=0.16.0)
+Requires-Dist: requests (>=2.13.0)
+Requires-Dist: munch (>=2.1.1)
+Provides-Extra: dev
+Requires-Dist: pylint (<3.0,>=2.0) ; extra == 'dev'
+
+************
+Introduction
+************
+This is the Traffic Ops Python Client for Python 3.x.
+
+Installation
+============
+The official installation method is to use ``pip`` to install directly from from GitHub.
+
+Install Using 'pip' From GitHub
+-------------------------------
+::
+
+	pip install git+https://github.com/apache/trafficcontrol.git#"egg=trafficops&subdirectory=traffic_control/clients/python"
+
+	# or
+	# pip install git+ssh://git@github.com/apache/trafficcontrol.git#"egg=trafficops&subdirectory=traffic_control/clients/python"
+
+Local Installation
+------------------
+The preferred method is to use ``pip`` to install locally. Starting from the repository's root directory, the following script should do the job:
+
+Local Installation of Python Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+	cd traffic_control/clients/python
+	pip install .
+
+	# The above will install using the system's default Python interpreter - to use a specific
+	# version it will be necessary to specify the interpreter and pass the 'pip' module to it.
+	# e.g. for the system's default Python 2 interpreter, typically one would do:
+	# sudo -H /usr/bin/env python3 -m pip install .
+
+	# Developers may wish to use the '-e' flag. This will install the package 'edit-ably',
+	# meaning that changes made to the package within the repository structure will be effected on
+	# the system-wide installation.
+	# sudo -H pip install -e .
+
+	# If your system does not have 'pip', but does (somehow) have 'setuptools' as well
+	# as the package's dependencies, you can call 'setup.py' directly to install the
+	# package for the system's default Python 3 interpreter
+	# sudo -H ./setup.py install
+
+The local installation method requires ``pip`` and ``setuptools``. ``setuptools`` should be installed if your system has ``pip``, but if you are missing either of them they can both be relatively easily installed with Python standard libraries.
+
+Setuptools Package Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+	# Here I'm using 'python' because that points to a Python 3 interpreter on my system. You may
+	# wish to use 'python3' instead.
+	sudo -H python -m ensure_pip
+	sudo -H python -m pip install -U pip
+
+	# If your system's 'python' already has 'pip', then you may skip to this step to
+	# install only 'setuptools'
+	sudo -H python -m pip install setuptools
+
+Development Dependencies
+------------------------
+To install the development dependencies, first ensure that your system has ``pip`` and ``setuptools`` then use ``pip`` to install the development environment.
+
+.. note:: Currently, the development environment only requires `Pylint <https://www.pylint.org/>`_, which is a simple linter for which a configuration file is provided at ``traffic_control/clients/python/pylint.rc``.
+
+Development Dependencies Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+	pip install -e .[dev]
+
+
+Versioning
+==========
+The ``trafficops.__version__`` module contains only the ``__version__`` "constant" which
+gives the version of this *Apache-TrafficControl package* and **not** the version of
+*Apache Traffic Control* for which it was made. The two are versioned separately, to allow the
+client to grow in a version-controlled manner without being tied to the release cadence of Apache
+Traffic Control as a whole.
+
+Version 3.0 is supported for use with Apache Traffic Control versions 5.0 and 5.1 (release pending
+at the time of this writing). New functionality will be added as the Traffic Ops API evolves, but
+changes to this client will remain non-breaking for existing code using it until the next major
+version is released.
+
+
