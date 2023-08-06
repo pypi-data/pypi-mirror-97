@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}
+{% block content %}
+<div id='content' class='container'>
+    <ul class='nav nav-tabs mt-2'>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/') }}'>ホーム</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/groups') }}'>グループ</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link active' href='{{ url('/users') }}'>ユーザー</a>
+        </li>
+        <li class='nav-item'>
+            <a class='nav-link' href='{{ url('/apps') }}'>アプリ</a>
+        </li>
+    </ul>
+    <div class='container'>
+        {% if permission("create_user", request.user) %}
+        <div class='mb-3 mt-3'>
+            <a href='{{ url('/users/invite') }}'><button class='btn btn-primary'>ユーザーを招待</button></a>
+        </div>
+        {% endif %}
+        <div class="inner">
+            <div class='user-list'>
+            {% if users|length %}
+            {% for user in users %}
+            <div class='mb-3 mt-3'>
+                {{ lists.userItem(user, link=url("/users/"+user.screen_name)) }}
+            </div>
+            {% endfor %}
+            {% else%}
+                <div class='no-item'>ユーザーはいません</div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

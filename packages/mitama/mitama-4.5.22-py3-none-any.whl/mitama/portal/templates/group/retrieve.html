@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}
+{% block content %}
+<div id='content' class='container'>
+    <div class="row pb-4 pt-5">
+        <div class='col d-flex justify-content-center'>
+            <img src="{{ dataurl(group.icon) }}" class="group-icon icon" style='width: 80px; height: 80px'/>
+        </div>
+        <div class="col-8">
+            <h2 class="name">{{group.name}}</h2>
+            <div class="screen-name">{{group.screen_name}}</div>
+        </div>
+        <div class='col d-flex justify-content-end'>
+        {% if permission("update_group", request.user) or inner_permission("admin", group, request.user) %}
+            <a href='/groups/{{group.screen_name}}/settings'><button class='btn btn-primary'>設定</button></a>
+        {% endif %}
+        </div>
+        <div class='group-list'>
+            <div class="children">
+            {% for g in group.groups %}
+                {{ lists.groupItem(g, link=url('/groups/'+g.screen_name)) }}
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <h3 class="mini-title">メンバー</h3>
+        <div class="user-list">
+            {% for user in group.users %}
+            <div class='mb-2'>
+                {{ lists.userItem(user, link=url('/users/'+user.screen_name)) }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
