@@ -1,0 +1,18 @@
+add_subdirectory(common)
+add_subdirectory(geomechanics)
+add_subdirectory(geometry)
+add_subdirectory(flux)
+add_subdirectory(freeflow)
+add_subdirectory(io)
+add_subdirectory(linear)
+add_subdirectory(material)
+add_subdirectory(multidomain)
+add_subdirectory(nonlinear)
+add_subdirectory(porenetwork)
+add_subdirectory(porousmediumflow)
+add_subdirectory(discretization)
+
+# if Python bindings are enabled, include Python binding tests
+if(DUNE_ENABLE_PYTHONBINDINGS)
+  add_subdirectory(python)
+endif()

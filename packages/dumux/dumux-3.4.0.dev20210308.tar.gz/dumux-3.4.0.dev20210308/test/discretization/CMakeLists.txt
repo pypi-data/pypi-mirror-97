@@ -1,0 +1,5 @@
+add_subdirectory(cellcentered)
+add_subdirectory(staggered)
+add_subdirectory(box)
+add_subdirectory(projection)
+add_subdirectory(rotationsymmetry)

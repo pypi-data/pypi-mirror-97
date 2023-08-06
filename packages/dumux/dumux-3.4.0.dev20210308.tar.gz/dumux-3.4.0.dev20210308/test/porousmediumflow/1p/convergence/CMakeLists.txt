@@ -1,0 +1,2 @@
+add_subdirectory(analyticsolution)
+add_subdirectory(discretesolution)
