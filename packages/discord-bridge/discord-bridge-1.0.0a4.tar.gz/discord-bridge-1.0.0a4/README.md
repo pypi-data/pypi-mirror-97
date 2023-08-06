@@ -1,0 +1,148 @@
+# discord-bridge
+
+> **THIS IS WORK-IN-PROGRESS** - Not released for production use yet
+
+HTTP bridge for the Discord API
+
+[![release](https://img.shields.io/pypi/v/discord-bridge?label=release)](https://pypi.org/project/discord-bridge/)
+[![python](https://img.shields.io/pypi/pyversions/discord-bridge)](https://pypi.org/project/discord-bridge/)
+[![pipeline](https://gitlab.com/ErikKalkoken/discord-bridge/badges/master/pipeline.svg)](https://gitlab.com/ErikKalkoken/discord-bridge/-/pipelines)
+[![coverage report](https://gitlab.com/ErikKalkoken/discord-bridge/badges/master/coverage.svg)](https://gitlab.com/ErikKalkoken/discord-bridge/-/commits/master)
+[![license](https://img.shields.io/badge/license-MIT-green)](https://gitlab.com/ErikKalkoken/discord-bridge/-/blob/master/LICENSE)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![chat](https://img.shields.io/discord/790364535294132234)](https://discord.gg/zmh52wnfvM)
+
+## Contents
+
+- [Overview](#overview)
+- [Features](#key-features)
+- [Examples](#examples)
+- [Installation](#installation)
+- [Updating](#updating)
+- [Server configuration](#server-configuration)
+- [FAQ](#faq)
+- [Change Log](CHANGELOG.md)
+
+## Overview
+
+The current Discord API provides a way to send direct messages to users via Websockets.
+
+However, some applications do not directly support Websockets, which makes it difficult to implement a feature for sending direct messages. For example many Django sites only directly support the HTTP protocol.
+
+Django Bridge solves this problem by allowing applications to send direct messages to Discord users with an HTTP API. This is accomplished by providing two main components:
+
+- server: A microservice that provides a HTTP API for sending direct messages and channel messages to Discord
+- client: A Python library, which provides easy access to the microservice API through a wrapper class for Python apps (optional)
+
+> **Note**<br>While Discord Bridge has been initially developed as helper for [Alliance Auth](https://gitlab.com/allianceauth/allianceauth) / Django apps, it has no Django dependencies and will work with any app that can use the HTTP API.
+
+## Features
+
+- HTTP API for sending direct messages to users and guild channels
+- Client library in Python for easy access to the HTTP API
+- Microservice is fully configurable and has logging
+- Solid test coverage
+
+## Examples
+
+Here is an example that shows how simple it is to send a direct message to a Discord user with the provided client library.
+
+```python
+from discordbridge.client import WebClient
+
+client = WebClient()
+client.send_direct_message(user_id=1234, content="Hello there!")
+```
+
+## Installation
+
+### Installation for Alliance Auth
+
+This section explains how to install Discord Bridge as companion app for an [Alliance Auth](https://gitlab.com/allianceauth/allianceauth) installation.
+
+#### Install from PyPI
+
+Make sure you are in the virtual environment (venv) of your Alliance Auth installation. Then install the newest release from PyPI:
+
+```bash
+pip install discord-bridge
+```
+
+#### Update supervisor configuration
+
+Next we need to setup the server of Discord Bridge. It is designed to run as another program with supervisor, just like celery and gunicorn.
+
+For that add the following new section to your `supervisor.conf`. Use the `DISCORD_BOT_TOKEN` from your existing installation as `TOKEN`. You find that token in your `local.py` settings file:
+
+```ini
+[program:discordbridge]
+command=/home/allianceserver/venv/auth/bin/discordbridgesrv --token "TOKEN"
+directory=/home/allianceserver/myauth/log
+user=allianceserver
+numprocs=1
+autostart=true
+autorestart=true
+stopwaitsecs=120
+stdout_logfile=/home/allianceserver/myauth/log/discordbridgesrv_out.log
+stderr_logfile=/home/allianceserver/myauth/log/discordbridgesrv_err.log
+```
+
+> **Note**<br>It is not necessary to add this program to your existing myauth supervisor group, since it has no dependencies to Auth and therefore does not need to be restarted with it.
+
+### Start the server
+
+Now we just need to tell supervisor to reload the new configuration and it will automatically start the server.
+
+```bash
+supervisorctl reload
+```
+
+## Updating
+
+To update your existing installation you first need to enable your virtual environment.
+Then run the following commands:
+
+```bash
+pip install -U discord-bridge
+supervisorctl restart discordbridge
+```
+
+## Server configuration
+
+The microservice is designed to run via [supervisor](https://pypi.org/project/supervisor/) and can be configured with the below arguments. It comes with sensible defaults and will in most cases only need the Discord bot token to operate.
+
+To configure your server just add/modify one of the below parameters in the respective command line of your `supervisor.conf`:
+
+```text
+usage: discordbridgesrv [-h] [--token TOKEN] [--host HOST] [--port PORT]
+                        [--log-level {INFO,WARN,ERROR,CRITICAL}]
+                        [--log-file-path LOG_FILE_PATH] [--version]
+
+Server with HTTP API for sending messages to Discord
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --token TOKEN         Discord bot token. Can alternatively be specified as
+                        environment variable DISCORD_BOT_TOKEN. (default:
+                        None)
+  --host HOST           server host address (default: 127.0.0.1)
+  --port PORT           server port (default: 9876)
+  --log-level {INFO,WARN,ERROR,CRITICAL}
+                        Log level of log file (default: INFO)
+  --log-file-path LOG_FILE_PATH
+                        Path for storing the log file. If no path if provided,
+                        the log file will be stored in the current working
+                        folder (default: None)
+  --version             show the program version and exit
+```
+
+## FAQ
+
+I am already using the Auth bot token for another bot. Can I still use it for Discord Bridge or do I need to create a new bot token?
+
+- *You can use the same bot token for multiple Discord bots at the same time, so you do not need to create another bot token*.
+
+There already is the AA-Discordbot, that also support direct messaging. Does that not make the Discord Bridge kind of redundant?
+
+- *No. Some people may not need a Discord bot and therefore would not want to install and maintain a large and heavily integrated bot like AA-Discordbot on their system, only to enable some apps to use direct messaging. A tiny microservice that only adds that needed functionality and is also very easy to install and maintain is therefore often a better solution.*
