@@ -1,0 +1,52 @@
+Metadata-Version: 1.1
+Name: translucent
+Version: 0.6.0
+Summary: UNKNOWN
+Home-page: https://gitlab.com/greenhousegroup/ai/libraries/translucent/
+Author: Greenhouse AI team
+Author-email: ai@greenhousegroup.com
+License: UNKNOWN
+Description: Description
+        ============
+        
+        Introduction
+        ------------
+        
+        Translucent provides a wrapper around the Python logging module, and is ment to
+        be a central place to gather all generic functionality related to logging.
+        
+        Example
+        -------
+        
+        The following is a sample `dictConfig` to configure translucent's JSON formatter.
+        
+        .. code-block:: yaml
+        
+            version: 1
+            handlers:
+              console:
+                class: logging.StreamHandler
+                formatter: json
+                level: INFO
+                stream: ext://sys.stdout
+            root:
+              level: INFO
+            handlers: [console]
+              loggers:
+                urllib3:
+                  level: INFO
+            formatters:
+              default:
+                format: '%(asctime)s %(levelname)-8s %(name)-35s %(message)s'
+                datefmt: '%Y-%m-%d %H:%M:%S'
+              json:
+                (): translucent.formatters.JSON
+                namespace: ai
+                name: logzio-prototype
+            disable_existing_loggers: False
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
