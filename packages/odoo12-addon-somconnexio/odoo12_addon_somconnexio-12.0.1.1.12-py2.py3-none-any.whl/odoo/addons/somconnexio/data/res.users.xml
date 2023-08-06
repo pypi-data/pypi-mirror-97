@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data>
+    <record id="cesar_partner" model="res.partner">
+      <field name="name">César</field>
+    </record>
+    <record id="cesar" model="res.users">
+      <field name="name">César</field>
+      <field name="login">cesar.lopez@coopdevs.org</field>
+      <field name="partner_id" ref="cesar_partner" />
+      <field name="new_password">test</field>
+      <field name="groups_id" eval="[(4, ref('easy_my_coop.group_easy_my_coop_user'))]" />
+    </record>
+    <record id="dani_partner" model="res.partner">
+      <field name="name">Dani</field>
+    </record>
+    <record id="dani" model="res.users">
+      <field name="name">Daniel</field>
+      <field name="login">daniel.palomar@coopdevs.org</field>
+      <field name="partner_id" ref="dani_partner" />
+      <field name="new_password">test</field>
+      <field name="groups_id" eval="[(4, ref('easy_my_coop.group_easy_my_coop_user'))]" />
+    </record>
+    <function model="somconnexio.module" name="disable_admin_noupdate" />
+    <record id="base.user_admin" model="res.users">
+      <field name="groups_id"
+             eval="[(4, ref('account.group_account_user')),(4, ref('contract.can_terminate_contract'))]" />
+    </record>
+    <function model="somconnexio.module" name="restore_admin_noupdate" />
+  </data>
+</odoo>
