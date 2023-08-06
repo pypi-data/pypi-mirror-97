@@ -1,0 +1,64 @@
+Metadata-Version: 2.1
+Name: quantecon-book-theme
+Version: 0.1.4
+Summary: Theme for Quantecon lectures
+Home-page: UNKNOWN
+Author: Project Jupyter Contributors
+Author-email: jupyter@googlegroups.com
+License: BSD
+Keywords: reproducible science environments scholarship notebook
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml
+Requires-Dist: docutils (>=0.15)
+Requires-Dist: sphinx
+Requires-Dist: click
+Requires-Dist: setuptools
+Requires-Dist: libsass
+Requires-Dist: pydata-sphinx-theme (~=0.4.0)
+Requires-Dist: beautifulsoup4
+Provides-Extra: code_style
+Requires-Dist: flake8 (<3.8.0,>=3.7.0) ; extra == 'code_style'
+Requires-Dist: black ; extra == 'code_style'
+Requires-Dist: pre-commit (==1.17.0) ; extra == 'code_style'
+Provides-Extra: sphinx
+Requires-Dist: folium ; extra == 'sphinx'
+Requires-Dist: numpy ; extra == 'sphinx'
+Requires-Dist: matplotlib ; extra == 'sphinx'
+Requires-Dist: ipywidgets ; extra == 'sphinx'
+Requires-Dist: pandas ; extra == 'sphinx'
+Requires-Dist: nbclient ; extra == 'sphinx'
+Requires-Dist: myst-nb (~=0.10.1) ; extra == 'sphinx'
+Requires-Dist: sphinx-togglebutton (>=0.2.1) ; extra == 'sphinx'
+Requires-Dist: sphinx-copybutton ; extra == 'sphinx'
+Requires-Dist: plotly ; extra == 'sphinx'
+Requires-Dist: sphinxcontrib-bibtex ; extra == 'sphinx'
+Requires-Dist: sphinx-thebe ; extra == 'sphinx'
+Provides-Extra: testing
+Requires-Dist: coverage ; extra == 'testing'
+Requires-Dist: pytest (~=6.0.1) ; extra == 'testing'
+Requires-Dist: pytest-cov ; extra == 'testing'
+Requires-Dist: beautifulsoup4 ; extra == 'testing'
+Requires-Dist: pytest-regressions ; extra == 'testing'
+
+# quantecon-book-theme
+A Jupyter Book Theme for QuantEcon Book Style Projects
+
+## Updating Fixtures for Tests
+
+### Updating test regression files on layout changes
+
+It is advisable to update the test files for file regression checks when releavant layout files change.
+
+For example, at present we have a sidebar file-regression check to validate html across tests.
+The file which it compares against is `tests/test_build/test_build_book.html`.
+
+If updating the sidebar html, then one of the easier steps to update this test file is:
+
+1. Delete the file `tests/test_build/test_build_book.html`.
+2. Run `pytest` in your command line, which will then generate a new file. Check if the file is at par with your expectations, contains elements which you added/modified.
+
+Now future pytests will test against this file, and the subsequent tests should pass.
+
+
