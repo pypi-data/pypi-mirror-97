@@ -1,0 +1,48 @@
+--- sumo
++++ sumo
+@@ -1587,13 +1587,14 @@
+                      options.progress,
+                      options.verbose, options.dry_run)
+ 
+-    # may raise IOError, ValueError:
+-    builddb= builddb_from_json_file(options.builddir,
+-                                    options.localbuilddir,
+-                                    keep_locked= not options.dry_run)
+-    builddb.change_state(buildtag, "testing")
+-    builddb.json_save(None, options.verbose, options.dry_run)
+-    # ^^^ does also unlock the file
++    if not options.dry_run:
++        # may raise IOError, ValueError:
++        builddb= builddb_from_json_file(options.builddir,
++                                        options.localbuilddir,
++                                        keep_locked= True)
++        builddb.change_state(buildtag, "testing")
++        builddb.json_save(None, options.verbose, options.dry_run)
++        # ^^^ does also unlock the file
+ 
+ def apprelease(build_tag, modulespec_complete, modulespecs,
+                builddb, db,
+@@ -3295,14 +3296,15 @@
+                    options.no_checkout,
+                    options.progress,
+                    options.verbose, options.dry_run)
+-    # may raise IOError, ValueError:
+-    builddb= builddb_from_json_file(options.builddir,
+-                                    options.localbuilddir,
+-                                    keep_locked= not options.dry_run,
+-                                    must_exist= False)
+-    builddb.change_state(buildtag, "unstable")
+-    builddb.json_save(None, options.verbose, options.dry_run)
+-    # ^^^ does also unlock the file
++    if not options.dry_run:
++        # may raise IOError, ValueError:
++        builddb= builddb_from_json_file(options.builddir,
++                                        options.localbuilddir,
++                                        keep_locked= not options.dry_run,
++                                        must_exist= False)
++        builddb.change_state(buildtag, "unstable")
++        builddb.json_save(None, options.verbose, options.dry_run)
++        # ^^^ does also unlock the file
+     if not options.no_checkout:
+         create_makefile(dist_dict, db,
+                         builddb,
