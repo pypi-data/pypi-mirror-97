@@ -1,0 +1,1 @@
+(self.webpackChunklabbox_ephys_widgets_jp=self.webpackChunklabbox_ephys_widgets_jp||[]).push([[1624],{11624:(e,s,a)=>{"use strict";a.r(s),a.d(s,{activate:()=>i});var p=a(13534);function i(e){e.registerPlugin({type:"WorkspaceView",name:"WorkspaceView",label:"Workspace View",component:p.Z})}}}]);
