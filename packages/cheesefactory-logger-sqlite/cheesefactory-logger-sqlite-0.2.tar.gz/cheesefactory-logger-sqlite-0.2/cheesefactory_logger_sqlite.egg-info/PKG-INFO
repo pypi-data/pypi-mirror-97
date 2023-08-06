@@ -1,0 +1,179 @@
+Metadata-Version: 2.1
+Name: cheesefactory-logger-sqlite
+Version: 0.2
+Summary: An interface for logging to a SQLite database.
+Home-page: https://bitbucket.org/hellsgrannies/cheesefactory-logger-sqlite
+Author: Todd Salazar
+Author-email: unixsal@yahoo.com
+License: UNKNOWN
+Description: # cheesefactory-logger-sqlite
+        
+        -----------------
+        
+        ##### An interface for logging to a SQLite database.
+        [![PyPI Latest Release](https://img.shields.io/pypi/v/cheesefactory-logger-sqlite.svg)](https://pypi.org/project/cheesefactory-smb/)
+        [![PyPI status](https://img.shields.io/pypi/status/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-smb/)
+        [![PyPI download month](https://img.shields.io/pypi/dm/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-smb/)
+        [![PyPI download week](https://img.shields.io/pypi/dw/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-smb/)
+        [![PyPI download day](https://img.shields.io/pypi/dd/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-smb/)
+        
+        ### Main Features
+        
+        * Log to a SQLite database
+        * Table fields are user-defined. 
+        * Ability to archive (rotate) database files.
+        * Query the database.
+        
+        **Note:** _This package is still in beta status. As such, future versions may not be backwards compatible and features may change._
+        
+        ## Installation
+        The source is hosted at https://bitbucket.org/hellsgrannies/cheesefactory-logger-sqlite
+        
+        ```sh
+        pip install cheesefactory-logger-sqlite
+        ```
+        
+        ## Dependencies
+        
+        None
+        
+        ### Basic Usage
+        
+        ```python
+        from cheesefactory_logger_sqlite import CfLogSqlite
+        
+        field_list = {
+            'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+            'action': 'TEXT',
+            'action_ok': 'INTEGER',
+            'client': 'TEXT',
+            'local_host': 'TEXT',
+            'local_path': 'TEXT',
+            'notes': 'TEXT',
+            'preserve_mtime': 'INTEGER',
+            'preserve_mtime_ok': 'INTEGER',
+            'redo': 'INTEGER',
+            'remote_host': 'TEXT',
+            'remote_path': 'TEXT',
+            'remove_source': 'INTEGER',
+            'remove_source_ok': 'INTEGER',
+            'size': 'INTEGER',
+            'size_match_ok': 'INTEGER',
+            'status': 'INTEGER',
+            'suffix': 'TEXT',
+            'suffix_ok': 'INTEGER',
+            'timestamp': 'TEXT DEFAULT CURRENT_TIMESTAMP',
+        }
+        
+        log = CfLogSqlite.connect(
+            database_path='/app/log.sqlite', 
+            create=True, 
+            field_list=field_list
+        )
+        ```
+        
+        * _database_path_ (str): Path to SQLite database file.
+        * _create_ (str): Create a new SQLite database file if it does not exist?
+        * _field_list_ (dict): A dictionary of field name "keys" paired with field type "values".
+        
+        
+        ### INSERT and UPDATE log entries
+        
+        ```python
+        # This is an INSERT. write_kwargs always returns a primary key (pk)
+        
+        pk = log.write_kwargs(
+            action='GET', client='CfTester', local_host='192.168.1.1', local_path='/tmp', preserve_mtime=1,
+            remote_host='172.16.1.1', remote_path='/upload', remove_source=1, status=0
+        )
+        
+        # If "pk" is defined, then write_kwargs becomes an UPDATE for the row matching pk's value. 
+        
+        log.write_kwargs(
+            pk=pk,
+            preserve_mtime_ok=1, remove_source_ok=1, size=2232, notes='not done yet'
+        )
+        ```
+        
+        __NOTE__:
+        The log table's primary key is assumed to be "id". If your table's PK is different, change it, before using
+        `write_kwargs()`, like this:
+        
+        ```python
+        log.primary_key = 'my_pk'
+        log.write_kwargs(pk=pk, ...)
+        ```
+        
+        ```python
+        # Another UPDATE
+        
+        log.write_kwargs(
+            pk=pk,
+            notes='done', status=0
+        )
+        
+        # Another INSERT 
+        
+        pk = log.write_kwargs(
+            action='GET', client='CfTester', local_host='192.168.1.1', local_path='/tmp5', preserve_mtime=1,
+            remote_host='172.16.1.1', remote_path='/upload5', remove_source=1, status=0
+        )
+        
+        # An UPDATE for the last "pk" captured.
+        
+        log.write_kwargs(
+            pk=pk,
+            preserve_mtime_ok=0, remove_source_ok=1, size=245, notes='not done yet'
+        )
+        ```
+        
+        ### Reading entries
+        
+        ```python
+        log.read_records()  # Writes results to an iterative called "result"
+        log.result
+        
+        # Using the earlier examples, here is an example result:
+        (1, 'GET', None, 'CfTester', '192.168.1.1', '/tmp', 'done', 1, 1, None, '172.16.1.1', 
+         '/upload', 1, 1, 2232, None, 0, None, None),
+        (2, 'GET', None, 'CfTester', '192.168.1.1', '/tmp5', 'done', 1, 0, None, '172.16.1.1', 
+         '/upload5', 1, 1, 245, None, 1, None, None),
+        (3, 'GET', None, 'CfTester', '192.168.1.1', '/tmp4', 'done', 0, 1, None, '172.16.1.1', 
+         '/upload4', 1, 0, 274, None, 1, None, None)
+        
+        # read_records() by itself is primitive. It simply does a "SELECT * FROM <table>". 
+        # Add to the query using a WHERE clause, like this:
+        log.read_records(where="size = 245 AND client = 'CfTester'")
+        
+        # ...results in:
+        (2, 'GET', None, 'CfTester', '192.168.1.1', '/tmp5', 'done', 1, 0, None, '172.16.1.1', 
+         '/upload5', 1, 1, 245, None, 1, None, None),
+        ```
+        
+        This package is to be used by cheesefactory-sftp, cheesefactory-smb, etc. as a way to 
+        not only keep a log of file transactions, but also to see if a file has already 
+        been transferred. 
+        
+        The technique: If only new files are to be moved, grab a file listing
+        from the file system (along with, perhaps, file sizes) then compare it to a list of 
+        files from the SQLite database:
+        
+        ```python
+        log.read_records(where="local_path = '/dir1/file12.txt AND size = 24314'")
+        
+        if len(log.results) == 0:
+            # Transfer the file
+        ```
+        
+        **Note:** _This package is still in beta status. As such, future versions may not be backwards compatible and features may change._
+        
+Keywords: cheesefactory logging logger sqlite development
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Description-Content-Type: text/markdown
