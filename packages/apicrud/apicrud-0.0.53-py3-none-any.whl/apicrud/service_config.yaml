@@ -1,0 +1,388 @@
+openapi: 3.0.1
+info:
+  title: apicrud configuration
+  version: "1.0"
+  description: >
+    This defines flask config global default values and an API endpoint
+    to retrieve current values
+servers:
+- url: http://localhost:8080/api/v1
+- url: http://localhost:8080/config/v1
+- url: http://localhost:32080/config/v1
+
+components:
+  schemas:
+    Config:
+      properties:
+        app_port:
+          default: 8080
+          description: TCP port number for flask
+          type: integer
+          minimum: 1
+          maximum: 65535
+        appname:
+          default: Example
+          description: Name of application
+          type: string
+          minLength: 2
+          maxLength: 32
+        approved_senders:
+          default: local-senders
+          description: >
+            Name of a list whose members are approved by email relay
+            provider for From headers
+          type: string
+        babel_default_locale:
+          default: en
+          description: Locale default
+          type: string
+          pattern: ^[a-zA-Z0-9_-]+$
+          minLength: 2
+          maxLength: 12
+        babel_default_timezone:
+          default: UTC
+          description: Timezone default
+          type: string
+          minLength: 3
+          maxLength: 24
+        babel_translation_directories:
+          default: i18n
+          description: >
+            List of directories in which to find LC_MESSAGES translations,
+            semicolon-delimited. If you want to keep the built-in translations
+            provided in the apicrud package, make your additions after the
+            semicolon (for example, `'i18n;%s' % os.path.join(path, 'i18n')`)
+          type: string
+        base_url:
+          default: /api/v1
+          description: The API base URL
+          type: string
+        carrier_gateways:
+          default:
+            att: txt.att.net
+            sprint: messaging.sprintpcs.com
+            tmobile: tmomail.net
+            verizon: vtext.com
+          description: Map of SMS carrier names to their SMTP gateways
+          type: object
+        config_version:
+          default: "1.0"
+          description: Schema version of this (service_config) file
+          type: string
+        cors_origins:
+          default:
+          - https://dev.example.com
+          - https://media-dev.example.com
+          description: Allowed URLs for cross-origin http resources
+          type: array
+          items:
+            type: string
+        db_host:
+          type: string
+          description: Database hostname or IP address
+        db_name:
+          default: example_dev
+          description: Database name
+          type: string
+          minLength: 2
+          maxLength: 32
+        db_port:
+          default: 3306
+          description: Port number of database server
+          type: integer
+          minimum: 1
+          maximum: 65535
+        db_url:
+          description: MySQL-compatible python database URL
+          type: string
+        db_aes_secret:
+          default: 6VYFX61SSx63VGw5
+          description: >
+            Encryption key for AES-encrypting secure fields in database
+          format: password
+          type: string
+          minLength: 16
+          maxLength: 50
+        db_connection_timeout:
+          default: 280
+          description: Connection timeout for idle database connections
+          type: integer
+        db_geo_support:
+          default: false
+          description: Support for spatial/geographic objects by database
+          type: boolean
+        db_migrations:
+          default: alembic
+          description: Parent directory containing alembic migration scripts
+          type: string
+        db_migrate_enable:
+          default: true
+          description: Enable alembic migrations upon startup
+          type: boolean
+        db_schema_maxtime:
+          default: 120
+          description: >
+            Maximum time to wait for schema updates at startup; if this
+            value is nonzero and db_migrate_enable is true, the service
+            will wait for another service to update to the current
+            version. If this value is zero, the service will ignore
+            database schema version and come up immediately.
+          type: integer
+        db_seed_file:
+          default: db_seed.yaml
+          description: >
+            Name of a file containing records for seeding a new database
+            file, relative to the openapi_file's parent directory
+          type: string
+        debug:
+          default: false
+          description: Flask debug mode
+          type: boolean
+        default_grants:
+          # Note - when customizing, make sure this list matches the one in
+          #  openapi/grant.schema.yaml
+          default:
+            albums: 10
+            album_size: 64
+            apikeys: 2
+            contacts: 8
+            email_daily_total: 200
+            email_monthly_total: 1000
+            lists: 12
+            list_size: 250
+            media_size_max: 16777216
+            message_daily_total: 200
+            photo_res_max: 1080
+            photo_daily_total: 200
+            ratelimit: 500
+            sms_daily_total: 100
+            sms_monthly_total: 1000
+            video_duration_max: 60
+            video_daily_total: 50
+          description: >
+            List of quota grants and their default values for users who
+            have not upgraded to higher levels
+          type: object
+          additionalProperties:
+            type: integer
+        flask_secret_key:
+          default: e6b6935e45ea4fb381e7a0167862788d
+          description: >
+            The flask session secret - hexadecimal input value is provided
+            to flask config as binary SECRET_KEY
+          format: password
+          type: string
+          pattern: ^[a-f0-9]+$
+          minLength: 32
+          maxLength: 64
+        header_auth_apikey:
+          default: X-Api-Key
+          description: Header name to use for API key authentication
+          type: string
+        http_response_cache_max_age:
+          default: 30
+          description: How long a browser should cache API objects
+          type: integer
+        jwt_issuer:
+          default: dev.example.com
+          description: Issuer string for JSON web tokens
+          type: string
+        jwt_secret:
+          default: PY07l0g0FSqeKsyx
+          description: A secret for generating/validating JSON web tokens
+          format: password
+          type: string
+        languages:
+          default: [ ar, de, en, es, fil, fr, it, ja, ko, pt, ru, vi, zh,
+                     zh_Hans, zh_Hant ]
+          description: List of supported languages
+          type: array
+          items:
+            type: string
+            minLength: 2
+            maxLength: 12
+        log_level:
+          default: info
+          description: The syslog level for container logs
+          enum: [ debug, info, warning, error, critical ]
+          type: string
+        login_admin_limit:
+          default: 900
+          description: Maximum duration of an admin login session token
+          type: integer
+        login_attempts_max:
+          default: 5
+          description: How many password attempts are allowed for locking
+          type: integer
+        login_lockout_interval:
+          default: 600
+          description: >
+            How long to lock out an account after unsuccessful attempts
+          type: integer
+        login_session_limit:
+          default: 7200
+          description: Maximum duration of a regular user session
+          type: integer
+        magic_validity_hours_min:
+          default: 504
+          description: Validity of a magic-token (for invitations)
+          type: integer
+        magic_validity_from_event:
+          default: 168
+          description: Validity of a magic-token (after an event)
+          type: integer
+        metrics:
+          default:
+            api_calls_total: { scope: instance, style: counter }
+            api_errors_total: { scope: instance, style: counter }
+            api_key_auth_total:  { scope: sitewide, style: counter }
+            api_request_seconds_total: { scope: instance, style: counter }
+            api_start_timestamp: { scope: instance, style: gauge }
+            email_daily_total: {}
+            email_monthly_total: { period: month }
+            geo_lookup_total: { scope: sitewide, style: counter }
+            logins_fail_total: { scope: sitewide, style: counter }
+            logins_success_total: { scope: sitewide, style: counter }
+            message_daily_total: {}
+            photo_daily_total: {}
+            photo_processing_seconds_total: { scope: sitewide, style: counter }
+            photo_uploads_total: { scope: sitewide, style: counter }
+            process_cpu_seconds_total: { scope: instance, style: counter }
+            process_max_fds: { scope: instance, style: gauge }
+            process_open_fds: { scope: instance, style: gauge }
+            process_start_time_seconds: { scope: instance, style: gauge }
+            process_resident_memory_bytes: { scope: instance, style: gauge }
+            process_virtual_memory_bytes: { scope: instance, style: gauge }
+            sms_daily_total: {}
+            sms_monthly_total: { period: month }
+            video_daily_total: {}
+            video_processing_seconds_total: { scope: sitewide, style: counter }
+            video_uploads_total: { scope: sitewide, style: counter }
+          description: >
+            Usage metrics - scope is user [default], instance, or
+            sitewide; style is grant [default], counter, or gauge; period
+            is hour, day [default], week, month, or indefinite; notify is
+            a percentage for triggering user notification, default [0] don't
+            notify. If style is grant, the counter will decrement from current
+            account's grant entitlement whenever the counter is initialized.
+        openapi_file:
+          default: openapi.yaml
+          description: Name of the openapi resource definition file
+          type: string
+        public_url:
+          default: "http://localhost"
+          description: >
+            Publicly-reachable name for the service registration, used by
+            the UI to access endpoints
+          type: string
+        ratelimit_interval:
+          default: 300
+          description: >
+            Rate-limit measurement interval (seconds) - each API key can
+            be invoked its granted number of calls over this interval
+            (see default_grants setting)
+          type: integer
+        ratelimit_enable:
+          default: true
+          description: Whether to impose rate limits
+          type: boolean
+        rbac_file:
+          default: rbac.yaml
+          description: >
+            Name of the role-based access control definitions file,
+            relative to the openapi_file's parent directory
+          type: string
+        redis_aes_secret:
+          default: 5bj27gMy6Kbb37A7P
+          description: Secret to use for AES-encrypting all values in redis
+          format: password
+          type: string
+          minLength: 16
+          maxLength: 50
+        redis_host:
+          default: redis
+          description: Hostname or IP address of redis service
+          type: string
+        redis_port:
+          default: 6379
+          description: TCP port number of redis service
+          type: integer
+        redis_ttl:
+          default: 1200
+          description: Time-to-live for expiring entries added to redis
+          type: integer
+        registry_interval:
+          default: 30
+          description: Refresh interval for microservice registration
+          type: integer
+        registry_ttl:
+          default: 60
+          description: >
+            How long a registration lasts before the container is assumed dead
+          type: integer
+        scopes_max:
+          default: 32
+          description: How many scopes allowed per account
+          type: integer
+        service_name:
+          default: main
+          description: Name of the microservice this container provides
+          type: string
+        template_folders:
+          default: []
+          description: Paths containing Jinja2 templates
+          type: array
+          items:
+            type: string
+        thumbnail_tiny:
+          default: 50
+          description: Pixel height of thumbnail images
+          type: integer
+        token_salt:
+          default: "YI31A26j6f4&0#X*8&7QBNF"
+          description: >
+            Salt value for JSON web tokens issued at account registration
+          format: password
+          type: string
+          minLength: 20
+          maxLength: 32
+        token_secret:
+          default: 6OoN6JYPp3t80BMf
+          description: >
+            Secret value for JSON web tokens issued at account registration
+          format: password
+          type: string
+          minLength: 16
+          maxLength: 16
+        token_timeout:
+          default: 43200
+          description: >
+            Validity period of an account registration or password-reset token
+          type: integer
+
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic
+      x-basicInfoFunc: apicrud.session_auth.basic
+    apikey:
+      in: header
+      name: api_key
+      type: apiKey
+      x-apikeyInfoFunc: apicrud.session_auth.api_key
+paths:
+  /config:
+    get:
+      summary: Get config values
+      operationId: get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+                  $ref: '#/components/schemas/Config'
+          description: successful operation
+      x-codegen-request-body-name: conditions
+      x-openapi-router-controller: apicrud.service_config.ServiceConfig
