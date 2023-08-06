@@ -1,0 +1,114 @@
+#!python
+import os
+import pytube
+import argparse
+import subprocess
+
+from http.client import RemoteDisconnected
+from socket import gaierror
+from urllib.error import URLError
+
+dl_directory = os.path.expanduser('~') +'/Downloads'
+
+
+def progressBar(stream,chunk,bytes_remaining):
+    totalSize = stream.filesize
+    downloaded = totalSize - bytes_remaining
+    percent = "{0:.1f}".format(100*downloaded/float(totalSize))
+    fillLength = int(50*downloaded//totalSize)
+    bar = '█'*fillLength+'-'*(50-fillLength)
+    print(f'Downloading: |{bar}| {percent}% Complete',end='\r')
+    if totalSize==downloaded:
+        print()
+
+def getstreamfordownload(streams,title,mp3=True):
+    bitrates = {}
+    for s in streams.filter(only_audio=True):
+        bitrates[int(s.abr.strip('kbps'))] = s
+    # print("####  Bitrates: ",list(bitrates.keys()))
+    fastest = max(list(bitrates.keys()))
+    if mp3:
+        return bitrates[fastest],None
+    resolutions = ['1080p','720p','480p','360p','240p','144p']
+    for r in resolutions:
+        objs = streams.filter(only_video=True,res=r)
+        if objs==None:
+            continue
+        else:
+            try:
+                return bitrates[fastest],objs[0]
+            except IndexError:
+                print("No video streams were returned. Try a different URL.")
+                exit(1)
+
+def getvideofromurl(url):
+    video = None
+    try:
+        print("Attempting to fetch video data . . .")
+        video = pytube.YouTube(url,on_progress_callback=progressBar)
+    except pytube.exceptions.RegexMatchError:
+        print("The link provided was not valid. Aborting")
+    except (RemoteDisconnected,gaierror,URLError,ConnectionResetError):
+        print("There was a network error while attempting to fetch video data. Try again later.")
+    finally:
+        return video
+
+def download_mp3(stream,title):
+    destination = title.replace('"','').replace(':','-').replace('|','-').replace('?','_')+'.mp3'
+    try:
+        stream.download(filename='temp')
+    except(ConnectionResetError,gaierror,RemoteDisconnected,URLError):
+        print("There was a network error while attempting to download the file, \nkindly verify that you have an internet connection and try gain in a moment.\nGoodbye, for now.")
+
+    command = 'ffmpeg -i {0} -vn -ab 128k -ar 44100 -y "{1}"'.format('temp.webm',destination)
+    FNULL = open(os.devnull, 'w')
+    subprocess.run(command,stdout=FNULL,stderr=subprocess.STDOUT,shell=True)
+    os.remove('temp.webm')
+
+
+def download_video(audiostream,videostream,title):
+    destination = title.replace('"','').replace(':','-').replace('|','-').replace('?','_')+'.mp4'
+    try:
+        audiostream.download(filename='temp')
+        videostream.download(filename='temp')
+    except (ConnectionResetError,gaierror,RemoteDisconnected,URLError):
+        print("There was a network error while attempting to download the files, \nkindly verify that you have an internet connection and try gain in a moment.\nGoodbye, for now.")
+    
+    if os.name=='nt':
+        command = 'ffmpeg -i {0} -i {1} -acodec copy -c:v copy "{2}"'.format('temp.webm','temp.mp4',destination)
+    else:
+        command = 'ffmpeg -i {0} -i {1} -c:v copy -c:a aac "{2}"'.format('temp.webm','temp.mp4',destination)
+    FNULL = open(os.devnull, 'w')
+    subprocess.run(command,stdout=FNULL,stderr=subprocess.STDOUT,shell=True)
+    os.remove('temp.webm')
+    os.remove('temp.mp4')
+
+def main():
+    options = {"v":"video/mp4","m":"audio/mp3","a":"audio/mp3","mp3":"audio/mp3","mp4":"video/mp4"}
+    parser = argparse.ArgumentParser()     
+    parser.add_argument("option",help="Option for downloading. [v] or [mp4] for video, [m] or [a]  or [mp3] for audio")
+    parser.add_argument("youtube_url",help="URL of the youtube video")
+    args = parser.parse_args()
+
+    #print(args.youtube_url)
+    opt = args.option.lower()
+    if opt!='v' and opt!='m' and opt!='a' and opt!='mp4' and opt!='mp3':
+        print("Option should be one of the following:\n[v] or [mp4] for video,\n[m] or [a] or [mp3] for audio")
+        exit(1)
+    
+    video = getvideofromurl(args.youtube_url)
+    if video is not None:
+        print(f'Retrieving {options[opt]} for {video.title}')
+        mp3_selected = (opt=='m' or opt=='a' or opt=='mp3')
+        audiostream,videostream = getstreamfordownload(video.streams,video.title,mp3_selected)
+        print("Attempting to download {0} for {1}".format(options[opt],video.title))
+        os.chdir(dl_directory)
+        if mp3_selected:
+            download_mp3(audiostream,video.title)
+        else:
+            download_video(audiostream,videostream,video.title)
+            
+
+    
+if __name__ == "__main__":
+    main()
