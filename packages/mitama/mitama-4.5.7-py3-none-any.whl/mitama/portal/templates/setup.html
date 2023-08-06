@@ -1,0 +1,20 @@
+{% extends 'login_base.html' %}
+{% block content %}
+{% set post = request.post() %}
+<h1>ようこそ</h1>
+<p>
+    <span>さっそく最初のユーザーを作り、</span>
+    <span>Mitamaを始めましょう</span>
+</p>
+<form method='post' action='' enctype='multipart/form-data' class='entrance'>
+    <div class='mb-3'>
+        <label class='form-label'>メールアドレス</label>
+        <input class='form-control' type="email" name="email" placeholder="メールアドレス" />
+    </div>
+    {{ forms.csrf(request) }}
+    <div class='submit'>
+        <button class='btn btn-primary' type="submit">確認メールを送信</button>
+    </div>
+    <p class='error'>{{ error }}</p>
+</form>
+{% endblock %}
