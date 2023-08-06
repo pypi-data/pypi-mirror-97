@@ -1,0 +1,271 @@
+Metadata-Version: 2.1
+Name: adamapi
+Version: 2.0.4
+Summary: Python Adam API
+Home-page: https://git.services.meeo.it/das/adamapi
+Author: MEEO s.r.l.
+Author-email: info@meeo.it
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.8
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Unix
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: imageio
+Requires-Dist: requests (>=2.22.0)
+
+# Installation
+
+### Versioning
+
+1. adamapi==1.0.1 , This package works only with ADAMCORE 1.
+2. adamapi==2.0.4, This pachage works only with ADAMCORE 2.
+
+## Requirements
+
+```bash
+sudo apt-get install python3-venv python3-gdal gdal-bin
+```
+
+## Install with pip
+```bash
+VENVNAME="adamapi"
+python3 -m venv "${VENVNAME}"
+PYTHONVERSION=$(ls ${VENVNAME}/lib/)
+source "${VENVNAME}/bin/activate";
+python3 -m pip install --upgrade pip;
+pip install adamapi==2.0.1r1
+ln -s "/usr/lib/python3/dist-packages/osgeo" "${VENVNAME}/lib/${PYTHONVERSION}/site-packages/osgeo"
+```
+
+# API DEFINITIONS
+This document briefly describes the ADMAPI functionalities.<br>
+The complete and interactive documentation is provided through a jupyter notebook *(LINK to notebook TBP)*.<br>
+The ADAMAPI library is divided in 4 modules:
+1.  Auth --> the authorization module
+2.  Datasets --> to get the list of datasets
+3.  Search --> to get the lists of products, including associated metadata (e.g. geometry, cloud cover, orbit, tile, ...)
+4.  GetData --> to retrieve the product(s), including options to subset in space and time
+
+## 1 - Auth
+This module takes care of user authentication and authorization.<br>
+Without instancing an object of this module other components don't work.<br>
+Auth module is based on the ADAMAPI_KEY, a key that uniquelly identifies the user.
+
+**Class contructor and parameters**
+```python
+from adamapi import Auth
+a = Auth()
+```
+Parameters:<br>
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| | | | | |
+
+**Public methods and parameters**
+
+*  **.setKey()** --> To setup the ADAMAPI_KEY<br>
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | str | | The ADAMAPI_KEY |
+
+*  **.setAdamCore()** --> To setup the url of the ADAM-CORE endpoint<br>
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | str | | The url like https://test.adamplatform.eu |
+
+*  **.authorize()** --> to instanciate an auth object<br>
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| | | | | |
+
+
+*  **.getAuthToken()** --> to get the authorization token<br>
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| | | | | |
+
+
+### 1.1 - ADAMAPI_KEY retrieval
+To get the ADAMAPI_KEY, you need to access your ADAM portal and:<br>
+1.  Select the "user icon" on the top right
+2.  Expand / click the "USERNAME"
+3.  Click on the "Api Key" to display your key
+<br>
+*Command-line ADAMAPI_KEY retrieval TBP*
+
+### 1.2 - ADAMAPI_KEY setup
+There are three methods to setup the ADAMAPI_KEY and the ADAM-CORE instance:
+1. use the method setKey() and setAdamCore()
+```python
+from adamapi import Auth
+a = Auth()
+a.setKey('<ADAMAPI_KEY>')
+a.setAdamCore('https://test.adamplatform.eu')
+```
+2. Export two envars like
+```bash
+#open a Terminal and type:
+export ADAMAPI_KEY='<ADAMAPI_KEY>'
+export ADAMAPI_URL='https://test.adamplatform.eu'
+```
+3. create a file called **.adamapirc** in the user home directory with the following content
+```text
+key=<ADAMAPI_KEY>
+url=https://test.adamplatform.eu
+```
+### 1.3 - Examples
+After ADAMAPI_KEY has been set up, an auth instance can be created with:
+```python
+from adamapi import Auth
+a = Auth()
+a.authorize()
+```
+After authorize method you can retrive your autho token:
+```python
+
+from adamapi import Auth
+a = Auth()
+a.authorize()
+a.getAuthToken()
+```
+
+## 2 - Datasets
+This module provides datasets discovery functionality.
+
+**Class contructor and parameters**
+```python
+from adamapi import Datasets
+datasets = Datasets( a )
+```
+Parameters:<br>
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True |  Auth instance | | The ADAMAPI authorized instance obtained in the previous section |
+
+**Public methods and parameters**
+
+*  **.getDatasets()** --> To retrieve datasets list and metadata<br>
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | False | str | | The datasetId. |
+| page | False | numeric | 0 | Indicats a specific page  |
+| maxRecords | False | numeric | 10 | Max number of results in output.  |
+
+
+### 2.1 Examples
+This module can be used in 2 different ways.
+1.  To list all available datasets:
+```python
+datasets = Datasets(a)
+print(datasets.getDatasets())
+```
+2.  To get detailed metadata about a specific dataset
+```python
+datasets = Datasets(a)
+print( datasets.getDatasets( '{{ID:DATASET}}' , page=0 , maxRecords=10 ) )
+```
+
+## 3 - Search
+This module provides discovery functionality through the products available on the ADAM instance.
+
+**Class contructor and parameters**
+```python
+from adamapi import Search
+search = Search( a )
+```
+Parameters:<br>
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | Auth instance | | The ADAMAPI authorized instance obtained in section 1-Auth |
+
+**Public methods and parameters**
+
+*  **.getProducts()** --> To retrieve datasets list and metadata<br>
+
+Parameters:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | str | | The datasetId. |
+| maxRecords | False | int | 10 | number of records |
+| startIndex | False | int | 0 | starting record index |
+| startDate | False | str or [datetime](https://docs.python.org/3/library/datetime.html) | | the start date |
+| endDate | False | str or [datetime](https://docs.python.org/3/library/datetime.html) | | the end date |
+
+
+### 3.1 Examples
+```python
+search=Search(a)
+mongo_search=search.getProducts('{{ID:DATASET}}',maxRecords=1,startIndex=0)
+```
+
+## 4 - getData
+This module provides data access of raster, spatial subset and timeseries.
+
+**Class contructor and parameters**
+```python
+from adamapi import GetData
+data=GetData(a)
+```
+Parameters:<br>
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | Auth Instance |  | The ADAMAPI authorized instance obtained in the section 1-Auth |
+
+**Public methods and parameters**
+
+*  **.getData()** --> To retrieve a product<br>
+
+Parameters to retrive a product:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | str |  | The datasetId |
+| 1 | True | str |  | The productId |
+| outputFname | False | str | "adamapiresults/datasetId" | absolute filename or relative filename without extension. If not set, the retrived product is saved in "adamapiresults/datasetId.tif" |
+
+
+Parameters to retrive a subset or a timeseries:
+
+| position/keyword | mandatory | type | default | description |
+| ------ | ------ | ------ | ------ | ------ |
+| 0 | True | str |  | The datasetId |
+| 1 | True | str |  | startDate |
+| 2 | True | str |  | endDate |
+| geometry | True | str or geojson |  | GeoJson geometry, if the geometry is a Point the api return a timeseries |
+| outputFname | False | str | "adamapiresults/datasetId" | absolute filename without extension. If not set, the retrived product is saved in "adamapiresults/datasetId" |
+
+
+### 4.1 Examples
+```python
+data=GetData(a)
+#to retrive a raster
+image=data.getData('{{ID:DATASET}}',productId='{{productId}}')
+#or image=data.getData('{{ID:DATASET}}',productId='{{productId}}',outputFname="adamapi/test_get_data")
+
+#to retrive a subset
+image=data.getData(datasetId, startDate, endDate, geometry = '{"type": "Polygon", "coordinates": [ [ [ 43.916666667, 15.716666667 ], [43.916666667, 15.416666667 ], [ 44.216666667, 15.416666667 ],     [ 44.216666667, 15.716666667 ],     [ 43.916666667, 15.716666667 ]]]}')
+#to retrive a timeseries
+px_series=data.getData(datasetId, startDate, endDate, geometry = '{"type": "Point","coordinates":[43.916666667, 15.716666667]}')
+```
+
+
+
