@@ -1,0 +1,58 @@
+Metadata-Version: 2.1
+Name: flatlatex
+Version: 0.10
+Summary: A LaTeX math converter to unicode text
+Home-page: https://gitlab.crans.org/leger/flatlatex
+Author: Jean-Benoist Leger
+Author-email: jb@leger.tf
+License: BSD-2
+Keywords: latex math unicode
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Text Processing :: Markup :: LaTeX
+Classifier: License :: OSI Approved
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires-Python: >=3
+Requires-Dist: regex
+Provides-Extra: test
+Requires-Dist: pytest ; extra == 'test'
+
+
+LaTeX math to Unicode text converter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+flatlatex is a basic converter from LaTeX math to human readable text math
+using unicode characters.
+
+Basic example:
+
+    >>> import flatlatex
+    >>> c = flatlatex.converter()
+    >>> c.convert(
+    ... (
+    ...     r'\forall \eta>0\, \exists n\in\mathbb{N}\, \forall i>n\,'
+    ...     r' |u_i-\mathcal{l}|<\eta'
+    ... ))
+    '∀η>0 ∃n∈ℕ ∀i>n |uᵢ-𝓵|<η'
+
+Commands can be added with LaTeX syntax:
+
+    >>> import flatlatex
+    >>> c = flatlatex.converter()
+    >>> c.add_newcommand(r'\newcommand\prob{\mathbb{P}}')
+    >>> c.add_newcommand(r'\newcommand\binom[2]{\frac{#2!}{#1!(#2-#1)!}}')
+    >>> c.convert(r'\prob(X=k)\,=\,\binom{k}{n}\times p^k(1-p)^{n-k}')
+    'ℙ(X=k) = (n!)/(k!(n-k)!)×pᵏ(1-p)ⁿ⁻ᵏ'
+
+The behavior can be change:
+
+    >>> import flatlatex
+    >>> c = flatlatex.converter()
+    >>> c.convert(r'\frac{8}{9}')
+    '⁸⁄₉'
+    >>> c.allow_zw = False
+    >>> c.convert(r'\frac{8}{9}')
+    '8/9'
+
+
