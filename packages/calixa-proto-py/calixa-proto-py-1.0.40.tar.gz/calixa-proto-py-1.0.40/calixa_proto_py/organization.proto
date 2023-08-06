@@ -1,0 +1,219 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+
+import "integration.proto";
+import "integration_source.proto";
+import "common.proto";
+import "authentication.proto";
+
+option java_package = "io.calixa.domain.organization";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.organization;
+
+enum AccessKeyStatus {
+    ACCESS_KEY_STATUS_UNSPECIFIED = 0;
+    ACCESS_KEY_ACTIVE = 1;
+    ACCESS_KEY_INACTIVE = 2;
+}
+
+enum OrganizationUserStatus {
+    ORGANIZATION_USER_STATUS_UNSPECIFIED = 0;
+    ORGANIZATION_USER_ACTIVE = 1;
+    ORGANIZATION_USER_SUSPENDED = 2;
+    ORGANIZATION_USER_DELETED = 3;
+    ORGANIZATION_USER_INVITED = 4;
+
+    // Try to keep aligned with AccountUserStatus.
+}
+
+message AccessKey {
+    string organization_id = 1 [deprecated = true];
+    string access_key_id = 2 [deprecated = true];
+    string secret_access_key = 3;
+    AccessKeyStatus status = 4;
+    string created_by_organization_user_id = 5;
+
+    google.protobuf.Timestamp created_at = 10 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 11 [deprecated = true];
+}
+
+message Settings {
+
+    // Indicates which IntegrationSource(s) are preferred for viewing Account
+    // and AccountUser in Search. By default, this array is empty and all
+    // Account and AccountUsers are returned. An Organization can limit this view
+    // if they like and all searches (for Account and AccountUser) will have
+    // the appropriate constraint added by default.
+    repeated calixa.domain.integration.IntegrationSource preferred_account_sources = 1;
+    google.protobuf.Timestamp new_user_experience_completed_at = 2;
+    google.protobuf.Timestamp new_user_experience_calixa_api_selected_at = 3;
+}
+
+message Organization {
+    string organization_id = 1 [deprecated = true];
+    string name = 2;
+
+    repeated AccessKey access_keys = 4 [deprecated = true];
+
+    google.protobuf.Timestamp created_at = 10 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 11 [deprecated = true];
+
+    Settings settings = 20;
+}
+
+
+message OrganizationUser {
+    string organization_user_id = 1 [deprecated = true];
+    string organization_id = 2 [deprecated = true];
+
+    string email = 3; // Copied from firebase_users.email
+    reserved 4; // previously string encrypted_password
+
+
+    string firebase_user_id = 5;
+    string name = 6; // Copied from firebase_users.name
+
+    string invite_email = 7;
+    string invite_token = 8;
+    OrganizationUserStatus status = 9;
+
+
+    google.protobuf.Timestamp created_at = 10 [deprecated = true];
+    google.protobuf.Timestamp updated_at = 11 [deprecated = true];
+
+    // For the Console-only, this is a front-end specified payload that
+    // captures arbitrary configuration settings that need to persist
+    // beyond the user's session lifetime (like Dashboard configs)
+    string client_data = 100;
+}
+
+message TrendSearch {
+    // fields used by console to save a trend search request
+    // name that shows up and filter/rank_metrics stringified by console
+    // sort is stored as local state in client/browser side.
+    string name = 1;
+    calixa.domain.common.EntityType entity_type = 2;
+    string filters = 4;
+    string rank_metrics = 5;
+}
+
+service OrganizationService {
+
+    rpc CreateOrganization (CreateOrganizationRequest) returns (Organization) {
+    }
+    rpc UpdateOrganization (UpdateOrganizationRequest) returns (Organization) {
+    }
+
+    rpc GetOrganization (GetOrganizationRequest) returns (Organization) {
+    }
+
+    rpc GetOrganizations (google.protobuf.Empty) returns (stream Organization) {
+    }
+
+    rpc CreateOrganizationUser (CreateOrganizationUserRequest) returns (OrganizationUser) {
+    }
+    rpc UpdateOrganizationUser (UpdateOrganizationUserRequest) returns (OrganizationUser) {
+    }
+    rpc GetOrganizationUser (GetOrganizationUserRequest) returns (OrganizationUser) {
+    }
+    rpc ListOrganizationUsers (ListOrganizationUsersRequest) returns (stream OrganizationUser) {
+    }
+
+    rpc CreateAccessKey (CreateKeyRequest) returns (AccessKey) {
+    }
+    rpc GetAccessKeys (GetOrganizationRequest) returns (stream AccessKey) {
+    }
+
+    rpc SendOrganizationUserInvite (SendOrganizationUserInvitesRequest) returns (SendOrganizationUserInvitesResponse) {
+    }
+    rpc AcceptOrganizationUserInvite (AcceptOrganizationUserInviteRequest) returns (AcceptOrganizationUserInviteResponse) {
+    }
+}
+
+message CreateKeyRequest {
+    string organization_id = 1;
+    string created_by_id = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message CreateOrganizationRequest {
+    Organization organization = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message CreateOrganizationUserRequest {
+    OrganizationUser organizationUser = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message UpdateOrganizationRequest {
+    Organization organization = 1;
+    google.protobuf.FieldMask update_mask = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message UpdateOrganizationUserRequest {
+    OrganizationUser organization_user = 1;
+    google.protobuf.FieldMask update_mask = 2;
+    calixa.domain.common.RequestContext request_context = 3;
+}
+
+message AccessAndSecretKeys {
+    string access_key_id = 1;
+    string secret_access_key = 2;
+}
+
+message GetOrganizationRequest {
+    oneof possible_keys {
+        string organization_id = 1;
+        AccessAndSecretKeys access_and_secret_keys = 2;
+    }
+}
+
+message GetOrganizationUserRequest {
+    string organization_id = 1;
+    oneof possible_keys {
+        string organization_user_id = 2;
+        string email = 3;
+        string invite_email = 4;
+        string firebase_user_id = 5;
+    }
+}
+
+message ListOrganizationUsersRequest {
+    oneof possible_keys {
+        string organization_id = 1;
+        string invite_email = 2;
+        string firebase_user_id = 3;
+    }
+}
+
+message SendOrganizationUserInvitesRequest {
+    OrganizationUser inviter = 1;
+    repeated OrganizationUser invitees = 2;
+    // TODO: Add RequestContext after we decide how to represent external side-effects.
+    //       (This call does not change anything within Calixa, but is an auditable action.)
+}
+
+message SendOrganizationUserInvitesResponse {
+    repeated OrganizationUser invitees = 1;
+    repeated bool email_results = 2;
+}
+
+message AcceptOrganizationUserInviteRequest {
+    string firebase_user_id = 1;
+    string invite_token = 2;
+}
+
+message AcceptOrganizationUserInviteResponse {
+    // This is the OrganizationUser that was explicitly accepted. Can be null.
+    OrganizationUser organization_user = 1;
+    // List of OrganizationUsers that were implicitly accepted.
+    repeated OrganizationUser implicit_organization_users = 2;
+}

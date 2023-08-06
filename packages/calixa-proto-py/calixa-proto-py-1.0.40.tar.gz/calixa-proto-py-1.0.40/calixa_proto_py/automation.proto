@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+
+import "common.proto";
+import "event_label.proto";
+import "integration_source.proto";
+import "push_notification.proto";
+
+option java_package = "io.calixa.domain.automation";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.automation;
+
+enum AutomationStatus {
+    AUTOMATION_STATUS_UNSPECIFIED = 0;
+    AUTOMATION_STATUS_ENABLED = 1;
+    AUTOMATION_STATUS_PAUSED = 2;
+}
+
+enum ConditionFieldType {
+    CONDITION_FIELD_TYPE_UNSPECIFIED = 0;
+    CONDITION_FIELD_TYPE_STRING = 1;
+    CONDITION_FIELD_TYPE_INTEGER = 2;
+    CONDITION_FIELD_TYPE_MONEY = 3;
+    CONDITION_FIELD_TYPE_ENUM = 4;
+}
+
+enum RelativeTimeRange {
+    RELATIVE_TIME_RANGE_UNSPECIFIED = 0;
+    RELATIVE_TIME_RANGE_TODAY = 1;
+    RELATIVE_TIME_RANGE_YESTERDAY = 2;
+    RELATIVE_TIME_RANGE_LAST_7_DAYS = 3;
+    RELATIVE_TIME_RANGE_LAST_30_DAYS = 4;
+    RELATIVE_TIME_RANGE_LAST_90_DAYS = 5;
+    RELATIVE_TIME_RANGE_LAST_365_DAYS = 6;
+    RELATIVE_TIME_RANGE_ALL_TIME = 7;
+}
+
+message AbsoluteTimeRange {
+    google.protobuf.Timestamp from = 1;
+    google.protobuf.Timestamp to = 2;
+}
+
+enum FieldOperatorType {
+    FIELD_OPERATOR_TYPE_UNSPECIFIED = 0;
+    FIELD_OPERATOR_TYPE_EQ = 1;
+    FIELD_OPERATOR_TYPE_NE = 2;
+    FIELD_OPERATOR_TYPE_GT = 3;
+    FIELD_OPERATOR_TYPE_GTE = 4;
+    FIELD_OPERATOR_TYPE_LT = 5;
+    FIELD_OPERATOR_TYPE_LTE = 6;
+    FIELD_OPERATOR_TYPE_RANGE = 7;
+    FIELD_OPERATOR_TYPE_WITHIN = 8;
+    FIELD_OPERATOR_TYPE_IS = 9;
+    FIELD_OPERATOR_TYPE_CONTAINS = 10;
+    FIELD_OPERATOR_TYPE_ISNOT = 11;
+    FIELD_OPERATOR_TYPE_NOTCONTAIN = 12;
+}
+
+message ConditionValue {
+    oneof value {
+        string s = 1;
+        int64 l = 2;
+    }
+}
+
+message Condition {
+    string field = 1;
+    FieldOperatorType operator = 2;
+    repeated ConditionValue values = 3;
+}
+
+message MetricCondition {
+    // this is counter key, metric id
+    string metric = 1;
+    // only few operators are supported for metric conditions
+    FieldOperatorType operator = 2;
+    repeated ConditionValue values = 3 ;
+    oneof metric_range {
+        RelativeTimeRange relative_time_range = 5;
+        AbsoluteTimeRange absolute_time_range = 6;
+    }
+}
+
+message ConditionOrGroup {
+    oneof conditionOrGroup {
+        Condition condition = 1;
+        ConditionGroup group = 2;
+        MetricCondition metric_condition = 3;
+    }
+}
+
+enum LogicOperatorType {
+    LOGIC_OPERATOR_TYPE_UNSPECIFIED = 0;
+    LOGIC_OPERATOR_TYPE_AND = 1;
+    LOGIC_OPERATOR_TYPE_OR = 2;
+}
+
+message ConditionGroup {
+    LogicOperatorType logic_operator = 1;
+    repeated ConditionOrGroup conditions = 2;
+}
+
+message EventTrigger {
+    calixa.domain.entity.EventLabel event_label = 1;
+    ConditionGroup trigger = 2;
+}
+
+message MetricTrigger {
+    // TODO(freds): This space intentionally left blank.
+}
+
+message Trigger {
+    oneof trigger {
+        EventTrigger event_trigger = 100;
+        MetricTrigger metric_trigger = 101;
+    }
+}
+
+message UpdateEntityAction {
+    // TODO: Encode a method for calling a third party (like refunding an invoice)
+}
+
+message Action {
+    oneof action {
+        calixa.domain.notification.Notification notification = 1;
+        UpdateEntityAction update_entity = 2;
+    }
+}
+
+message Automation {
+    string title = 1;
+    AutomationStatus status = 2;
+    Trigger trigger = 3;
+    Action action = 4;
+}

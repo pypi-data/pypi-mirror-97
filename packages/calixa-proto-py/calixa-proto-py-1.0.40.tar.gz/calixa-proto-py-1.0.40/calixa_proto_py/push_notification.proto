@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package calixa.domain.notification;
+
+
+option java_package = "io.calixa.domain.notification";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+enum Template {
+    TEMPLATE_UNSPECIFIED = 0;
+    EMAIL_NOTE = 1;
+    EMAIL_AUTOMATION = 2;
+    WEBHOOK = 3;
+    SLACK = 4;
+}
+
+message Notification {
+    string organization_id = 1;
+    Template template = 2;
+    oneof channel {
+
+        Email email = 3;
+        Webhook webhook = 4;
+        Slack slack = 5;
+        Sms sms = 6;
+    }
+}
+/**
+ * NOTE:
+ * - 'body' is here if/when we allow users to craft their own messages
+ * - 'variables' are use there is a pre-defined template (in Courier) that
+ * expects them
+ *
+ * Most likely 'body' will be empty when 'variables' are populated, and vice-versa
+ */
+message Email {
+    string to = 1;
+    string subject = 2;
+    string body = 3;
+    string variables = 4; // Variables defined in Courier email template
+}
+
+message Webhook {
+    string url = 1;
+    string payload = 2;
+}
+
+message Slack {
+    string access_token = 1;
+    string channel = 2;
+    string message = 3;
+    string body = 4;
+    string variables = 5; // Variables defined in Courier email template
+}
+
+message Sms {
+    string number = 1;
+    string message = 2;
+}
