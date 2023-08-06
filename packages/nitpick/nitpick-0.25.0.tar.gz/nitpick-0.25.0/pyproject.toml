@@ -1,0 +1,93 @@
+[tool.nitpick]
+# Use the default style and override some things (like the Python version)
+style = ["nitpick-style", "styles/python36"]
+
+[tool.black]
+line-length = 120
+
+[tool.poetry]
+name = "nitpick"
+version = "0.25.0"
+description = "Enforce the same configuration across multiple projects"
+authors = ["W. Augusto Andreoli <andreoliwa@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/andreoliwa/nitpick"
+keywords = ["python3", "flake8", "linter", "styleguide"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Plugins",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[tool.poetry.urls]
+"Documentation" = "https://nitpick.readthedocs.io/"
+"Changelog" = "https://github.com/andreoliwa/nitpick/blob/develop/CHANGELOG.md"
+"Issue Tracker" = "https://github.com/andreoliwa/nitpick/issues"
+
+[tool.poetry.scripts]
+nitpick = "nitpick.cli:nitpick_cli"
+
+[tool.poetry.plugins."flake8.extension"]
+NIP = "nitpick.flake8:NitpickFlake8Extension"
+
+[tool.poetry.plugins.nitpick]
+text = "nitpick.plugins.text"
+json = "nitpick.plugins.json"
+pre_commit = "nitpick.plugins.pre_commit"
+ini = "nitpick.plugins.ini"
+pyproject_toml = "nitpick.plugins.pyproject_toml"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+flake8 = ">=3.0.0"
+attrs = "*"
+tomlkit = "*"
+toml = "*" # TODO: keep only tomlkit if possible, to have only one package to handle TOML
+requests = "*"
+dictdiffer = "*"
+"ruamel.yaml" = "*"
+python-slugify = "*"
+jmespath = "*"
+sortedcontainers = "*"
+click = "*"
+# Pin marshmallow to avoid error on "pip install -U nitpick":
+# marshmallow-polyfield 5.7 has requirement marshmallow>=3.0.0b10, but you'll have marshmallow 2.19.5 which is incompatible.
+marshmallow = {version = ">=3.0.0b10"}
+# Pin to avoid error on "flake8 ." when there is an invalid TOML style:
+# TypeError: _deserialize() got an unexpected keyword argument 'partial'
+marshmallow-polyfield = "^5.10"
+identify = "*"
+"more-itertools" = "*"
+pluggy = "*"
+pylint = {version = "*", optional = true}
+pytest = {version = "*", optional = true}
+pytest-cov = {version = "*", optional = true}
+testfixtures = {version = "*", optional = true}
+responses = {version = "*", optional = true}
+sphinx = {version = "*", optional = true}
+sphinx_rtd_theme = {version = "*", optional = true}
+sphobjinv = {version = "*", optional = true}
+pydantic = "*"
+autorepr = "*"
+loguru = "*"
+ConfigUpdater = "*"
+
+[tool.poetry.extras]
+lint = ["pylint"]
+test = ["pytest", "pytest-cov", "testfixtures", "responses"]
+doc = ["sphinx", "sphinx_rtd_theme", "sphobjinv"]
+
+[tool.poetry.dev-dependencies]
+ipython = "*"
+jedi = "<0.18.0" # TODO: remove when this is fixed https://github.com/ipython/ipython/issues/12745
+ipdb = "*"
+icecream = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
