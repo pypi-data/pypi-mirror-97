@@ -1,0 +1,136 @@
+[
+  {
+    "name": "general_2",
+    "type": "potential-2",
+    "parameters": "f, df_dr",
+    "kernel": "f(r)",
+    "grad": "df_dr(r)",
+    "openmp": false
+  },
+  {
+    "name": "general_3",
+    "type": "potential-3",
+    "parameters": "f, df_dr1, df_dr2, df_dt",
+    "kernel": "f(r1, r2, r12_cos)",
+    "grad_r1": "df_dr1(r1, r2, r12_cos)",
+    "grad_r2": "df_dr2(r1, r2, r12_cos)",
+    "grad_cosine": "df_dt(r1, r2, r12_cos)",
+    "openmp": false
+  },
+  {
+    "name": "harmonic_repulsion",
+    "type": "potential-2",
+    "parameters": "double epsilon",
+    "kernel": "epsilon * (r - a) * (r - a) / a / a / 2",
+    "grad": "epsilon * (r - a) / a / a"
+  },
+  {
+    "name": "lj",
+    "type": "potential-2",
+    "kernel": "4 * (pow(r, -12) - pow(r, -6))",
+    "grad": "4 * (- 12 * pow(r, -12) + 6 * pow(r, -6)) / r"
+  },
+  {
+    "name": "sw_phi2",
+    "type": "potential-2",
+    "parameters": "double gauge_a, double gauge_b, double p, double q",
+    "kernel": "gauge_a * (gauge_b * r ** (-p) - r ** (-q)) * exp(1. / (r - a))",
+    "grad": "(- p * gauge_a * gauge_b * r ** (- p - 1) + gauge_a * q * r ** (- q - 1)) * exp(1. / (r - a)) - function_value / (r - a) / (r - a)"
+  },
+  {
+    "name": "sw_phi3",
+    "type": "potential-3",
+    "parameters": "double l, double gamma, double cos_theta0",
+    "kernel": "l * (r12_cos - cos_theta0) * (r12_cos - cos_theta0) * exp(gamma * (1 / (r1 - a) + 1 / (r2 - a)))",
+    "grad_r1": "- function_value * gamma / (r1 - a) / (r1 - a)",
+    "grad_r2": "- function_value * gamma / (r2 - a) / (r2 - a)",
+    "grad_cosine": "2 * l * (r12_cos - cos_theta0) * exp(gamma * (1 / (r1 - a) + 1 / (r2 - a)))"
+  },
+  {
+    "name": "mlsf_g2",
+    "type": "potential-2",
+    "parameters": "double eta, double r_sphere, double[:, ::1] pre_compute_r, int[::1] pre_compute_r_handles",
+    "preamble": "cdef int pre_compute_r_fn_handle = pre_compute_r_handles[0]",
+    "preamble_grad": "cdef int pre_compute_r_fp_handle = pre_compute_r_handles[1]",
+    "kernel": "exp(- eta * (r - r_sphere) * (r - r_sphere)) * pre_compute_r[ptr, pre_compute_r_fn_handle]",
+    "grad": "- 2 * eta * (r - r_sphere) * function_value + exp(- eta * (r - r_sphere) * (r - r_sphere)) * pre_compute_r[ptr, pre_compute_r_fp_handle]"
+  },
+  {
+    "name": "mlsf_g5",
+    "type": "potential-3",
+    "parameters": "double epsilon, double eta, double l, double zeta, double[:, ::1] pre_compute_r, int[::1] pre_compute_r_handles",
+    "preamble": [
+      "cdef double _fn_cutoff1, _fn_cutoff2, _fn_exponent, _fn_pw",
+      "cdef double _prefactor = pow(2, 1 - zeta) * epsilon",
+      "cdef int pre_compute_r_cutoff_fn_handle = pre_compute_r_handles[0], pre_compute_r_exp_fn_handle = pre_compute_r_handles[2]"
+      ],
+    "preamble_grad": [
+      "cdef double _fp_cutoff1, _fp_cutoff2",
+      "cdef int pre_compute_r_cutoff_fp_handle = pre_compute_r_handles[1]"
+    ],
+    "before1": "_fn_cutoff1 = pre_compute_r[ptr1, pre_compute_r_cutoff_fn_handle]",
+    "before1_grad": "_fp_cutoff1 = pre_compute_r[ptr1, pre_compute_r_cutoff_fp_handle]",
+    "before": [
+      "_fn_cutoff2 = pre_compute_r[ptr2, pre_compute_r_cutoff_fn_handle]",
+      "_fn_exponent = _prefactor * pre_compute_r[ptr1, pre_compute_r_exp_fn_handle] * pre_compute_r[ptr2, pre_compute_r_exp_fn_handle]",
+      "_fn_pw = pow(1 + l * r12_cos, zeta)"
+    ],
+    "before_grad": "_fp_cutoff2 = pre_compute_r[ptr2, pre_compute_r_cutoff_fp_handle]",
+    "kernel": "_fn_pw * _fn_exponent * _fn_cutoff1 * _fn_cutoff2",
+    "grad_r1": "- 2 * eta * r1 * function_value + _fn_pw * _fn_exponent * _fn_cutoff2 * _fp_cutoff1",
+    "grad_r2": "- 2 * eta * r2 * function_value + _fn_pw * _fn_exponent * _fn_cutoff1 * _fp_cutoff2",
+    "grad_cosine": "zeta * l * pow(1 + l * r12_cos, zeta - 1) * _fn_exponent * _fn_cutoff1 * _fn_cutoff2",
+    "r12_symmetry_allowed": "1"
+  },
+  {
+    "name": "mlsf_g4",
+    "type": "potential-3",
+    "parameters": "double epsilon, double eta, double l, double zeta, double[:, ::1] pre_compute_r, int[::1] pre_compute_r_handles",
+    "preamble": [
+      "cdef double _fn_cutoff1, _fn_cutoff2, _fn_cutoff3, _fn_exponent, _fn_pw",
+      "cdef double _prefactor = pow(2, 1 - zeta) * epsilon",
+      "cdef int pre_compute_r_cutoff_fn_handle = pre_compute_r_handles[0], pre_compute_r_exp_fn_handle = pre_compute_r_handles[2]",
+      "cdef double _r3, _r3_factor, g5_fun"
+      ],
+    "preamble_grad": [
+      "cdef double _fp_cutoff1, _fp_cutoff2",
+      "cdef int pre_compute_r_cutoff_fp_handle = pre_compute_r_handles[1]",
+      "cdef double _r3_factor_p, _r3_grad_r1, _r3_grad_r2, _r3_grad_cosine, g5_grad_r1, g5_grad_r2, g5_grad_cosine"
+    ],
+    "before1": "_fn_cutoff1 = pre_compute_r[ptr1, pre_compute_r_cutoff_fn_handle]",
+    "before1_grad": "_fp_cutoff1 = pre_compute_r[ptr1, pre_compute_r_cutoff_fp_handle]",
+    "before": [
+      "_r3 = sqrt(r1 * r1 + r2 * r2 - 2 * r1 * r2 * r12_cos)"
+    ],
+    "final_filter": "_r3 < a",
+    "before_inner": [
+      "_fn_cutoff2 = pre_compute_r[ptr2, pre_compute_r_cutoff_fn_handle]",
+      "_fn_exponent = _prefactor * pre_compute_r[ptr1, pre_compute_r_exp_fn_handle] * pre_compute_r[ptr2, pre_compute_r_exp_fn_handle]",
+      "_fn_pw = pow(1 + l * r12_cos, zeta)",
+      "g5_fun = _fn_pw * _fn_exponent * _fn_cutoff1 * _fn_cutoff2",
+      "_r3_factor = exp(-eta * _r3 * _r3) * (.5 + cos(pi * _r3 / a) / 2)"
+    ],
+    "before_inner_grad": [
+      "_fp_cutoff2 = pre_compute_r[ptr2, pre_compute_r_cutoff_fp_handle]",
+      "g5_grad_r1 = - 2 * eta * r1 * g5_fun + _fn_pw * _fn_exponent * _fn_cutoff2 * _fp_cutoff1",
+      "g5_grad_r2 = - 2 * eta * r2 * g5_fun + _fn_pw * _fn_exponent * _fn_cutoff1 * _fp_cutoff2",
+      "g5_grad_cosine = zeta * l * pow(1 + l * r12_cos, zeta - 1) * _fn_exponent * _fn_cutoff1 * _fn_cutoff2",
+      "_r3_factor_p = - 2 * eta * _r3 * _r3_factor - exp(- eta * _r3 * _r3) * sin(pi * _r3 / a) * pi / a / 2",
+      "_r3_grad_r1 = (r1 - r2 * r12_cos) / _r3",
+      "_r3_grad_r2 = (r2 - r1 * r12_cos) / _r3",
+      "_r3_grad_cosine = - r1 * r2 / _r3"
+    ],
+    "kernel": "g5_fun * _r3_factor",
+    "grad_r1": "g5_grad_r1 * _r3_factor + g5_fun * _r3_factor_p * _r3_grad_r1",
+    "grad_r2": "g5_grad_r2 * _r3_factor + g5_fun * _r3_factor_p * _r3_grad_r2",
+    "grad_cosine": "g5_grad_cosine * _r3_factor + g5_fun * _r3_factor_p * _r3_grad_cosine",
+    "r12_symmetry_allowed": "1"
+  },
+  {
+    "name": "sigmoid",
+    "type": "potential-2",
+    "parameters": "double r0, double dr",
+    "kernel": "1. / (1 + exp((r - r0) / dr)) * (.5 + cos(pi * r / a) / 2)",
+    "grad": "- 1. / (1 + exp((r - r0) / dr)) * exp((r - r0) / dr) / dr * function_value - 1. / (1 + exp((r - r0) / dr)) * .5 * sin(pi * r / a) * pi / a"
+  }
+]
