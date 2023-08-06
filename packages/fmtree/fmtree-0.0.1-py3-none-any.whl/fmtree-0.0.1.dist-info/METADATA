@@ -1,0 +1,86 @@
+Metadata-Version: 2.1
+Name: fmtree
+Version: 0.0.1
+Summary: Scrape File System and output in different formats
+Home-page: https://github.com/HuakunShen/filetree
+Author: Huakun Shen
+Author-email: huakun.shen@huakunshen.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/HuakunShen/filetree/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# FileTree
+
+## Sample Output
+
+### GithubMarkdownContentFormatter
+
+```
+- OSCP
+- [Notes](./Notes)
+  - Tools
+    - [Python](./Notes/Tools/Python.md)
+    - [nmap](./Notes/Tools/nmap.md)
+    - [Netcat](./Notes/Tools/Netcat.md)
+    - [Metasploit](./Notes/Tools/Metasploit.md)
+  - [common](./Notes/common.md)
+  - [FileTransfer](./Notes/FileTransfer.md)
+  - [Service](./Notes/Service.md)
+  - [Bash](./Notes/Bash.md)
+```
+
+- OSCP
+  - [Notes](./Notes)
+    - Tools
+      - [Python](./Notes/Tools/Python.md)
+      - [nmap](./Notes/Tools/nmap.md)
+      - [Netcat](./Notes/Tools/Netcat.md)
+      - [Metasploit](./Notes/Tools/Metasploit.md)
+    - [common](./Notes/common.md)
+    - [FileTransfer](./Notes/FileTransfer.md)
+    - [Service](./Notes/Service.md)
+    - [Bash](./Notes/Bash.md)
+
+### TreeCommandFormatter
+
+```
+OSCP
+└── Notes
+    ├── Tools
+    │   ├── Python.md
+    │   ├── nmap.md
+    │   ├── Netcat.md
+    │   └── Metasploit.md
+    ├── common.md
+    ├── FileTransfer.md
+    ├── README.md
+    ├── Service.md
+    └── Bash.md
+```
+
+## Sample Code
+
+```python
+path_ = pathlib2.Path('/OSCP')
+scraper = Scraper(path_, scrape_now=False, keep_empty_dir=False)
+scraper.add_filter(filter_=MarkdownFilter())
+scraper.run()
+
+# GNU Tree Format
+formatter = TreeCommandFormatter(scraper.get_tree())
+stringio = formatter.generate()
+print(stringio.getvalue())
+
+# GitHub Content Format
+formatter = GithubMarkdownContentFormatter(scraper.get_tree())
+stringio = formatter.generate()
+print(stringio.getvalue())
+formatter.to_stream(sys.stdout)
+```
+
+
