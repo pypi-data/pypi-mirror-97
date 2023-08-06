@@ -1,0 +1,50 @@
+Metadata-Version: 2.1
+Name: zwave-js-server-python
+Version: 0.21.0
+Summary: Python wrapper for zwave-js-server
+Home-page: https://github.com/home-assistant-libs/zwave-js-server-python
+Author: Home Assistant Team
+Author-email: hello@home-assistant.io
+License: UNKNOWN
+Download-URL: https://github.com/home-assistant-libs/zwave-js-server-python
+Description: # zwave-js-server-python
+        
+        Python library for communicating with zwave-js-server. Goal for this library is to replicate the structure and the events of Z-Wave JS 1:1. So it has a `Driver`, `Controller` and `Node` classes.
+        
+        ## Trying it out
+        
+        ```shell
+        python3 -m zwave_js_server ws://localhost:3000
+        ```
+        
+        Or get the version of the server
+        
+        ```shell
+        python3 -m zwave_js_server ws://localhost:3000 --server-version
+        ```
+        
+        Or dump the state. Optionally add `--event-timeout 5` if you want to listen 5 seconds extra for events.
+        
+        ```shell
+        python3 -m zwave_js_server ws://localhost:3000 --dump-state
+        ```
+        
+        ## Sending commands
+        
+        ```python
+        try:
+            result = await client.async_send_command({ "command": "start_listening" })
+        except zwave_js_server.client.FailedCommand as err:
+            print("Command failed with", err.error_code)
+        ```
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Home Automation
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
