@@ -1,0 +1,15 @@
+<h2>{{obj.title or str(obj)}} {{tostring(obj.obj2href(ar, "(edit)"))}}</h2>
+
+{{ar.parse_memo(obj.body_preview)}}
+
+<p>
+{{fdf(obj.pub_date)}} by {{obj.user}}
+{% set sep = joiner(", ") %}
+{% set tags = obj.controlled_rows(rt.models.topics.Interest) %}
+{% if tags.count() %}
+Topics:
+{% for t in tags.all() -%}
+{{ sep() }}<a href="#">{{t.topic}}</a>
+{%- endfor %}
+{% endif %}
+</p>
