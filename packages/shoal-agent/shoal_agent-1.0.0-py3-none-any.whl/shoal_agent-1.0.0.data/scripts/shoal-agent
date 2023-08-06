@@ -1,0 +1,375 @@
+#!python
+
+# Author: Colson Drimiel <heprc-shoal@uvic.ca>
+# Copyright (C) 2013 University of Victoria
+# You may distribute under the terms of either the GNU General Public
+# License or the Apache v2 License.
+
+from __future__ import print_function
+
+import sys
+import json
+import time
+import uuid
+import signal
+import socket
+import logging
+
+import netifaces
+import pika
+import re
+import requests
+from socket import gethostbyname, gethostname
+try:
+    import _thread as thread
+except:
+    import thread
+
+import smtplib
+try:
+    from email.message import EmailMessage
+except:
+    from email.mime.text import MIMEText
+
+from shoal_agent import config
+
+def broadcast_my_ip():
+    PORT = 50000
+    BROADCAST_ID = "fna349fn" #to make sure we don't confuse or get confused by other programs
+    MULTICAST_TTL = 2
+    global squid_available    
+
+    from time import sleep
+    from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, gethostbyname, gethostname
+    
+    s = socket(AF_INET, SOCK_DGRAM) #create UDP socket
+    s.bind(('', 0))
+    # s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1) #this is a broadcast socket
+    s.setsockopt(SOL_SOCKET, SO_BROADCAST, MULTICAST_TTL) #this is a broadcast socket
+    try:
+        my_ip = gethostbyname(gethostname()) #get our IP. Be careful if you have multiple network interfaces or IPs
+    except:
+        try:
+            my_ip = config.dnsname
+        except:
+            logging.error("No hostname found")
+    
+    while 1:
+        if squid_available:
+            data = (BROADCAST_ID + str(my_ip) + ":" + str(config.squid_port)).encode()
+            s.sendto(data, ('<broadcast>', PORT))
+            logging.info("sent service announcement")
+        else:
+            pass
+        sleep(60)
+
+# Time interval to send data
+INTERVAL = config.interval
+privAddressList = ['172.' + str(x) for x in range(16, 32)] + ['10.', '192.168.']
+PRIVATE_ADDRESS = tuple(privAddressList)
+LOG_FORMAT = '%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)s] - %(message)s'
+test_targeturl = config.test_targeturl
+squid_available = False
+
+def SIGTERM_handler(signal, frame):
+
+    # Catches sigterm sent by the start-stop script when running shoal agent as a service.
+
+    logging.info("shoal-agent exiting")
+    sys.exit(0)
+
+def amqp_send(data, topics=['info']):
+
+    # amqp_send sends the passed in data to the rabbitMQ exchange with a routing key that is
+    # a concatenation of all items in topics separated by periods This method on each call
+    # reads SSL certificate/key files, establishes a connection to the AMQP server, sends the
+    # data then closes the connection.
+
+    routing_key = ''.join(topics)
+    logging.info('AMQP routing key: {0}'.format(routing_key))
+
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=config.amqp_server_url,
+            port=config.amqp_port,)
+        ,)
+    channel = connection.channel()
+    channel.basic_publish(exchange=config.amqp_exchange,
+                          routing_key=routing_key,
+                          body=data,
+                          properties=pika.BasicProperties(content_type='application/json'))
+    connection.close()
+
+def get_load_data(interface):
+
+    # get_load_data returns the outgoing kilobytes per second of the passed in interface
+    # note this is UNIX specifc
+
+    path = '/sys/class/net/{0}/statistics/tx_bytes'.format(interface)
+    logging.info("Path to '{0}' load data: {1}".format(interface, path))
+    try:
+        # Get the change in outgoing bytes over 1 second
+        with open(path) as tx:
+            tx1 = int(tx.read())
+        time.sleep(1)
+        with open(path) as tx:
+            tx2 = int(tx.read())
+        # get kilobytes
+        return (tx2 - tx1) / 1024
+    except IOError:
+        logging.error("Path '{0}' does not exist. Please change NIC to monitor in configuration file.".format(path))
+        sys.exit(1)
+    except Exception as exc:
+        logging.error(exc)
+        sys.exit(1)
+
+def get_ip_addresses():
+    """
+        Uses netifaces to return public and private dictionaries of IP addresses
+    """
+    public = {}
+    private = {}
+    for interface in netifaces.interfaces():
+        try:
+            for link in netifaces.ifaddresses(interface)[netifaces.AF_INET]:
+                if link['addr'].startswith(PRIVATE_ADDRESS):
+                    private[interface] = link['addr']
+                elif not link['addr'].startswith('127.'):
+                    public[interface] = link['addr']
+        except Exception:
+            # This is intentionally left blank
+            # Not all interfaces returned form netifaces.interfaces have an internet address
+            # (some are ethernet or MAC) This code only looks for adresses with proper internet
+            # adresses. Note IPV6 addresses are not checked and netifaces.AF_INET6 needs to be
+            # used to get those (Note this currently does not work on all platforms unlike
+            # AF_INET/IPV4) For more information on netifaces, see the readme at
+            # https://github.com/raphdg/netifaces
+            continue
+    logging.info('Public IPs found: {0}, Private IPs found: {1}'.format(public, private))
+    return public, private
+
+def getString(content):
+    try:
+        formatted = bytes(content, 'utf-8')
+    except:
+        formatted = bytes(content) # for python 2
+    return formatted
+
+def functionalTest(ip, port):
+    """
+    An url is tested to see if the repo if working, returns the "True" if it is verified or "False" if it cannot be
+    """
+    proxystring = "http://%s:%s" % (ip or '127.0.0.1', port)
+    #set proxy
+    proxies = {
+        "http":proxystring,
+    }
+    targeturl = test_targeturl   
+    try:
+        # print("Trying", targeturl)
+        repo = re.search("cvmfs\/(.+?)(\/|\.)|opt\/(.+?)(\/|\.)", targeturl).group(1)
+        if repo is None:
+            repo = re.search("cvmfs\/(.+?)(\/|\.)|opt\/(.+?)(\/|\.)", targeturl).group(3)
+        file = requests.get(targeturl, proxies=proxies, timeout=2)
+        f = file.content
+        for line in f.splitlines():            
+            if line.startswith(getString('N')):
+                if getString(repo) in line:
+                    return True
+        logging.error("%s failed verification on %s" % (ip, targeturl))
+        return False
+    except:
+        # note that this would catch any RE errors aswell but they are
+        # specified in the config and all fit the pattern.
+        logging.error("%s timeout or proxy error on %s repo" % (ip, targeturl))
+        return False
+    return True
+
+def sendEmail():
+    try:
+        msg = EmailMessage()
+        msg.set_content(config.email_content)
+    except:
+        try:
+            msg = MIMEText(config.email_content) # for python 2
+        except:
+            logging.error("Having error when writing the email content")
+    sender_email = config.sender_email
+    receiver_email = config.receiver_email
+    msg['Subject'] = config.email_subject
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    # Send the message via our own SMTP server
+    s = smtplib.SMTP('localhost')
+    try:
+        s.send_message(msg)
+    except:
+        try:
+            s.sendmail(sender_email, receiver_email, msg.as_string()) # for python 2
+        except:
+            logging.error("Have error when sending email to the admin")
+    s.quit()
+
+def writeEmailTime(time_to_write):
+    try:
+        f = open(config.last_sent_email, "w")
+        f.write(str(time_to_write))
+        f.close()
+    except:
+        logging.error("Have error when writing the time stamp to the last sent email file")
+
+def main():
+    # Sets up uuid, hostname, squid_port, public/private/external ip, and interface
+    # Establishes connection and publishes the load and ip of the squid server using
+    # a json formatted amqp message at regular intervals
+    global squid_available
+    SHORT_INTERVAL = 60 * 30
+    MEDIUM_INTERVAL = 60 * 60 * 6
+    LONG_INTERVAL = 60 * 60 * 24
+
+    data = {
+        'uuid': uuid.uuid1().hex,
+        'hostname': socket.gethostname(),
+        'squid_port': config.squid_port,
+        'verified': config.verified,
+        'max_load': config.max_load
+    }
+
+    public_ip, private_ip = get_ip_addresses()
+    external_ip = config.external_ip
+    dnsname = config.dnsname
+
+    #set the data to the first valid IP address
+    try:
+        data['private_ip'] = list(private_ip.values())[0]
+    except IndexError:
+        pass
+
+    if public_ip:
+        try:
+            data['public_ip'] = list(public_ip.values())[0]
+            data['hostname'] = socket.gethostbyaddr(list(public_ip.values())[0])[0]
+        except IndexError:
+            pass
+    elif external_ip:
+        try:
+            data['external_ip'] = external_ip
+        except KeyError:
+            #not sure this is needed, if the key doesn't exist it will be created
+            pass
+    else:
+        logging.error("Shoal-Agent was unable to find a public IP or external IP for this squid."
+                      " Please set an external IP in shoal-agent config file.")
+        sys.exit(1)
+
+
+    if dnsname:
+        try:
+            data['hostname'] = dnsname
+        except KeyError:
+            pass
+
+    # assumes only one interface is used by shoal-agent
+    # the user specifying an interface to use takes priority
+    if config.interface:
+        interface = config.interface
+    elif public_ip:
+        interface = list(public_ip.keys())[0]
+    elif private_ip:
+        interface = list(private_ip.keys())[0]
+    else:
+        logging.error("Unable to automatically detect interface to monitor, please "
+                      "set the interface to monitor in configuration file.")
+        sys.exit(1)
+
+    # enable the sigterm signal handler to log before exit
+    signal.signal(signal.SIGTERM, SIGTERM_handler)
+
+    logging.info("test if the squid is running successfully")
+
+    try:
+        test_ip = list(private_ip.values())[0]
+    except:
+        try:
+            test_ip = gethostbyname(gethostname())
+        except:
+            try:
+                test_ip = list(public_ip.values())[0]
+            except:
+                test_ip = external_ip
+    last_test_time = time.time()
+    available = functionalTest(test_ip, config.squid_port)
+    squid_available = available
+    try:
+        # if has history email time
+        with open(config.last_sent_email) as f:
+            last_email_time = float(f.readlines()[0])
+        current_time = time.time()
+        if not available and current_time - last_email_time > LONG_INTERVAL:
+            # send initial email notification
+            sendEmail()
+            last_email_time = current_time
+            writeEmailTime(last_email_time)
+    except:
+        last_email_time = time.time()
+        if not available:
+            sendEmail()
+            writeEmailTime(last_email_time)
+    test_interval = SHORT_INTERVAL
+    
+    logging.info("shoal-agent configured, starting up")
+   
+    while True:
+        # only time/load are expected to change
+        # private/public/external IPs are kept constant while shoal-agent is running
+        # the load is read only from a single interface either user specified or the
+        # first valid one netifaces finds
+        try:
+            current_time = time.time()
+            if current_time - last_test_time > test_interval:
+                # redo functional test for every test_invertal time
+                last_test_time = current_time
+                available = functionalTest(test_ip, config.squid_port)
+                squid_available = available
+            if available:
+                test_interval = MEDIUM_INTERVAL
+                data['timestamp'] = time.time()
+                data['load'] = get_load_data(interface)
+                try:
+                    amqp_send(json.dumps(data))
+                    logging.debug("heartbeat sent to shoal-server sucessfully")
+                except Exception as exc:
+                    logging.error("Could not connect to AMQP Server. Attempting to connect in {0}s...".format(INTERVAL))
+                    logging.error(exc)
+            else:
+                test_interval = SHORT_INTERVAL
+                try:
+                    if current_time - last_email_time > LONG_INTERVAL:
+                        sendEmail()
+                        last_email_time = current_time
+                        writeEmailTime(current_time)
+                    time.sleep(SHORT_INTERVAL)
+                except Exception as exc:
+                    logging.error("Have error when reading the last sent email time")
+                    logging.error(exc)
+            time.sleep(INTERVAL)
+        except KeyboardInterrupt:
+            logging.info("shoal-agent exiting")
+            sys.exit()
+        except KeyError:
+            logging.info("shoal-agent exiting")
+            sys.exit()
+
+if __name__ == '__main__':
+    try:
+        logging.basicConfig(level=config.logging_level, format=LOG_FORMAT, filename=config.log_file)
+    except IOError as exc:
+        print("Could not set logging file. Please check config file.", exc)
+        sys.exit(1)
+    logging.info("starting shoal-agent broadcast thread")
+    try:
+        thread.start_new_thread( broadcast_my_ip, () )
+    except:
+        print("Error: unable to start thread")
+    print("starting shoal-agent")
+    main()
