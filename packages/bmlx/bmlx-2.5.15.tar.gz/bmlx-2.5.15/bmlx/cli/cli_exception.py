@@ -1,0 +1,2 @@
+class BmlxCliException(Exception):
+    pass

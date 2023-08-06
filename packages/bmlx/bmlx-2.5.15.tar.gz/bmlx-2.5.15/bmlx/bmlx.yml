@@ -1,0 +1,175 @@
+# bmlx.yml配置文件，大部分值是不需要你修改的，你可以选择uncomment一些字段满足你的需求
+# 项目的名称，最好是和目录名字一致, 全局唯一的名字，主要在各个下游平台的唯一标示
+name: default
+
+# 任务所在的命名空间
+namespace: mlplat
+
+# pipeline 的 tag
+tags: []
+
+# 项目描述
+description: demo description
+
+local: False
+
+# 入口文件，必须包含create_pipeline(ctx: BmlxContext) -> Pipeline函数
+# 默认是pipeline.py
+entry: pipeline.py
+
+# 包文件的过滤，默认是全部包含的，你可以选择需要上传的包文件
+package:
+    include:
+        - '**/*.py'
+        - '**/*.pbtxt'
+        - '**/*.yml'
+
+# 执行钩子
+hooks: []
+# 报警配置
+# alert:
+#  receipts:
+#  - type: wxwork
+#    receivers: 
+#      - "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=08c44667-d5e0-4b61-aec0-f39216c5fd57"
+#  notifications:
+#  - level: "warning"
+#    receipts: ["wxwork"]
+
+# 平台页面上的可配置参数目前在这里声明
+configurable_parameters: {}
+
+parameters: {}
+
+# pipeline级别参数，主要是用于启动pipeline的镜像，默认是使用
+# harbor.bigo.sg/mlplat/bmlx:latest
+settings:
+  pipeline:
+    image:
+      name: "harbor.bigo.sg/mlplat/bmlx:latest"
+      pull_secrets: "harbor-mlplat"
+      pull_policy: "Always"
+
+    # bmlx-components python package version
+    components:
+      version: "local"
+
+    artifact_storage_base: 
+      dev: ceph://fs-ceph-hk.bigo.sg/mlpipeline-test/artifacts
+      prod: ceph://fs-ceph-hk.bigo.sg/bmlx-pipeline/artifacts
+
+    pipeline_storage_base:
+      dev: ceph://fs-ceph-hk.bigo.sg/mlpipeline-test/packages
+      prod: ceph://fs-ceph-hk.bigo.sg/bmlx-pipeline/packages
+
+    dns_policy: "None"
+    dns_config:
+      nameservers:
+        - "103.216.103.224"
+        - "103.211.228.247"
+        - "14.29.85.126"
+
+    # 这里配置额外的bucket和相关access_key/secret_key/endpoint, 这些会被更新到storage_map中，
+    # 调用filesystem时通过完整路径或者指定bucket_name即可访问；如果这里配置的bucket名称和默认配置冲突，则会覆
+    # 盖默认配置
+    # s3_storage:
+    #   "ceph://endpointxx/bucket-test":
+    #     endpoint: "http://endpointxx"   #注意endpoint需要以"http://"开头
+    #     access_key: "xxxxxxx"
+    #     secret_key: "xxxxxxxxxxxxxxxxxxx"
+
+  xdl_train:
+    k8s_context: "xdl-prod"
+    node_selector: 
+      state: normal
+    timeout: 3600
+    resources:
+      worker:
+          cpu: 1
+          memory: 5Gi
+          master_extra_memory: 1Gi
+          instances: 1
+          gpu: 0
+      ps:
+          instances: 1
+          cpu: 1
+          memory: 50Gi
+      scheduler:
+          cpu: 10
+          memory: 10Gi
+    zk_addr:
+      - "103.211.228.225:2183"
+      - "103.211.228.226:2183"
+      - "103.211.228.227:2183"
+      - "103.211.228.228:2183"
+      - "103.211.228.229:2183"
+  xdl_eval:
+    k8s_context: "xdl-prod"
+    node_selector: 
+      state: normal
+    timeout: 3600
+    resources:
+      worker:
+          cpu: 1
+          memory: 5Gi
+          master_extra_memory: 1Gi
+          instances: 1
+          gpu: 0
+      ps:
+          instances: 1
+          cpu: 1
+          memory: 50Gi
+      scheduler:
+          cpu: 10
+          memory: 10Gi
+    zk_addr:
+      - "103.211.228.225:2183"
+      - "103.211.228.226:2183"
+      - "103.211.228.227:2183"
+      - "103.211.228.228:2183"
+      - "103.211.228.229:2183"
+
+  xdl_convert:
+    k8s_context: "xdl-prod"
+    node_selector: 
+      state: normal
+    timeout: 3600
+    resources:
+      worker:
+          cpu: 1
+          memory: 5Gi
+          master_extra_memory: 1Gi
+          instances: 10
+          gpu: 0
+    zk_addr:
+      - "103.211.228.225:2183"
+      - "103.211.228.226:2183"
+      - "103.211.228.227:2183"
+      - "103.211.228.228:2183"
+      - "103.211.228.229:2183"
+
+  xdl_predict:
+    k8s_context: "xdl-prod"
+    node_selector: 
+      state: normal
+    timeout: 3600
+    resources:
+      worker:
+          cpu: 1
+          memory: 5Gi
+          master_extra_memory: 1Gi
+          instances: 1
+          gpu: 0
+      ps:
+          instances: 1
+          cpu: 1
+          memory: 50Gi
+      scheduler:
+          cpu: 10
+          memory: 10Gi
+    zk_addr:
+      - "103.211.228.225:2183"
+      - "103.211.228.226:2183"
+      - "103.211.228.227:2183"
+      - "103.211.228.228:2183"
+      - "103.211.228.229:2183"

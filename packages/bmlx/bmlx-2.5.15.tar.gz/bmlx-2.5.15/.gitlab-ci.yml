@@ -1,0 +1,94 @@
+variables:
+  image: "harbor.bigo.sg/mlplat/docker:latest"
+
+stages:
+  - test
+  - report
+  - deploy
+  - build_image
+
+bmlx_test:
+  image: harbor.bigo.sg/mlplat/bmlx-build:1.0.0
+  stage: test
+  script:
+    - pip uninstall enum34 -y && pip install pytest
+    # 加上 trusted host 是为了安装私有pip source的包，bmlx-metadata , bmlx-openapi-client
+    - pip uninstall bmlx-openapi-client -y # 安装最新版
+    - pip install . --user
+    - python setup.py develop
+    - python setup.py install --user
+    - pip install --user -U pytest pytest-cov coverage
+    - pytest bmlx
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  only:
+    refs:
+      - dev/bmlx-2.0
+      - master
+      - develop
+      - merge_requests
+  artifacts:
+    paths:
+      - build/coverage_report/
+    expire_in: 1 day
+  except:
+    refs:
+      - tags
+  tags:
+    - hk
+    - k8s-bak
+
+pages:
+  stage: report
+  before_script:
+    - "true"
+  script:
+    - mkdir -p public/coverage
+    - cp -rf build/coverage_report/* public/coverage
+  only:
+    refs:
+      - master
+  artifacts:
+    paths:
+      - public
+  except:
+    refs:
+      - tags
+  tags:
+    - hk
+    - k8s-bak
+
+pypi_deploy:
+  stage: deploy
+  image: ${image}
+  script:
+    - pip install grpcio-tools>=1.14.0
+    - pip install . --user
+    - python setup.py develop
+    - python setup.py sdist
+    - twine upload --verbose --skip-existing dist/*
+    - twine upload --verbose --skip-existing --repository-url http://pypi.mlp.bigo.inner/ dist/*
+  only:
+    - /^(\d+\.)?(\d+\.)?(\*|\d+\.)?(\*|\d+)$/
+  tags:
+    - hk
+    - k8s-bak
+
+bmlx_image:
+  stage: build_image
+  cache: {}
+  script:
+    - docker login "harbor.bigo.sg" -u "$HARBOR_USERNAME"  -p "$HARBOR_PASSWORD"
+    - docker build --pull bmlx/external/ -f bmlx/external/Dockerfile -t harbor.bigo.sg/mlplat/bmlx:${CI_COMMIT_TAG} --build-arg BMLX_VERSION=${CI_COMMIT_TAG}
+    - docker push harbor.bigo.sg/mlplat/bmlx:${CI_COMMIT_TAG}
+
+    # bmlx-develop 用于用户开发，避免开发机器没有 avx512 指令集，使用了 noavx512 image。 同时加入了ssh 支持
+    - docker build --pull bmlx/external/ -f bmlx/external/Dockerfile.develop -t harbor.bigo.sg/mlplat/bmlx-develop:${CI_COMMIT_TAG} --build-arg BMLX_VERSION=${CI_COMMIT_TAG}
+    - docker push harbor.bigo.sg/mlplat/bmlx-develop:${CI_COMMIT_TAG}
+    - docker tag harbor.bigo.sg/mlplat/bmlx-develop:${CI_COMMIT_TAG} harbor.bigo.sg/mlplat/bmlx-develop:latest
+    - docker push harbor.bigo.sg/mlplat/bmlx-develop:latest
+    # - docker rmi harbor.bigo.sg/mlplat/bmlx-develop:${CI_COMMIT_TAG}
+  only:
+    - /^(\d+\.)?(\d+\.)?(\*|\d+\.)?(\*|\d+)$/
+  tags:
+    - physical
+    - avx512
