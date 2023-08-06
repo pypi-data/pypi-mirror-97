@@ -1,0 +1,97 @@
+dist: bionic
+sudo: false
+language: python
+virtualenv:
+  system_site_packages: false
+addons:
+  apt:
+    update: true
+matrix:
+  fast_finish: true
+  allow_failures:
+  - os: osx
+  - os: windows
+  include:
+  - python: 3.7
+    env: CUDA_VERSION=10-1
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  - python: 3.8
+    env: CUDA_VERSION=10-1
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  - python: 3.7
+    env: CUDA_VERSION=10-2
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  - python: 3.8
+    env: CUDA_VERSION=10-2
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  - python: 3.9
+    env: CUDA_VERSION=10-2
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  - python: 3.9
+    env: CUDA_VERSION=11-1
+    before_install:
+    - sudo apt-get install -y ninja-build build-essential rename
+  #- name: Python 3.7.2 on macOS
+    #os: osx
+    #osx_image: xcode11
+    #language: shell
+    #before_install:
+    #- brew update && brew upgrade python
+    #- brew install ninja
+    #- alias python=python3
+    #- alias pip="python3 -m pip"
+    #- alias pip3="python3 -m pip"
+    #- shopt -s expand_aliases
+    #before_cache:
+    #- brew cleanup
+  #- name: Python 3.7.3 on Windows
+    #os: windows
+    #language: shell
+    #before_install:
+    #- choco install python
+    #env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+install:
+- source tests/travis_install.sh
+- pip3 install setuptools wheel -U
+- pip3 install torch
+- pip3 install -e .
+- pip3 install torch || echo "failed to install machine learning stuff"
+before_script:
+- git config --global user.email "stephan.seitz@fau.de"
+- git config --global user.name "Stephan Seitz"
+script:
+- python setup.py bdist_wheel
+- rename "s/dist\/pyronn_torch-(.*)\.whl/dist\/cuda-$CUDA_VERSION-pyronn_torch-\$1\.whl/s" dist/pyronn_torch-*.whl
+ 
+after_success:
+- if [[ "$COVERAGE" == "true" ]]; then coveralls || echo "failed"; codecov; fi
+after_script:
+- travis-cleanup
+cache:
+  pip: true
+  directories:
+  - "$HOME/miniconda"
+  - "/c/Python37"
+  - "$HOME/Library/Caches/Homebrew"
+deploy:
+  - provider: releases
+    api_key:
+      secure: P9tlJtzObP4Y+XlpjN0oWJtSBFD2QgLQKDJF2vXj/w+qBJDkXSk6KvRoNlGMnKAAIlM2Re56bNVkaZ+tJJn24DE9YK+2P49RJC7HvPGTXRoTmjhYdyFmuNWpo+rCeWgfjYioVOcyqwge2M4yZIg9x+ne+tCVoN/kJiCsVtsfaWo9MypynoEbfztoDTRvvQXJmVWLfvIQw5QAyqAicRIdycEWxwn0x7I7/Hz9mU/RcH/35W+dve8evco3pHYlKJO+wXJaQQdTHjwsfBmaPCIi1m5UVdOELZ+fEWp2sZi5nXhVX4ZHiWAgpNOv4R5fTEg98BzMECDB1xo9/HVCheyC2fv5LS5FyzOlS6/k+F+LfSp+K8f1cnXns3fiTmcOZazlRODC2LLjJi69HP8purZpZuPfRG8v4CmrALrrWUMz/DoHQwDr4EFjY/uIRWbFvB9PeITLxtKY2L5dGOWSKdmn/TmyIkXoFI9WwBP4dHgBEIPc+/FbIi/lAL5sSBzz2NS6wlNobz9PyVtCvWX2QwI7u7paoygAIjJwNi88Gv8Qg2q4Yy8d9ngrCX6SEmOFj4t562z3JV/3CXhnGEvR3PD9wjnZ2DL+fZrWizCwHuPUvtwqOHJ145gJ1ZGzJIdUu+y/BzqBHDIdvmJszCyOHtI+/vGbV8FmJMDMcYLpmZKXZo0=
+    file_glob: true
+    file: dist/*
+    skip_cleanup: true
+    on:
+      tags: true
+  #- provider: pypi
+    #user: __token__
+    #password:
+      #secure: ZWfigSArT7KLg2Y6HV/gYdplbcx3//yO/wGCJZYzF92gd44EvgY3B3JPmGfZqd/Wg9j3kxrKaH9CYkSJ+s7TT6v7X23fEUpna7YCXzpsSC3iWdKUAfxkQsH7PXWCEBoZ5qqzUQFvnGGVAoAGzicm/58L+IsF0Gk6O1yqcllR6ei/J931VP7chDAlWHOe64MgzbyQhNO6fw3ZnYtBuWrFSpjrpoIVcJYRZLqqaXOvq1mLoQ/Oz1LFIs9YzAoF3f63GhT9ulka+kn2GcS+05yv7KsH0BMsF2PhY9Sx47epa37dMCjF64rJfFdRRshJZDo+N3TCHWijb3RlnyvFjBMuaujriekXsj978RfjQvi9urRKWlXJhxQeXaTi8tiDqICqxPZsArU2Kd3hR7E8fkPRIAi8zSzaBTgR2NFkOQLpcRwZfKbKwvarexMoRUIxE7lAETR8iJJqSBDRLOfB+pZ6Jmzl7DaZdr5yVxA4z3VJPk1HYhwWBg7tDj05tnHE4x0iwUqckyzw6a+05ZGC6badEJ7wV1u9k7bqGKDIRg/axmeVzmkVbVnxAn+f8XlqjFoFvltsTjvGa/0iFcpzyflRDOQxJ34KgLEf9zDKO2EL6gFqMt1k94XKpH8WhtWdQUlMmvxlqbB1UCgYfoipqn+CXd8TXvD777qCw9FJRIKJAS0=
+    #on:
+      #tags: true
+      #condition: $CUDA_VERSION == "10-1"
+    #distributions: bdist_wheel
