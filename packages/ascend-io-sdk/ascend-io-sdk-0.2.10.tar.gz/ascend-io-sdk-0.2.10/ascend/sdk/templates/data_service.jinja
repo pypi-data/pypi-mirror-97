@@ -1,0 +1,25 @@
+{% from 'common.jinja' import data_service_from_definition -%}
+import base64
+import os
+import pathlib
+
+from ascend.sdk import definitions
+from ascend.sdk.applier import DataServiceApplier
+from ascend.sdk.client import Client
+
+{% for mod in proto_mods %}
+import ascend.protos.{{mod}}.{{mod}}_pb2 as {{mod}}
+{% endfor %}
+
+{% for gmod, cls in gmod_classes %}
+from {{gmod}} import {{cls}}
+{% endfor %}
+
+{{ data_service_from_definition(data_service, renderer, ordered_components, inline_code_map, classname_map) }}
+
+def apply_data_service(client: Client, data_service: definitions.DataService):
+  DataServiceApplier(client).apply(data_service)
+
+if __name__ == "__main__":
+  client = Client("{{hostname}}")
+  apply_data_service(client, data_service)

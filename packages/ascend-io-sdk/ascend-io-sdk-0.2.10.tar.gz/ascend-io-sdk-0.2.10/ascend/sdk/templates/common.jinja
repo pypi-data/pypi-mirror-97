@@ -1,0 +1,90 @@
+{% macro dataflow_from_definition(dataflow, dataflow_alias, renderer, ordered_components, inline_code_map, classname_map) -%}
+
+# dataflow '{{dataflow.id}}'
+## data feed connectors for dataflow '{{dataflow.id}}'
+data_feed_connectors_{{dataflow.id}} = []
+
+{% for data_feed_connector in dataflow.data_feed_connectors %}
+data_feed_connector_{{data_feed_connector.id}} = {{renderer(data_feed_connector, classname_map=classname_map)}}
+data_feed_connectors_{{dataflow.id}}.append(data_feed_connector_{{data_feed_connector.id}})
+
+{% endfor %}
+
+## components for dataflow '{{dataflow.id}}'
+components_{{dataflow.id}} = []
+
+{% for component in ordered_components(dataflow.components) %}
+{% set attribute_overrides = inline_code_map.attribute_path_to_loader(dataflow.id, component.id) -%}
+component_{{component.id}} = {{renderer(component, classname_map=classname_map, attribute_overrides=attribute_overrides)}}
+components_{{dataflow.id}}.append(component_{{component.id}})
+
+{% endfor %}
+
+## data feeds for dataflow '{{dataflow.id}}'
+data_feeds_{{dataflow.id}} = []
+
+{% for data_feed in dataflow.data_feeds %}
+data_feed_{{data_feed.id}} = {{renderer(data_feed, classname_map=classname_map)}}
+data_feeds_{{dataflow.id}}.append(data_feed_{{data_feed.id}})
+
+{% endfor %}
+
+## component groups for dataflow '{{dataflow.id}}'
+groups_{{dataflow.id}} = []
+
+{% for group in dataflow.groups %}
+group_{{group.id}} = {{renderer(group, classname_map=classname_map)}}
+groups_{{dataflow.id}}.append(group_{{group.id}})
+
+{% endfor %}
+
+{% set attribute_overrides = {
+      ("components",): "components_{}".format(dataflow.id),
+      ("data_feeds",): "data_feeds_{}".format(dataflow.id),
+      ("data_feed_connectors",): "data_feed_connectors_{}".format(dataflow.id),
+      ("groups",): "groups_{}".format(dataflow.id)
+    }
+-%}
+{{dataflow_alias}} = {{renderer(dataflow, classname_map=classname_map, attribute_overrides=attribute_overrides)}}
+{%- endmacro %}
+
+{% macro data_service_from_definition(data_service, renderer, ordered_components, inline_code_map, classname_map) -%}
+
+credentials = []
+
+{% for credential in data_service.credentials %}
+{% set cred_var = "credential_" + (credential.id | replace("-", "_")) -%}
+{{cred_var}} = {{renderer(credential, classname_map=classname_map)}}
+credentials.append({{cred_var}})
+
+{% endfor %}
+
+# Connections for all data service
+connections = []
+
+{% for connection in data_service.connections %}
+{% set conn_var = "connection_" + (connection.id | replace("-", "_")) -%}
+{{conn_var}} = {{renderer(connection, classname_map=classname_map)}}
+connections.append({{conn_var}})
+
+{% endfor %}
+
+dataflows = []
+
+{% for dataflow in data_service.dataflows %}
+{% set dataflow_alias = "dataflow_{}".format(dataflow.id) -%}
+{{ dataflow_from_definition(dataflow, dataflow_alias, renderer, ordered_components, inline_code_map, classname_map) }}
+dataflows.append({{dataflow_alias}})
+
+{% endfor %}
+
+
+# data service '{{data_service.id}}'
+{% set attribute_overrides = {
+      ("credentials",): "credentials",
+      ("connections",): "connections",
+      ("dataflows",): "dataflows",
+    }
+-%}
+data_service = {{renderer(data_service, classname_map=classname_map, attribute_overrides=attribute_overrides)}}
+{%- endmacro %}
