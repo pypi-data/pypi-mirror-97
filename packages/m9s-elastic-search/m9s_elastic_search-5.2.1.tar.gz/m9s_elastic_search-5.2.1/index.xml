@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="res.group" id="group_elasticsearch_admin">
+            <field name="name">Elastic Search Administrator</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_elasticsearch_admin">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_elasticsearch_admin"/>
+        </record>
+
+        <menuitem parent="ir.menu_administration" id="menu_elastic_search"
+                  name="Elastic Search"/>
+
+        <record model="ir.ui.view" id="document_type_form_view">
+            <field name="model">elasticsearch.document.type</field>
+            <field name="type">form</field>
+            <field name="name">document_type_form</field>
+        </record>
+        <record model="ir.ui.view" id="document_type_list_view">
+            <field name="model">elasticsearch.document.type</field>
+            <field name="type">tree</field>
+            <field name="name">document_type_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_document_type_form">
+            <field name="name">Document Types</field>
+            <field name="res_model">elasticsearch.document.type</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_document_type_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="document_type_list_view"/>
+            <field name="act_window" ref="act_document_type_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_document_type_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="document_type_form_view"/>
+            <field name="act_window" ref="act_document_type_form"/>
+        </record>
+        <menuitem parent="menu_elastic_search"
+                  action="act_document_type_form" id="menu_document_type_form"/>
+
+        <record model="ir.ui.view" id="index_backlog_form_view">
+            <field name="model">elasticsearch.index_backlog</field>
+            <field name="type">form</field>
+            <field name="name">index_backlog_form</field>
+        </record>
+        <record model="ir.ui.view" id="index_backlog_list_view">
+            <field name="model">elasticsearch.index_backlog</field>
+            <field name="type">tree</field>
+            <field name="name">index_backlog_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_index_backlog_form">
+            <field name="name">Index Backlog</field>
+            <field name="res_model">elasticsearch.index_backlog</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_index_backlog_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="index_backlog_list_view"/>
+            <field name="act_window" ref="act_index_backlog_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_index_backlog_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="index_backlog_form_view"/>
+            <field name="act_window" ref="act_index_backlog_form"/>
+        </record>
+        <menuitem parent="menu_elastic_search"
+                      action="act_index_backlog_form" id="menu_index_backlog_form"/>
+
+        <!-- Buttons -->
+	<record model="ir.model.button" id="elastic_search_update_settings_button">
+            <field name="name">update_settings</field>
+            <field name="string">Update settings</field>
+            <field name="model" search="[('model', '=', 'elasticsearch.configuration')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="elastic_search_update_settings_button_group_sale">
+            <field name="button" ref="elastic_search_update_settings_button"/>
+            <field name="group" ref="elastic_search.group_elasticsearch_admin"/>
+        </record>
+
+	<record model="ir.model.button" id="elastic_search_refresh_index_button">
+            <field name="name">refresh_index</field>
+            <field name="string">Update settings</field>
+            <field name="model" search="[('model', '=', 'elasticsearch.configuration')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="elastic_search_refresh_index_button_group_sale">
+            <field name="button" ref="elastic_search_refresh_index_button"/>
+            <field name="group" ref="elastic_search.group_elasticsearch_admin"/>
+        </record>
+
+	<record model="ir.model.button" id="elastic_search_update_mapping_button">
+            <field name="name">update_mapping</field>
+            <field name="string">Update mapping</field>
+            <field name="model" search="[('model', '=', 'elasticsearch.document.type')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="elastic_search_update_mapping_button_group_sale">
+            <field name="button" ref="elastic_search_update_mapping_button"/>
+            <field name="group" ref="elastic_search.group_elasticsearch_admin"/>
+        </record>
+
+	<record model="ir.model.button" id="elastic_search_reindex_all_button">
+            <field name="name">reindex_all_records</field>
+            <field name="string">Reindex all records</field>
+            <field name="model" search="[('model', '=', 'elasticsearch.document.type')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="elastic_search_reindex_all_button_group_sale">
+            <field name="button" ref="elastic_search_reindex_all_button"/>
+            <field name="group" ref="elastic_search.group_elasticsearch_admin"/>
+        </record>
+
+	<record model="ir.model.button" id="elastic_search_get_default_mapping_button">
+            <field name="name">get_default_mapping</field>
+            <field name="string">Get default mapping</field>
+            <field name="model" search="[('model', '=', 'elasticsearch.document.type')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="elastic_search_get_default_mapping_button_group_sale">
+            <field name="button" ref="elastic_search_get_default_mapping_button"/>
+            <field name="group" ref="elastic_search.group_elasticsearch_admin"/>
+        </record>
+
+
+	<record model="ir.model.access" id="access_backlog_group_es_admin">
+            <field name="model" search="[('model', '=', 'elasticsearch.index_backlog')]"/>
+            <field name="group" ref="group_elasticsearch_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_document_type_group_es_admin">
+            <field name="model" search="[('model', '=', 'elasticsearch.document.type')]"/>
+            <field name="group" ref="group_elasticsearch_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_backlog_group_es_user">
+            <field name="model" search="[('model', '=', 'elasticsearch.index_backlog')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_document_type_group_es_user">
+            <field name="model" search="[('model', '=', 'elasticsearch.document.type')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+    </data>
+</tryton>
