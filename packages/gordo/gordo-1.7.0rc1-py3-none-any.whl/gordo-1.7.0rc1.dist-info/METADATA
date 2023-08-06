@@ -1,0 +1,155 @@
+Metadata-Version: 2.1
+Name: gordo
+Version: 1.7.0rc1
+Summary: Train and build models for Argo / Kubernetes
+Home-page: https://github.com/equinor/gordo
+Author: Equinor ASA
+Author-email: fg_gpl@equinor.com
+License: AGPLv3
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Dist: Click (~=7.0)
+Requires-Dist: dictdiffer (~=0.8)
+Requires-Dist: dataclasses-json (~=0.3)
+Requires-Dist: gunicorn (~=20.0)
+Requires-Dist: h5py (~=2.8)
+Requires-Dist: jinja2 (~=2.10)
+Requires-Dist: numpy (~=1.18)
+Requires-Dist: pandas (~=1.0)
+Requires-Dist: numexpr (~=2.7)
+Requires-Dist: python-dateutil (~=2.8)
+Requires-Dist: pyyaml (~=5.3)
+Requires-Dist: requests (~=2.20)
+Requires-Dist: scikit-learn (~=0.23)
+Requires-Dist: tensorflow (~=2.4.0)
+Requires-Dist: Flask (~=1.0)
+Requires-Dist: flask-restplus (~=0.12)
+Requires-Dist: Werkzeug (==0.16.1)
+Requires-Dist: cchardet (~=2.1)
+Requires-Dist: urllib3 (~=1.24)
+Requires-Dist: simplejson (~=3.17)
+Requires-Dist: catboost (~=0.20)
+Requires-Dist: typing-extensions (~=3.7)
+Requires-Dist: prometheus-client (~=0.7.1)
+Requires-Dist: azure-identity (~=1.4.0)
+Requires-Dist: PyYAML (~=5.3.1)
+Requires-Dist: gordo-dataset (~=2.4.0)
+Requires-Dist: jeepney (>=0.6)
+Requires-Dist: packaging (~=20.7)
+Requires-Dist: pydantic (~=1.7.3)
+Requires-Dist: gordo-client (~=3.0.0)
+Provides-Extra: docs
+Requires-Dist: sphinx-rtd-theme (~=0.4) ; extra == 'docs'
+Requires-Dist: sphinxcontrib-websupport (~=1.1) ; extra == 'docs'
+Requires-Dist: sphinx (~=2.1) ; extra == 'docs'
+Requires-Dist: sphinx-click (~=2.0) ; extra == 'docs'
+Provides-Extra: full
+Requires-Dist: mlflow (~=1.5) ; extra == 'full'
+Requires-Dist: azureml-contrib-run (~=1.0) ; extra == 'full'
+Requires-Dist: peewee (~=3.13) ; extra == 'full'
+Requires-Dist: psycopg2-binary (==2.8.4) ; extra == 'full'
+Provides-Extra: mlflow
+Requires-Dist: mlflow (~=1.5) ; extra == 'mlflow'
+Requires-Dist: azureml-contrib-run (~=1.0) ; extra == 'mlflow'
+Provides-Extra: postgres
+Requires-Dist: peewee (~=3.13) ; extra == 'postgres'
+Requires-Dist: psycopg2-binary (==2.8.4) ; extra == 'postgres'
+Provides-Extra: tests
+Requires-Dist: adal (==1.2.2) ; extra == 'tests'
+Requires-Dist: apipkg (==1.5) ; extra == 'tests'
+Requires-Dist: appdirs (==1.4.3) ; extra == 'tests'
+Requires-Dist: appnope (==0.1.2) ; extra == 'tests'
+Requires-Dist: attrs (==19.3.0) ; extra == 'tests'
+Requires-Dist: backcall (==0.1.0) ; extra == 'tests'
+Requires-Dist: black (==19.3b0) ; extra == 'tests'
+Requires-Dist: bleach (==3.1.5) ; extra == 'tests'
+Requires-Dist: certifi (==2019.11.28) ; extra == 'tests'
+Requires-Dist: cffi (==1.13.2) ; extra == 'tests'
+Requires-Dist: chardet (==3.0.4) ; extra == 'tests'
+Requires-Dist: click (==7.1.2) ; extra == 'tests'
+Requires-Dist: coverage (==5.0.3) ; extra == 'tests'
+Requires-Dist: cryptography (==3.4.6) ; extra == 'tests'
+Requires-Dist: decorator (==4.4.1) ; extra == 'tests'
+Requires-Dist: defusedxml (==0.6.0) ; extra == 'tests'
+Requires-Dist: docker (==4.1.0) ; extra == 'tests'
+Requires-Dist: entrypoints (==0.3) ; extra == 'tests'
+Requires-Dist: execnet (==1.7.1) ; extra == 'tests'
+Requires-Dist: idna (==2.8) ; extra == 'tests'
+Requires-Dist: importlib-metadata (==1.4.0) ; extra == 'tests'
+Requires-Dist: influxdb (==5.3.0) ; extra == 'tests'
+Requires-Dist: ipykernel (==5.1.3) ; extra == 'tests'
+Requires-Dist: ipython-genutils (==0.2.0) ; extra == 'tests'
+Requires-Dist: ipython (==7.11.1) ; extra == 'tests'
+Requires-Dist: ipywidgets (==7.5.1) ; extra == 'tests'
+Requires-Dist: jedi (==0.15.2) ; extra == 'tests'
+Requires-Dist: jinja2 (==2.10.3) ; extra == 'tests'
+Requires-Dist: jsonschema (==3.2.0) ; extra == 'tests'
+Requires-Dist: jupyter-client (==5.3.4) ; extra == 'tests'
+Requires-Dist: jupyter-console (==6.0.0) ; extra == 'tests'
+Requires-Dist: jupyter-core (==4.6.1) ; extra == 'tests'
+Requires-Dist: jupyter (==1.0.0) ; extra == 'tests'
+Requires-Dist: markupsafe (==1.1.1) ; extra == 'tests'
+Requires-Dist: mistune (==0.8.4) ; extra == 'tests'
+Requires-Dist: mock (==3.0.5) ; extra == 'tests'
+Requires-Dist: more-itertools (==8.1.0) ; extra == 'tests'
+Requires-Dist: msgpack (==0.6.1) ; extra == 'tests'
+Requires-Dist: mypy-extensions (==0.4.3) ; extra == 'tests'
+Requires-Dist: mypy (==0.761) ; extra == 'tests'
+Requires-Dist: nbconvert (==5.6.1) ; extra == 'tests'
+Requires-Dist: nbformat (==5.0.3) ; extra == 'tests'
+Requires-Dist: notebook (==6.0.2) ; extra == 'tests'
+Requires-Dist: packaging (==20.7) ; extra == 'tests'
+Requires-Dist: pandocfilters (==1.4.2) ; extra == 'tests'
+Requires-Dist: parso (==0.5.2) ; extra == 'tests'
+Requires-Dist: pexpect (==4.7.0) ; extra == 'tests'
+Requires-Dist: pickleshare (==0.7.5) ; extra == 'tests'
+Requires-Dist: pluggy (==0.13.1) ; extra == 'tests'
+Requires-Dist: prometheus-client (==0.7.1) ; extra == 'tests'
+Requires-Dist: prompt-toolkit (==2.0.10) ; extra == 'tests'
+Requires-Dist: ptyprocess (==0.6.0) ; extra == 'tests'
+Requires-Dist: py-cpuinfo (==5.0.0) ; extra == 'tests'
+Requires-Dist: py (==1.8.1) ; extra == 'tests'
+Requires-Dist: pycparser (==2.19) ; extra == 'tests'
+Requires-Dist: pyflakes (==2.1.1) ; extra == 'tests'
+Requires-Dist: pygments (==2.5.2) ; extra == 'tests'
+Requires-Dist: pyjwt[crypto] (==1.7.1) ; extra == 'tests'
+Requires-Dist: pyparsing (==2.4.6) ; extra == 'tests'
+Requires-Dist: pyrsistent (==0.15.7) ; extra == 'tests'
+Requires-Dist: pytest-benchmark (==3.2.3) ; extra == 'tests'
+Requires-Dist: pytest-cov (==2.8.1) ; extra == 'tests'
+Requires-Dist: pytest-flakes (==4.0.0) ; extra == 'tests'
+Requires-Dist: pytest-forked (==1.1.3) ; extra == 'tests'
+Requires-Dist: pytest-mock (==1.13.0) ; extra == 'tests'
+Requires-Dist: pytest-mypy (==0.4.2) ; extra == 'tests'
+Requires-Dist: pytest-timeout (==1.3.4) ; extra == 'tests'
+Requires-Dist: pytest-xdist (==1.31.0) ; extra == 'tests'
+Requires-Dist: pytest (==5.3.2) ; extra == 'tests'
+Requires-Dist: python-dateutil (==2.8.1) ; extra == 'tests'
+Requires-Dist: pytz (==2019.3) ; extra == 'tests'
+Requires-Dist: pyzmq (==18.1.1) ; extra == 'tests'
+Requires-Dist: qtconsole (==4.6.0) ; extra == 'tests'
+Requires-Dist: requests (==2.22.0) ; extra == 'tests'
+Requires-Dist: responses (==0.10.9) ; extra == 'tests'
+Requires-Dist: send2trash (==1.5.0) ; extra == 'tests'
+Requires-Dist: six (==1.15.0) ; extra == 'tests'
+Requires-Dist: terminado (==0.8.3) ; extra == 'tests'
+Requires-Dist: testpath (==0.4.4) ; extra == 'tests'
+Requires-Dist: toml (==0.10.0) ; extra == 'tests'
+Requires-Dist: tornado (==6.0.3) ; extra == 'tests'
+Requires-Dist: traitlets (==4.3.3) ; extra == 'tests'
+Requires-Dist: typed-ast (==1.4.0) ; extra == 'tests'
+Requires-Dist: typing-extensions (==3.7.4.1) ; extra == 'tests'
+Requires-Dist: urllib3 (==1.25.7) ; extra == 'tests'
+Requires-Dist: wcwidth (==0.1.8) ; extra == 'tests'
+Requires-Dist: webencodings (==0.5.1) ; extra == 'tests'
+Requires-Dist: websocket-client (==0.57.0) ; extra == 'tests'
+Requires-Dist: widgetsnbextension (==3.5.1) ; extra == 'tests'
+Requires-Dist: zipp (==2.0.0) ; extra == 'tests'
+
+UNKNOWN
+
+
