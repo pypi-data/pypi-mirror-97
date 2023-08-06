@@ -1,0 +1,202 @@
+[
+    {
+        "name": "ExpandingWindowValidator",
+        "js_name": "FathomExpandingWindowValidator",
+        "module": "fathom.runnable.expanding_window",
+        "py_module": "fathom.runnable.expanding_window",
+        "js_component_prefix": "Fathom",
+        "human_module": "fathom.runnable.expanding_window",
+        "params_list": [
+            "y_columns",
+            "time_column",
+            "train_cutoff_window_str",
+            "test_cutoff_window_str",
+            "test_freq",
+            "model_type"
+        ],
+        "params": {
+            "y_columns": {
+                "name": "y_columns",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": null
+            },
+            "time_column": {
+                "name": "time_column",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": null
+            },
+            "train_cutoff_window_str": {
+                "name": "train_cutoff_window_str",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": null
+            },
+            "test_cutoff_window_str": {
+                "name": "test_cutoff_window_str",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": null
+            },
+            "test_freq": {
+                "name": "test_freq",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": "m"
+            },
+            "model_type": {
+                "name": "model_type",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": "classifier"
+            }
+        },
+        "doc": "\n    Expanding window validation component for predictive maintenance tasks.\n\n    Parameters\n    ----------\n    y_columns :  str or List[str]\n        Column name or names with predicted variable\n    time_column : str\n        Column name with time information\n    train_cutoff_window_str : str\n        Length of training window e.g \"60 days\"\n    test_cutoff_window_str : str\n        Length of testing window e.g \"30 days\"\n    test_freq : str\n        Frequency of testing iterations e.g \"m\"\n    model_type : str\n        Information about the model type, either \"classifier\"\n        or \"regressor\"\n    ",
+        "obj_type": "other",
+        "input_list": [
+            {
+                "key": "model",
+                "name": "model",
+                "socket": "anySocket",
+                "many_connections": true
+            }
+        ],
+        "output_list": [],
+        "json_schema_form": {
+            "type": "object",
+            "properties": {
+                "y_columns": {
+                    "type": "string",
+                    "title": "y_columns",
+                    "description": "y_columns"
+                },
+                "time_column": {
+                    "type": "string",
+                    "title": "time_column",
+                    "description": "time_column"
+                },
+                "train_cutoff_window_str": {
+                    "type": "string",
+                    "title": "train_cutoff_window_str",
+                    "description": "train_cutoff_window_str"
+                },
+                "test_cutoff_window_str": {
+                    "type": "string",
+                    "title": "test_cutoff_window_str",
+                    "description": "test_cutoff_window_str"
+                },
+                "test_freq": {
+                    "type": "string",
+                    "title": "test_freq",
+                    "description": "test_freq"
+                },
+                "model_type": {
+                    "type": "string",
+                    "title": "model_type",
+                    "description": "model_type"
+                }
+            }
+        }
+    },
+    {
+        "name": "Runnable",
+        "js_name": "FathomRunnable",
+        "module": "fathom.runnable.single_split",
+        "py_module": "fathom.runnable.single_split",
+        "js_component_prefix": "Fathom",
+        "human_module": "fathom.runnable.single_split",
+        "params_list": [],
+        "params": {},
+        "doc": "\n    The idea behind this class:\n    Runnable is a workflow component that uses the model and can be run (e.g. saving model or\n    validation). Note that by ``run`` signature this method accepts only ``model`` parameter.\n    Other parameters should be supplied in init method. This separation is because of our idea\n    that the model will be plugged in from other components, whereas the other parameters required\n    for ``run`` to execute will be supplied by user in the UI. This is exactly how it is done e.g.\n    with sklearn estimators, where all hyperparameters are specified by the user in UI,\n    and the parameters of fit/predict methods come from other sockets.\n\n    Also note that although ``run`` returns nothing, other methods can be created to return some\n    objects that could be used by other components. Those methods would work as outgoing sockets\n    just like transform or predict methods in sklearn objects.\n    ",
+        "obj_type": "other",
+        "input_list": [
+            {
+                "key": "model",
+                "name": "model",
+                "socket": "anySocket",
+                "many_connections": true
+            }
+        ],
+        "output_list": [],
+        "json_schema_form": {
+            "type": "object",
+            "properties": {}
+        }
+    },
+    {
+        "name": "SingleSplitValidator",
+        "js_name": "FathomSingleSplitValidator",
+        "module": "fathom.runnable.single_split",
+        "py_module": "fathom.runnable.single_split",
+        "js_component_prefix": "Fathom",
+        "human_module": "fathom.runnable.single_split",
+        "params_list": [
+            "y_columns",
+            "model_type",
+            "split_at"
+        ],
+        "params": {
+            "y_columns": {
+                "name": "y_columns",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": null
+            },
+            "model_type": {
+                "name": "model_type",
+                "types": [],
+                "choices": [],
+                "is_optional": false,
+                "default": "classifier"
+            },
+            "split_at": {
+                "name": "split_at",
+                "types": [
+                    "float"
+                ],
+                "choices": [],
+                "is_optional": false,
+                "default": 0.8
+            }
+        },
+        "doc": "\n    Single split validation component.\n\n    Parameters\n    ----------\n    y_columns :  str or List[str]\n        Column name or names with predicted variable\n    model_type : str\n        Information about the model type, either \"classifier\"\n        or \"regressor\"\n    split_at : float\n        Fraction of data to be used as the training set\n    ",
+        "obj_type": "other",
+        "input_list": [
+            {
+                "key": "model",
+                "name": "model",
+                "socket": "anySocket",
+                "many_connections": true
+            }
+        ],
+        "output_list": [],
+        "json_schema_form": {
+            "type": "object",
+            "properties": {
+                "y_columns": {
+                    "type": "string",
+                    "title": "y_columns",
+                    "description": "y_columns"
+                },
+                "model_type": {
+                    "type": "string",
+                    "title": "model_type",
+                    "description": "model_type"
+                },
+                "split_at": {
+                    "type": "number",
+                    "title": "split_at",
+                    "description": "split_at"
+                }
+            }
+        }
+    }
+]
