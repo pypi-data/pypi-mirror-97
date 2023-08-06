@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "properties": {
+    "system": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" }
+      },
+      "additionalProperties": true,
+      "required": ["controller"]
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "additionalProperties": true,
+      "required": ["controller", "status"]
+    },
+    "frame": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" }
+      },
+      "patternProperties": {
+        "^(?!controller).+$": { "type": "integer" }
+      },
+      "additionalProperties": false,
+      "required": ["controller"]
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" },
+        "config": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProps": false,
+      "required": ["controller", "config"]
+    },
+    "text": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "controller": { "type": "string" },
+            "text": { "type": "string" }
+          },
+          "additionalProperties": false,
+          "required": ["controller", "text"]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "log": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" },
+        "log": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": ["controller", "log"]
+    },
+    "raw_reply": {
+      "type": "object",
+      "properties": {
+        "controller": { "type": "string" },
+        "command": { "type": "string" },
+        "response": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": ["controller", "command", "response"]
+    }
+  },
+  "additionalProperties": false
+}
