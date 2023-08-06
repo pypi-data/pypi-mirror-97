@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>troublebox</title>
+    <style>
+        table th {
+            text-align: left;
+        }
+        table tr td {
+            vertical-align: top;
+        }
+        dl dt {
+            font-weight: bold;
+        }
+        pre {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header><h1>troublebox</h1></header>
+    <nav>
+        <div tal:condition="project">
+            <a href="${request.route_url('index')}">Back to index</a>
+        </div>
+        <div>
+            <a tal:condition="end is not None" href="${request.current_route_url(_query=dict(end=end))}">Previous Events</a>
+            <a tal:condition="start is not None" href="${request.current_route_url(_query=dict(start=start))}">Next Events</a>
+        </div>
+    </nav>
+    <main>
+        <table>
+            <thead>
+                <th>ID</th>
+                <th tal:condition="not project">Project</th>
+                <th>Event</th>
+                <th>Level</th>
+                <th>Infos</th>
+            </thead>
+            <tbody>
+                <tr tal:repeat="event events">
+                    <td>
+                        ${event.timestamp}
+                        (${event.id})
+                    </td>
+                    <td class="project" tal:condition="not project">
+                        <a href="${request.route_url('project', project=event.project)}">
+                            ${event.project_title}
+                        </a>
+                    </td>
+                    <td class="event">
+                        <a href="${request.route_url('event', project=event.project, event_id=event.event_id)}">
+                            ${event.event_id}
+                        </a>
+                    </td>
+                    <td>${event.data.get('level', '')}</td>
+                    <td>${event.rendered_infos}</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <nav>
+        <div tal:condition="project">
+            <a href="${request.route_url('index')}">Back to index</a>
+        </div>
+        <div>
+            <a tal:condition="end is not None" href="${request.current_route_url(_query=dict(end=end))}">Previous Events</a>
+            <a tal:condition="start is not None" href="${request.current_route_url(_query=dict(start=start))}">Next Events</a>
+        </div>
+    </nav>
+</body>
+</html>

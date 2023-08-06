@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>troublebox event ${event.event_id}</title>
+    <style>
+        dl dt {
+            font-weight: bold;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1px;
+            margin-top: 0;
+        }
+        table pre,
+        dl.frame pre {
+            padding: 1px;
+            margin: 0;
+        }
+        dl.frame dt {
+            font-weight: normal;
+        }
+        dl.frame dt code {
+            font-weight: bold;
+        }
+        .toggleable {
+            display: none;
+        }
+        table th {
+            vertical-align: top;
+            font-weight: bold;
+        }
+        table td {
+            vertical-align: top;
+        }
+        input.togglecontrol {
+            display: none;
+        }
+        input.togglecontrol + label .toggler::before {
+            display: inline-block;
+            text-align: center;
+            border: 1px dotted black;
+            content: '+';
+            padding: 1px 1px;
+            margin-left: .5em;
+            min-width: 1em;
+            min-height: 1em;
+        }
+        input.togglecontrol:checked + label .toggler::before {
+            content: '-';
+        }
+        input.togglecontrol:checked + label + .toggleable {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header><h1>troublebox event ${event.event_id}</h1></header>
+    <nav>
+        <a href="${request.route_url('index')}">Back to index</a>
+        <a href="${request.route_url('project', project=event.project)}">Back to overview</a>
+    </nav>
+    <main>
+        <p>${event.timestamp}</p>
+        <dl>
+            <tal:items repeat="item event.iter_items()">
+                <input tal:condition="item.toggle" type="checkbox" tal:attributes="checked 'checked' if not item.toggled else None" id="itemtoggle${id(item)}" class="togglecontrol">
+                <label tal:omit-tag="not item.toggle" for="itemtoggle${id(item)}"><dt>${item.title}<span class="toggler"></span></dt></label>
+                <dd tal:attributes="class 'toggleable' if item.toggle else None">${item.value}</dd>
+            </tal:items>
+        </dl>
+    </main>
+    <nav>
+        <a href="${request.route_url('index')}">Back to index</a>
+        <a href="${request.route_url('project', project=event.project)}">Back to overview</a>
+    </nav>
+</body>
+</html>
