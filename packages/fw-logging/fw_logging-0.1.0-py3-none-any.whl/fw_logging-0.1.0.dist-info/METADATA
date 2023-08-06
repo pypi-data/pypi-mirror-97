@@ -1,0 +1,76 @@
+Metadata-Version: 2.1
+Name: fw-logging
+Version: 0.1.0
+Summary: Logging helper library.
+Home-page: https://gitlab.com/flywheel-io/tools/lib/fw-logging
+License: MIT
+Keywords: Flywheel,helper,logging
+Author: Flywheel
+Author-email: support@flywheel.io
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: crayons (>=0.3.1,<0.4.0)
+Requires-Dist: orjson (>=3.4.3,<4.0.0)
+Requires-Dist: pydantic (>=1.6.1,<2.0.0)
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-logging
+Description-Content-Type: text/markdown
+
+# fw-logging
+
+Logging helper module standardizing logging and reducing boilerplate.
+
+## Installation
+
+Add as a `poetry` dependency to your project:
+
+```bash
+poetry add fw-logging
+```
+
+## Usage
+
+### Dev
+
+The default config is recommended for development, sending logs to `stdout` and
+colorizing level names if a TTY is detected.
+
+```python
+import fw_logging
+fw_logging.setup_logging()
+```
+
+### Prod
+
+Production apps should emit JSON-formatted structured logs instead, which can be
+enabled via the envvar `FW_LOG_FORMATTER=json` in a ConfigMap.
+
+### Config
+
+`fw_logging` may be further configured using envvars and/or kwargs passed to
+`setup_logging` or `get_log_config`, where keyword arguments take precedence
+using the `LogConfig` pydantic model. See the most important envvars with their
+defaults below or check out [`fw_logging.py`](fw_logging.py) for more details.
+
+| Envvar             | Default    |
+|:-------------------|:-----------|
+| `FW_LOG_HANDLER`   | `"stdout"` |
+| `FW_LOG_FORMATTER` | `"text"`   |
+| `FW_LOG_LEVEL`     | `"INFO"`   |
+
+## Development
+
+Install the project using `poetry` and enable `pre-commit`:
+
+```bash
+poetry install
+pre-commit install
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
