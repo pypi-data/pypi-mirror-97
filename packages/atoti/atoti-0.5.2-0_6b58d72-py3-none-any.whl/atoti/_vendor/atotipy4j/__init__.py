@@ -1,0 +1,7 @@
+"""Py4J Package vendored into atoti."""
+
+from __future__ import absolute_import
+
+from . import version
+
+__version__ = version.__version__
