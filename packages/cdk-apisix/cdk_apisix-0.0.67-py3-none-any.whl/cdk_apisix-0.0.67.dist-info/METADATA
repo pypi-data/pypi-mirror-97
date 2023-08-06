@@ -1,0 +1,73 @@
+Metadata-Version: 2.1
+Name: cdk-apisix
+Version: 0.0.67
+Summary: CDK construct library to generate serverless Apache APISIX workload on AWS Fargate.
+Home-page: https://github.com/pahud/cdk-apisix.git
+Author: Pahud<pahudnet@gmail.com>
+License: Apache-2.0
+Project-URL: Source, https://github.com/pahud/cdk-apisix.git
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: JavaScript
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Typing :: Typed
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: aws-cdk.aws-ec2 (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-ecs-patterns (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-ecs (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-efs (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-elasticloadbalancingv2 (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-iam (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-logs (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.core (<2.0.0,>=1.82.0)
+Requires-Dist: constructs (<4.0.0,>=3.2.27)
+Requires-Dist: jsii (<2.0.0,>=1.24.0)
+Requires-Dist: publication (>=0.0.3)
+
+[![NPM version](https://badge.fury.io/js/cdk-apisix.svg)](https://badge.fury.io/js/cdk-apisix)
+[![PyPI version](https://badge.fury.io/py/cdk-apisix.svg)](https://badge.fury.io/py/cdk-apisix)
+![Release](https://github.com/pahud/cdk-apisix/workflows/Release/badge.svg)
+
+# cdk-apisix
+
+CDK construct library to generate serverless [Apache APISIX](https://github.com/apache/apisix) workload on AWS Fargate
+
+![](images/apisix-fargate-cdk.png)
+
+# sample
+
+```python
+# Example automatically generated without compilation. See https://github.com/aws/jsii/issues/826
+from cdk_apisix import Apisix
+
+# create a standard apisix service
+apisix = Apisix(stack, "apisix-demo")
+
+# create a sample webservice with apisix in the same Amazon ECS cluster
+apisix.create_web_service("flask",
+    environment={
+        "PLATFORM": "Apache APISIX on AWS Fargate"
+    },
+    image=ContainerImage.from_registry("public.ecr.aws/d7p2r8s3/flask-docker-sample")
+)
+```
+
+## custom container image from local assets
+
+```python
+# Example automatically generated without compilation. See https://github.com/aws/jsii/issues/826
+Apisix(stack, "apisix-demo",
+    apisix_container=ContainerImage.from_asset(path.join(__dirname, "../apisix_container")),
+    dashboard_container=ContainerImage.from_asset(path.join(__dirname, "../apisix_dashboard"))
+)
+```
+
+
