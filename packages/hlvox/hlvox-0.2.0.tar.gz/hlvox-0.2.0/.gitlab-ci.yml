@@ -1,0 +1,91 @@
+image: python:3.9
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+
+stages:
+  - test
+  - deploy
+
+
+before_script:
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
+
+test:
+  stage: test
+  script:
+  - pip install pytest tox
+  - tox
+
+
+coverage:
+    stage: test
+    script:
+        - pip install pytest pytest-cov
+        - python setup.py develop
+        - pytest --cov=hlvox --cov-report=html tests/
+        - coverage report -m
+    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+    artifacts:
+        paths:
+            - htmlcov
+        expire_in: 1 day
+
+pages:
+  script:
+    - pip install sphinx
+    - sphinx-apidoc -o ./doc/source ./hlvox/ -f
+    - cd doc
+    - make html
+    - mv build/html/ ../public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+  
+
+deploy_staging:
+  stage: deploy
+  variables:
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - twine upload --repository-url $TEST_REPOSITORY_URL dist/*
+  except:
+    - tags
+  only:
+  - master
+
+
+deploy_production:
+  stage: deploy
+  variables:
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - twine upload --repository-url $DEP_REPOSITORY_URL dist/*
+  only:
+    - tags
