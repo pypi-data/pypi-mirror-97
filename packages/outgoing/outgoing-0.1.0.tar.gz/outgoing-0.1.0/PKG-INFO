@@ -1,0 +1,158 @@
+Metadata-Version: 2.1
+Name: outgoing
+Version: 0.1.0
+Summary: Common interface for multiple e-mail methods
+Home-page: https://github.com/jwodder/outgoing
+Author: John Thorvald Wodder II
+Author-email: outgoing@varonathe.org
+License: MIT
+Project-URL: Source Code, https://github.com/jwodder/outgoing
+Project-URL: Bug Tracker, https://github.com/jwodder/outgoing/issues
+Project-URL: Documentation, https://outgoing.readthedocs.io
+Description: .. image:: http://www.repostatus.org/badges/latest/active.svg
+            :target: http://www.repostatus.org/#active
+            :alt: Project Status: Active — The project has reached a stable, usable
+                  state and is being actively developed.
+        
+        .. image:: https://github.com/jwodder/outgoing/workflows/Test/badge.svg?branch=master
+            :target: https://github.com/jwodder/outgoing/actions?workflow=Test
+            :alt: CI Status
+        
+        .. image:: https://codecov.io/gh/jwodder/outgoing/branch/master/graph/badge.svg
+            :target: https://codecov.io/gh/jwodder/outgoing
+        
+        .. image:: https://img.shields.io/pypi/pyversions/outgoing.svg
+            :target: https://pypi.org/project/outgoing/
+        
+        .. image:: https://img.shields.io/github/license/jwodder/outgoing.svg
+            :target: https://opensource.org/licenses/MIT
+            :alt: MIT License
+        
+        `GitHub <https://github.com/jwodder/outgoing>`_
+        | `PyPI <https://pypi.org/project/outgoing/>`_
+        | `Documentation <https://outgoing.readthedocs.io>`_
+        | `Issues <https://github.com/jwodder/outgoing/issues>`_
+        
+        ``outgoing`` provides a common interface to multiple different e-mail sending
+        methods (SMTP, sendmail, mbox, etc.).  Just construct a sender from a
+        configuration file or object, pass it an ``EmailMessage`` instance, and let the
+        magical internet daemons take care of the rest.
+        
+        ``outgoing`` itself provides support for only basic sending methods; additional
+        methods are provided by extension packages.
+        
+        See `the documentation <https://outgoing.readthedocs.io>`_ for more
+        information.
+        
+        
+        Installation
+        ============
+        ``outgoing`` requires Python 3.6 or higher.  Just use `pip
+        <https://pip.pypa.io>`_ for Python 3 (You have pip, right?) to install
+        ``outgoing`` and its dependencies::
+        
+            python3 -m pip install outgoing
+        
+        
+        Examples
+        ========
+        
+        A sample configuration file:
+        
+        .. code:: toml
+        
+            [outgoing]
+            method = "smtp"
+            host = "mx.example.com"
+            ssl = "starttls"
+            username = "myname"
+            password = { "file" = "~/secrets/smtp-password" }
+        
+        
+        Sending an e-mail based on a configuration file:
+        
+        .. code:: python
+        
+            from email.message import EmailMessage
+            import outgoing
+        
+            # Construct an EmailMessage object the standard Python way:
+            msg = EmailMessage()
+            msg["Subject"] = "Meet me"
+            msg["To"] = "my.beloved@love.love"
+            msg["From"] = "me@here.qq"
+            msg.set_content(
+                "Oh my beloved!\n"
+                "\n"
+                "Wilt thou dine with me on the morrow?\n"
+                "\n"
+                "We're having hot pockets.\n"
+                "\n"
+                "Love, Me\n"
+            )
+        
+            # Construct a sender object based on the default config file (assuming it's
+            # populated)
+            with outgoing.from_config_file() as sender:
+                # Now send that letter!
+                sender.send(msg)
+        
+        
+        As an alternative to using a configuration file, you can specify an explicit
+        configuration by passing the configuration structure to the
+        ``outgoing.from_dict()`` method, like so:
+        
+        .. code:: python
+        
+            from email.message import EmailMessage
+            import outgoing
+        
+            msg1 = EmailMessage()
+            msg1["Subject"] = "No."
+            msg1["To"] = "me@here.qq"
+            msg1["From"] = "my.beloved@love.love"
+            msg1.set_content(
+                "Hot pockets?  Thou disgusteth me.\n"
+                "\n"
+                "Pineapple pizza or RIOT.\n"
+            )
+        
+            msg2 = EmailMessage()
+            msg2["Subject"] = "I'd like to place an order."
+            msg2["To"] = "pete@za.aa"
+            msg2["From"] = "my.beloved@love.love"
+            msg2.set_content(
+                "I need the usual.  Twelve Hawaiian Abominations to go, please.\n"
+            )
+        
+            SENDING_CONFIG = {
+                "method": "smtp",
+                "host": "smtp.love.love",
+                "username": "my.beloved",
+                "password": {"env": "SMTP_PASSWORD"},
+                "ssl": "starttls",
+            }
+        
+            with outgoing.from_dict(SENDING_CONFIG) as sender:
+                sender.send(msg1)
+                sender.send(msg2)
+        
+Keywords: e-mail,email,mailbox,mbox,send mail,sendmail,smtp
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: Topic :: Communications :: Email
+Classifier: Typing :: Typed
+Requires-Python: ~=3.6
+Description-Content-Type: text/x-rst
