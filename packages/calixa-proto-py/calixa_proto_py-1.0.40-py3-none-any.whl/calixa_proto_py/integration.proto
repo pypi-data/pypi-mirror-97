@@ -1,0 +1,281 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "integration_source.proto";
+import "log.proto";
+
+option java_package = "io.calixa.domain.integration";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.integration;
+
+message StripeCredentials {
+    string private_key = 1;
+    string perishable_key = 2;
+}
+
+message CognitoCredentials {
+    string pool_id = 1;
+    string region = 2;
+    string access_key_id = 3;
+    string secret_access_key = 4;
+}
+
+message Credentials {
+    oneof credentials {
+        OAuthCredentials oauth = 100;
+
+        StripeCredentials stripe = 101;
+        CognitoCredentials cognito = 102;
+    }
+}
+
+enum IntegrationStatus {
+    INTEGRATION_STATUS_UNSPECIFIED = 0;
+    INTEGRATION_STATUS_ENABLED = 1;
+    INTEGRATION_STATUS_PAUSED = 3;
+    INTEGRATION_STATUS_FAILED = 4;
+}
+
+message Integration {
+    string organization_id = 1;
+    string instance_id = 2;
+
+    string installed_by_user_id = 4;
+    IntegrationSource source = 5;
+
+    Credentials credentials = 6;
+    IntegrationStatus status = 7;
+
+    // key:value pairs needed to lookup an integration from webhooks we receive
+    map<string, string> properties = 8;
+    CredentialsStatus credentials_status = 9;
+
+    google.protobuf.Timestamp installed_at = 10;
+    google.protobuf.Timestamp created_at = 11;
+    google.protobuf.Timestamp updated_at = 12;
+    google.protobuf.Timestamp backfill_completed_at = 13;
+}
+
+message OAuthCredentials {
+    // List of scopes we have access to.
+    repeated string scopes = 1;
+
+    // These fields are modeled after the official OAuth 2.0 spec:
+    // https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
+    string access_token = 4;
+    string refresh_token = 5;
+    string token_type = 6;
+    google.protobuf.Timestamp token_granted_at = 7;
+    int32 expires_in = 8;
+}
+
+service IntegrationService {
+
+    // HealthCheck can be called periodically by the Platform to ensure that an integration
+    // is doing well.
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+
+    // Verifies that the credentials (parameters, config, etc) for an integration is correct
+    // and ready for an install and on-going webhooks/incremental updates and backfill.
+    rpc Verify(VerifyRequest) returns (VerifyResponse);
+
+    // Performs a full install (this is different than verifying that credentials work) of
+    // the integration for the Organization (and InstanceID).
+    rpc Install(InstallRequest) returns (InstallResponse);
+
+    // The backfill process is broken down into two components.
+    // 1) InitializeBackfill is called by the Platform to fetch the "size of the data"
+    //    required to be backfilled.
+    // 2) BackfillPartial will be called by the Platform to fetch a subset of the full
+    //    data to be backfilled. The backfill progress will be managed by the Platform
+    rpc InitializeBackfill(InitializeBackfillRequest) returns (InitializeBackfillResponse);
+    rpc BackfillPartial(BackfillPartialRequest) returns (google.protobuf.Empty);
+
+    // Called by the platform after a log entry for the integration has been
+    // durably written.
+    rpc ProcessLogEntry(ProcessLogEntryRequest) returns (ProcessLogEntryResponse);
+
+    // Called by the IntegrationManager when a user tries to install an integration. This RPC
+    // must return the URL that the browser is redirected to initiate the OAuth flow.
+    rpc GetOAuthAuthenticationUrl(OAuthAuthenticationUrlRequest) returns (OAuthAuthenticationUrlResponse);
+
+    // This RPC is called when the final step in the OAuth flow completes. The RPC must fetch
+    // the access token (and other OAuth properties) from the third-party and return the OAuthCredentials
+    rpc FinalizeOAuthIntegration(FinalizeOAuthIntegrationRequest) returns (FinalizeOAuthIntegrationResponse);
+}
+
+enum OAuthFinalizedStatus {
+    OAUTH_FINALIZED_STATUS_UNSPECIFIED = 0;
+    OAUTH_FINALIZED_STATUS_SUCCESS = 1;
+
+    // The user did not grant access to the 3rd party (i.e. did not click the
+    // "Accept" link)
+    OAUTH_FINALIZED_STATUS_ACCESS_DENIED = 2;
+}
+
+message OAuthAuthenticationUrlRequest {
+
+    // This is a Platform-side generated UUID that is a temporary pointer to
+    // the session state that must be specified in the URL with the field name
+    // "state=..."
+    string state = 1;
+
+    // Raw POST body that is sent from the Console to start the OAuth Flow.
+    // Zendesk, for instance, passes the parameter "subdomain" to the flow to
+    // resolve the appropriate "Zendesk Support" instance to grant tokens from.
+    //
+    // This is sent as JSON encoded as a string. For instance:
+    // { "subdomain": "my_company" }
+    //
+    // This field is optional; Intercom, for instance, does not pass any data.
+    string json_encoded_post_params = 2;
+
+    // The URI that the third party should redirect to. This is a well-formed
+    // URI supplied by the Platform service that receives that callback then
+    // delegates to the IntegrationService.
+    string redirect_uri = 3;
+}
+
+message OAuthAuthenticationUrlResponse {
+    // A fully formed HTTP URI that contains the state token and whatever
+    // other required fields to initiate the OAuth flow with the 3rd party.
+    string authentication_url = 1;
+}
+
+message FinalizeOAuthIntegrationRequest {
+
+    // A map of name-value pairs received from the Third Party platform. This
+    // map will contain 3rd-party specific name-value pairs.
+    map<string, string> query_parameters = 1;
+
+    // The **original** Raw POST body that was sent from the Console to start
+    // the OAuth Flow.
+    //
+    // This is not part of the OAuth flow, but necessary for context for
+    // some 3rd party integrations (namely Zendesk) that use non-standard
+    // variants of OAuth.
+    string json_encoded_post_params = 2;
+
+    // The integration instance that captures the configuration (including the
+    // OAuth properties).
+    Integration integration = 3;
+
+    // The URI that the third party should redirect to. While this URL is no longer
+    // necessary as part of the data flow, the OAuth spec requires this field to
+    // be passed in when an Access Token is requested to further verify the caller.
+    // This is the exact same value that was passed in to call GetOAuthAuthenticationUrl
+    string redirect_uri = 4;
+}
+
+message FinalizeOAuthIntegrationResponse {
+    OAuthFinalizedStatus status = 1;
+
+    // Optional; when status != SUCCESS, this field captures the error message
+    // that was returned by the 3rd party.
+    string message = 2;
+
+    // The integration instance that captures the fully configured fields. This
+    // is stored in the database after the flow completes.
+    Integration integration = 3;
+}
+
+message ProcessLogEntryRequest {
+    calixa.domain.log.WriteAheadLogEntry log_entry = 1;
+}
+
+message ProcessLogEntryResponse {
+    calixa.domain.log.LogStatus status = 1;
+}
+
+message HealthCheckRequest {
+    // Intentionally left blank
+}
+
+enum HealthCheckStatus {
+    HEALTH_CHECK_STATE_UNSPECIFIED = 0;
+    HEALTH_CHECK_STATE_OK = 1;
+    HEALTH_CHECK_STATE_UNHEALTHY = 2;
+}
+
+message HealthCheckResponse {
+    HealthCheckStatus status = 1;
+}
+
+enum CredentialsStatus {
+    CREDENTIALS_STATUS_UNSPECIFIED = 0;
+
+    // Credentials work, we're good to go!
+    CREDENTIALS_STATUS_OK = 1;
+
+    // Credentials were rejected
+    CREDENTIALS_STATUS_REJECTED = 2;
+}
+
+enum InstallStatus {
+    INSTALL_STATUS_UNSPECIFIED = 0;
+    INSTALL_STATUS_OK = 1;
+    INSTALL_STATUS_FAILED = 2;
+}
+
+message VerifyRequest {
+    Integration integration = 1;
+}
+
+message VerifyResponse {
+
+    CredentialsStatus status = 1;
+
+    // Optionally populated when status != 1 to capture what the Vendor told us about
+    // the keys.
+    string message = 2;
+}
+
+message InstallRequest {
+    Integration integration = 1;
+}
+
+message InstallResponse {
+    InstallStatus status = 1;
+}
+
+message InitializeBackfillRequest {
+    Integration integration = 1;
+    google.protobuf.Timestamp backfill_from = 2;
+    google.protobuf.Timestamp backfill_to = 3;
+}
+
+enum CursorStatus {
+    CURSOR_STATUS_UNSPECIFIED = 0;
+    CURSOR_STATUS_PROCESSED = 1;
+    CURSOR_STATUS_ERROR = 2;
+    CURSOR_STATUS_PENDING = 3;
+}
+
+message Cursor {
+    string organization_id = 1;
+    string cursor_id = 2;
+    string instance_id = 3;
+    calixa.domain.integration.IntegrationSource source = 4;
+    google.protobuf.Timestamp cursor_from = 5;
+    google.protobuf.Timestamp cursor_to = 6;
+    CursorStatus status = 7;
+    bool last_cursor = 8;
+
+    // These are managed internally by the service.
+    google.protobuf.Timestamp internal_created_at = 1005;
+    google.protobuf.Timestamp internal_updated_at = 1006;
+}
+
+message InitializeBackfillResponse {
+    repeated Cursor backfill_cursors = 2;
+}
+
+message BackfillPartialRequest {
+    Integration integration = 1;
+    repeated Cursor cursors = 2;
+}
+

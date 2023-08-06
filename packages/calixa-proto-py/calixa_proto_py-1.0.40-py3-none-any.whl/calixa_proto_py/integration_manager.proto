@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "common.proto";
+import "integration_source.proto";
+import "integration.proto";
+
+option java_package = "io.calixa.domain.integrationmanager";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.integrationmanager;
+
+service IntegrationManagerService {
+    rpc InstallIntegration(SaveIntegrationRequest) returns (InstallIntegrationResponse);
+    rpc PerformBackfill(PerformBackfillRequest) returns (PerformBackfillResponse);
+    rpc GetBackfillStatus(GetBackfillStatusRequest) returns (BackfillStatus);
+    rpc UpdateBackfillStatus(UpdateBackfillStatusRequest) returns (google.protobuf.Empty);
+
+    rpc SaveIntegration(SaveIntegrationRequest) returns (calixa.domain.integration.Integration);
+
+    // Returns a list of all installed Integrations (plus their full configurations) for an
+    // organization
+    rpc GetIntegrations(GetIntegrationRequest) returns (stream calixa.domain.integration.Integration);
+
+    rpc GetIntegrationsForSource(GetIntegrationsForSourceRequest) returns (stream calixa.domain.integration.Integration);
+
+    // Returns a singleton Integration config
+    rpc GetIntegration(GetIntegrationRequest) returns (calixa.domain.integration.Integration);
+
+    // Utility methods for setting/getting integration data by a particular property value.
+    rpc GetIntegrationByPropertyValue(GetIntegrationByPropertyValueRequest) returns (calixa.domain.integration.Integration);
+    rpc SetIntegrationByPropertyValue(IntegrationPropertyValueRequest) returns (google.protobuf.Empty);
+
+    // ===== Support Integration Metadata Service api's after migration from Organization Service ======
+    rpc GetOrganizationIdForIntegrationMetadata (GetOrganizationIdForIntegrationMetadataRequest) returns (GetOrganizationIdForIntegrationMetadataResponse) {
+        option deprecated = true;
+    }
+    rpc GetIntegrationConfig (GetIntegrationConfigRequest) returns (IntegrationConfigResponse) {
+        option deprecated = true;
+    }
+    rpc SetIntegrationConfig (SetIntegrationConfigRequest) returns (google.protobuf.Empty) {
+        option deprecated = true;
+    }
+
+    rpc GetOrganizationIdsForIntegrationSource (GetOrganizationIdsForIntegrationSourceRequest) returns (stream GetOrganizationIdsForIntegrationSourceResponse) {
+        option deprecated = true;
+    }
+    // ==================================================================================================
+}
+
+message SaveIntegrationRequest {
+    calixa.domain.integration.Integration integration = 1;
+    calixa.domain.common.RequestContext request_context = 2;
+}
+
+message IntegrationPropertyValueRequest {
+    string organization_id = 1;
+    string instance_id = 2;
+    calixa.domain.integration.IntegrationSource source = 3;
+    string key = 4;
+    string value = 5;
+}
+
+message GetIntegrationByPropertyValueRequest {
+    calixa.domain.integration.IntegrationSource source = 1;
+    string key = 2;
+    string value = 3;
+}
+
+message GetIntegrationRequest {
+    string organization_id = 1;
+
+    // These fields are only specified when fetching a specific Integration
+    string instance_id = 2;
+    calixa.domain.integration.IntegrationSource source = 3;
+}
+
+message GetIntegrationsForSourceRequest {
+    calixa.domain.integration.IntegrationSource source = 1;
+}
+
+message InstallIntegrationResponse {
+    string organization_id = 1;
+
+    // If the installation is successful, the created object is returned here. Check the
+    // install_status field to determine the status of the call.
+    calixa.domain.integration.Integration integration = 2;
+    calixa.domain.integration.InstallStatus install_status = 3;
+    string task_id = 4; // unique identifier performing the install task.
+}
+
+message PerformBackfillRequest {
+    string organization_id = 1;
+    string instance_id = 2;
+    calixa.domain.integration.IntegrationSource source = 3;
+    google.protobuf.Timestamp from = 4;
+    google.protobuf.Timestamp to = 5;
+}
+
+message PerformBackfillResponse {
+    string organization_id = 1;
+    string task_id = 2; // unique identifier performing the backfill task.
+}
+
+message GetBackfillStatusRequest {
+    string organization_id = 1;
+    string instance_id = 2;
+    calixa.domain.integration.IntegrationSource source = 3;
+}
+
+message BackfillStatus {
+    double percent_complete = 1;
+    string organization_id = 2;
+    string instance_id = 3;
+    calixa.domain.integration.IntegrationSource source = 4;
+
+    google.protobuf.Timestamp started_at = 5;
+    google.protobuf.Timestamp completed_at = 6;
+}
+
+message UpdateBackfillStatusRequest {
+    calixa.domain.integration.Cursor cursor = 1;
+}
+
+// ===== Support Integration Metadata Service api's after migration from Organization Service ======
+message GetOrganizationIdForIntegrationMetadataRequest {
+    string key = 1;
+    oneof values {
+        string as_string = 2 [deprecated = true];
+        int64 as_long = 3 [deprecated = true];
+    }
+    calixa.domain.integration.IntegrationSource source = 4;
+}
+
+message GetOrganizationIdForIntegrationMetadataResponse {
+    string organization_id = 1;
+}
+
+message GetIntegrationConfigRequest {
+    string organization_id = 1;
+    string key = 2 [deprecated = true];
+    IntegrationConfigValueType type = 3 [deprecated = true];
+    calixa.domain.integration.IntegrationSource source = 4 [deprecated = true];
+}
+
+message SetIntegrationConfigRequest {
+    string organization_id = 1;
+    string key = 2 [deprecated = true];
+    oneof values {
+        string as_string = 3 [deprecated = true];
+        int64 as_long = 4 [deprecated = true];
+    }
+    calixa.domain.integration.IntegrationSource source = 5 [deprecated = true];
+    calixa.domain.common.RequestContext request_context = 6;
+}
+
+message IntegrationConfigResponse {
+    string organization_id = 1 [deprecated = true];
+    string key = 2 [deprecated = true];
+    oneof values {
+        string as_string = 3 [deprecated = true];
+        int64 as_long = 4 [deprecated = true];
+    }
+    calixa.domain.integration.IntegrationSource source = 5 [deprecated = true];
+}
+
+enum IntegrationConfigValueType {
+    INTEGRATION_CONFIG_VALUE_TYPE_UNSPECIFIED = 0 [deprecated = true];
+    INTEGRATION_CONFIG_VALUE_TYPE_STRING = 1 [deprecated = true];
+    INTEGRATION_CONFIG_VALUE_TYPE_LONG = 2 [deprecated = true];
+}
+
+message GetOrganizationIdsForIntegrationSourceRequest {
+    calixa.domain.integration.IntegrationSource source = 1 [deprecated = true];
+}
+
+message GetOrganizationIdsForIntegrationSourceResponse {
+    string organization_id = 1;
+}
+// ==================================================================================================

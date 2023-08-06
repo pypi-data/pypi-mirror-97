@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option java_package = "io.calixa.domain.integration";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+
+package calixa.domain.integration;
+
+enum IntegrationSource {
+    INTEGRATION_SOURCE_UNSPECIFIED = 0;
+    INTEGRATION_SOURCE_STRIPE = 1;
+    INTEGRATION_SOURCE_COGNITO = 2;
+    INTEGRATION_SOURCE_MAILGUN = 3;
+    INTEGRATION_SOURCE_SEGMENT = 4;
+    INTEGRATION_SOURCE_ZENDESK = 5;
+    INTEGRATION_SOURCE_INTERCOM = 6;
+    INTEGRATION_SOURCE_FRONT = 7;
+    INTEGRATION_SOURCE_SENDGRID = 8;
+    INTEGRATION_SOURCE_FRESHDESK = 9;
+    INTEGRATION_SOURCE_SENTRY = 10;
+    INTEGRATION_SOURCE_SALESFORCE = 11;
+    INTEGRATION_SOURCE_HUBSPOT = 12;
+    INTEGRATION_SOURCE_GOOGLE_FIREBASE = 13;
+    INTEGRATION_SOURCE_SLACK = 14;
+
+
+    INTEGRATION_SOURCE_AUTO_METRICS = 536870907;
+
+    INTEGRATION_SOURCE_ORGANIZATION = 536870908;
+
+    // Special case: This represents an email address -- this is UNIVERSAL
+    INTEGRATION_SOURCE_UNIVERSAL_EMAIL = 536870909;
+
+    // We need to be special somehow, right? The max value for a protobuf field is the 2^29 - 1.
+    // We represent the use of Calixa via API (computer) and Console (human) separately to better
+    // enrich the log history in RequestContext. See integration.proto for more info.
+    INTEGRATION_SOURCE_CALIXA_CONSOLE = 536870910;
+    INTEGRATION_SOURCE_CALIXA_API = 536870911;
+}
+
+
