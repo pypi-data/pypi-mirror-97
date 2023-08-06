@@ -1,0 +1,58 @@
+import os.path
+__dir__ = os.path.split(os.path.abspath(os.path.realpath(__file__)))[0]
+data_location = os.path.join(__dir__, "resources")
+src = "https://github.com/lowRISC/opentitan"
+
+# Module version
+version_str = "0.0.post5288"
+version_tuple = (0, 0, 5288)
+try:
+    from packaging.version import Version as V
+    pversion = V("0.0.post5288")
+except ImportError:
+    pass
+
+# Data version info
+data_version_str = "0.0.post5193"
+data_version_tuple = (0, 0, 5193)
+try:
+    from packaging.version import Version as V
+    pdata_version = V("0.0.post5193")
+except ImportError:
+    pass
+data_git_hash = "2f5e5cf1888f6c48eed6bb24b141a682282e1c5d"
+data_git_describe = "v0.0-5193-g2f5e5cf18"
+data_git_msg = """\
+commit 2f5e5cf1888f6c48eed6bb24b141a682282e1c5d
+Author: Udi Jonnalagadda <udij@google.com>
+Date:   Mon Mar 8 11:51:17 2021 -0800
+
+    [util] minor updates to secded_gen
+    
+    this PR does a few things with secded_gen.py:
+    
+    - adds a seed value to data/secded_cfg.hjson for reproducibility
+    - adds decoding functions to prim_secded_pkg
+    - minor spacing updates throughout if generating the pkg functions
+    
+    Signed-off-by: Udi Jonnalagadda <udij@google.com>
+
+"""
+
+# Tool version info
+tool_version_str = "0.0.post95"
+tool_version_tuple = (0, 0, 95)
+try:
+    from packaging.version import Version as V
+    ptool_version = V("0.0.post95")
+except ImportError:
+    pass
+
+
+def data_file(f):
+    """Get absolute path for file inside pythondata_misc_opentitan."""
+    fn = os.path.join(data_location, f)
+    fn = os.path.abspath(fn)
+    if not os.path.exists(fn):
+        raise IOError("File {f} doesn't exist in pythondata_misc_opentitan".format(f))
+    return fn
