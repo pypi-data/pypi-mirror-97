@@ -1,0 +1,645 @@
+import typing
+
+import httplib2  # type: ignore
+import typing_extensions
+
+import googleapiclient.discovery
+import googleapiclient.http  # type: ignore
+
+from .schemas import *
+@typing.type_check_only
+class SpannerResource(googleapiclient.discovery.Resource):
+    @typing.type_check_only
+    class ProjectsResource(googleapiclient.discovery.Resource):
+        @typing.type_check_only
+        class InstanceConfigsResource(googleapiclient.discovery.Resource):
+            def get(
+                self, *, name: str, **kwargs: typing.Any
+            ) -> InstanceConfigHttpRequest: ...
+            def list(
+                self,
+                *,
+                parent: str,
+                pageSize: int = ...,
+                pageToken: str = ...,
+                **kwargs: typing.Any
+            ) -> ListInstanceConfigsResponseHttpRequest: ...
+        @typing.type_check_only
+        class InstancesResource(googleapiclient.discovery.Resource):
+            @typing.type_check_only
+            class BackupOperationsResource(googleapiclient.discovery.Resource):
+                def list(
+                    self,
+                    *,
+                    parent: str,
+                    filter: str = ...,
+                    pageSize: int = ...,
+                    pageToken: str = ...,
+                    **kwargs: typing.Any
+                ) -> ListBackupOperationsResponseHttpRequest: ...
+            @typing.type_check_only
+            class BackupsResource(googleapiclient.discovery.Resource):
+                @typing.type_check_only
+                class OperationsResource(googleapiclient.discovery.Resource):
+                    def cancel(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def delete(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def get(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> OperationHttpRequest: ...
+                    def list(
+                        self,
+                        *,
+                        name: str,
+                        filter: str = ...,
+                        pageSize: int = ...,
+                        pageToken: str = ...,
+                        **kwargs: typing.Any
+                    ) -> ListOperationsResponseHttpRequest: ...
+                def create(
+                    self,
+                    *,
+                    parent: str,
+                    body: Backup = ...,
+                    backupId: str = ...,
+                    encryptionConfig_encryptionType: typing_extensions.Literal[
+                        "ENCRYPTION_TYPE_UNSPECIFIED",
+                        "USE_DATABASE_ENCRYPTION",
+                        "GOOGLE_DEFAULT_ENCRYPTION",
+                        "CUSTOMER_MANAGED_ENCRYPTION",
+                    ] = ...,
+                    encryptionConfig_kmsKeyName: str = ...,
+                    **kwargs: typing.Any
+                ) -> OperationHttpRequest: ...
+                def delete(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> EmptyHttpRequest: ...
+                def get(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> BackupHttpRequest: ...
+                def getIamPolicy(
+                    self,
+                    *,
+                    resource: str,
+                    body: GetIamPolicyRequest = ...,
+                    **kwargs: typing.Any
+                ) -> PolicyHttpRequest: ...
+                def list(
+                    self,
+                    *,
+                    parent: str,
+                    filter: str = ...,
+                    pageSize: int = ...,
+                    pageToken: str = ...,
+                    **kwargs: typing.Any
+                ) -> ListBackupsResponseHttpRequest: ...
+                def patch(
+                    self,
+                    *,
+                    name: str,
+                    body: Backup = ...,
+                    updateMask: str = ...,
+                    **kwargs: typing.Any
+                ) -> BackupHttpRequest: ...
+                def setIamPolicy(
+                    self,
+                    *,
+                    resource: str,
+                    body: SetIamPolicyRequest = ...,
+                    **kwargs: typing.Any
+                ) -> PolicyHttpRequest: ...
+                def testIamPermissions(
+                    self,
+                    *,
+                    resource: str,
+                    body: TestIamPermissionsRequest = ...,
+                    **kwargs: typing.Any
+                ) -> TestIamPermissionsResponseHttpRequest: ...
+                def operations(self) -> OperationsResource: ...
+            @typing.type_check_only
+            class DatabaseOperationsResource(googleapiclient.discovery.Resource):
+                def list(
+                    self,
+                    *,
+                    parent: str,
+                    filter: str = ...,
+                    pageSize: int = ...,
+                    pageToken: str = ...,
+                    **kwargs: typing.Any
+                ) -> ListDatabaseOperationsResponseHttpRequest: ...
+            @typing.type_check_only
+            class DatabasesResource(googleapiclient.discovery.Resource):
+                @typing.type_check_only
+                class OperationsResource(googleapiclient.discovery.Resource):
+                    def cancel(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def delete(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def get(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> OperationHttpRequest: ...
+                    def list(
+                        self,
+                        *,
+                        name: str,
+                        filter: str = ...,
+                        pageSize: int = ...,
+                        pageToken: str = ...,
+                        **kwargs: typing.Any
+                    ) -> ListOperationsResponseHttpRequest: ...
+                @typing.type_check_only
+                class SessionsResource(googleapiclient.discovery.Resource):
+                    def batchCreate(
+                        self,
+                        *,
+                        database: str,
+                        body: BatchCreateSessionsRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> BatchCreateSessionsResponseHttpRequest: ...
+                    def beginTransaction(
+                        self,
+                        *,
+                        session: str,
+                        body: BeginTransactionRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> TransactionHttpRequest: ...
+                    def commit(
+                        self,
+                        *,
+                        session: str,
+                        body: CommitRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> CommitResponseHttpRequest: ...
+                    def create(
+                        self,
+                        *,
+                        database: str,
+                        body: CreateSessionRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> SessionHttpRequest: ...
+                    def delete(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def executeBatchDml(
+                        self,
+                        *,
+                        session: str,
+                        body: ExecuteBatchDmlRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> ExecuteBatchDmlResponseHttpRequest: ...
+                    def executeSql(
+                        self,
+                        *,
+                        session: str,
+                        body: ExecuteSqlRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> ResultSetHttpRequest: ...
+                    def executeStreamingSql(
+                        self,
+                        *,
+                        session: str,
+                        body: ExecuteSqlRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> PartialResultSetHttpRequest: ...
+                    def get(
+                        self, *, name: str, **kwargs: typing.Any
+                    ) -> SessionHttpRequest: ...
+                    def list(
+                        self,
+                        *,
+                        database: str,
+                        filter: str = ...,
+                        pageSize: int = ...,
+                        pageToken: str = ...,
+                        **kwargs: typing.Any
+                    ) -> ListSessionsResponseHttpRequest: ...
+                    def partitionQuery(
+                        self,
+                        *,
+                        session: str,
+                        body: PartitionQueryRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> PartitionResponseHttpRequest: ...
+                    def partitionRead(
+                        self,
+                        *,
+                        session: str,
+                        body: PartitionReadRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> PartitionResponseHttpRequest: ...
+                    def read(
+                        self,
+                        *,
+                        session: str,
+                        body: ReadRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> ResultSetHttpRequest: ...
+                    def rollback(
+                        self,
+                        *,
+                        session: str,
+                        body: RollbackRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> EmptyHttpRequest: ...
+                    def streamingRead(
+                        self,
+                        *,
+                        session: str,
+                        body: ReadRequest = ...,
+                        **kwargs: typing.Any
+                    ) -> PartialResultSetHttpRequest: ...
+                def create(
+                    self,
+                    *,
+                    parent: str,
+                    body: CreateDatabaseRequest = ...,
+                    **kwargs: typing.Any
+                ) -> OperationHttpRequest: ...
+                def dropDatabase(
+                    self, *, database: str, **kwargs: typing.Any
+                ) -> EmptyHttpRequest: ...
+                def get(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> DatabaseHttpRequest: ...
+                def getDdl(
+                    self, *, database: str, **kwargs: typing.Any
+                ) -> GetDatabaseDdlResponseHttpRequest: ...
+                def getIamPolicy(
+                    self,
+                    *,
+                    resource: str,
+                    body: GetIamPolicyRequest = ...,
+                    **kwargs: typing.Any
+                ) -> PolicyHttpRequest: ...
+                def list(
+                    self,
+                    *,
+                    parent: str,
+                    pageSize: int = ...,
+                    pageToken: str = ...,
+                    **kwargs: typing.Any
+                ) -> ListDatabasesResponseHttpRequest: ...
+                def restore(
+                    self,
+                    *,
+                    parent: str,
+                    body: RestoreDatabaseRequest = ...,
+                    **kwargs: typing.Any
+                ) -> OperationHttpRequest: ...
+                def setIamPolicy(
+                    self,
+                    *,
+                    resource: str,
+                    body: SetIamPolicyRequest = ...,
+                    **kwargs: typing.Any
+                ) -> PolicyHttpRequest: ...
+                def testIamPermissions(
+                    self,
+                    *,
+                    resource: str,
+                    body: TestIamPermissionsRequest = ...,
+                    **kwargs: typing.Any
+                ) -> TestIamPermissionsResponseHttpRequest: ...
+                def updateDdl(
+                    self,
+                    *,
+                    database: str,
+                    body: UpdateDatabaseDdlRequest = ...,
+                    **kwargs: typing.Any
+                ) -> OperationHttpRequest: ...
+                def operations(self) -> OperationsResource: ...
+                def sessions(self) -> SessionsResource: ...
+            @typing.type_check_only
+            class OperationsResource(googleapiclient.discovery.Resource):
+                def cancel(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> EmptyHttpRequest: ...
+                def delete(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> EmptyHttpRequest: ...
+                def get(
+                    self, *, name: str, **kwargs: typing.Any
+                ) -> OperationHttpRequest: ...
+                def list(
+                    self,
+                    *,
+                    name: str,
+                    filter: str = ...,
+                    pageSize: int = ...,
+                    pageToken: str = ...,
+                    **kwargs: typing.Any
+                ) -> ListOperationsResponseHttpRequest: ...
+            def create(
+                self,
+                *,
+                parent: str,
+                body: CreateInstanceRequest = ...,
+                **kwargs: typing.Any
+            ) -> OperationHttpRequest: ...
+            def delete(
+                self, *, name: str, **kwargs: typing.Any
+            ) -> EmptyHttpRequest: ...
+            def get(
+                self, *, name: str, fieldMask: str = ..., **kwargs: typing.Any
+            ) -> InstanceHttpRequest: ...
+            def getIamPolicy(
+                self,
+                *,
+                resource: str,
+                body: GetIamPolicyRequest = ...,
+                **kwargs: typing.Any
+            ) -> PolicyHttpRequest: ...
+            def list(
+                self,
+                *,
+                parent: str,
+                filter: str = ...,
+                instanceDeadline: str = ...,
+                pageSize: int = ...,
+                pageToken: str = ...,
+                **kwargs: typing.Any
+            ) -> ListInstancesResponseHttpRequest: ...
+            def patch(
+                self,
+                *,
+                name: str,
+                body: UpdateInstanceRequest = ...,
+                **kwargs: typing.Any
+            ) -> OperationHttpRequest: ...
+            def setIamPolicy(
+                self,
+                *,
+                resource: str,
+                body: SetIamPolicyRequest = ...,
+                **kwargs: typing.Any
+            ) -> PolicyHttpRequest: ...
+            def testIamPermissions(
+                self,
+                *,
+                resource: str,
+                body: TestIamPermissionsRequest = ...,
+                **kwargs: typing.Any
+            ) -> TestIamPermissionsResponseHttpRequest: ...
+            def backupOperations(self) -> BackupOperationsResource: ...
+            def backups(self) -> BackupsResource: ...
+            def databaseOperations(self) -> DatabaseOperationsResource: ...
+            def databases(self) -> DatabasesResource: ...
+            def operations(self) -> OperationsResource: ...
+        def instanceConfigs(self) -> InstanceConfigsResource: ...
+        def instances(self) -> InstancesResource: ...
+    def projects(self) -> ProjectsResource: ...
+
+@typing.type_check_only
+class BackupHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Backup: ...
+
+@typing.type_check_only
+class BatchCreateSessionsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> BatchCreateSessionsResponse: ...
+
+@typing.type_check_only
+class CommitResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> CommitResponse: ...
+
+@typing.type_check_only
+class DatabaseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Database: ...
+
+@typing.type_check_only
+class EmptyHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Empty: ...
+
+@typing.type_check_only
+class ExecuteBatchDmlResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ExecuteBatchDmlResponse: ...
+
+@typing.type_check_only
+class GetDatabaseDdlResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> GetDatabaseDdlResponse: ...
+
+@typing.type_check_only
+class InstanceHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Instance: ...
+
+@typing.type_check_only
+class InstanceConfigHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> InstanceConfig: ...
+
+@typing.type_check_only
+class ListBackupOperationsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListBackupOperationsResponse: ...
+
+@typing.type_check_only
+class ListBackupsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListBackupsResponse: ...
+
+@typing.type_check_only
+class ListDatabaseOperationsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListDatabaseOperationsResponse: ...
+
+@typing.type_check_only
+class ListDatabasesResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListDatabasesResponse: ...
+
+@typing.type_check_only
+class ListInstanceConfigsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListInstanceConfigsResponse: ...
+
+@typing.type_check_only
+class ListInstancesResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListInstancesResponse: ...
+
+@typing.type_check_only
+class ListOperationsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListOperationsResponse: ...
+
+@typing.type_check_only
+class ListSessionsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ListSessionsResponse: ...
+
+@typing.type_check_only
+class OperationHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Operation: ...
+
+@typing.type_check_only
+class PartialResultSetHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> PartialResultSet: ...
+
+@typing.type_check_only
+class PartitionResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> PartitionResponse: ...
+
+@typing.type_check_only
+class PolicyHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Policy: ...
+
+@typing.type_check_only
+class ResultSetHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> ResultSet: ...
+
+@typing.type_check_only
+class SessionHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Session: ...
+
+@typing.type_check_only
+class TestIamPermissionsResponseHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> TestIamPermissionsResponse: ...
+
+@typing.type_check_only
+class TransactionHttpRequest(googleapiclient.http.HttpRequest):
+    def execute(
+        self,
+        http: typing.Optional[
+            typing.Union[httplib2.Http, googleapiclient.http.HttpMock]
+        ] = ...,
+        num_retries: int = ...,
+    ) -> Transaction: ...
