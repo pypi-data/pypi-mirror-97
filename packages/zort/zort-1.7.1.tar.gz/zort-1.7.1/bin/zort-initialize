@@ -1,0 +1,63 @@
+#! /usr/bin/env python
+"""
+zort-initialize :
+Create an objects file, objects map and rcip map for all lightcurve files in
+the current directory. These initialization files are required for using zort.
+"""
+
+import glob
+import argparse
+import os
+import sys
+import subprocess
+import numpy as np
+
+from zort.initialize import generate_objects_file, generate_radec_rcid_maps
+
+
+def main():
+    # Get arguments
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    parallelgroup = parser.add_mutually_exclusive_group()
+    parallelgroup.add_argument('--single', dest='parallelFlag',
+                               action='store_false',
+                               help='Run in single mode. DEFAULT.')
+    parallelgroup.add_argument('--parallel', dest='parallelFlag',
+                               action='store_true',
+                               help='Run in parallel mode. Requires mpi4py.')
+    parser.set_defaults(parallelFlag=False)
+
+    args = parser.parse_args()
+
+    if args.parallelFlag:
+        reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+        installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+        if 'mpi4py' not in installed_packages:
+            print('mpi4py must be installed to use --parallel mode.')
+            sys.exit(0)
+
+    if args.parallelFlag:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+    else:
+        rank = 0
+        size = 1
+
+    lightcurve_files = glob.glob('field*.txt')
+    lightcurve_files.sort()
+
+    if rank == 0:
+        print('Generating object files, object maps and rcid maps '
+              'for %i lightcurve files' % len(lightcurve_files))
+
+    my_lightcurve_files = np.array_split(lightcurve_files, size)[rank]
+    for lightcurve_file in my_lightcurve_files:
+        generate_objects_file(lightcurve_file)
+        generate_radec_rcid_maps(lightcurve_file)
+
+
+if __name__ == '__main__':
+    main()
