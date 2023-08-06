@@ -1,0 +1,1 @@
+from .GetData import NewsAnalyzer
