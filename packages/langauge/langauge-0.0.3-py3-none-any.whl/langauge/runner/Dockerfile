@@ -1,0 +1,1 @@
+FROM apache/beam_flink1.10_job_server:latest
