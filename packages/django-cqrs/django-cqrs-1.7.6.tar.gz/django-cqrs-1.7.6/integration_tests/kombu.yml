@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  mq:
+    image: redis:latest
+    expose:
+      - '6379'
+
+  postgres:
+    image: postgres:latest
+    expose:
+      - '5432'
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pswd
+      - POSTGRES_DB=replica
+
+  replica:
+    build:
+      context: ..
+      dockerfile: integration_tests/Dockerfile.Replica
+    restart: always
+    command: >
+      bash -c "
+      dockerize -wait tcp://mq:6379 -wait tcp://postgres:5432 -timeout 60s && 
+      python manage.py makemigrations --settings=integration_tests.replica_settings &&
+      python manage.py makemigrations dj_replica --settings=integration_tests.replica_settings &&
+      python manage.py migrate --settings=integration_tests.replica_settings &&
+      python manage.py cqrs_consume -w 2 --settings=integration_tests.replica_settings
+      "
+    container_name: django_cqrs_test_replica
+    depends_on:
+      - mq
+      - postgres
+    volumes:
+      - ../dj_cqrs:/replica/dj_cqrs
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pswd
+      - POSTGRES_DB=replica
+      - CQRS_REPLICA_TRANSPORT=tests.dj.transport.KombuTransportWithEvents
+      - CQRS_BROKER_URL=redis://mq:6379/
+
+  master:
+    build:
+      context: ..
+      dockerfile: integration_tests/Dockerfile.Master
+    command: >
+      bash -c "
+      dockerize -wait tcp://mq:6379 -wait tcp://postgres:5432 -timeout 60s && 
+      ./run_integration_tests.sh
+      "
+      
+    container_name: django_cqrs_test_master
+    depends_on:
+      - mq
+      - replica
+    volumes:
+      - ./tests/:/master/integration_tests/tests
+      - ../dj_cqrs:/master/dj_cqrs
+    environment:
+      - CQRS_MASTER_TRANSPORT=dj_cqrs.transport.KombuTransport
+      - CQRS_BROKER_URL=redis://mq:6379/
