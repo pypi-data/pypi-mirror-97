@@ -1,0 +1,92 @@
+version:
+  tag:    'v{version.major}.{version.minor}.{version.patch}'
+  format: semver
+  bump:
+    policy: conventional-commits
+    strict: yes
+    on-every-change: no
+
+project-name: PIPE
+
+scm:
+  git:
+    worktrees:
+      doc/build/html: pages
+
+pass-through-environment-vars:
+  - GIT_COMMITTER_NAME
+  - GIT_COMMITTER_EMAIL
+
+modality-source-preparation:
+  AUTO_MERGE:
+    - git fetch origin release/0
+    - sh: git merge --no-commit --no-ff FETCH_HEAD
+      changed-files: []
+      commit-message: "Merge branch 'release/0'"
+
+volumes:
+  - source: null
+    target: /etc/passwd
+  - source: null
+    target: /etc/group
+
+pip:
+  - commisery>=0.3,<1
+
+phases:
+  style:
+    commit-messages: !template "commisery"
+    flake8:
+      - docker build --build-arg=PYTHON_VERSION=3.8 -t hopic-python:3.8-slim-git hopic/test/docker-images/python
+      - junit: flake8.xml
+        image: hopic-python:3.8-slim-git
+        sh: tox -e flake8
+
+  test:
+    python3.6:
+      - docker build --build-arg=PYTHON_VERSION=3.6 -t hopic-python:3.6-slim-git hopic/test/docker-images/python
+      - junit: junit-test.xml
+        image: hopic-python:3.6-slim-git
+        docker-in-docker: yes
+        sh: tox -r -e py36
+
+    python3.7:
+      - docker build --build-arg=PYTHON_VERSION=3.7 -t hopic-python:3.7-slim-git hopic/test/docker-images/python
+      - junit: junit-test.xml
+        image: hopic-python:3.7-slim-git
+        docker-in-docker: yes
+        sh: tox -r -e py37
+
+    python3.8:
+      - docker build --build-arg=PYTHON_VERSION=3.8 -t hopic-python:3.8-slim-git hopic/test/docker-images/python
+      - junit: junit-test.xml
+        image: hopic-python:3.8-slim-git
+        docker-in-docker: yes
+        sh: tox -r -e py38
+
+  build:
+    sphinx-doc:
+      - rm -rf doc/build/venv
+      - python3 -m venv --clear doc/build/venv
+      - doc/build/venv/bin/python -m pip install setuptools_scm setuptools_scm_git_archive . -r doc-requirements.txt
+      - archive:
+          artifacts: doc/build/html/**
+        worktrees:
+          doc/build/html:
+            commit-message: "Update documentation for ${VERSION}"
+        sh: >
+          sh -x -c ':
+          && find doc/build/html -maxdepth 1 -not -path doc/build/html -not -name .git\* -exec rm -v -r "{}" +
+          && doc/build/venv/bin/python -m sphinxcontrib.versioning build --override-branch=${GIT_BRANCH}=${GIT_COMMIT} doc/source doc/build/html
+          && find doc/build/html \( -name .doctrees -o -name objects.inv -o -name jquery-\*.js \) -exec rm -v -r "{}" +
+          && touch doc/build/html/.nojekyll'
+
+post-submit:
+  publish:
+    - run-on-change: new-version-only
+      with-credentials:
+        id: hopic-pypi
+        type: username-password
+    - python3 -m venv --clear venv3
+    - venv3/bin/python -m pip install --upgrade tox
+    - venv3/bin/python -m tox -e publish
