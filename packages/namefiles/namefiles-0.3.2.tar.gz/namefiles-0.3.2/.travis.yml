@@ -1,0 +1,47 @@
+# Disable sudo to speed up the build
+# Taken from: https://github.com/codecov/example-python/blob/master/.travis.yml
+sudo: false
+
+language: python
+
+jobs:
+  include:
+    # Test all python versions in Linux, which should be supported,
+    # since travis-ci provide best support for Linux at the current moment.
+    - name: "Python 3.6 on Xenial Linux"
+      python: 3.6           # this works for Linux but is ignored on macOS or Windows
+    - name: "Python 3.7 on Xenial Linux"
+      python: 3.7           # this works for Linux but is ignored on macOS or Windows
+    - name: "Python 3.8 on Xenial Linux"
+      python: 3.8           # this works for Linux but is ignored on macOS or Windows
+    - name: "Python 3.9 on Xenial Linux"
+      python: 3.9           # this works for Linux but is ignored on macOS or Windows
+    # MacOs and Windows are only checked for provided Versions of Python.  
+    - name: "Python 3.7.4 on macOS"
+      os: osx
+      osx_image: xcode11.2  # Python 3.7.4 running on macOS 10.14.4
+      language: shell       # 'language: python' is an error on Travis CI macOS
+    - name: "Python 3.8.0 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install python --version 3.8.0
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
+    - name: "Python 3.9.1 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install python --version 3.9.1
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python39:/c/Python39/Scripts:$PATH
+
+install: 
+    - pip3 install --upgrade pip  # all three OSes agree about 'pip3'
+    - pip3 install -U tox-travis coveralls
+# 'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
+# 'python3' is a 'command not found' error on Windows but 'py' works on Windows only
+#script: python3 my_app.py || python my_app.py
+
+script: tox
+
