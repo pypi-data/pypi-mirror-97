@@ -1,0 +1,150 @@
+Metadata-Version: 2.1
+Name: prestool
+Version: 0.0.21
+Summary: prestool
+Home-page: https://gitee.com/prestest/pres-pip-prestool
+Author: preszang
+Author-email: preszang@foxmail.com
+License: MIT
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: faker
+Requires-Dist: beautifulsoup4
+Requires-Dist: loguru
+Requires-Dist: yagmail
+Requires-Dist: lxml
+Requires-Dist: pymysql
+
+
+### 一、安装（python版本 python3.6+）
+
+ ```bash
+pip install --upgrade  prestool
+ ```
+### 二、使用
+
+ ```python
+ from prestool.Tool import Tool
+ tool = Tool()
+ ```
+
+#### 随机数据
+
+ ```python
+tool.random_name()  # 随机姓名
+tool.random_phone()  # 随机手机号
+tool.random_ssn()  # 随机身份证
+
+tool.random_string(16)  # 随机位数的字符串
+tool.random_number(8)  # 随机位数的数字
+
+tool.random_ua()  # 随机UA
+tool.random_ua('chrome')  # 随机UA-Chrome
+tool.random_ua('firefox')  # 随机UA-Firefox
+tool.random_ua('ie')  # 随机UA-IE
+tool.random_ua('opera')  # 随机UA-opera
+tool.random_ua('safari')  # 随机UA-safari
+ ```
+
+
+#### 记录日志
+
+ ```python
+tool.logger('日志信息')
+ ```
+
+#### 加密相关
+
+ ```python
+tool.to_md5('原始字符串')
+tool.to_hmac_256('原始字符串', '加密key')
+tool.to_sha_256('原始字符串')
+ ```
+
+#### 发送钉钉webhook消息
+
+ ```python
+tool.ding_talk_token = '钉钉机器人token'
+tool.ding_talk_sign_key = '钉钉机器人签名key'
+
+tool.send_ding_talk_msg('消息内容')
+ ```
+
+#### 发送企业微信webhook消息
+
+ ```python
+tool.qy_wechat_token = '企业微信机器人token'
+
+tool.send_qy_wechat_msg('消息内容')
+ ```
+
+#### 发送邮件消息
+
+ ```python
+tool.mail_from_user_host = '发件地址host'
+tool.mail_from_user = '发件人邮箱号'
+tool.mail_from_user_pwd = '发件人密码'
+
+tool.send_mail_msg(to_user='收件人邮箱地址（列表）', title='邮件标题', content='邮件内容')
+ ```
+
+#### 时间相关
+
+ ```python
+tool.time_stamp()  # 秒级时间戳10位
+tool.time_stamp('ms')  # 毫秒级时间戳13位
+
+tool.get_now_time()  # 获取当前时间 20201206000000
+tool.get_now_time('-')  # 获取当前时间 2020-12-06 00:00:00
+ ```
+#### 格式转换
+
+ ```python
+tool.json_dumps({"test": "python字典"})  # 字典转json
+tool.json_loads('{"test": "python字典"}')  # json转字典
+
+tool.xml_to_dict('xml字符串')
+ ```
+#### http请求
+
+ ```python
+tool.http_client(url='', data={}, method='GET')
+tool.http_client(url='', data={}, method='POST')
+
+tool.get_cookies(url='接口地址', data={}, method='GET')
+tool.get_cookies(url='接口地址', data={}, method='POST')
+
+tool.trans_data_to_url(url='接口地址', data={})  # 把参数拼接到url上
+ ```
+#### 编码解码
+
+ ```python
+tool.url_encode('编码前的url地址')  # 编码
+tool.url_decode('解码前的url地址')  # 解码
+
+tool.base_64_encode('编码前的字符串')  # base64编码
+ ```
+#### dubbo接口
+
+ ```python
+tool.dubbo_args('参数1', '参数2', '参数3')  # dubbo接口参数
+tool.invoke_dubbo('地址', '端口', '服务API名', '接口方法名', 'dubbo接口参数')  # 请求dubbo接口
+ ```
+
+#### 其他
+
+ ```python
+tool.get_ip_by_url('url地址')  # 获取ip
+ ```
+
+```bash
+# 上传到pypi相关
+python setup.py bdist_wheel --universal
+twine upload dist/*
+```
+
