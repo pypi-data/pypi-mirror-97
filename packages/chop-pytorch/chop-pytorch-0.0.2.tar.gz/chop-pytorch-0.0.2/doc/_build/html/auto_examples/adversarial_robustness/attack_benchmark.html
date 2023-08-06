@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benchmark of attacks. &#8212; chop  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Visualizing Adversarial Examples" href="plot_visualizing_adversarial_attacks.html" />
+    <link rel="prev" title="Example of robust training on CIFAR10." href="train_robust_cifar10.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-adversarial-robustness-attack-benchmark-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="benchmark-of-attacks">
+<span id="sphx-glr-auto-examples-adversarial-robustness-attack-benchmark-py"></span><h1>Benchmark of attacks.<a class="headerlink" href="#benchmark-of-attacks" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">chop</span>
+<span class="kn">from</span> <span class="nn">chop.optim</span> <span class="kn">import</span> <a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_frank_wolfe</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">,</span> <a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_pgd</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">,</span> <span class="n">minimize_pgd_madry</span><span class="p">,</span> <a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_three_split</span></a></a></a></a></a></a></a></a></a></a></a></a>
+<span class="kn">from</span> <span class="nn">chop.data</span> <span class="kn">import</span> <a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><span class="n">load_cifar10</span></a></a></a></a></a></a></a></a></a></a></a></a>
+<span class="kn">from</span> <span class="nn">chop.adversary</span> <span class="kn">import</span> <span class="n">Adversary</span>
+
+<span class="kn">from</span> <span class="nn">robustbench.utils</span> <span class="kn">import</span> <span class="n">load_model</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">n_examples</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">loaders</span> <span class="o">=</span> <a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><a href="../../generated/chop.data.html#chop.data.load_cifar10" title="chop.data.load_cifar10" class="sphx-glr-backref-module-chop-data sphx-glr-backref-type-py-function"><span class="n">load_cifar10</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">(</span><span class="n">test_batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s1">&#39;~/datasets&#39;</span><span class="p">)</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">loaders</span><span class="o">.</span><span class="n">test</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s1">&#39;Engstrom2019Robustness&#39;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;Linf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define the perturbation constraint set</span>
+<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">/</span> <span class="mf">255.</span>
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">chop</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">LinfBall</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evaluating model </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> on L</span><span class="si">{</span><span class="n">constraint</span><span class="o">.</span><span class="n">p</span><span class="si">}</span><span class="s2"> ball(</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+
+<span class="n">n_correct</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">n_correct_adv_pgd_madry</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">n_correct_adv_pgd</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">n_correct_adv_split</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">n_correct_adv_fw</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">adversary_pgd</span> <span class="o">=</span> <span class="n">Adversary</span><span class="p">(</span><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_pgd</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">)</span>
+<span class="n">adversary_pgd_madry</span> <span class="o">=</span> <span class="n">Adversary</span><span class="p">(</span><span class="n">minimize_pgd_madry</span><span class="p">)</span>
+<span class="n">adversary_split</span> <span class="o">=</span> <span class="n">Adversary</span><span class="p">(</span><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_three_split</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">)</span>
+<span class="n">adversary_fw</span> <span class="o">=</span> <span class="n">Adversary</span><span class="p">(</span><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><a href="../../generated/chop.optim.html#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe" class="sphx-glr-backref-module-chop-optim sphx-glr-backref-type-py-function"><span class="n">minimize_frank_wolfe</span></a></a></a></a></a></a></a></a></a></a></a></a><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">loader</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="p">)):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">image_constraint_prox</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Projects perturbation delta</span>
+<span class="sd">        so that 0. &lt;= data + delta &lt;= 1.&quot;&quot;&quot;</span>
+
+        <span class="n">adv_img</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">delta</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">adv_img</span> <span class="o">-</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">delta</span>
+
+    <span class="k">def</span> <span class="nf">prox</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">prox</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">image_constraint_prox</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delta</span>
+
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">delta_pgd</span> <span class="o">=</span> <span class="n">adversary_pgd</span><span class="o">.</span><span class="n">perturb</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span>
+                                         <span class="n">use_best</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                         <span class="n">step</span><span class="o">=</span><span class="s1">&#39;backtracking&#39;</span><span class="p">,</span>
+                                         <span class="n">prox</span><span class="o">=</span><span class="n">prox</span><span class="p">,</span>
+                                         <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span>
+
+    <span class="n">delta_pgd_madry</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># _, delta_pgd_madry = adversary_pgd_madry.perturb(data, target, model,</span>
+    <span class="c1">#                                                  criterion,</span>
+    <span class="c1">#                                                  use_best=False,</span>
+    <span class="c1">#                                                  prox=prox,</span>
+    <span class="c1">#                                                  lmo=constraint.lmo,</span>
+    <span class="c1">#                                                  step=2. / max_iter,</span>
+    <span class="c1">#                                                  max_iter=max_iter)</span>
+
+    <span class="n">delta_split</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># _, delta_split = adversary_split.perturb(data, target, model,</span>
+    <span class="c1">#                                          criterion,</span>
+    <span class="c1">#                                          use_best=False,</span>
+    <span class="c1">#                                          prox1=constraint.prox,</span>
+    <span class="c1">#                                          prox2=image_constraint_prox,</span>
+    <span class="c1">#                                          max_iter=max_iter)</span>
+
+    <span class="n">delta_fw</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># _, delta_fw = adversary_fw.perturb(data, target, model, criterion,</span>
+    <span class="c1">#                                    lmo=constraint.lmo,</span>
+    <span class="c1">#                                    step=&#39;sublinear&#39;,</span>
+    <span class="c1">#                                    max_iter=max_iter</span>
+    <span class="c1">#                                    )</span>
+
+    <span class="n">label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">adv_label_pgd_madry</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">delta_pgd_madry</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_correct_adv_pgd_madry</span> <span class="o">+=</span> <span class="p">(</span><span class="n">adv_label_pgd_madry</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">adv_label_pgd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">delta_pgd</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_correct_adv_pgd</span> <span class="o">+=</span> <span class="p">(</span><span class="n">adv_label_pgd</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">adv_label_split</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">delta_split</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_correct_adv_split</span> <span class="o">+=</span> <span class="p">(</span><span class="n">adv_label_split</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">adv_label_fw</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">delta_fw</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_correct_adv_fw</span> <span class="o">+=</span> <span class="p">(</span><span class="n">adv_label_fw</span> <span class="o">==</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">n_correct</span> <span class="o">/</span> <span class="n">n_examples</span>
+<span class="n">accuracy_adv_pgd_madry</span> <span class="o">=</span> <span class="n">n_correct_adv_pgd_madry</span> <span class="o">/</span> <span class="n">n_examples</span>
+<span class="n">accuracy_adv_pgd</span> <span class="o">=</span> <span class="n">n_correct_adv_pgd</span> <span class="o">/</span> <span class="n">n_examples</span>
+<span class="n">accuracy_adv_split</span> <span class="o">=</span> <span class="n">n_correct_adv_split</span> <span class="o">/</span> <span class="n">n_examples</span>
+<span class="n">accuracy_adv_fw</span> <span class="o">=</span> <span class="n">n_correct_adv_fw</span> <span class="o">/</span> <span class="n">n_examples</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RobustAccuracy PGD Madry: </span><span class="si">{</span><span class="n">accuracy_adv_pgd_madry</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RobustAccuracy PGD: </span><span class="si">{</span><span class="n">accuracy_adv_pgd</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RobustAccuracy Splitting: </span><span class="si">{</span><span class="n">accuracy_adv_split</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RobustAccuracy FW: </span><span class="si">{</span><span class="n">accuracy_adv_fw</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  0 MB</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-adversarial-robustness-attack-benchmark-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f8d278ba6f688d51fd6e750e59c210ce/attack_benchmark.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">attack_benchmark.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/2a140fbdc41c4bf8f44e7211d9dd9a6b/attack_benchmark.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">attack_benchmark.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">chop</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.optim.html">chop.optim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.stochastic.html">chop.stochastic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.constraints.html">chop.constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.adversary.html">chop.adversary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.penalties.html">chop.penalties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.utils.html">chop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.data.html">chop.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.image.html">chop.image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/chop.logging.html">chop.logging</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#miscellaneous-examples">Miscellaneous examples</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#adversarial-robustness">Adversarial Robustness</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Example Gallery</a><ul>
+      <li>Previous: <a href="train_robust_cifar10.html" title="previous chapter">Example of robust training on CIFAR10.</a></li>
+      <li>Next: <a href="plot_visualizing_adversarial_attacks.html" title="next chapter">Visualizing Adversarial Examples</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, chop developers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/auto_examples/adversarial_robustness/attack_benchmark.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

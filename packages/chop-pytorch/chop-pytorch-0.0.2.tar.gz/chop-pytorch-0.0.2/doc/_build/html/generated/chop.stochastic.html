@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chop.stochastic &#8212; chop  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chop.constraints" href="chop.constraints.html" />
+    <link rel="prev" title="chop.optim" href="chop.optim.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-chop.stochastic">
+<span id="chop-stochastic"></span><h1>chop.stochastic<a class="headerlink" href="#module-chop.stochastic" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="stochastic-optimizers">
+<h2>Stochastic optimizers.<a class="headerlink" href="#stochastic-optimizers" title="Permalink to this headline">¶</a></h2>
+<p>This module contains stochastic first order optimizers.
+These are meant to be used in replacement of optimizers such as SGD, Adam etc,
+for training a model over batches of a dataset.
+The API in this module is inspired by torch.optim.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.stochastic.backtracking_step_size" title="chop.stochastic.backtracking_step_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backtracking_step_size</span></code></a>(x, f_t, old_f_t, …)</p></td>
+<td><p>Backtracking step-size finding routine for FW-like algorithms</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.stochastic.FrankWolfe" title="chop.stochastic.FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrankWolfe</span></code></a>(params, constraint[, lr, momentum])</p></td>
+<td><p>Class for the Stochastic Frank-Wolfe algorithm given in Mokhtari et al.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.stochastic.PGD" title="chop.stochastic.PGD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGD</span></code></a>(params, constraint[, lr])</p></td>
+<td><p>Projected Gradient Descent</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.stochastic.PGDMadry" title="chop.stochastic.PGDMadry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PGDMadry</span></code></a>(params, constraint, lr)</p></td>
+<td><p>What Madry et al.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.stochastic.PairwiseFrankWolfe" title="chop.stochastic.PairwiseFrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PairwiseFrankWolfe</span></code></a>(params, constraint[, lr, …])</p></td>
+<td><p>Pairwise Frank-Wolfe algorithm</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="chop.stochastic.FrankWolfe">
+<em class="property">class </em><code class="sig-prename descclassname">chop.stochastic.</code><code class="sig-name descname">FrankWolfe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">constraint</span></em>, <em class="sig-param"><span class="n">lr</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">momentum</span><span class="o">=</span><span class="default_value">0.9</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/stochastic.py#L228"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for the Stochastic Frank-Wolfe algorithm given in Mokhtari et al.
+This is essentially FrankWolfe with Momentum.
+We use the tricks from [Pokutta, Spiegel, Zimmer, 2020].
+<a class="reference external" href="https://arxiv.org/abs/2010.07243">https://arxiv.org/abs/2010.07243</a></p>
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.add_param_group">
+<code class="sig-name descname">add_param_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe.add_param_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a param group to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> s <cite>param_groups</cite>.</p>
+<p>This can be useful when fine tuning a pre-trained network as frozen layers can be made
+trainable and added to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> as training progresses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_group</strong> (<em>dict</em>) – Specifies what Tensors should be optimized along with group</p></li>
+<li><p><strong>optimization options.</strong> (<em>specific</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.certificate">
+<em class="property">property </em><code class="sig-name descname">certificate</code><a class="headerlink" href="#chop.stochastic.FrankWolfe.certificate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator over the current convergence certificate estimate
+for each optimized parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L105"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the optimizer state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_dict</strong> (<em>dict</em>) – optimizer state. Should be an object returned
+from a call to <a class="reference internal" href="#chop.stochastic.FrankWolfe.state_dict" title="chop.stochastic.FrankWolfe.state_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">state_dict()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the state of the optimizer as a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+<p>It contains two entries:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>state - a dict holding current optimization state. Its content</dt><dd><p>differs between optimizer classes.</p>
+</dd>
+</dl>
+</li>
+<li><p>param_groups - a dict containing all parameter groups</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/autograd/grad_mode.py#L261"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a single optimization step.
+:param closure: A closure that reevaluates the model</p>
+<blockquote>
+<div><p>and returns the loss</p>
+</div></blockquote>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.FrankWolfe.zero_grad">
+<code class="sig-name descname">zero_grad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_to_none</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.FrankWolfe.zero_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the gradients of all optimized <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> s to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>set_to_none</strong> (<em>bool</em>) – instead of setting to zero, set the grads to None.
+This is will in general have lower memory footprint, and can modestly improve performance.
+However, it changes certain behaviors. For example:
+1. When the user tries to access a gradient and perform manual ops on it,
+a None attribute or a Tensor full of 0s will behave differently.
+2. If the user requests <code class="docutils literal notranslate"><span class="pre">zero_grad(set_to_none=True)</span></code> followed by a backward pass, <code class="docutils literal notranslate"><span class="pre">.grad</span></code>s
+are guaranteed to be None for params that did not receive a gradient.
+3. <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> optimizers have a different behavior if the gradient is 0 or None
+(in one case it does the step with a gradient of 0 and in the other it skips
+the step altogether).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="chop.stochastic.PGD">
+<em class="property">class </em><code class="sig-prename descclassname">chop.stochastic.</code><code class="sig-name descname">PGD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">constraint</span></em>, <em class="sig-param"><span class="n">lr</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/stochastic.py#L95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Projected Gradient Descent</p>
+<dl class="py method">
+<dt id="chop.stochastic.PGD.add_param_group">
+<code class="sig-name descname">add_param_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD.add_param_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a param group to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> s <cite>param_groups</cite>.</p>
+<p>This can be useful when fine tuning a pre-trained network as frozen layers can be made
+trainable and added to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> as training progresses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_group</strong> (<em>dict</em>) – Specifies what Tensors should be optimized along with group</p></li>
+<li><p><strong>optimization options.</strong> (<em>specific</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGD.certificate">
+<em class="property">property </em><code class="sig-name descname">certificate</code><a class="headerlink" href="#chop.stochastic.PGD.certificate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator over the current convergence certificate estimate
+for each optimized parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGD.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L105"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the optimizer state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_dict</strong> (<em>dict</em>) – optimizer state. Should be an object returned
+from a call to <a class="reference internal" href="#chop.stochastic.PGD.state_dict" title="chop.stochastic.PGD.state_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">state_dict()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGD.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the state of the optimizer as a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+<p>It contains two entries:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>state - a dict holding current optimization state. Its content</dt><dd><p>differs between optimizer classes.</p>
+</dd>
+</dl>
+</li>
+<li><p>param_groups - a dict containing all parameter groups</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGD.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/autograd/grad_mode.py#L118"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a single optimization step (parameter update).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>closure</strong> (<em>callable</em>) – A closure that reevaluates the model and
+returns the loss. Optional for most optimizers.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unless otherwise specified, this function should not modify the
+<code class="docutils literal notranslate"><span class="pre">.grad</span></code> field of the parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGD.zero_grad">
+<code class="sig-name descname">zero_grad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_to_none</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGD.zero_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the gradients of all optimized <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> s to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>set_to_none</strong> (<em>bool</em>) – instead of setting to zero, set the grads to None.
+This is will in general have lower memory footprint, and can modestly improve performance.
+However, it changes certain behaviors. For example:
+1. When the user tries to access a gradient and perform manual ops on it,
+a None attribute or a Tensor full of 0s will behave differently.
+2. If the user requests <code class="docutils literal notranslate"><span class="pre">zero_grad(set_to_none=True)</span></code> followed by a backward pass, <code class="docutils literal notranslate"><span class="pre">.grad</span></code>s
+are guaranteed to be None for params that did not receive a gradient.
+3. <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> optimizers have a different behavior if the gradient is 0 or None
+(in one case it does the step with a gradient of 0 and in the other it skips
+the step altogether).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="chop.stochastic.PGDMadry">
+<em class="property">class </em><code class="sig-prename descclassname">chop.stochastic.</code><code class="sig-name descname">PGDMadry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">constraint</span></em>, <em class="sig-param"><span class="n">lr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/stochastic.py#L148"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry" title="Permalink to this definition">¶</a></dt>
+<dd><p>What Madry et al. call PGD</p>
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.add_param_group">
+<code class="sig-name descname">add_param_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry.add_param_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a param group to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> s <cite>param_groups</cite>.</p>
+<p>This can be useful when fine tuning a pre-trained network as frozen layers can be made
+trainable and added to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> as training progresses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_group</strong> (<em>dict</em>) – Specifies what Tensors should be optimized along with group</p></li>
+<li><p><strong>optimization options.</strong> (<em>specific</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.certificate">
+<em class="property">property </em><code class="sig-name descname">certificate</code><a class="headerlink" href="#chop.stochastic.PGDMadry.certificate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator over the current convergence certificate estimate
+for each optimized parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L105"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the optimizer state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_dict</strong> (<em>dict</em>) – optimizer state. Should be an object returned
+from a call to <a class="reference internal" href="#chop.stochastic.PGDMadry.state_dict" title="chop.stochastic.PGDMadry.state_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">state_dict()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the state of the optimizer as a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+<p>It contains two entries:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>state - a dict holding current optimization state. Its content</dt><dd><p>differs between optimizer classes.</p>
+</dd>
+</dl>
+</li>
+<li><p>param_groups - a dict containing all parameter groups</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">closure</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/autograd/grad_mode.py#L176"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a single optimization step (parameter update).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>closure</strong> (<em>callable</em>) – A closure that reevaluates the model and
+returns the loss. Optional for most optimizers.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unless otherwise specified, this function should not modify the
+<code class="docutils literal notranslate"><span class="pre">.grad</span></code> field of the parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PGDMadry.zero_grad">
+<code class="sig-name descname">zero_grad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_to_none</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PGDMadry.zero_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the gradients of all optimized <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> s to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>set_to_none</strong> (<em>bool</em>) – instead of setting to zero, set the grads to None.
+This is will in general have lower memory footprint, and can modestly improve performance.
+However, it changes certain behaviors. For example:
+1. When the user tries to access a gradient and perform manual ops on it,
+a None attribute or a Tensor full of 0s will behave differently.
+2. If the user requests <code class="docutils literal notranslate"><span class="pre">zero_grad(set_to_none=True)</span></code> followed by a backward pass, <code class="docutils literal notranslate"><span class="pre">.grad</span></code>s
+are guaranteed to be None for params that did not receive a gradient.
+3. <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> optimizers have a different behavior if the gradient is 0 or None
+(in one case it does the step with a gradient of 0 and in the other it skips
+the step altogether).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="chop.stochastic.PairwiseFrankWolfe">
+<em class="property">class </em><code class="sig-prename descclassname">chop.stochastic.</code><code class="sig-name descname">PairwiseFrankWolfe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">constraint</span></em>, <em class="sig-param"><span class="n">lr</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">momentum</span><span class="o">=</span><span class="default_value">0.9</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/stochastic.py#L208"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairwise Frank-Wolfe algorithm</p>
+<dl class="py method">
+<dt id="chop.stochastic.PairwiseFrankWolfe.add_param_group">
+<code class="sig-name descname">add_param_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe.add_param_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a param group to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> s <cite>param_groups</cite>.</p>
+<p>This can be useful when fine tuning a pre-trained network as frozen layers can be made
+trainable and added to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> as training progresses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_group</strong> (<em>dict</em>) – Specifies what Tensors should be optimized along with group</p></li>
+<li><p><strong>optimization options.</strong> (<em>specific</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PairwiseFrankWolfe.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L105"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the optimizer state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state_dict</strong> (<em>dict</em>) – optimizer state. Should be an object returned
+from a call to <a class="reference internal" href="#chop.stochastic.PairwiseFrankWolfe.state_dict" title="chop.stochastic.PairwiseFrankWolfe.state_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">state_dict()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PairwiseFrankWolfe.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the state of the optimizer as a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+<p>It contains two entries:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>state - a dict holding current optimization state. Its content</dt><dd><p>differs between optimizer classes.</p>
+</dd>
+</dl>
+</li>
+<li><p>param_groups - a dict containing all parameter groups</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PairwiseFrankWolfe.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L194"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a single optimization step (parameter update).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>closure</strong> (<em>callable</em>) – A closure that reevaluates the model and
+returns the loss. Optional for most optimizers.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unless otherwise specified, this function should not modify the
+<code class="docutils literal notranslate"><span class="pre">.grad</span></code> field of the parameters.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="chop.stochastic.PairwiseFrankWolfe.zero_grad">
+<code class="sig-name descname">zero_grad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_to_none</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../torch/optim/optimizer.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.PairwiseFrankWolfe.zero_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the gradients of all optimized <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> s to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>set_to_none</strong> (<em>bool</em>) – instead of setting to zero, set the grads to None.
+This is will in general have lower memory footprint, and can modestly improve performance.
+However, it changes certain behaviors. For example:
+1. When the user tries to access a gradient and perform manual ops on it,
+a None attribute or a Tensor full of 0s will behave differently.
+2. If the user requests <code class="docutils literal notranslate"><span class="pre">zero_grad(set_to_none=True)</span></code> followed by a backward pass, <code class="docutils literal notranslate"><span class="pre">.grad</span></code>s
+are guaranteed to be None for params that did not receive a gradient.
+3. <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> optimizers have a different behavior if the gradient is 0 or None
+(in one case it does the step with a gradient of 0 and in the other it skips
+the step altogether).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.stochastic.backtracking_step_size">
+<code class="sig-prename descclassname">chop.stochastic.</code><code class="sig-name descname">backtracking_step_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">f_t</span></em>, <em class="sig-param"><span class="n">old_f_t</span></em>, <em class="sig-param"><span class="n">f_grad</span></em>, <em class="sig-param"><span class="n">certificate</span></em>, <em class="sig-param"><span class="n">lipschitz_t</span></em>, <em class="sig-param"><span class="n">max_step_size</span></em>, <em class="sig-param"><span class="n">update_direction</span></em>, <em class="sig-param"><span class="n">norm_update_direction</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/stochastic.py#L23"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.stochastic.backtracking_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backtracking step-size finding routine for FW-like algorithms</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – array-like, shape (n_features,)
+Current iterate</p></li>
+<li><p><strong>f_t</strong> – float
+Value of objective function at the current iterate.</p></li>
+<li><p><strong>old_f_t</strong> – float
+Value of objective function at previous iterate.</p></li>
+<li><p><strong>f_grad</strong> – callable
+Callable returning objective function and gradient at
+argument.</p></li>
+<li><p><strong>certificate</strong> – float
+FW gap</p></li>
+<li><p><strong>lipschitz_t</strong> – float
+Current value of the Lipschitz estimate.</p></li>
+<li><p><strong>max_step_size</strong> – float
+Maximum admissible step-size.</p></li>
+<li><p><strong>update_direction</strong> – array-like, shape (n_features,)
+Update direction given by the FW variant.</p></li>
+<li><p><strong>norm_update_direction</strong> – float
+Squared L2 norm of update_direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>float</dt><dd><p>Step-size to be used to compute the next iterate.</p>
+</dd>
+<dt>lipschitz_t: float</dt><dd><p>Updated value for the Lipschitz estimate.</p>
+</dd>
+<dt>f_next: float</dt><dd><p>Objective function evaluated at x + step_size_t d_t.</p>
+</dd>
+<dt>grad_next: array-like</dt><dd><p>Gradient evaluated at x + step_size_t d_t.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>step_size_t</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">chop</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chop.optim.html">chop.optim</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">chop.stochastic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stochastic-optimizers">Stochastic optimizers.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chop.constraints.html">chop.constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.adversary.html">chop.adversary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.penalties.html">chop.penalties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.utils.html">chop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.data.html">chop.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.image.html">chop.image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.logging.html">chop.logging</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Example Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="chop.optim.html" title="previous chapter">chop.optim</a></li>
+      <li>Next: <a href="chop.constraints.html" title="next chapter">chop.constraints</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, chop developers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/chop.stochastic.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

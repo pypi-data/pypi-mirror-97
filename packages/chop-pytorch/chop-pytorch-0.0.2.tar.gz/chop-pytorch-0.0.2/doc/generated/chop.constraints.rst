@@ -1,0 +1,46 @@
+﻿chop.constraints
+================
+
+.. automodule:: chop.constraints
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_lp_constraints
+      euclidean_proj_l1ball
+      euclidean_proj_simplex
+      get_avg_init_norm
+      make_LpBall
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Box
+      GroupL1Ball
+      L1Ball
+      L2Ball
+      LinfBall
+      LpBall
+      NuclearNormBall
+      Simplex
+   
+   
+
+   
+   
+   
+
+
+

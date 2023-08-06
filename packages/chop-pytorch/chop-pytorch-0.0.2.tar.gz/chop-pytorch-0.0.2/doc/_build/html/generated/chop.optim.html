@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chop.optim &#8212; chop  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chop.stochastic" href="chop.stochastic.html" />
+    <link rel="prev" title="Welcome to chop’s documentation!" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-chop.optim">
+<span id="chop-optim"></span><h1>chop.optim<a class="headerlink" href="#module-chop.optim" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="full-gradient-optimizers">
+<h2>Full-gradient optimizers.<a class="headerlink" href="#full-gradient-optimizers" title="Permalink to this headline">¶</a></h2>
+<p>This module contains full gradient optimizers in PyTorch.
+These optimizers expect to be called on variables of shape (batch_size, <a href="#id1"><span class="problematic" id="id2">*</span></a>),
+and will perform the optimization point-wise over the batch.</p>
+<p>This API is inspired by the COPT project
+<a class="reference external" href="https://github.com/openopt/copt">https://github.com/openopt/copt</a>.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">backtracking_pgd</span></code>(closure, prox, step_size, …)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#chop.optim.minimize_frank_wolfe" title="chop.optim.minimize_frank_wolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimize_frank_wolfe</span></code></a>(closure, x0, lmo[, …])</p></td>
+<td><p>Performs the Frank-Wolfe algorithm on a batch of objectives of the form</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.optim.minimize_pgd" title="chop.optim.minimize_pgd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimize_pgd</span></code></a>(closure, x0, prox[, step, …])</p></td>
+<td><p>Performs Projected Gradient Descent on batch of objectives of form:</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimize_pgd_madry</span></code>(closure, x0, prox, lmo[, …])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#chop.optim.minimize_three_split" title="chop.optim.minimize_three_split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimize_three_split</span></code></a>(closure, x0[, prox1, …])</p></td>
+<td><p>Davis-Yin three operator splitting method.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="chop.optim.minimize_frank_wolfe">
+<code class="sig-prename descclassname">chop.optim.</code><code class="sig-name descname">minimize_frank_wolfe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span></em>, <em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">lmo</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">'sublinear'</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">200</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/optim.py#L367"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.optim.minimize_frank_wolfe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Performs the Frank-Wolfe algorithm on a batch of objectives of the form</dt><dd><p>min_x f(x)
+s.t. x in C</p>
+</dd>
+</dl>
+<p>where we have access to the Linear Minimization Oracle (LMO) of the constraint set C,
+and the gradient of f through closure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closure</strong> – callable
+gives function values and the jacobian of f.</p></li>
+<li><p><strong>x0</strong> – torch.Tensor of shape (batch_size, <a href="#id3"><span class="problematic" id="id4">*</span></a>).
+initial guess</p></li>
+<li><p><strong>lmo</strong> – callable
+Returns update_direction, max_step_size</p></li>
+<li><p><strong>step</strong> – float or ‘sublinear’
+step-size scheme to be used.</p></li>
+<li><p><strong>max_iter</strong> – int
+max number of iterations.</p></li>
+<li><p><strong>callback</strong> – callable
+(optional) Any callable called on locals() at the end of each iteration.
+Often used for logging.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.optim.minimize_pgd">
+<code class="sig-prename descclassname">chop.optim.</code><code class="sig-name descname">minimize_pgd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span></em>, <em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">prox</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">'backtracking'</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">200</span></em>, <em class="sig-param"><span class="n">max_iter_backtracking</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">backtracking_factor</span><span class="o">=</span><span class="default_value">0.6</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-08</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">prox_args</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/optim.py#L252"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.optim.minimize_pgd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Performs Projected Gradient Descent on batch of objectives of form:</dt><dd><p>f(x) + g(x).</p>
+</dd>
+</dl>
+<p>We suppose we have access to gradient computation for f through closure,
+and to the proximal operator of g in prox.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closure</strong> – callable</p></li>
+<li><p><strong>x0</strong> – torch.Tensor of shape (batch_size, <a href="#id5"><span class="problematic" id="id6">*</span></a>).</p></li>
+<li><p><strong>prox</strong> – callable
+proximal operator of g</p></li>
+<li><p><strong>step</strong> – ‘backtracking’ or float or torch.tensor of shape (batch_size,) or None.
+step size to be used. If None, will be estimated at the beginning
+using line search.
+If ‘backtracking’, will be estimated at each step using backtracking line search.</p></li>
+<li><p><strong>max_iter</strong> – int
+number of iterations to perform.</p></li>
+<li><p><strong>max_iter_backtracking</strong> – int
+max number of iterations in the backtracking line search</p></li>
+<li><p><strong>backtracking_factor</strong> – float
+factor by which to multiply the step sizes during line search</p></li>
+<li><p><strong>tol</strong> – float
+stops the algorithm when the certificate is smaller than tol
+for all datapoints in the batch</p></li>
+<li><p><strong>prox_args</strong> – tuple
+(optional) additional args for prox</p></li>
+<li><p><strong>callback</strong> – callable
+(optional) Any callable called on locals() at the end of each iteration.
+Often used for logging.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="chop.optim.minimize_three_split">
+<code class="sig-prename descclassname">chop.optim.</code><code class="sig-name descname">minimize_three_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">closure</span></em>, <em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">prox1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prox2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-06</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">line_search</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_iter_backtracking</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">backtracking_factor</span><span class="o">=</span><span class="default_value">0.7</span></em>, <em class="sig-param"><span class="n">h_Lipschitz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args_prox</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/openopt/copt/blob/bd41e60/copt/../../../../../../../chop/chop/optim.py#L22"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chop.optim.minimize_three_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Davis-Yin three operator splitting method.
+This algorithm can solve problems of the form</p>
+<blockquote>
+<div><p>minimize_x f(x) + g(x) + h(x)</p>
+</div></blockquote>
+<p>where f is a smooth function and g and h are (possibly non-smooth)
+functions for which the proximal operator is known.</p>
+<dl class="simple">
+<dt>Remark: this method returns x = prox1(…). If g and h are two indicator</dt><dd><p>functions, this method only garantees that x is feasible for the first.
+Therefore if one of the constraints is a hard constraint,
+make sure to pass it to prox1.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closure</strong> – callable
+Returns the function values and gradient of the objective function.
+With return_gradient=False, returns only the function values.
+Shape of return value: (batch_size, <a href="#id7"><span class="problematic" id="id8">*</span></a>)</p></li>
+<li><p><strong>x0</strong> – torch.Tensor(shape: (batch_size, <a href="#id9"><span class="problematic" id="id10">*</span></a>))
+Initial guess</p></li>
+<li><p><strong>prox1</strong> – callable or None
+prox1(x, step_size, <a href="#id11"><span class="problematic" id="id12">*</span></a>args) returns the proximal operator of g at xa
+with parameter step_size.
+step_size can be a scalar or of shape (batch_size,).</p></li>
+<li><p><strong>prox2</strong> – callable or None
+prox2(x, step_size, <a href="#id13"><span class="problematic" id="id14">*</span></a>args) returns the proximal operator of g at xa
+with parameter step_size.
+alpha can be a scalar or of shape (batch_size,).</p></li>
+<li><p><strong>tol</strong> – float
+Tolerance of the stopping criterion.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of iterations.</p></li>
+<li><p><strong>verbose</strong> – int
+Verbosity level, from 0 (no output) to 2 (output on each iteration)</p></li>
+<li><p><strong>callback</strong> – callable.
+callback function (optional).
+Called with locals() at each step of the algorithm.
+The algorithm will exit if callback returns False.</p></li>
+<li><p><strong>line_search</strong> – boolean
+Whether to perform line-search to estimate the step sizes.</p></li>
+<li><p><strong>step_size</strong> – float or tensor(shape: (batch_size,)) or None
+Starting value(s) for the line-search procedure.
+if None, step_size will be estimated for each datapoint in the batch.</p></li>
+<li><p><strong>max_iter_backtracking</strong> – int
+maximun number of backtracking iterations.  Used in line search.</p></li>
+<li><p><strong>backtracking_factor</strong> – float
+the amount to backtrack by during line search.</p></li>
+<li><p><strong>args_prox</strong> – iterable
+(optional) Extra arguments passed to the prox functions.</p></li>
+<li><p><strong>kwargs_prox</strong> – dict
+(optional) Extra keyword arguments passed to the prox functions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>OptimizeResult</dt><dd><p>The optimization result represented as a
+<code class="docutils literal notranslate"><span class="pre">scipy.optimize.OptimizeResult</span></code> object. Important attributes are:
+<code class="docutils literal notranslate"><span class="pre">x</span></code> the solution tensor, <code class="docutils literal notranslate"><span class="pre">success</span></code> a Boolean flag indicating if
+the optimizer exited successfully and <code class="docutils literal notranslate"><span class="pre">message</span></code> which describes
+the cause of the termination. See <cite>scipy.optimize.OptimizeResult</cite>
+for a description of other attributes.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">chop</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">chop.optim</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#full-gradient-optimizers">Full-gradient optimizers.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chop.stochastic.html">chop.stochastic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.constraints.html">chop.constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.adversary.html">chop.adversary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.penalties.html">chop.penalties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.utils.html">chop.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.data.html">chop.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.image.html">chop.image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chop.logging.html">chop.logging</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Example Gallery</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to chop’s documentation!</a></li>
+      <li>Next: <a href="chop.stochastic.html" title="next chapter">chop.stochastic</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, chop developers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/chop.optim.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
