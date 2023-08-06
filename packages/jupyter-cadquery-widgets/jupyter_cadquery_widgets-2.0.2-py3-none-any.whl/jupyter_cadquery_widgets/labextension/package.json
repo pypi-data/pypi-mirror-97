@@ -1,0 +1,87 @@
+{
+  "name": "jupyter_cadquery",
+  "version": "2.0.2",
+  "description": "A JupyterLab extension.",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/bernhard-42/jupyter-cadquery-widgets",
+  "bugs": {
+    "url": "https://github.com/bernhard-42/jupyter-cadquery-widgets/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": {
+    "name": "Bernhard Walter",
+    "email": "b_walter@arcor.de"
+  },
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,.js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
+    "dist/*.js"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bernhard-42/jupyter-cadquery-widgets.git"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:labextension": "webpack && jupyter labextension build .",
+    "build:labextension:dev": "webpack . && jupyter labextension build --development True .",
+    "build:lib": "mkdir -p lib && cp src/*.js lib/ && tsc",
+    "clean": "jlpm run clean:lib && jlpm run clean:labextension && jlpm run clean:nbextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo dist",
+    "clean:labextension": "rimraf jupyter_cadquery_widgets/labextension",
+    "clean:nbextension": "rimraf jupyter_cadquery_widgets/nbextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension && jlpm run clean:nbextension",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^4.0.0",
+    "@jupyter-widgets/controls": "^3.0.0",
+    "@jupyterlab/application": "^3.0.6",
+    "@jupyterlab/apputils": "^3.0.5",
+    "css-loader": "4.2.1",
+    "lodash": "^4.17.21",
+    "style-loader": "^1.2.1"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.1",
+    "rimraf": "^3.0.2",
+    "typescript": "~4.1.3",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "sideEffects": [
+    "style/*.css",
+    "style/index.js"
+  ],
+  "styleModule": "style/index.js",
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "jupyter_cadquery_widgets/labextension",
+    "_build": {
+      "load": "static/remoteEntry.b835eb8fb10bb4212c35.js",
+      "extension": "./extension",
+      "style": "./style"
+    }
+  }
+}
