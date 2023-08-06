@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js no-svg">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="shortcut icon" href="images/logo.jpg" />
+        <title>DnsBench - Multi-Thread Python Application for Dns Benchmark</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="js/materialize.min.js"></script>
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/jquery-3.3.1.slim.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+        <link rel='stylesheet' id='umetric-font-css'  href='//fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&#038;family=Source+Sans+Pro:wght@200;300;400;600;700;900&#038;subset=latin%2Clatin-ext' media='all' />
+        <link rel='stylesheet' id='google-fonts-1-css'  href='https://fonts.googleapis.com/css?family=Montserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CLato%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;ver=5.5.3' media='all' />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+        <link rel='stylesheet' id='wp-block-library-css'  href='css/style.min.css' media='all' />
+        <link rel='stylesheet' id='marvy-custom-pro-css'  href='css/marvy-custom-pro.css' media='all' />
+        <link rel='stylesheet' id='contact-form-7-css'  href='css/styles.css' media='all' />
+        <link rel='stylesheet' id='graphina-charts-for-elementor-public-css'  href='css/graphina-charts-for-elementor-public.css' media='all' />
+        <script id='graphina-charts-for-elementor-public-js-extra'>
+            /* <![CDATA[ */
+            var graphina_localize = {"ajaxurl":"https:\/\/iqonic.design\/wp-themes\/umetric-new\/wp-admin\/admin-ajax.php","nonce":"508c3c1e29","graphinaAllGraphs":[],"graphinaAllGraphsOptions":[],"graphinaBlockCharts":[]};
+            /* ]]> */
+        </script>
+        <link rel='stylesheet' id='intro-linker-css'  href='css/intro-linker-public.css' media='all' />
+        <link rel='stylesheet' id='flaticon-css'  href='css/flaticon.css' media='all' />
+        <link rel='stylesheet' id='tox-progress-css'  href='css/tox-progress.css' media='all' />
+        <link rel='stylesheet' id='timeline-css'  href='css/timeline.css' media='all' />
+        <link rel='stylesheet' id='slick-theme-css'  href='css/slick-theme.css' media='all' />
+        <link rel='stylesheet' id='slick-css'  href='css/slick.css' media='all' />
+        <link rel='stylesheet' id='iqonic-extenstion-css'  href='css/iqonic-extenstion.css' media='all' />
+        <link rel='stylesheet' id='marvy-custom-css'  href='css/marvy-custom.css' media='all' />
+        <link rel='stylesheet' id='rs-plugin-settings-css'  href='css/rs6.css' media='all' />
+        <link rel='stylesheet' id='bootstrap-css'  href='css/bootstrap.min.css' media='all' />
+        <link rel='stylesheet' id='ionicons-css'  href='css/ionicons.min.css' media='all' />
+        <link rel='stylesheet' id='typicon-css'  href='css/typicon.min.css' media='all' />
+        <link rel='stylesheet' id='font-awesome-css'  href='css/font-awesome.min.css' media='all' />
+        <link rel='stylesheet' id='magnific-popup-css'  href='css/magnific-popup.css' media='all' />
+        <link rel='stylesheet' id='owl-carousel-css'  href='css/owl.carousel.min.css' media='all' />
+        <link rel='stylesheet' id='wow-css'  href='css/wow.css' media='all' />
+        <link rel='stylesheet' id='umetric-style-css'  href='css/umetric-style.css' media='all' />
+        <style id='umetric-style-inline-css'>
+            #loading {
+            background:#ffffff !important;
+            }
+            header.menu-sticky {
+                background:#ffffff !important;
+                position:fixed;
+            }
+        </style>
+        <link rel='stylesheet' id='umetric-responsive-css'  href='css/umetric-responsive.css' media='all' />
+        <link rel='stylesheet' id='elementor-icons-css'  href='css/elementor-icons.min.css' media='all' />
+        <link rel='stylesheet' id='elementor-animations-css'  href='css/animations.min.css' media='all' />
+        <link rel='stylesheet' id='elementor-frontend-legacy-css'  href='css/frontend-legacy.min.css' media='all' />
+        <link rel='stylesheet' id='elementor-frontend-css'  href='css/frontend.min.css' media='all' />
+        <link rel='stylesheet' id='elementor-post-5-css'  href='css/post-5.css' media='all' />
+        <link rel='stylesheet' id='font-awesome-5-all-css'  href='css/all.min.css' media='all' />
+        <link rel='stylesheet' id='font-awesome-4-shim-css'  href='css/v4-shims.min.css' media='all' />
+        <link rel='stylesheet' id='elementor-post-4516-css'  href='css/post-4516.css' media='all' />
+        <script src='js/jquery.js' id='jquery-core-js'></script>
+        <script src='js/apexcharts.min.js' id='apexcharts-min-js'></script>
+        <script src='js/graphina-charts-for-elementor-public.js' id='graphina-charts-for-elementor-public-js'></script>
+        <script src='js/intro-linker-public.js' id='intro-linker-js'></script>
+        <script src='js/marvy.ripples.js' id='marvy-ripples-js'></script>
+        <script src='js/rbtools.min.js' id='tp-tools-js'></script>
+        <script src='js/rs6.min.js' id='revmin-js'></script>
+        <script src='js/v4-shims.min.js' id='font-awesome-4-shim-js'></script>
+        <link rel="stylesheet" href="css/all.min.css" />
+        <link rel="canonical" href="https://iqonic.design/wp-themes/umetric-new/mobile-apps-reporting/" />
+        <link rel='shortlink' href='https://iqonic.design/wp-themes/umetric-new/?p=4516' />
+        <link rel="alternate" type="application/json+oembed" href="https://iqonic.design/wp-themes/umetric-new/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fiqonic.design%2Fwp-themes%2Fumetric-new%2Fmobile-apps-reporting%2F" />
+        <link rel="alternate" type="text/xml+oembed" href="https://iqonic.design/wp-themes/umetric-new/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fiqonic.design%2Fwp-themes%2Fumetric-new%2Fmobile-apps-reporting%2F&#038;format=xml" />
+        <style id='umetric-dynamic-css'>
+
+            .header1 .navbar-brand img, .vertical-navbar-brand img{
+            width:px!important;
+            }
+            
+            .header1 .navbar-brand img, .vertical-navbar-brand img{
+            height:px!important;
+            }
+            
+        </style>
+        <style id='umetric-dynamic-css86624'>
+            .iq-breadcrumb-one{
+            display:none !important;
+            }
+            .content-area .site-main{
+            padding:0 !important;
+            }
+            .iq-breadcrumb-one .title{
+            display:none !important;
+            }
+            .iq-breadcrumb-one .breadcrumb{
+            display:none !important;
+            }
+            .iq-breadcrumb-one{
+            background:url(https://iqonic.design/wp-themes/umetric-new/wp-content/uploads/2020/06/122-4.png) !important;
+            }
+        </style>
+    </head>
+    <body data-spy="scroll" data-offset="80" class="page-template-default page page-id-4516 has-header-image page-two-column colors-light boxed_layout iq-dark-mode vertical-menu-collapsed elementor-default elementor-kit-5 elementor-page elementor-page-4516">
+        <!-- loading -->
+        <div id="loading">
+            <div id="loading-center">
+                <div class="load-img" >
+                    <img src="images/loader.gif" alt="loader">
+                </div>
+            </div>
+        </div>
+        <!-- loading End -->
+        <canvas id="canvas1" class="banner-bg"></canvas>
+        <div id="page" class="site vertical-site-content">
+            <div class="site-content-contain">
+                <div id="content" class="site-content">
+                    <div id="primary" class="content-area">
+                        <main id="main" class="site-main">
+                            <div class="container">
+                                <article id="post-4516" class="post-4516 page type-page status-publish hentry">
+                                <div class="sf-content">
+                                <div data-elementor-type="wp-page" data-elementor-id="4516" class="elementor elementor-4516" data-elementor-settings="[]">
+                                <div class="elementor-inner">
+                                <div class="elementor-section-wrap">
+                                <div data-marvy_enable_birds_animation="false" data-marvy_enable_cells_animation="false" data-marvy_enable_dots_animation="false" data-marvy_enable_fog_animation="false" data-marvy_enable_globe_animation="false" data-marvy_enable_halo_animation="false" data-marvy_enable_net_animation="false" data-marvy_enable_trunk_animation="false" data-marvy_enable_drop_animation="false" data-marvy_enable_fancy_rotate="false" data-marvy_enable_flying_object="false" data-marvy_enable_ripples_animation="true" data-marvy_ripples_animation_circle_color="#33374D" data-marvy_ripples_animation_circle_position="top" data-marvy_enable_waves_animation="false" data-marvy_enable_rings_animation="false" data-marvy_enable_topology_animation="false" class="elementor-section elementor-top-section elementor-element elementor-element-67846a5 elementor-section-full_width elementor-section-stretched elementor-section-height-min-height elementor-section-height-default elementor-section-items-middle" data-id="67846a5" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;,&quot;stretch_section&quot;:&quot;section-stretched&quot;}" style="padding-bottom: 200px;">
+                                <div class="elementor-container elementor-column-gap-default">
+                                <div class="elementor-row">
+                                <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-2fc47997" data-id="2fc47997" data-element_type="column">
+                                <div class="elementor-column-wrap elementor-element-populated">
+                                <div class="elementor-widget-wrap">
+                                <section data-marvy_enable_birds_animation="false" data-marvy_enable_cells_animation="false" data-marvy_enable_dots_animation="false" data-marvy_enable_fog_animation="false" data-marvy_enable_globe_animation="false" data-marvy_enable_halo_animation="false" data-marvy_enable_net_animation="false" data-marvy_enable_trunk_animation="false" data-marvy_enable_drop_animation="false" data-marvy_enable_fancy_rotate="false" data-marvy_enable_flying_object="false" data-marvy_enable_ripples_animation="false" data-marvy_enable_waves_animation="false" data-marvy_enable_rings_animation="false" data-marvy_enable_topology_animation="false" class="elementor-section elementor-inner-section elementor-element elementor-element-6734b50b elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="6734b50b" data-element_type="section">
+                                <div class="elementor-container elementor-column-gap-default">
+                                <div class="elementor-row">
+                                <div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-5782d548" data-id="5782d548" data-element_type="column">
+                                <div class="elementor-column-wrap elementor-element-populated">
+                                    <div class="elementor-widget-wrap">
+                                        <div class="elementor-element elementor-element-778ba3ab elementor-widget elementor-widget-section_title" data-id="778ba3ab" data-element_type="widget" data-widget_type="section_title.default">
+                                            <div class="elementor-widget-container">
+                                                <div class="text-center iq-title-box iq-title-default iq-title-box-1">
+                                                    <div class="iq-title-icon">
+                                                    </div>
+                                                    <h1 class="iq-title" >
+                                                        DnsBench	
+                                                    </h1>
+                                                    <p>Multi-Threaded Python Application for Dns Benchmark</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </section>
+                                <section data-marvy_enable_birds_animation="false" data-marvy_enable_cells_animation="false" data-marvy_enable_dots_animation="false" data-marvy_enable_fog_animation="false" data-marvy_enable_globe_animation="false" data-marvy_enable_halo_animation="false" data-marvy_enable_net_animation="false" data-marvy_enable_trunk_animation="false" data-marvy_enable_drop_animation="false" data-marvy_enable_fancy_rotate="false" data-marvy_enable_flying_object="false" data-marvy_enable_ripples_animation="false" data-marvy_enable_waves_animation="false" data-marvy_enable_rings_animation="false" data-marvy_enable_topology_animation="false" class="elementor-section elementor-inner-section elementor-element elementor-element-4754f8d elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="4754f8d" data-element_type="section">
+                                <div class="elementor-container elementor-column-gap-default">
+                                <div class="elementor-row">
+                                <div class="elementor-column elementor-col-30 elementor-inner-column elementor-element elementor-element-73036da" data-id="73036da" data-element_type="column" style="margin: auto;">
+                                <div class="elementor-column-wrap elementor-element-populated">
+                                    <div class="elementor-widget-wrap">
+                                        <div class="elementor-element elementor-element-11dca83 elementor-invisible elementor-widget elementor-widget-iqonic_counter" data-id="11dca83" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;fadeInUp&quot;,&quot;_animation_delay&quot;:300}" data-widget_type="iqonic_counter.default">
+                                            <div class="elementor-widget-container" id="startcon">
+                                                <div type="button" class="iq-counter iq-counter-style-2 button" onclick="dns();">
+                                                    <div class="counter-content">
+                                                        <p class="iq-counter-info">
+                                                            <br>
+                                                            <h3>Start <i class="fa fa-play" aria-hidden="true" style="font-size: 30px;"></i></h3>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div class="center custom-control custom-checkbox mb-6" style="margin-left: -100px">
+                                                    <ul class="tg-list">
+                                                        <li class="tg-list-item">
+                                                            <p>Disable Cache</p>
+                                                            <input class="tgl tgl-ios" id="cacheenable" type="checkbox">
+                                                            <label class="tgl-btn" for="cacheenable"></label>
+                                                        </li>
+                                                        
+                                                        <li class="tg-list-item">
+                                                            <p>Enable DoH</p>
+                                                            <input class="tgl tgl-ios" id="https" type="checkbox">
+                                                            <label class="tgl-btn" for="https"></label>
+                                                        </li>
+
+                                                        <li class="tg-list-item">
+                                                            <p>Enable DoT</p>
+                                                            <input class="tgl tgl-ios" id="tls" type="checkbox">
+                                                            <label class="tgl-btn" for="tls"></label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <script type="text/javascript" src="/eel.js"></script>
+                                            <script type="text/javascript">
+                                                async function dns(){
+                                                    var cache = document.getElementById("cacheenable").checked,
+                                                        https = document.getElementById("https").checked,
+                                                        tls = document.getElementById("tls").checked;
+                                                    var buttonhtml = document.getElementById("startcon").innerHTML;
+                                                    document.getElementById("graph").setAttribute("style","display: none;");
+                                                    document.getElementById("startcon").innerHTML = '<div class="spinner-border" role="status" style="width: 65px;height: 65px;margin: auto 100px; padding-left: 50px;"></div>'
+                                                    await eel.dnscheck(cache,tls,https)().then((data) => {
+                                                        chart(data,buttonhtml);
+                                                    });
+                                                }
+                                                
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </section>
+                                
+                                <section id="graph" style="visibility: hidden!important;position: absolute; top: -9999px; left: -9999px;opacity: 0;width: 0; height: 0;" data-marvy_enable_birds_animation="false" data-marvy_enable_cells_animation="false" data-marvy_enable_dots_animation="false" data-marvy_enable_fog_animation="false" data-marvy_enable_globe_animation="false" data-marvy_enable_halo_animation="false" data-marvy_enable_net_animation="false" data-marvy_enable_trunk_animation="false" data-marvy_enable_drop_animation="false" data-marvy_enable_fancy_rotate="false" data-marvy_enable_flying_object="false" data-marvy_enable_ripples_animation="false" data-marvy_enable_waves_animation="false" data-marvy_enable_rings_animation="false" data-marvy_enable_topology_animation="false" class="elementor-section elementor-top-section elementor-element elementor-element-72c3a417 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="72c3a417" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                                    <div class="elementor-container elementor-column-gap-default">
+                                    <div class="elementor-row">
+                                    <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-90b3a80" data-id="90b3a80" data-element_type="column">
+                                    <div class="elementor-column-wrap elementor-element-populated">
+                                    <div class="elementor-widget-wrap">
+                                    <div class="elementor-element elementor-element-4943118d elementor-widget elementor-widget-column_chart animated fadeInUp" data-id="4943118d" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;fadeInUp&quot;,&quot;_animation_delay&quot;:300}" data-widget_type="column_chart.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="chart-card">
+                                            <div class="" style="text-align: center;">
+                                                <h4 class="heading graphina-chart-heading" style="text-align: center; color: #FFFFFF;">DNS Benchmark</h4>
+                                                <p>All Resolving Speed are measured in ms (millisecond)</p>
+                                            </div>
+                                            <div class="" style="position: relative;">
+                                                <div id="column-chart" class="chart-texture column-chart-4943118d" style="min-height: 200px;max-height: 700px;overflow-x:auto;overflow-y:hidden;">
+                                                </div>
+                                                <div class="resize-triggers">
+                                                    <div class="expand-trigger">
+                                                        <div style="width: 1081px; height: 700px;"></div>
+                                                    </div>
+                                                    <div class="contract-trigger"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <br><br>
+                                        <div id="recent-comments-2" class="widget widget_recent_comments">
+                                            <h4 class="widget-title" style="color: #071c35;" id="best"></h4>
+                                            <ul id="recentcomments" class="text-black">
+                                                <li class="recentcomments text-muted" id="recd"></li>
+                                                <li class="recentcomments text-muted">Here is a <a href="https://kb.adguard.com/general/dns-providers">list of known DNS providers</a> to choose from.</li>
+                                                <li class="recentcomments">This Application checks over 55+ public DNS server and finds the best and optimistic server for your network. NOTE: Currently this only used ipv4 and some get be blocked by your ISP.</li>
+                                            </ul>
+                                        </div>
+
+                                        <script>
+                                            var myElement = document.querySelector(".column-chart-4943118d");
+                                            function chart(data,buttonhtml){
+                                                document.getElementById("startcon").innerHTML = buttonhtml;
+                                                document.getElementById("best").innerHTML = data[2];
+                                                document.getElementById("recd").innerHTML = data[3];
+                                                document.getElementById("graph").removeAttribute("style");
+                                                document.getElementById("graph").setAttribute("style","margin-top:150px");
+                                            if (typeof isInit === 'undefined') {
+                                                var isInit = {};
+                                            }
+                                            isInit['4943118d'] = false;
+                                            var array = [
+                                                {"name":"IPv4","data":data[1][0],"color":"#00D2FF"}
+                                            ];
+                                            
+                                            if(data[1][1].length > 0){
+                                                array[array.length] = {"name":"TLS","data":data[1][1],"color":"#F94F58"};
+                                            }
+                                            
+                                            if(data[1][2].length > 0){
+                                                array[array.length] = {"name":"HTTPS","data":data[1][2],"color":"#F99C4E"};
+                                            }
+
+                                            var temp = Math.max.apply(null, [
+                                                Math.max.apply(null, data[1][0]),
+                                                Math.max.apply(null, data[1][1]),
+                                                Math.max.apply(null, data[1][2])]);
+
+                                            var w = (temp > 1100) ? temp : 1100;
+                                            w=w+200;
+                                            var columnOptions = {
+                                                series: array,
+                                                chart: {
+                                                    height: (data[0].length*50 + 85),
+                                                    width: w,
+                                                    type: 'bar',
+                                                    responsive: true,
+                                                    stacked: '',
+                                                    stackType: 'normal',
+                                                    animations: {
+                                                        enabled: '1',
+                                                        speed: '800',
+                                                    },
+                                                    toolbar: {
+                                                        show: ''
+                                                    },
+                                                    dropShadow: {
+                                                        enabled: '',
+                                                        enabledOnSeries: [],
+                                                        top: parseInt('0'),
+                                                        left: parseInt('0'),
+                                                        blur: parseInt('0'),
+                                                        color: '#000',
+                                                        opacity: parseFloat('0.35')
+                                                    }
+                                                },
+                                                plotOptions: {
+                                                    bar: {
+                                                        horizontal: 'yes',
+                                                        columnWidth: '2.5%',
+                                                        startingShape: 'flat',
+                                                        endingShape: 'flat',
+                                                        dataLabels: {
+                                                            position: 'top',
+                                                        }
+                                                    },
+                                                },
+                                                zoom: {
+                                                    enabled: true,
+                                                    type: 'x',
+                                                    resetIcon: {
+                                                        offsetX: -10,
+                                                        offsetY: 0,
+                                                        fillColor: '#fff',
+                                                        strokeColor: '#37474F'
+                                                    },
+                                                    selection: {
+                                                        background: '#90CAF9',
+                                                        border: '#0D47A1'
+                                                    }    
+                                                },
+                                                noData: {
+                                                    text: 'No Data Available',
+                                                    align: 'center',
+                                                    verticalAlign: 'middle',
+                                                    style: {
+                                                        fontSize: '16px',
+                                                        fontFamily: 'Source Sans Pro',
+                                                        color: '#FFFFFF'
+                                                    }
+                                                },
+                                                dataLabels: {
+                                                    enabled: '',
+                                                    offsetY: parseFloat('0'),
+                                                    offsetX: parseFloat('0'),
+                                                    style: {
+                                                        colors: ['#000000']
+                                                    },
+                                                    background: {
+                                                        enabled: '',
+                                                        foreColor: ['#FFFFFF'],
+                                                        borderWidth: parseInt('1'),
+                                                        borderColor: '#FFFFFF'
+                                                    },
+                                                    formatter: function (val) {
+                                                        return '' + val + '';
+                                                    }
+                                                },
+                                                stroke: {
+                                                    show: true,
+                                                    width: 2,
+                                                    colors: ['transparent']
+                                                },
+                                                grid: {
+                                                    yaxis: {
+                                                        lines: {
+                                                            show: 'yes'
+                                                        }
+                                                    }
+                                                },
+                                                xaxis: {
+                                                    categories: data[0],
+                                                    position: 'bottom',
+                                                    tickAmount: parseInt("30"),
+                                                    tickPlacement: "on",
+                                                    labels: {
+                                                        show: 'yes',
+                                                        rotateAlways: '',
+                                                        rotate: '-45',
+                                                        offsetX: parseInt('0'),
+                                                        offsetY: parseInt('0'),
+                                                        trim: true,
+                                                        style: {
+                                                            colors: '#FFFFFF',
+                                                            fontSize: '16px',
+                                                            fontFamily: 'Source Sans Pro',
+                                                            fontWeight: ''
+                                                        },
+                                                        formatter: function (val) {
+                                                            return '' + val + '';
+                                                        }
+                                                    },
+                                                    tooltip: {
+                                                        enabled: ""
+                                                    },
+                                                    crosshairs: {
+                                                        show: ""
+                                                    }
+                                                },
+                                                yaxis: {
+                                                    opposite: '',
+                                                    tickAmount: parseInt("0"),
+                                                    decimalsInFloat: parseInt("2"),
+                                                    labels: {
+                                                        show: 'yes',
+                                                        rotate: '0',
+                                                        offsetX: parseInt('0'),
+                                                        offsetY: parseInt('0'),
+                                                        style: {
+                                                            colors: '#FFFFFF',
+                                                            fontSize: '16px',
+                                                            fontFamily: 'Source Sans Pro',
+                                                            fontWeight: ''
+                                                        }
+                                                    },
+                                                    tooltip: {
+                                                        enabled: ""
+                                                    },
+                                                    crosshairs: {
+                                                        show: ""
+                                                    }
+                                                },
+                                                colors: '#3346D3_,_#F94F58_,_#F99C4E_,_#00D2FF'.split('_,_'),
+                                                fill: {
+                                                    type: 'classic',
+                                                    opacity: parseFloat('1'),
+                                                    colors: '#3346D3_,_#F94F58_,_#F99C4E_,_#00D2FF'.split('_,_'),
+                                                    gradient: {
+                                                        gradientToColors: '#3346D3_,_#F94F58_,_#F99C4E_,_#00D2FF'.split('_,_'),
+                                                        type: 'vertical',
+                                                        inverseColors: '',
+                                                        opacityFrom: parseFloat('1'),
+                                                        opacityTo: parseFloat('1')
+                                                    },
+                                                    pattern: {
+                                                        style: '_,__,__,_'.split('_,_'),
+                                                        width: 6,
+                                                        height: 6,
+                                                        strokeWidth: 2
+                                                    }
+                                                },
+                                                legend: {
+                                                    show: 'yes',
+                                                    position: 'bottom',
+                                                    horizontalAlign: 'center',
+                                                    fontSize: '16px',
+                                                    fontFamily: 'Source Sans Pro',
+                                                    fontWeight: '',
+                                                    labels: {
+                                                        colors: '#FFFFFF'
+                                                    }
+                                                },
+                                                tooltip: {
+                                                    enabled: 'yes',
+                                                    theme: 'light',
+                                                    shared: 'yes' === "yes",
+                                                    style: {
+                                                        fontSize: '16px',
+                                                        fontFamily: 'Source Sans Pro'
+                                                    }
+                                                }
+                                            };
+                                            
+                                            if ("" === "yes") {
+                                                columnOptions.yaxis.labels.formatter = function (val) {
+                                                    return '' + val + '';
+                                                }
+                                            }
+                                            if ("yes" === "yes") {
+                                                columnOptions.tooltip['enabledOnSeries'] = [0,1,2,3];
+                                            }
+                                            if ("" === "yes") {
+                                                columnOptions['annotations'] = {
+                                                    yaxis: [
+                                                        {
+                                                            y: 0,
+                                                            strokeDashArray: parseInt("0"),
+                                                            borderColor: '#000000'
+                                                        }
+                                                    ]
+                                                };
+                                            }
+                                            
+                                            initNowGraphina(
+                                                myElement,
+                                                {
+                                                    ele: document.querySelector(".column-chart-4943118d"),
+                                                    options: columnOptions,
+                                                    series: [{name: '', data: []}],
+                                                    animation: true
+                                                },
+                                                '4943118d'
+                                            );
+                                            if ('' === "1") {
+                                                getDataForChartsAjax([], 'column', '4943118d');
+                                            }
+                                        }
+                                        </script>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                </section>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                    <!-- .sf-content -->
+                                </article>
+                                <!-- #post-## -->		
+                            </div>
+                            <!-- .container -->
+                        </main>
+                        <!-- #main -->
+                    </div>
+                    <!-- #primary -->
+                </div>
+                <!-- #content -->
+            </div>
+            <!-- .site-content-contain -->
+        </div>
+        <!-- #page -->
+        <!-- === back-to-top === -->
+        <div id="back-to-top">
+            <a class="top" id="top" href="#top"> <i class="fas fa-arrow-up"></i> </a>
+        </div>
+        <!-- === back-to-top End === -->
+        <script>
+            jQuery( function( $ ) {
+            	// Add space for Elementor Menu Anchor link
+            	if ( window.elementorFrontend ) {
+            		
+            		jQuery("#load").fadeOut();
+            		jQuery("#loading").delay(0).fadeOut("slow");
+            		
+            		if(jQuery('header').hasClass('has-sticky'))
+                          {         
+                              jQuery(window).on('scroll', function() {
+                                  if (jQuery(this).scrollTop() > 10) {
+                                      jQuery('header').addClass('menu-sticky');
+                                      jQuery('.has-sticky .logo').addClass('logo-display');
+                                  } else {
+                                      jQuery('header').removeClass('menu-sticky');
+                                      jQuery('.has-sticky .logo').removeClass('logo-display');
+                                  }
+                              });
+            
+            		}
+            		
+            		
+            	}
+            	
+            } );
+        </script>
+        <script>
+            jQuery( function( $ ) {
+            	// Add space for Elementor Menu Anchor link
+            	if ( window.elementorFrontend ) {
+            		jQuery("#load").fadeOut();
+            		jQuery("#loading").delay(0).fadeOut("slow");
+            		
+            		if(jQuery('header').hasClass('has-sticky'))
+                          {         
+                              jQuery(window).on('scroll', function() {
+                                  if (jQuery(this).scrollTop() > 10) {
+                                      jQuery('header').addClass('menu-sticky');
+                                      jQuery('.has-sticky .logo').addClass('logo-display');
+                                  } else {
+                                      jQuery('header').removeClass('menu-sticky');
+                                      jQuery('.has-sticky .logo').removeClass('logo-display');
+                                  }
+                              });
+            
+            		}
+            		
+            	}
+            	
+            } );
+            
+        </script>
+        <script id='contact-form-7-js-extra'>
+            /* <![CDATA[ */
+            var wpcf7 = {"apiSettings":{"root":"https:\/\/iqonic.design\/wp-themes\/umetric-new\/wp-json\/contact-form-7\/v1","namespace":"contact-form-7\/v1"}};
+            /* ]]> */
+        </script>
+        <script src='js/scripts.js' id='contact-form-7-js'></script>
+        <script src='js/jQuery.countdownTimer.min.js' id='jQuery-countdownTimer-min-js'></script>
+        <script src='js/tox-progress.min.js' id='tox-progress-js'></script>
+        <script src='js/timeline.js' id='timeline-js'></script>
+        <script src='js/timeline.min.js' id='timeline-min-js'></script>
+        <script src='js/slick.min.js' id='slick-min-js'></script>
+        <script src='js/amcharts-core.js' id='amcharts-core-js'></script>
+        <script src='js/amcharts-maps.js' id='amcharts-maps-js'></script>
+        <script src='js/amcharts-worldLow.js' id='amcharts-worldLow-js'></script>
+        <script src='js/amcharts-animated.js' id='amcharts-animated-js'></script>
+        <script src='js/popper.min.js' id='popper-min-js'></script>
+        <script src='js/custom-map.js' id='custom-map-js'></script>
+        <script src='js/owl.carousel.min.js' id='owl-carousel-js'></script>
+        <script src='js/iqonic-extenstion.js' id='iqonic-extenstion-js'></script>
+        <script src='js/bootstrap.min.js' id='bootstrap-js'></script>
+        <script src='js/countdown.js' id='countdown-js'></script>
+        <script src='js/appear.js' id='appear-js'></script>
+        <script src='js/progresscircle.js' id='progresscircle-js'></script>
+        <script src='js/jquery.countTo.js' id='jquery-count-js'></script>
+        <script src='js/jquery.magnific-popup.min.js' id='jquery-magnific-js'></script>
+        <script src='js/isotope.pkgd.min.js' id='isotope-js'></script>
+        <script src='js/popper.min.js' id='popper-js'></script>
+        <script src='js/wow.min.js' id='wow-js'></script>
+        <script src='js/dot-script.js' id='dot-script-js'></script>
+        <script src='js/smooth-scrollbar.js' id='smooth-js'></script>
+        <script src='js/umetric-custom.js' id='umetric-custom-js'></script>
+        <script src='js/wp-embed.min.js' id='wp-embed-js'></script>
+        <script src='js/frontend-modules.min.js' id='elementor-frontend-modules-js'></script>
+        <script src='js/position.min.js' id='jquery-ui-position-js'></script>
+        <script src='js/dialog.min.js' id='elementor-dialog-js'></script>
+        <script src='js/waypoints.min.js' id='elementor-waypoints-js'></script>
+        <script src='js/swiper.min.js' id='swiper-js'></script>
+        <script src='js/share-link.min.js' id='share-link-js'></script>
+        <script id='elementor-frontend-js-before'>
+            var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"version":"3.0.9","is_static":false,"legacyMode":{"elementWrappers":true},"urls":{"assets":"https:\/\/iqonic.design\/wp-themes\/umetric-new\/wp-content\/plugins\/elementor\/assets\/"},"settings":{"page":[],"editorPreferences":[]},"kit":{"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":4516,"title":"Mobile%20Apps%20Reporting%20%E2%80%93%20umetric","excerpt":"","featuredImage":false}};
+        </script>
+        <script src='js/frontend.min.js' id='elementor-frontend-js'></script>
+    </body>
+</html>
