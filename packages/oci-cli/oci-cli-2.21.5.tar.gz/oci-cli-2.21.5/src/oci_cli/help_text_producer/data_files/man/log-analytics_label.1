@@ -1,0 +1,782 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "LOG-ANALYTICS_LABEL" "1" "Mar 08, 2021" "2.21.5" "OCI CLI Command Reference"
+.SH NAME
+log-analytics_label \- 
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+LogAnalytics label
+.SH AVAILABLE COMMANDS
+.INDENT 0.0
+.IP \(bu 2
+batch\-get\-basic\-info
+.IP \(bu 2
+delete\-label
+.IP \(bu 2
+get\-label
+.IP \(bu 2
+get\-label\-summary
+.IP \(bu 2
+list\-label\-priorities
+.IP \(bu 2
+list\-label\-source\-details
+.IP \(bu 2
+list\-labels
+.IP \(bu 2
+upsert\-label
+.UNINDENT
+.SS \fBbatch\-get\-basic\-info\fP
+.SS Description
+.sp
+get basic information about a specified set of labels
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label batch\-get\-basic\-info [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-is\-include\-deleted [boolean]
+.UNINDENT
+.sp
+flag for whether or not to include information on deleted labels
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-basic\-label\-sort\-by [text]
+.UNINDENT
+.sp
+sort by label
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+name, priority
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-label\-names [complex type]
+.UNINDENT
+.sp
+string list
+This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the \fI\%file://path/to/file\fP syntax.
+.sp
+The \fB\-\-generate\-param\-json\-input\fP option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the \fI\%file://\fP syntax.
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+The maximum number of items to return.
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBdelete\-label\fP
+.SS Description
+.sp
+delete a label
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label delete\-label [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-label\-name [text]
+.UNINDENT
+.sp
+name of the label to get
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-force
+.UNINDENT
+.sp
+Perform deletion without prompting for confirmation.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-if\-match [text]
+.UNINDENT
+.sp
+For optimistic concurrency control. In the PUT or DELETE call for a resource, set the \fIif\-match\fP parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource\(aqs current etag value.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBget\-label\fP
+.SS Description
+.sp
+get label with specified name
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label get\-label [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-label\-name [text]
+.UNINDENT
+.sp
+name of the label to get
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBget\-label\-summary\fP
+.SS Description
+.sp
+get total count
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label get\-label\-summary [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-label\-priorities\fP
+.SS Description
+.sp
+get list of priorities
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label list\-label\-priorities [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results. If you provide this option, then you cannot provide the \fB\-\-limit\fP option.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+The maximum number of items to return.
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.
+.INDENT 0.0
+.TP
+.B \-\-page\-size [integer]
+.UNINDENT
+.sp
+When fetching results, the number of results to fetch per call. Only valid when used with \fB\-\-all\fP or \fB\-\-limit\fP, and ignored otherwise.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-label\-source\-details\fP
+.SS Description
+.sp
+get details of sources using the label
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label list\-label\-source\-details [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results. If you provide this option, then you cannot provide the \fB\-\-limit\fP option.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-label\-name [text]
+.UNINDENT
+.sp
+label name
+.INDENT 0.0
+.TP
+.B \-\-label\-source\-sort\-by [text]
+.UNINDENT
+.sp
+sort by source displayname
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+labelFieldDisplayName, sourceDisplayName
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+The maximum number of items to return.
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.
+.INDENT 0.0
+.TP
+.B \-\-page\-size [integer]
+.UNINDENT
+.sp
+When fetching results, the number of results to fetch per call. Only valid when used with \fB\-\-all\fP or \fB\-\-limit\fP, and ignored otherwise.
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-labels\fP
+.SS Description
+.sp
+get labels passing specified filter
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label list\-labels [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results. If you provide this option, then you cannot provide the \fB\-\-limit\fP option.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-is\-alias\-pop [boolean]
+.UNINDENT
+.sp
+isAliasPop
+.INDENT 0.0
+.TP
+.B \-\-is\-count\-pop [boolean]
+.UNINDENT
+.sp
+isCountPop
+.INDENT 0.0
+.TP
+.B \-\-is\-system [text]
+.UNINDENT
+.sp
+Is system param of value (all, custom, sourceUsing)
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ALL, BUILT_IN, CUSTOM
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-label\-display\-text [text]
+.UNINDENT
+.sp
+search by label display name or description
+.INDENT 0.0
+.TP
+.B \-\-label\-name [text]
+.UNINDENT
+.sp
+label name
+.INDENT 0.0
+.TP
+.B \-\-label\-priority [text]
+.UNINDENT
+.sp
+label priority
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+HIGH, LOW, MEDIUM, NONE
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-label\-sort\-by [text]
+.UNINDENT
+.sp
+sort by label
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+name, priority, sourceUsing
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+The maximum number of items to return.
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.
+.INDENT 0.0
+.TP
+.B \-\-page\-size [integer]
+.UNINDENT
+.sp
+When fetching results, the number of results to fetch per call. Only valid when used with \fB\-\-all\fP or \fB\-\-limit\fP, and ignored otherwise.
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBupsert\-label\fP
+.SS Description
+.sp
+Define or update a label.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci log\-analytics label upsert\-label [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-namespace\-name [text]
+.UNINDENT
+.sp
+The Logging Analytics namespace used for the request.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-aliases [complex type]
+.UNINDENT
+.sp
+alias list
+.sp
+This option is a JSON list with items of type LogAnalyticsLabelAlias.  For documentation on LogAnalyticsLabelAlias please see our API reference: \fI\%https://docs.cloud.oracle.com/api/#/en/loganalytics/20200601/datatypes/LogAnalyticsLabelAlias\fP\&.
+This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the \fI\%file://path/to/file\fP syntax.
+.sp
+The \fB\-\-generate\-param\-json\-input\fP option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the \fI\%file://\fP syntax.
+.INDENT 0.0
+.TP
+.B \-\-description [text]
+.UNINDENT
+.sp
+description
+.INDENT 0.0
+.TP
+.B \-\-display\-name [text]
+.UNINDENT
+.sp
+display name
+.INDENT 0.0
+.TP
+.B \-\-edit\-version [integer]
+.UNINDENT
+.sp
+edit version
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-if\-match [text]
+.UNINDENT
+.sp
+For optimistic concurrency control. In the PUT or DELETE call for a resource, set the \fIif\-match\fP parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource\(aqs current etag value.
+.INDENT 0.0
+.TP
+.B \-\-impact [text]
+.UNINDENT
+.sp
+impact
+.INDENT 0.0
+.TP
+.B \-\-is\-system [boolean]
+.UNINDENT
+.sp
+is system flag
+.INDENT 0.0
+.TP
+.B \-\-name [text]
+.UNINDENT
+.sp
+label identifier
+.INDENT 0.0
+.TP
+.B \-\-priority [text]
+.UNINDENT
+.sp
+Valid values are (NONE, LOW, HIGH). NONE is default.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+HIGH, LOW, MEDIUM, NONE
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-recommendation [text]
+.UNINDENT
+.sp
+tag recommendation
+.INDENT 0.0
+.TP
+.B \-\-suggest\-type [integer]
+.UNINDENT
+.sp
+suggest type
+.INDENT 0.0
+.TP
+.B \-\-type [text]
+.UNINDENT
+.sp
+Valid values are (INFO, PROBLEM). INFO is default.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+INFO, PROBLEM
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SH AUTHOR
+Oracle
+.SH COPYRIGHT
+2016, 2021, Oracle
+.\" Generated by docutils manpage writer.
+.

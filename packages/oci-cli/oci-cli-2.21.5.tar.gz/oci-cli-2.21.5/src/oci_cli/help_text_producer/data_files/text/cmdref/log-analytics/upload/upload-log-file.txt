@@ -1,0 +1,138 @@
+"upload-log-file"
+*****************
+
+
+Description
+===========
+
+Accepts log data for processing by Logging Analytics.
+
+
+Usage
+=====
+
+   oci log-analytics upload upload-log-file [OPTIONS]
+
+
+Required Parameters
+===================
+
+--file [filename]
+
+Log data file. Example: --file /Users/me/myfile.txt
+
+--filename [text]
+
+The name of the file being uploaded. The extension of the filename
+part will be used to detect the type of file (like zip, tar).
+
+--log-source-name [text]
+
+Name of the log source that will be used to process the files being
+uploaded.
+
+--namespace-name, --namespace, -ns [text]
+
+The Logging Analytics namespace used for the request.
+
+--opc-meta-loggrpid [text]
+
+The log group OCID to which the log data in this upload will be mapped
+to.
+
+--upload-name [text]
+
+The name of the upload. This can be considered as a container name
+where different kind of logs will be collected and searched together.
+This upload name/id can further be used for retrieving the details of
+the upload, including its status or deleting the upload.
+
+
+Optional Parameters
+===================
+
+--char-encoding [text]
+
+Character encoding to be used to detect the encoding type of file(s)
+being uploaded. When this property is not specified, system detected
+character encoding will be used.
+
+--content-md5 [text]
+
+The base-64 encoded MD5 hash of the body. If the Content-MD5 header is
+present, Logging Analytics performs an integrity check on the body of
+the HTTP request by computing the MD5 hash for the body and comparing
+it to the MD5 hash supplied in the header. If the two hashes do not
+match, the log data is rejected and an HTTP-400 Unmatched Content MD5
+error is returned with the message:
+
+"The computed MD5 of the request body (ACTUAL_MD5) does not match the
+Content-MD5 header (HEADER_MD5)"
+
+--content-type [text]
+
+The content type of the log data.
+
+--date-format [text]
+
+This property is used to specify the format of the date. This is to be
+used for ambiguous dates like 12/11/10. This property can take any of
+the following values -  MONTH_DAY_YEAR, DAY_MONTH_YEAR,
+YEAR_MONTH_DAY, MONTH_DAY, DAY_MONTH.
+
+--date-year [text]
+
+Used to indicate the year where the log entries timestamp do not
+mention year (Ex: Nov  8 20:45:56).
+
+--entity-id [text]
+
+The entity OCID.
+
+--from-json [text]
+
+Provide input to this command as a JSON document from a file using the
+file://path-to/file syntax.
+
+The "--generate-full-command-json-input" option can be used to
+generate a sample json file to be used with this command option. The
+key names are pre-populated and match the command option names
+(converted to camelCase format, e.g. compartment-id -->
+compartmentId), while the values of the keys need to be populated by
+the user before using the sample file as an input to this command. For
+any command option that accepts multiple values, the value of the key
+can be a JSON array.
+
+Options can still be provided on the command line. If an option exists
+in both the JSON document and the command line then the command line
+specified value will be used.
+
+For examples on usage of this option, please see our "using CLI with
+advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Conte
+nt/API/SDKDocs/cliusing.htm#AdvancedJSONOptions
+
+--invalidate-cache [boolean]
+
+This property can be used to reset configuration cache in case of an
+issue with the upload.
+
+--timezone [text]
+
+Timezone to be used when processing log entries whose timestamps do
+not include an explicit timezone. When this property is not specified,
+the timezone of the entity specified is used. If the entity is also
+not specified or do not have a valid timezone then UTC is used
+
+
+Global Parameters
+=================
+
+Use "oci --help" for help on global parameters.
+
+"--auth-purpose", "--auth", "--cert-bundle", "--cli-rc-file", "--
+config-file", "--debug", "--defaults-file", "--endpoint", "--generate-
+full-command-json-input", "--generate-param-json-input", "--help", "--
+latest-version", "--no-retry", "--opc-client-request-id", "--opc-
+request-id", "--output", "--profile", "--query", "--raw-output", "--
+region", "--release-info", "--request-id", "--version", "-?", "-d",
+"-h", "-v"

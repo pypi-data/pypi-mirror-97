@@ -1,0 +1,200 @@
+"create"
+********
+
+
+Description
+===========
+
+Creates a rule to collect logs from an object storage bucket.
+
+
+Usage
+=====
+
+   oci log-analytics object-collection-rule create [OPTIONS]
+
+
+Required Parameters
+===================
+
+--compartment-id, -c [text]
+
+The OCID of the compartment to which this rule belongs.
+
+--log-group-id [text]
+
+Logging Analytics Log group OCID to associate the processed logs with.
+
+--log-source-name [text]
+
+Name of the Logging Analytics Source to use for the processing.
+
+--name [text]
+
+A unique name given to the rule. The name must be unique within the
+tenancy, and cannot be modified.
+
+--namespace-name, --namespace, -ns [text]
+
+The Logging Analytics namespace used for the request.
+
+--os-bucket-name [text]
+
+Name of the Object Storage bucket.
+
+--os-namespace [text]
+
+Object Storage namespace.
+
+
+Optional Parameters
+===================
+
+--char-encoding [text]
+
+An optional character encoding to aid in detecting the character
+encoding of the contents of the objects while processing. It is
+recommended to set this value as ISO_8859_1 when configuring content
+of the objects having more numeric characters, and very few alphabets.
+For e.g. this applies when configuring VCN Flow Logs.
+
+--collection-type [text]
+
+The type of collection.
+
+Accepted values are:
+
+   HISTORIC, HISTORIC_LIVE, LIVE
+
+--defined-tags [complex type]
+
+Defined tags for this resource. Each key is predefined and scoped to a
+namespace. Example: *{"foo-namespace": {"bar-key": "value"}}* This is
+a complex type whose value must be valid JSON. The value can be
+provided as a string on the command line or passed in as a file using
+the file://path/to/file syntax.
+
+The "--generate-param-json-input" option can be used to generate an
+example of the JSON which must be provided. We recommend storing this
+example in a file, modifying it as needed and then passing it back in
+via the file:// syntax.
+
+--description [text]
+
+A string that describes the details of the rule. It does not have to
+be unique, and can be changed. Avoid entering confidential
+information.
+
+--entity-id [text]
+
+Logging Analytics entity OCID. Associates the processed logs with the
+given entity (optional).
+
+--freeform-tags [complex type]
+
+Simple key-value pair that is applied without any predefined name,
+type or scope. Exists for cross-compatibility only. Example: *{"bar-
+key": "value"}* This is a complex type whose value must be valid JSON.
+The value can be provided as a string on the command line or passed in
+as a file using the file://path/to/file syntax.
+
+The "--generate-param-json-input" option can be used to generate an
+example of the JSON which must be provided. We recommend storing this
+example in a file, modifying it as needed and then passing it back in
+via the file:// syntax.
+
+--from-json [text]
+
+Provide input to this command as a JSON document from a file using the
+file://path-to/file syntax.
+
+The "--generate-full-command-json-input" option can be used to
+generate a sample json file to be used with this command option. The
+key names are pre-populated and match the command option names
+(converted to camelCase format, e.g. compartment-id -->
+compartmentId), while the values of the keys need to be populated by
+the user before using the sample file as an input to this command. For
+any command option that accepts multiple values, the value of the key
+can be a JSON array.
+
+Options can still be provided on the command line. If an option exists
+in both the JSON document and the command line then the command line
+specified value will be used.
+
+For examples on usage of this option, please see our "using CLI with
+advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Conte
+nt/API/SDKDocs/cliusing.htm#AdvancedJSONOptions
+
+--is-enabled [boolean]
+
+Whether or not this rule is currently enabled.
+
+--max-wait-seconds [integer]
+
+The maximum time to wait for the resource to reach the lifecycle state
+defined by "--wait-for-state". Defaults to 1200 seconds.
+
+--overrides [complex type]
+
+The override is used to modify some important configuration properties
+for objects matching a specific pattern inside the bucket. Supported
+propeties for override are - logSourceName, charEncoding. Supported
+matchType for override are "contains". This is a complex type whose
+value must be valid JSON. The value can be provided as a string on the
+command line or passed in as a file using the file://path/to/file
+syntax.
+
+The "--generate-param-json-input" option can be used to generate an
+example of the JSON which must be provided. We recommend storing this
+example in a file, modifying it as needed and then passing it back in
+via the file:// syntax.
+
+--poll-since [text]
+
+The oldest time of the file in the bucket to consider for collection.
+Accepted values are: BEGINNING or CURRENT_TIME or RFC3339 formatted
+datetime string. Use this for HISTORIC or HISTORIC_LIVE collection
+types. When collectionType is LIVE, specifying pollSince value other
+than CURRENT_TIME will result in error.
+
+--poll-till [text]
+
+The newest time of the file in the bucket to consider for collection.
+Accepted values are: CURRENT_TIME or RFC3339 formatted datetime
+string. Use this for HISTORIC collection type. When collectionType is
+LIVE or HISTORIC_LIVE, specifying pollTill will result in error.
+
+--wait-for-state [text]
+
+This operation creates, modifies or deletes a resource that has a
+defined lifecycle state. Specify this option to perform the action and
+then wait until the resource reaches a given lifecycle state. Multiple
+states can be specified, returning on the first state. For example, "
+--wait-for-state" SUCCEEDED "--wait-for-state" FAILED would return on
+whichever lifecycle state is reached first. If timeout is reached, a
+return code of 2 is returned. For any other error, a return code of 1
+is returned.
+
+Accepted values are:
+
+   ACTIVE, DELETED, INACTIVE
+
+--wait-interval-seconds [integer]
+
+Check every "--wait-interval-seconds" to see whether the resource to
+see if it has reached the lifecycle state defined by "--wait-for-
+state". Defaults to 30 seconds.
+
+
+Global Parameters
+=================
+
+Use "oci --help" for help on global parameters.
+
+"--auth-purpose", "--auth", "--cert-bundle", "--cli-rc-file", "--
+config-file", "--debug", "--defaults-file", "--endpoint", "--generate-
+full-command-json-input", "--generate-param-json-input", "--help", "--
+latest-version", "--no-retry", "--opc-client-request-id", "--opc-
+request-id", "--output", "--profile", "--query", "--raw-output", "--
+region", "--release-info", "--request-id", "--version", "-?", "-d",
+"-h", "-v"
