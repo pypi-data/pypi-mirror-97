@@ -1,0 +1,83 @@
+Metadata-Version: 2.1
+Name: agilicus
+Version: 1.94.0
+Summary: Agilicus SDK
+License: MIT
+Author: Agilicus Devs
+Author-email: dev@agilicus.com
+Requires-Python: >=3.7,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Dist: PyJWT (>=2.0.1,<2.1.0)
+Requires-Dist: certifi (>=14.05.14)
+Requires-Dist: click-shell (>=2.0,<3.0)
+Requires-Dist: cryptography (>=3.1.1,<4.0.0)
+Requires-Dist: oauth2client (>=4.1.3,<4.2.0)
+Requires-Dist: prettytable (>=0.7.2,<0.8.0)
+Requires-Dist: python_dateutil (>2.5.3)
+Requires-Dist: requests (>=2.23.0,<2.24.0)
+Requires-Dist: six (>=1.14.0,<2.0.0)
+Description-Content-Type: text/markdown
+
+## Agilicus SDK (Python)
+
+The [Agilicus Platform](https://www.agilicus.com/) API is defined using [OpenAPI 3.0](https://github.com/OAI/OpenAPI-Specification),
+and may be used from any language. This allows configuration of our Zero-Trust Network Access cloud native platform
+using REST. You can see the API specification [online](https://www.agilicus.com/api).
+
+This package provides a Python SDK, class library interfaces for use in
+accessing individual collections. In addition it provides a command-line-interface (CLI)
+for interactive use.
+
+Read the class-library documentation [online](https://www.agilicus.com/api/)
+
+A subset of this code (that which accesses the above API) is [generated](agilicus/agilicus_api_README.md)
+
+Generally you may install this as:
+```
+pip install --upgrade agilicus
+```
+You may wish to add bash completion by adding this to your ~/.bashrc:
+```
+eval "$(_AGILICUS_CLI_COMPLETE=source agilicus-cli)"
+```
+
+## Build
+
+(first generate the api access, 'cd ..; ./local-build')
+
+```
+poetry install
+poetry run pre-commit install
+poetry run pytest
+```
+
+To run the CLI from the development venv:
+gene
+
+`poetry run python -m agilicus.main`
+
+To format & lint:
+
+```
+poetry run black .
+poetry run flake8
+```
+
+## CLI Usage
+
+Credentials are cached in ~/.config/agilicus, per issuer.
+
+```
+agilicus-cli list-applications
+```
+
+## Debugging with Codium
+
+```
+"python.venvPath": "~/.cache/pypoetry/virtualenvs"
+```
+
