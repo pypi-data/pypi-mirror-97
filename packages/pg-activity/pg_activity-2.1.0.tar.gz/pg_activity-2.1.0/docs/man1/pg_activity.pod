@@ -1,0 +1,223 @@
+=head1 NAME
+
+pg_activity - Realtime PostgreSQL database server monitoring tool
+
+=head1 SYNOPSIS
+
+B<pg_activity> [option..] [connection string]
+
+=head1 DESCRIPTION
+
+Command line tool for PostgreSQL server activity monitoring.
+
+pg_activity must run on the same server than the instance and
+as the user running the instance (or root) to show
+CPU, MEM, READ or WRITE columns and other system information.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over 2
+
+=item B<-U USERNAME>, B<--username=USERNAME>
+
+	Database user name (default: $USER).
+
+=item B<-p PORT>, B<--port=PORT>
+
+	Database server port (default: "5432").
+
+=item B<-h HOSTNAME>, B<--host=HOSTNAME>
+
+	Database server host or socket directory (default: "localhost").
+
+=item B<-d DBNAME>, B<--dbname=DBNAME>
+
+    Database name to connect to (default: "postgres").
+
+=item B<--blocksize=BLOCKSIZE>
+
+	Filesystem blocksize (default: 4096).
+
+=item B<--rds>
+
+	Enable support for AWS RDS.
+
+=item B<--output=FILEPATH>
+
+	Store running queries as CSV.
+
+=item B<--no-db-size>
+
+	Skip total size of DB.
+
+=item B<--min-duration=SECONDS>
+
+	Don't display queries with smaller than specified duration (in seconds).
+
+=item B<--verbose-mode=VERBOSE_MODE>
+
+	Queries display mode. Values: 1-TRUNCATED, 2-FULL(default), 3-INDENTED
+
+=item B<--duration-mode=DURATION_MODE>
+
+	Duration mode. Values: 1-QUERY(default), 2-TRANSACTION, 3-BACKEND
+
+=item B<--help>
+
+	Show this help message and exit.
+
+=item B<--version>
+
+	Show program's version number and exit.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 2
+
+=item B<PGPASSWORD>
+
+    PostgreSQL password.
+
+=item B<PGPORT>
+
+	Database server port.
+
+=item B<PGUSER>
+
+	Database user name.
+
+=item B<PGHOST>
+
+	Database server host or socket directory.
+
+=item B<PGPASSFILE>
+
+    Path to .pgpass file (default is ~/.pgpass)
+
+=back
+
+=head1 DISPLAY OPTIONS
+
+=over 2
+
+=item B<--no-pid>
+
+	Disable PID.
+
+=item B<--no-database>
+
+	Disable DATABASE.
+
+=item B<--no-user>
+
+	Disable USER.
+
+=item B<--no-client>
+
+	Disable CLIENT.
+
+=item B<--no-cpu>
+
+	Disable CPU%.
+
+=item B<--no-mem>
+
+	Disable MEM%.
+
+=item B<--no-read>
+
+	Disable READ/s.
+
+=item B<--no-write>
+
+	Disable WRITE/s.
+
+=item B<--no-time>
+
+	Disable TIME+.
+
+=item B<--no-wait>
+
+	Disable W.
+
+=item B<--no-app-name>
+
+	Disable App.
+
+=back
+
+=head1 INTERACTIVE COMMANDS
+
+=over 2
+
+=item B<r>     Sort by READ/s, descending.
+
+=item B<w>     Sort by WRITE/s, descending.
+
+=item B<c>     Sort by CPU%, descending.
+
+=item B<m>     Sort by MEM%, descending.
+
+=item B<t>     Sort by TIME+, descending.
+
+=item B<T>     Change duration mode: query, transaction, backend
+
+=item B<Space> Pause on/off.
+
+=item B<v>     Change queries display mode: full, truncated, indented
+
+=item B<UP / DOWN> Scroll process list.
+
+=item B<k / j> Scroll process list.
+
+=item B<q>     Quit
+
+=item B<+>     Increase refresh time. Maximum value : 3s
+
+=item B<->     Decrease refresh time. Minimum Value : 1s
+
+=item B<F1/1>  Running queries monitoring.
+
+=item B<F2/2>  Waiting queries monitoring.
+
+=item B<F3/3>  Blocking queries monitoring.
+
+=item B<h>     Help page.
+
+=item B<R>     Refresh.
+
+=item B<D>     Refresh database size.
+
+=back
+
+=head1 NAVIGATION MODE
+
+=over 2
+
+=item B<UP / k>    Move up the cursor.
+
+=item B<DOWN / j>  Move down the cursor.
+
+=item B<K>     Terminate the current backend/tagged backends.
+
+=item B<C>     Cancel the current backend/tagged backends.
+
+=item B<Space> Tag or untag the process.
+
+=item B<q>     Quit.
+
+=item B<Other> Back to activity.
+
+=back
+
+=head1 EXAMPLES
+
+PGPASSWORD='mypassword' pg_activity -U pgadmin -h 127.0.0.1 --no-client
+
+pg_activity -h /var/run/postgresql
+
+pg_activity -h myserver -p 5433 -d nagios -U nagios
+
+=cut
