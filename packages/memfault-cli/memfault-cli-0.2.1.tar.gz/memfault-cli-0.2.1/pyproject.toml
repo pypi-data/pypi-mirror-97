@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "memfault-cli"
+version = "0.2.1"
+description = "Memfault CLI tool"
+homepage = "https://docs.memfault.com"
+documentation = "https://docs.memfault.com/docs/ci/install-memfault-cli"
+authors = ["Memfault Inc <hello@memfault.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+memfault = 'memfault_cli.cli:main'
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Click = "^7.0"
+requests = "^2.22.0"
+pyelftools = "^0.26.0"
+more_itertools = "^8.0.2"
+tqdm = "^4.44.1"
+
+[tool.poetry.dev-dependencies]
+Click = "^7.0"
+invoke = "^1.4.1"
+pyaxmlparser = "^0.3.24"
+pytest = "^5.3.1"
+requests-mock = "^1.7.0"
+snapshottest = "^0.5.1"
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+include = '\.pyi?$'
+
+[tool.isort]
+# Black Compatible Settings from
+# https://black.readthedocs.io/en/stable/the_black_code_style.html?highlight=isort#how-black-wraps-lines
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 100
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
