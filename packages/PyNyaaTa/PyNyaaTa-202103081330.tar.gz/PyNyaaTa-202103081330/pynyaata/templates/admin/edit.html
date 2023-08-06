@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block title %}- Admin Edit {{ link.name }}{% endblock %}
+{% block body %}
+    <form method="post">
+        {{ action_form.csrf_token }}
+        {{ action_form.id(value=link.id) }}
+
+        <div class="field is-horizontal">
+            <div class="field-body">
+                <div class="field column">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            {{ action_form.folder(value=link.title.folder.name, list='folders', class='input', placeholder='Folder') }}
+                            <datalist id="folders">
+                                {% for folder in folders %}
+                                    <option {{ 'selected' if folder.id == link.title.folder.id }}
+                                            value="{{ folder.name }}">
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field column is-6">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            {{ action_form.name(value=link.title.name, list='animes', class='input', placeholder='Name') }}
+                            <datalist id="animes">
+                                {% for folder in folders %}
+                                    {% for title in folder.titles %}
+                                        <option {{ 'selected' if title.id == link.title.id }}
+                                                data-folder="{{ title.folder.name }}" value="{{ title.name }}"
+                                                data-keyword="{{ title.keyword }}">
+                                    {% endfor %}
+                                {% endfor %}
+                            </datalist>
+
+                            <script>
+                                document.getElementById('name').oninput = function (choice) {
+                                    document.getElementById('animes').childNodes.forEach(function (option) {
+                                        if (option.value === choice.target.value) {
+                                            document.getElementById('folder').value = option.dataset.folder;
+                                            document.getElementById('keyword').value = option.dataset.keyword;
+                                        }
+                                    });
+                                };
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-body">
+                <div class="field column is-6">
+                    <div class="control is-expanded">
+                        {{ action_form.link(value=link.link, class='input', placeholder='Link') }}
+                    </div>
+                </div>
+
+                <div class="field column">
+                    <div class="control is-expanded">
+                        {{ action_form.season(value=link.season, class='input', placeholder='Season') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-body">
+                <div class="field column is-6">
+                    <div class="control is-expanded">
+                        {{ action_form.comment(value=link.comment, class='input', placeholder='Comment') }}
+                    </div>
+                </div>
+
+                <div class="field column">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            {{ action_form.keyword(value=link.title.keyword, list='keywords', class='input', placeholder='Keyword') }}
+                            <datalist id="keywords">
+                                {% for folder in folders %}
+                                    {% for title in folder.titles %}
+                                        <option {{ 'selected' if title.keyword == link.title.keyword }}
+                                                value="{{ title.keyword }}">
+                                    {% endfor %}
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-body">
+                <div class="field column">
+                    <div class="control is-expanded">
+                        <input class="button is-info" type="submit">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
