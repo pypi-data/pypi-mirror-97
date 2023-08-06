@@ -1,0 +1,101 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Cashnet Item Catalog{%endblock%}}</title>
+    {% block scripts %}
+        {%datatables%}
+    {% endblock %}
+</head>
+<body>
+
+    {% block breadcrumbs %}
+        <a href="{%url 'cashnet:catalog_index'%}" class="active">Item List</a>
+        &nbsp; | &nbsp;
+        <a href="{%url 'cashnet:catalog_edit' 0%}">
+            {%fa fa-plus-circle%}
+            New Item
+        </a>
+    {% endblock %}
+    {% block pagecontent %}
+
+    <h1>Cashnet Catalog</h1>
+
+    <table class="table table-striped table-hover table-condensed" id="catalog_table">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Description</th>
+                <th scope="col">Item Code</th>
+                <th scope="col">Cashnet Code</th>
+                <th scope="col">Normal Price</th>
+                <th scope="col">Sale Price</th>
+                <th scope="col">Sale Start</th>
+                <th scope="col">Sale End</th>
+                <th scope="col">GL Code</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        {%for ii in items%}
+            <tr>
+                <td><a href="{%url 'cashnet:catalog_edit' ii.id%}">{{ii.id}}</a></td>
+                <td>{{ii.description}}</td>
+                <td>{{ii.item_code}}</td>
+                <td>{{ii.cashnet_code}}</td>
+                <td class="number">
+                    {%if ii.is_on_sale%}
+                        <s class="text-muted">{% format_currency ii.amount %}</s>
+                    {%else%}
+                        {% format_currency ii.amount %}
+                    {%endif%}
+                </td>
+                <td class="number">
+                    {%if ii.is_on_sale%}
+                        {%if ii.sale_end_date%}
+                            {%fa fa-hourglass-half fa-fw title=ii.sale_date_notice%}
+                        {%endif%}
+                        <b class="text-danger">{% format_currency ii.sale_amount %}</b>
+                    {%elif ii.is_future_sale%}
+                        {%fa fa-clock-o fa-fw class="text-muted"  title=ii.sale_date_notice%}
+                        <em class="text-muted">{% format_currency ii.sale_amount %}</em>
+                    {%elif ii.is_past_sale%}
+                        {%fa fa-hourglass-end fa-fw class="text-muted" title=ii.sale_date_notice%}
+                        <s class="text-muted">{% format_currency ii.sale_amount %}</s>
+                    {%else%}
+                        <span class="text-muted">{% format_currency ii.sale_amount %}</span>
+                    {%endif%}
+                </td>
+                <td>{{ii.sale_start_date|default:''}}</td>
+                <td>{{ii.sale_end_date|default:''}}</td>
+                <td>{{ii.gl|default:''}}</td>
+                <td>
+                    <a href="{%url 'cashnet:catalog_edit' ii.id%}">{%fa fa-pencil-square-o fa-fw title="Edit this item"%}</a>
+                </td>
+            </tr>
+        {%endfor%}
+        </tbody>
+    </table>
+
+    <a href="{%url 'cashnet:catalog_edit' 0%}" class="btn btn-success">
+        {%fa fa-plus-circle%}
+        New Item
+    </a>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var application_table = $('#catalog_table').DataTable( {
+                "pageLength": 50,
+                "pagingType": "full_numbers"
+            } );
+            //Focus on the search box on page load
+            $('#catalog_table_filter').find('input[type=search]').focus();
+        } );
+    </script>
+    {% endblock %}
+</body>
+</html>

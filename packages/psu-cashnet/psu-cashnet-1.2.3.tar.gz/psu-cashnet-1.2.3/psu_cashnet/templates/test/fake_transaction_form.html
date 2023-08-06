@@ -1,0 +1,91 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Transaction Test Form{%endblock%}}</title>
+    {% block scripts %}
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Cashnet Transaction Simulator</h1>
+    <br />
+
+    <form action="{%url 'cashnet:test_form_response'%}" method="post">
+        {%csrf_token%}
+        <h2>Cashnet Fees</h2>
+        <i class="text-muted">Select the items you want to pay for</i>
+        <div class="list-group">
+            {%for item in catalog_items%}
+                <div class="list-group-item ">
+                    <label style="width:100%;">
+                        <div class="float-left">
+                            <input type="checkbox" name="item_id_{{item.id}}" value="{{item.id}}" /> &nbsp;
+                            {{item.description}}:
+                        </div>
+                        <div class="float-right number">
+                            {%if item.is_on_sale%}
+                                <s>{%format_currency item.amount%}</s>
+                                <span style="color:red;">{%format_currency item.current_price%}</span>
+                            {%else%}
+                                {%if item.current_price < 1%}
+                                    {{item.current_price_as_percent}}
+                                {%else%}
+                                    {%format_currency item.current_price%}
+                                {%endif%}
+                            {%endif%}
+                        </div>
+                    </label><br style="clear:both;" />
+                    <label>
+                        Qty: <input type="number" name="qty_{{item.id}}" value="1" min="1" max="10" />
+                    </label>
+                </div>
+            {%endfor%}
+        </div>
+        <br />
+        <br />
+
+        <h2>Transaction Parameters</h2>
+        <i class="text-muted">
+            Specify other parameters sent to Cashnet
+        </i>
+        <div class="row">
+            <div class="col-md-2">merchantCode:</div>
+            <div class="col-md-10"><input type="text" name="merchant_code" value="{%setting_value 'CASHNET_MERCHANT_CODE'%}" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">secretKey:</div>
+            <div class="col-md-10"><input type="text" name="secret_key" value="" class="form-control" readonly placeholder="Not Used" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">reference_id:</div>
+            <div class="col-md-10"><input type="text" name="reference_id" value="54274" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">reference_class:</div>
+            <div class="col-md-10"><input type="text" name="reference_class" value="Fake" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">successEndpoint:</div>
+            <div class="col-md-10"><input type="text" name="success_url" value="cashnet:fake_success" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">failureEndpoint:</div>
+            <div class="col-md-10"><input type="text" name="failure_url" value="cashnet:fake_failure" class="form-control" /></div>
+        </div>
+        <hr/>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-money" style="cursor:default;" aria-hidden="true" ></i>
+            Buy it now
+        </button>
+        <a href="/" class="btn btn-default">Cancel</a>
+    </form>
+
+
+    {% endblock %}
+</body>
+</html>

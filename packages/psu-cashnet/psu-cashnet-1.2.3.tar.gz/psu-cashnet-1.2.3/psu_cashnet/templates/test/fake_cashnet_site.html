@@ -1,0 +1,103 @@
+{% extends 'psu_base.html' %}
+{% load base_taglib %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}Fake Cashnet{%endblock%}}</title>
+    {% block scripts %}
+    {% endblock %}
+</head>
+<body>
+    {% block pagecontent %}
+
+    <h1>Fake Cashnet</h1>
+    <br />
+    {%if train_url%}
+        <em>If you have the fake credit card info, you may go to the <a href="{{train_url}}">Cashnet Training Site</a> instead.</em><br />
+        <br />
+    {%endif%}
+
+    <form action="{%url 'cashnet:response'%}" method="post">
+        <h2>Cashnet Fees</h2>
+        <i class="text-muted">Items you must pay for</i>
+        <div class="list-group">
+            {%for item in items%}
+                <div class="list-group-item ">
+                    <label style="width:100%;">
+                        Item {{forloop.counter}}:
+                        <input type="text" name="amount{{forloop.counter}}" value="{{item.amount}}" /> &nbsp;
+                    </label>
+                </div>
+            {%endfor%}
+        </div>
+        <br />
+        <br />
+
+        <h2>Transaction Parameters</h2>
+        <i class="text-muted">
+            Specify parameters sent back from Cashnet
+        </i>
+        <div class="row">
+            <div class="col-md-2">ref1type1:</div>
+            <div class="col-md-10"><input type="text" name="ref1type1" value="{{ref1type1}}" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">ref1val1:</div>
+            <div class="col-md-10"><input type="text" name="ref1val1" value="{{ref1val1}}" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">custcode:</div>
+            <div class="col-md-10"><input type="text" name="custcode" value="{{custcode}}" class="form-control" /></div>
+        </div>
+
+
+
+        <div class="row hidden">
+            <div class="col-md-2">respmessage:</div>
+            <div class="col-md-10"><input type="text" name="respmessage" id="respmessage" value="" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">merchant:</div>
+            <div class="col-md-10"><input type="text" name="merchant" value="{%setting_value 'CASHNET_MERCHANT_CODE'%}" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">operator:</div>
+            <div class="col-md-10"><input type="text" name="operator" value="" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">tx:</div>
+            <div class="col-md-10"><input type="text" name="tx" value="123" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">batchno:</div>
+            <div class="col-md-10"><input type="text" name="batchno" value="456" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">ccerrorcode:</div>
+            <div class="col-md-10"><input type="text" name="ccerrorcode" value="" class="form-control" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">ccerrormessage:</div>
+            <div class="col-md-10"><input type="text" name="ccerrormessage" value="" class="form-control" /></div>
+        </div>
+
+
+
+        <hr/>
+        <button type="submit" name="result" value="0" class="btn btn-success" onmousedown="$('#respmessage').val('SUCCESS');">
+            <i class="fa fa-money" style="cursor:default;" aria-hidden="true" ></i>
+            Pay
+        </button>
+        <button type="submit" name="result" value="100" class="btn btn-danger" onmousedown="$('#respmessage').val('Customer Cancelled before processing payment');">
+            <i class="fa fa-ban" style="cursor:default;" aria-hidden="true" ></i>
+            Don't Pay
+        </button>
+        <a href="/" class="btn btn-default">Cancel</a>
+    </form>
+
+
+    {% endblock %}
+</body>
+</html>
