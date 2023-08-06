@@ -1,0 +1,48 @@
+[package]
+name = "neighborhood_analysis"
+version = "0.2.2"
+authors = ["Mr-Milk <zym.zym1220@gmail.com>"]
+edition = "2018"
+license = "MIT"
+
+[package.metadata.maturin]
+classifier = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Programming Language :: Rust",
+]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itertools = "0.10.0"
+counter = "0.5.2"
+rand = "0.8.3"
+kdbush = "0.2.0"
+rayon = "1.4.0"
+rstar = "0.8.2"
+spade = "1.8.2"
+
+[profile.dev]
+opt-level = 3
+
+[lib]
+name = "neighborhood_analysis"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.13.1"
+features = ["extension-module"]
+
+[target.x86_64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
