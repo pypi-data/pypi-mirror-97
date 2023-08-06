@@ -1,0 +1,101 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "gaphas"
+version = "3.0.2"
+description="Gaphas is a GTK+ based diagramming widget"
+authors = [
+    "Arjan J. Molenaar <gaphor@gmail.com>",
+    "Dan Yeaw <dan@yeaw.me>"
+]
+license = "Apache-2.0"
+
+readme = "README.md"
+
+homepage = "https://gaphas.readthedocs.io/"
+repository = "https://github.com/gaphor/gaphas"
+documentation = "https://gaphas.readthedocs.io/"
+
+keywords = ["gtk", "diagram", "gaphas"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+PyGObject = "^3.38.0"
+pycairo = "^1.20.0"
+typing-extensions = "^3.7.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+pytest-cov = "^2.11"
+pytest-runner = "^5.3"
+black = "^20.8b1"
+pre-commit = "^2.11"
+tox = "^3.23"
+pytest-sugar = "^0.9.2"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = true
+envlist = clean, py38, py39, report
+tox_pyenv_fallback = false
+
+[gh-actions]
+python =
+    3.8: py38
+    3.9: py39
+
+[testenv]
+whitelist_externals =
+    xvfb-run
+commands =
+    xvfb-run pytest --cov --cov-append --cov-report=term-missing {posargs}
+deps =
+    pytest
+    pytest-cov
+depends =
+    {py38,py39}: clean
+    report: py38,py39
+
+[testenv:report]
+deps = coverage[toml]
+skip_install = true
+commands =
+    coverage report
+    coverage html
+
+[testenv:clean]
+deps = coverage[toml]
+skip_install = true
+commands = coverage erase
+"""
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --doctest-glob='*.rst' --ignore=docs/conf.py"
+testpaths = [
+    "tests",
+    "docs",
+    ]
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+known_third_party = ["cairo", "gi", "importlib_metadata", "pytest"]
+skip = ".venv,build,dist"
+
+[tool.coverage.run]
+source = ["gaphas"]
