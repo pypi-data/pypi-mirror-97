@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+#
+# Author: Yipeng Sun
+# License: BSD 2-clause
+# Last Change: Mon Jun 08, 2020 at 11:27 PM +0800
+
+import uproot
+
+from pyTuplingUtils.utils import find_common_uid
+from pyTuplingUtils.parse import double_ntuple_parser_no_output
+
+
+def parse_input(descr='''
+dump runNumber-eventNumber id for all events in both ntuples, and find the
+intersection of unique events in them.
+'''):
+    parser = double_ntuple_parser_no_output(descr)
+
+    parser.add_argument('--runNumber',
+                        nargs='?',
+                        default='runNumber',
+                        help='''
+branch name contains runNumber.''')
+
+    parser.add_argument('--eventNumber',
+                        nargs='?',
+                        default='eventNumber',
+                        help='''
+branch name contains eventNumber.''')
+
+    return parser
+
+
+if __name__ == '__main__':
+    args = parse_input().parse_args()
+    ntp1 = uproot.open(args.ref)
+    ntp2 = uproot.open(args.comp)
+
+    uid_comm, idx1, idx2 = find_common_uid(
+        ntp1, ntp2, args.ref_tree, args.comp_tree,
+        run_branch=args.runNumber, event_branch=args.eventNumber)
+    print('Total common UIDs: {}'.format(uid_comm.size))
