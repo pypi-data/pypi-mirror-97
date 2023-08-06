@@ -1,0 +1,72 @@
+Metadata-Version: 2.1
+Name: gitlab-versioned-pages
+Version: 0.1.3
+Summary: Include documentation for multiple project versions in a single GitLab page
+Home-page: https://gitlab.com/ostrokach/gitlab-versioned-pages
+Author: Alexey Strokach
+Author-email: alex.strokach@utoronto.ca
+License: UNKNOWN
+Description: # gitlab-versioned-pages
+        
+        [![conda](https://img.shields.io/conda/dn/ostrokach-forge/gitlab-versioned-pages.svg)](https://anaconda.org/ostrokach-forge/gitlab-versioned-pages/)
+        [![docs](https://img.shields.io/badge/docs-v0.1.3-blue.svg)](https://ostrokach.gitlab.io/gitlab-versioned-pages/v0.1.3/)
+        [![pipeline status](https://gitlab.com/ostrokach/gitlab-versioned-pages/badges/v0.1.3/pipeline.svg)](https://gitlab.com/ostrokach/gitlab-versioned-pages/commits/v0.1.3/)
+        [![coverage report](https://gitlab.com/ostrokach/gitlab-versioned-pages/badges/v0.1.3/coverage.svg?job=docs)](https://ostrokach.gitlab.io/gitlab-versioned-pages/v0.1.3/htmlcov/)
+        
+        Include documentation for multiple project versions in a single GitLab page.
+        
+        ## Overview
+        
+        Use the following stage in your `.gitlab-ci.yml` file to collect documentations for all tagged versions and include them in a single page.
+        
+        ```yaml
+        pages:
+          stage: custom
+          before_script:
+            - pip install gitlab_versioned_pages
+          script:
+            - mkdir -p ./public
+            - python -m gitlab_versioned_pages
+              --project-id ${CI_PROJECT_ID}
+              --job-name docs
+              --private-token ${CI_DOCS_TOKEN}
+              --output-dir ./public
+              --url "https://${CI_PROJECT_NAMESPACE}.gitlab.io"
+          artifacts:
+            paths:
+              - public
+          only:
+            variables:
+              - $UPDATE_PAGES
+        ```
+        
+        ## Notes
+        
+        This file creates a `./public` folder containing documentation created for multiple versions (tags) of this repository.
+        
+        When the repository is public, our job is easy: we simply download the `artifact.zip` file from a publicly-accessible URL (see: [downloading the latest artifacts]). However, when the repository is private, using the above-mentioned URL does not work (see: [gitlab-org/gitlab-ce#22957]). In that case, we resort to using the GitLab API instead.
+        
+        If [gitlab-org/gitlab-ce#22957] is ever fixed, we would be able to specify
+        `--header "Private-Token: XXXXX"` or attach `&private_token=XXXXX` to the query string,
+        and keep using the original URL:
+        
+        ```bash
+        curl --header "Private-Token: XXXXX" \
+            "https://gitlab.com/user/repo/-/jobs/artifacts/ref/download?job=job_name"
+        ```
+        
+        Good resource: <https://docs.gitlab.com/ee/api/jobs.html#download-the-artifacts-archive>.
+        
+        <!-- Links -->
+        
+        [downloading the latest artifacts]: https://docs.gitlab.com/ee/user/project/pipelines/job_artifacts.html#downloading-the-latest-artifacts
+        [gitlab-org/gitlab-ce#22957]: https://gitlab.com/gitlab-org/gitlab-ce/issues/22957
+        
+Keywords: gitlab_versioned_pages
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Description-Content-Type: text/markdown
