@@ -1,0 +1,28 @@
+@require(symbol)
+
+@def header_level():
+@(
+if symbol.extension_attributes.get('is_section_head', False):
+	return '2'
+elif symbol.extension_attributes.get('order_by_section', False):
+	return '4'
+else:
+	return '3'
+)
+@end
+
+@(level = header_level())
+
+@def header():
+<h@level data-hotdoc-id="@symbol.link.id_">
+	<i>@symbol.link.title</i>
+</h@level>
+@end
+
+@header()
+
+@def content():
+@end
+@content()
+
+<hr>
