@@ -1,0 +1,89 @@
+Metadata-Version: 2.1
+Name: phylodeep
+Version: 0.0.91
+Summary: Phylodynamic paramater and model inference using pretrained deep neural networks
+Home-page: https://github.com/evolbioinfo/deepphylo
+Author: Jakub Voznica, Anna Zhukova
+Author-email: jakub.voznica@pasteur.fr
+License: UNKNOWN
+Keywords: phylodynamics,deep learning,model selection,phylogeny,molecular epidemiology,paramdeep,phylodeep,deep learning,convolutional networks
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Description-Content-Type: text/markdown
+Requires-Dist: ete3 (==3.1.1)
+Requires-Dist: pandas (==0.23.4)
+Requires-Dist: numpy (==1.18.5)
+Requires-Dist: scipy (==1.1.0)
+Requires-Dist: scikit-learn (==0.19.1)
+Requires-Dist: tensorflow (==1.13.1)
+Requires-Dist: joblib (==0.13.2)
+Requires-Dist: h5py (<3.0.0)
+Requires-Dist: Keras (==2.4.3)
+Requires-Dist: phylodeep-data-BD-small
+Requires-Dist: phylodeep-data-BD-large
+Requires-Dist: phylodeep-data-BDEI-small
+Requires-Dist: phylodeep-data-BDEI-large
+Requires-Dist: phylodeep-data-BDSS-large
+
+# Phylodeep
+
+Phylodeep is a python library for parameter estimation and model selection from phylogenetic trees, based on deep learning.
+
+## Installation
+
+Use the package [pip](https://pip.pypa.io/en/stable/) to install phylodeep.
+
+## Usage 
+
+###Python
+
+```python
+import phylodeep
+from phylodeep import BD, BDSS, BD_vs_BDEI, BD_vs_BDSS, SUMSTATS, FULL
+
+path_to_tree = './tests/Zurich.trees'
+
+# set presumed sampling probability
+sampling_proba = 0.20
+
+# a priori check
+
+
+# model selection
+model_BD_vs_BDEI = phylodeep.modeldeep(path_to_tree, sampling_proba, vector_representation=SUMSTATS)
+model_BD_vs_BDSS = phylodeep.modeldeep(path_to_tree, sampling_proba, vector_representation=FULL)
+
+# the selected model is BDSS
+
+# parameter inference
+inference_param_BD = phylodeep.paramdeep(path_to_tree, sampling_proba, model=BD, vector_representation=FULL)
+inference_param_BDSS = phylodeep.paramdeep(path_to_tree, sampling_proba, model=BDSS, vector_representation=FULL)
+
+```
+
+###Command line
+```python
+# parameter inference
+paramdeep -t ./tests/Zurich.trees -p 0.25 -m BDSS -v CNN_FULL_TREE -o HIV_Zurich_BDSS_CNN.csv
+paramdeep -t ./tests/Zurich.trees -p 0.25 -m BDSS -v FFNN_SUMSTATS -o HIV_Zurich_BDSS_FFNN_CI.csv -c
+
+# model selection
+
+
+```
+
+
+
+## Citation
+
+
+## Contributing
+
+
+## License
+
