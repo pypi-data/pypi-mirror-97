@@ -1,0 +1,104 @@
+Metadata-Version: 2.1
+Name: git-annex-gui
+Version: 0.2.5
+Summary: A small systray app for git annex assistant.
+Home-page: https://gitlab.com/joystein/git-annex-gui
+Author: Øystein S. Haaland
+Author-email: oystein.s.haaland@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Dist: PySide2
+Provides-Extra: dev
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: invoke ; extra == 'dev'
+Requires-Dist: python-language-server ; extra == 'dev'
+
+=============
+Git annex gui
+=============
+A small systray app for git annex assistant.
+
+Installation
+============
+
+Install from pypi::
+
+    $ pip install --user git-annex-gui
+
+Install from gitlab::
+
+    $ git clone
+    $ mkvirtualenv git-annex-gui
+    $ pip install -e .
+
+Setup and configuration
+=======================
+
+Ssh configuration
+-----------------
+
+Create ssh keys. Use default file path or type in. Type in pass phrase::
+
+    $ ssh-keygen
+
+Add key to `ssh-agent`. If not default file path used, type in path::
+
+    $ ssh-add
+
+Copy public key to remote git annex server::
+
+    $ ssh-copy-id username@gitannex.domain.org
+
+
+Connect to existing repo
+------------------------
+Setting up the local repo is more or less equivalent to whats described in the quickstart
+instructions:
+
+https://git-annex.branchable.com/assistant/quickstart/
+
+This will prepare an empty local repo ready to be synched. The next step is to add a remote repo
+that can be synced with the local one. This can be done in the assistant by clicking add repository
+and then selecting server. We assume that the two repos are supposed to containt the same files, so
+then we select to have them merged in the configuration dialogs.
+
+ROADMAP
+=======
+
+v0.4 - basic features
+---------------------
+- [ ] Implement open annex dir in file explorer. Use `xdg-open`?
+  - What about BeOS style file navigation in the systray sub-menu?
+- [ ] Implement start of app when desktop starts.
+- [ ] Implement starting of annex daemon when app starts.
+
+v0.5 - desktop integration
+--------------------------
+- [ ] Forward notifications to desktop notification system?
+
+v0.6 - in-app documentation/assistant
+-------------------------------------
+- [ ] add in-app documentation to aid in
+
+  - [ ] starting the assistant wizard
+  - [ ] setting remote central repo
+- [ ] see what else of existing documentatio can be used in-app
+
+Development
+===========
+This project use `sykel` for release handling etc: https://pypi.org/project/sykel/
+
+Resources
+=========
+
+REST interface
+--------------
+Check the routes file in the git-annex repo (under assistant/webapp) to get an
+understanding about the REST interface.
+
+Misc
+----
+- recovery from corrupt repo: http://git-annex.branchable.com/tips/recovering_from_a_corrupt_git_repository/
+- how to setup central repo setup
+
+
