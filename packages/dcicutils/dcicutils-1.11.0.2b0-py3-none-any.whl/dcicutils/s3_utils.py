@@ -1,0 +1,250 @@
+from __future__ import print_function
+import json
+import boto3
+import os
+import mimetypes
+from zipfile import ZipFile
+from io import BytesIO
+import logging
+from .env_utils import is_stg_or_prd_env, prod_bucket_env
+from .misc_utils import PRINT
+
+
+###########################
+# Config
+###########################
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+
+
+class s3Utils(object):  # NOQA - This class name violates style rules, but a lot of things might break if we change it.
+
+    SYS_BUCKET_TEMPLATE = "elasticbeanstalk-%s-system"
+    OUTFILE_BUCKET_TEMPLATE = "elasticbeanstalk-%s-wfoutput"
+    RAW_BUCKET_TEMPLATE = "elasticbeanstalk-%s-files"
+    BLOB_BUCKET_TEMPLATE = "elasticbeanstalk-%s-blobs"
+
+    def __init__(self, outfile_bucket=None, sys_bucket=None, raw_file_bucket=None,
+                 blob_bucket=None, env=None):
+        """
+        if we pass in env set the outfile and sys bucket from the environment
+        """
+        # avoid circular ref
+        from .beanstalk_utils import get_beanstalk_real_url
+        self.url = ''
+        self.s3 = boto3.client('s3', region_name='us-east-1')
+        if sys_bucket is None:
+            # staging and production share same buckets
+            if env:
+                if is_stg_or_prd_env(env):
+                    self.url = get_beanstalk_real_url(env)
+                    env = prod_bucket_env(env)
+            # we use standardized naming schema, so s3 buckets always have same prefix
+            sys_bucket = self.SYS_BUCKET_TEMPLATE % env
+            outfile_bucket = self.OUTFILE_BUCKET_TEMPLATE % env
+            raw_file_bucket = self.RAW_BUCKET_TEMPLATE % env
+            blob_bucket = self.BLOB_BUCKET_TEMPLATE % env
+
+        self.sys_bucket = sys_bucket
+        self.outfile_bucket = outfile_bucket
+        self.raw_file_bucket = raw_file_bucket
+        self.blob_bucket = blob_bucket
+
+    ACCESS_KEYS_S3_KEY = 'access_key_admin'
+
+    def get_access_keys(self, name=ACCESS_KEYS_S3_KEY):
+        keys = self.get_key(keyfile_name=name)
+        if not isinstance(keys, dict):
+            raise ValueError("Remotely stored access keys are not in the expected form")
+
+        if isinstance(keys.get('default'), dict):
+            keys = keys['default']
+        if self.url:
+            keys['server'] = self.url
+        return keys
+
+    def get_ff_key(self):
+        return self.get_access_keys()
+
+    def get_higlass_key(self):
+        # higlass key corresponds to Django server super user credentials
+        return self.get_key(keyfile_name='api_key_higlass')
+
+    def get_google_key(self):
+        return self.get_key(keyfile_name='api_key_google')
+
+    def get_jupyterhub_key(self):
+        # jupyterhub key is a Jupyterhub API token
+        return self.get_key(keyfile_name='api_key_jupyterhub')
+
+    def get_key(self, keyfile_name='access_key_admin'):
+        # Share secret encrypted S3 File
+        response = self.s3.get_object(Bucket=self.sys_bucket,
+                                      Key=keyfile_name,
+                                      SSECustomerKey=os.environ['S3_ENCRYPT_KEY'],
+                                      SSECustomerAlgorithm='AES256')
+        akey = response['Body'].read()
+        if type(akey) == bytes:
+            akey = akey.decode()
+        try:
+            return json.loads(akey)
+        except (ValueError, TypeError):
+            # maybe its not json after all
+            return akey
+
+    def read_s3(self, filename):
+        response = self.s3.get_object(Bucket=self.outfile_bucket, Key=filename)
+        logger.info(str(response))
+        return response['Body'].read()
+
+    def does_key_exist(self, key, bucket=None, print_error=True):
+        if not bucket:
+            bucket = self.outfile_bucket
+        try:
+            file_metadata = self.s3.head_object(Bucket=bucket, Key=key)
+        except Exception as e:
+            if print_error:
+                PRINT("object %s not found on bucket %s" % (str(key), str(bucket)))
+                PRINT(str(e))
+            return False
+        return file_metadata
+
+    def get_file_size(self, key, bucket=None, add_bytes=0, add_gb=0,
+                      size_in_gb=False):
+        """
+        default returns file size in bytes,
+        unless size_in_gb = True
+        """
+        meta = self.does_key_exist(key, bucket)
+        if not meta:
+            raise Exception("key not found")
+        one_gb = 1073741824
+        add = add_bytes + (add_gb * one_gb)
+        size = meta['ContentLength'] + add
+        if size_in_gb:
+            size = size / one_gb
+        return size
+
+    def delete_key(self, key, bucket=None):
+        if not bucket:
+            bucket = self.outfile_bucket
+        self.s3.delete_object(Bucket=bucket, Key=key)
+
+    @classmethod
+    def size(cls, bucket):
+        sbuck = boto3.resource('s3').Bucket(bucket)
+        # get only head of objects so we can count them
+        return sum(1 for _ in sbuck.objects.all())
+
+    def s3_put(self, obj, upload_key, acl=None):
+        """
+        try to guess content type
+        """
+        content_type = mimetypes.guess_type(upload_key)[0]
+        if content_type is None:
+            content_type = 'binary/octet-stream'
+        if acl:
+            # we use this to set some of the object as public
+            return self.s3.put_object(Bucket=self.outfile_bucket,
+                                      Key=upload_key,
+                                      Body=obj,
+                                      ContentType=content_type,
+                                      ACL=acl)
+        else:
+            return self.s3.put_object(Bucket=self.outfile_bucket,
+                                      Key=upload_key,
+                                      Body=obj,
+                                      ContentType=content_type)
+
+    def s3_put_secret(self, data, keyname, bucket=None, secret=None):
+        if not bucket:
+            bucket = self.sys_bucket
+        if not secret:
+            secret = os.environ["S3_ENCRYPT_KEY"]
+        return self.s3.put_object(Bucket=bucket,
+                                  Key=keyname,
+                                  Body=data,
+                                  SSECustomerKey=secret,
+                                  SSECustomerAlgorithm='AES256')
+
+    def s3_read_dir(self, prefix):
+        return self.s3.list_objects(Bucket=self.outfile_bucket, Prefix=prefix)
+
+    def s3_delete_dir(self, prefix):
+        # one query get list of all the files we want to delete
+        obj_list = self.s3.list_objects(Bucket=self.outfile_bucket, Prefix=prefix)
+        files = obj_list.get('Contents', [])
+
+        # morph file list into format that boto3 wants
+        delete_keys = {'Objects': [{'Key': k}
+                                   for k in [obj['Key']
+                                             for obj in files]]}
+
+        # second query deletes all the files, NOTE: Max 1000 files
+        if delete_keys['Objects']:
+            self.s3.delete_objects(Bucket=self.outfile_bucket, Delete=delete_keys)
+
+    def read_s3_zipfile(self, s3key, files_to_extract):
+        s3_stream = self.read_s3(s3key)
+        bytestream = BytesIO(s3_stream)
+        zipstream = ZipFile(bytestream, 'r')
+        ret_files = {}
+
+        for name in files_to_extract:
+            # search subdirectories for file with name
+            # so I don't have to worry about figuring out the subdirs
+            zipped_filename = find_file(name, zipstream)
+            if zipped_filename:
+                ret_files[name] = zipstream.open(zipped_filename).read()
+        return ret_files
+
+    def unzip_s3_to_s3(self, zipped_s3key, dest_dir, acl=None, store_results=True):
+        """stream the content of a zipped key on S3 to another location on S3.
+        if store_results=True, it saves the content and returns it in the dictionary format
+        (default)
+        """
+
+        if not dest_dir.endswith('/'):
+            dest_dir += '/'
+
+        s3_stream = self.read_s3(zipped_s3key)
+        # read this badboy to memory, don't go to disk
+        bytestream = BytesIO(s3_stream)
+        zipstream = ZipFile(bytestream, 'r')
+
+        # The contents of zip can sometimes be like
+        # ["foo/", "file1", "file2", "file3"]
+        # and other times like
+        # ["file1", "file2", "file3"]
+        file_list = zipstream.namelist()
+        if file_list[0].endswith('/'):
+            # in case directory first name in the list
+            basedir_name = file_list.pop(0)
+        else:
+            basedir_name = ''
+
+        ret_files = {}
+        for file_name in file_list:
+            # don't copy dirs just files
+            if not file_name.endswith('/'):
+                if basedir_name:
+                    s3_file_name = file_name.replace(basedir_name, dest_dir)
+                else:
+                    s3_file_name = dest_dir + file_name
+                s3_key = "https://s3.amazonaws.com/%s/%s" % (self.outfile_bucket, s3_file_name)
+                # just perf optimization so we don't have to copy
+                # files twice that we want to further interrogate
+                the_file = zipstream.open(file_name, 'r').read()
+                file_to_find = os.path.basename(file_name)
+                if store_results:
+                    ret_files[file_to_find] = {'s3key': s3_key,
+                                               'data': the_file}
+                self.s3_put(the_file, s3_file_name, acl=acl)
+
+        return ret_files
+
+
+def find_file(name, zipstream):
+    for zipped_filename in zipstream.namelist():
+        if zipped_filename.endswith(name):
+            return zipped_filename
