@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: flexlog
+Version: 1.3.0
+Summary: A convenience package to add a flexible logger easily.
+Home-page: https://gitlab.com/optano/flexlog
+Author: Sven Flake
+Author-email: sven.flake@optano.com
+License: UNKNOWN
+Description: # README
+        
+        This package shall make logging easier. These are the goals:
+        
+        * Make setup of a logger with time-stamped log messages a no-brainer
+        * Make adding/removing additional log files a one-liner
+        
+        Use it like this:
+        
+        ```python
+        from flexlog import cleanlogger
+        
+        log = cleanlogger.CleanLogger("My Cool Module Name, Version 42")
+        
+        # Log to console
+        log.info("Hello World!")
+        
+        # Add a file
+        log.add_filelogger("mylogging.log")
+        log.debug("Log level of files is debug by default, but you can give it as parameter, too.")
+        
+        import logging
+        log.add_filelogger("problemsonly.log", loglevel = logging.WARNING)
+        
+        # Remove a file
+        log.remove_filelogger("mylogging.log")
+        ```
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
