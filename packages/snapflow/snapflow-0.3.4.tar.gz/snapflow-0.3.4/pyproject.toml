@@ -1,0 +1,68 @@
+[tool.poetry]
+authors = ["Ken Van Haren <kenvanharen@gmail.com>"]
+description = "Functional Data Pipelines"
+license = "BSD-3-Clause"
+name = "snapflow"
+version = "0.3.4"
+
+[tool.poetry.dependencies]
+alembic = "^1.5.5"
+click = "^7.1.1"
+colorful = "^0.5.4"
+jinja2 = "^2.11.1"
+loguru = "^0.5.1"
+networkx = "^2.4"
+pandas = "^1.0.1"
+python = "^3.7"
+ratelimit = "^2.2.1"
+requests = "^2.23.0"
+sqlalchemy = "^1.3.13"
+sqlparse = "^0.3.1"
+strictyaml = "^1.0.6"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+flake8 = "^3.8.1"
+ipython = "^7.13.0"
+isort = "^4.3.21"
+mkdocs = "^1.1.2"
+mkdocs-material = "^6.1.7"
+mypy = "^0.770"
+pre-commit = "^2.1.1"
+pydeps = "^1.9.0"
+pytest = "^4.6"
+pytest-cov = "^2.8.1"
+sqlalchemy-stubs = "^0.3"
+
+[tool.poetry.scripts]
+snapflow = "snapflow.cli:app"
+
+[tool.black]
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+use_parentheses = true
+
+[tool.pytest.ini_options]
+filterwarnings = [
+  "error",
+  "ignore:skipping",
+]
+
+[build-system]
+build-backend = "poetry.masonry.api"
+requires = ["poetry>=0.12"]
