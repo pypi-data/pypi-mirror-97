@@ -1,0 +1,179 @@
+[tool.poetry]
+name = "ssm-dox"
+version = "0.0.0"
+description = "CLI tool for building and publishing SSM Documents."
+authors = [
+  "Kyle Finley <kyle@finley.sh>"
+]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [
+  { include = "ssm_dox" }
+]
+
+homepage = "https://github.com/ITProKyle/ssm-dox"
+repository = "https://github.com/ITProKyle/ssm-dox"
+
+keywords = ["cli"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Operating System :: POSIX",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Utilities",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/ITProKyle/ssm-dox/issues"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+flake8 = "^3.8.4"
+flake8-docstrings = "^1.5.0"
+isort = "^5.7.0"
+pep8-naming = "^0.11.1"
+pre-commit = "^2.11.0"
+pydocstyle = "^5.1.1"
+pylint = "^2.7.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+exclude = '''
+/(
+    _build
+  | \.eggs
+  | \.git
+  | \.venv
+  | build
+  | dist
+  | node_modules
+)/
+'''
+include = '\.pyi?$'
+line-length = 88
+target-version = ['py38']
+
+
+[tool.isort]
+profile = "black"
+skip = [
+  "_build",
+  ".eggs",
+  ".git",
+  ".venv",
+  "build",
+  "dist",
+  "node_modules",
+]
+
+
+[tool.pylint.basic]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#basic-checker
+attr-rgx = "([a-z_][a-z0-9_]{2,30}|VARIABLES)$"
+attr-name-hint = "([a-z_][a-z0-9_]{2,30}|VARIABLES)$"
+good-names = [
+  "_",
+  "a",
+  "b",
+  "ca",
+  "ci",
+  "d",
+  "db",
+  "f",
+  "fn",
+  "i",
+  "id",
+  "j",
+  "k",
+  "ok",
+  "s3",
+  "ui",
+  "up",
+  "v",
+]
+
+[tool.pylint.classes]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#classes-checker
+defining-attr-methods = [
+  "__init__",
+  "__new__",
+  "setUp",
+]
+exclude-protected=[
+  "_asdict",
+  "_fields",
+  "_replace",
+  "_source",
+  "_make",
+  "_session",  # for boto3.session.Session
+  "_prompter",
+  "_client_config",  # boto3.client.Client._client_config contains info like region
+  "_endpoint",  # boto3.client.Client._endpoint contains s3 endpoint info
+]
+
+[tool.pylint.design]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#design-checker-options
+max-args = 10
+max-attributes = 20
+max-bool-expr = 5
+max-branches = 20
+max-locals = 25
+max-parents = 10
+max-public-methods = 30
+max-returns = 6
+max-statements = 50
+min-public-methods = 1
+
+[tool.pylint.format]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#format-checker
+max-line-length = 100
+max-module-lines = 1000
+
+[tool.pylint.imports]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#imports-checker
+allow-wildcard-with-all = "no"
+
+[tool.pylint.logging]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#logging-checker
+logging-format-style = "old"
+
+[tool.pylint.master]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#general-options
+extension-pkg-whitelist = [
+  "pydantic",  # https://github.com/samuelcolvin/pydantic/issues/992#issuecomment-553545180
+]
+ignore = [
+  "typings"
+]
+jobs = 0
+
+[tool.pylint.miscellaneous]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#miscellaneous-checker
+notes = ["FIXME"]
+
+[tool.pylint.message_control]
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#messages-control-options
+disable = [
+  "line-too-long",  # flake8 overlap
+  "missing-class-docstring",  # flake8 (pydocstyle) overlap
+  "missing-function-docstring",  # flake8 (pydocstyle) overlap
+  "missing-module-docstring",  # flake8 (pydocstyle) overlap
+  "similarities",  # black overcomplicates this
+  "ungrouped-imports",  # handled by isort
+]
+
+[tool.pylint.reports]
+msg-template="{path}:{line}:{column}: {msg_id}: {msg} ({symbol})"
+output-format="colorized"
+score="yes"
