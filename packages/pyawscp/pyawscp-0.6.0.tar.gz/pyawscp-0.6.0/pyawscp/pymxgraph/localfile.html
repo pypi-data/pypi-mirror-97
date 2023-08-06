@@ -1,0 +1,174 @@
+<html style="margin:0px;overflow:hidden;"><head>
+    <script type="text/javascript">
+        var DRAW_IFRAME_URL = 'https://embed.diagrams.net/?embed=1';
+        var graph = null;
+        var xml = null;
+
+        function mxClientOnLoad(stylesheet)
+        {
+            mxfile = getQueryStringMxFile()
+            xml = decodeURIComponent(mxfile);
+
+            // Removes all illegal control characters before parsing
+            var checked = [];
+
+            for (var i = 0; i < xml.length; i++)
+            {
+                var code = xml.charCodeAt(i);
+
+                // Removes all control chars except TAB, LF and CR
+                if (code >= 32 || code == 9 || code == 10 || code == 13) {
+                    checked.push(xml.charAt(i));
+                }
+            }
+
+            xml = checked.join('');
+
+            var div = document.createElement('div');
+            div.style.width = '100%';
+            div.style.height = '100%';
+            div.style.position = 'relative';
+            document.body.appendChild(div);
+            graph = new mxGraph(div);
+
+            graph.resetViewOnRootChange = false;
+            graph.foldingEnabled = false;
+            // NOTE: Tooltips require CSS
+            graph.setTooltips(false);
+            graph.setEnabled(false);
+
+            // Loads the stylesheet
+            if (stylesheet != null)
+            {
+                var xmlDoc = mxUtils.parseXml(stylesheet);
+                var dec = new mxCodec(xmlDoc);
+                dec.decode(xmlDoc.documentElement, graph.getStylesheet());
+            }
+
+            var xmlDoc = mxUtils.parseXml(xml);
+            var codec = new mxCodec(xmlDoc);
+            codec.decode(codec.document.documentElement, graph.getModel());
+            graph.maxFitScale = 1;
+            graph.fit();
+            graph.center(true, false);
+
+            window.addEventListener('resize', function()
+            {
+                graph.fit();
+                graph.center(true, false);
+            });
+        }
+
+        function edit(url)
+        {
+            var border = 0;
+            var iframe = document.createElement('iframe');
+            iframe.style.zIndex = '9999';
+            iframe.style.position = 'absolute';
+            iframe.style.top = border + 'px';
+            iframe.style.left = border + 'px';
+
+            if (border == 0)
+            {
+                iframe.setAttribute('frameborder', '0');
+            }
+
+            var resize = function()
+            {
+                iframe.setAttribute('width', document.body.clientWidth - 2 * border);
+                iframe.setAttribute('height', document.body.clientHeight - 2 * border);
+            };
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            var receive = function(evt)
+            {
+                if (evt.data == 'ready')
+                {
+                    iframe.contentWindow.postMessage(xml, '*');
+                    resize();
+                }
+                else
+                {
+                    if (evt.data.length > 0)
+                    {
+                        // Update the graph
+                        var xmlDoc = mxUtils.parseXml(evt.data);
+                        var codec = new mxCodec(xmlDoc);
+                        codec.decode(codec.document.documentElement, graph.getModel());
+                        graph.fit();
+                        graph.center(true, false);
+
+                        var data = encodeURIComponent(evt.data);
+                        var idx = doc.indexOf('<div ' + 'id="mxfile"');
+                        var newdoc = doc.substring(0, idx) + '\n<div ' + 'id="mxfile" style="display:none;">' +
+                            data + '</d' + 'iv>' +
+                            '\n<script type="text/javascript">\nvar doc = document.documentElement.outerHTML;\n</' + 'script>' +
+                            '\n<script type="text/javascript" src="https://www.draw.io/embed.js"></' + 'script></body></html>';
+
+                        save(newdoc, location.pathname.substring(location.pathname.lastIndexOf("/") + 1));
+                    }
+
+                    window.removeEventListener('resize', resize);
+                    window.removeEventListener('message', receive);
+                    document.body.removeChild(iframe);
+                }
+            };
+
+            window.addEventListener('message', receive);
+            iframe.setAttribute('src', DRAW_IFRAME_URL);
+            document.body.appendChild(iframe);
+        }
+
+        function save(data, filename)
+        {
+            try
+            {
+                if (mxClient.IS_QUIRKS || document.documentMode >= 8)
+                {
+                    var win = window.open('about:blank', '_blank');
+                    win.document.write(data);
+                    win.document.close();
+                    win.document.execCommand('SaveAs', true, filename);
+                    win.close();
+                }
+                else if (mxClient.IS_SF)
+                {
+                    // Opens new tab (user saves file). No workaround to force dialog in Safari.
+                    window.open('data:application/octet-stream,' + encodeURIComponent(data), filename);
+                }
+                else
+                {
+                    var a = document.createElement('a');
+
+                    // NOTE: URL.revokeObjectURL(a.href) after click breaks download in FF
+                    a.href = URL.createObjectURL(new Blob([data], {type: 'application/octet-stream'}));
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.parentNode.removeChild(a);
+                    URL.revokeObjectURL(a.href);
+                }
+            }
+            catch (e)
+            {
+                console.log('error', e);
+                console.log('html', data);
+            }
+        };
+
+        function getQueryStringMxFile() {
+            mxfile = location.search.replace("?mxfile=","");
+            return mxfile;
+        };
+    </script>
+</head>
+<body style="margin:10px;overflow:hidden;">
+    <button onclick="edit();" title="Start Editing as Draw.IO Diagram" onmouseover="this.style.cursor='pointer'" style="position:absolute;left:15%;bottom:15%;z-index:1;box-shadow:rgba(0, 0, 0, 0.8) 8px 8px 15px;"><img width="64" height="64" title="Start Editing as Draw.IO Diagram" alt="Start Editing..." src="data:image/png;base64,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"></button>
+
+<div id="mxfile" style="display:none;">%3CmxGraphModel%3E%0A%09%3Croot%3E%0A%09%09%3CmxCell%20id%3D%220%22%2F%3E%0A%09%09%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%0A%09%09%3CmxCell%20id%3D%223%22%20value%3D%22Hello%2C%22%20vertex%3D%221%22%20parent%3D%221%22%3E%0A%09%09%09%3CmxGeometry%20x%3D%22150%22%20y%3D%22310%22%20width%3D%22170%22%20height%3D%22120%22%20as%3D%22geometry%22%2F%3E%0A%09%09%3C%2FmxCell%3E%0A%09%09%3CmxCell%20id%3D%224%22%20value%3D%22World!%22%20vertex%3D%221%22%20parent%3D%221%22%3E%0A%09%09%09%3CmxGeometry%20x%3D%22200%22%20y%3D%22150%22%20width%3D%2280%22%20height%3D%2230%22%20as%3D%22geometry%22%2F%3E%0A%09%09%3C%2FmxCell%3E%0A%09%09%3CmxCell%20id%3D%222%22%20parent%3D%220%22%2F%3E%0A%09%09%3CmxCell%20id%3D%225%22%20value%3D%22%22%20edge%3D%221%22%20parent%3D%222%22%20source%3D%223%22%20target%3D%224%22%3E%0A%09%09%09%3CmxGeometry%20relative%3D%221%22%20as%3D%22geometry%22%2F%3E%0A%09%09%3C%2FmxCell%3E%0A%09%3C%2Froot%3E%0A%3C%2FmxGraphModel%3E</div>
+<script type="text/javascript">
+var doc = document.documentElement.outerHTML;
+</script>
+<script type="text/javascript" src="https://www.draw.io/embed.js"></script></body></html>
