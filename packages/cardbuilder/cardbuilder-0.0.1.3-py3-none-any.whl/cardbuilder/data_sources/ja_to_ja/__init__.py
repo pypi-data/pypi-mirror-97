@@ -1,0 +1,1 @@
+from cardbuilder.data_sources.ja_to_ja.nhk_pitch_accent import NhkPitchAccent
