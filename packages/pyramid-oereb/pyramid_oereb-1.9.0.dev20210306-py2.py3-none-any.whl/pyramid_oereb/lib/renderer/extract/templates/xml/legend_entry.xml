@@ -1,0 +1,24 @@
+<% from pyramid_oereb import route_prefix %>
+<%page args="legend_entry"/>
+%if params.images:
+<data:Symbol>${legend_entry.symbol.encode()}</data:Symbol>
+%else:
+<data:SymbolRef>${get_symbol_ref(request, legend_entry)|u}</data:SymbolRef>
+%endif
+<data:LegendText>
+    <%include file="multilingual_text.xml" args="text=legend_entry.legend_text"/>
+</data:LegendText>
+<data:TypeCode>${legend_entry.type_code | x}</data:TypeCode>
+<data:TypeCodelist>${legend_entry.type_code_list | x}</data:TypeCodelist>
+<data:Theme>
+    <%include file="theme.xml" args="theme=legend_entry.theme"/>
+</data:Theme>
+%if legend_entry.sub_theme:
+<%
+    localized_sub_theme = localized(legend_entry.sub_theme)
+%>
+<data:SubTheme>${localized_sub_theme.get('Text') | x}</data:SubTheme>
+%endif
+%if legend_entry.other_theme:
+<data:OtherTheme>${legend_entry.other_theme | x}</data:OtherTheme>
+%endif
