@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+#
+# OTP-CR-117/19 otp.informationdesk@icc-cpi.int http://pypi.org/project/genocide
+
+"genocide (gcd)"
+
+# imports
+
+import ob
+
+from ob.krn import cfg, op
+from gcd.tbl import tbl
+
+# runtime
+
+def main():
+    ob.wd = ob.e("~/.genocide")
+    ob.krn.parse("genocide", "ob,mod,gcd")
+    if op("v"):
+        cfg.verbose = True
+    if op("r"):
+        ob.wd = cfg.wd = "/var/lib/%s/" % cfg.name.lower()
+        ob.utl.privileges(cfg.name.lower())
+        cfg.mods += ",irc"
+    s = ob.krn.Shell(tbl)
+    s.load_mod("krn")
+    s.load_mod(cfg.mods)
+    s.scandir(ob.j(ob.wd, "mod"))
+    if cfg.res.txt:
+        s.load_mod("all")
+        return s.cmd(cfg.old.txt)
+    if op("c"):
+        c = ob.krn.Console(tbl)
+        ob.update(c.cmds, s.cmds)
+        c.start()
+    else:
+        s.start()
+    s.init(cfg.mods)
+    if op("cr"):
+        s.wait()
+
+ob.krn.exec(main)

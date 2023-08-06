@@ -1,0 +1,41 @@
+#!/usr/bin/python3
+# OTP-CR-117/19 otp.informationdesk@icc-cpi.int http://pypi.org/project/genocide !
+#
+# This file is placed in the Public Domain.
+
+import select, socket, sys
+
+host = "localhost"
+port = 5500
+
+def toudp(hostout, portout, txt):
+    "send text over udp to the udp to irc relay server"
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(bytes(txt.strip(), "utf-8"), (hostout, portout))
+
+def main():
+    "send text over udp to the bot"
+    if len(sys.argv) > 1:
+        txt = " ".join(sys.argv[1:])
+        toudp(host, port, txt)
+        return
+    if not select.select([sys.stdin, ], [], [], 0.0)[0]:
+        return
+    while 1:
+        try:
+            (i, o, e) = select.select([sys.stdin,], [], [sys.stderr,])
+        except KeyboardInterrupt:
+            return
+        if e:
+            break
+        stop = False
+        for sock in i:
+            txt = sock.readline()
+            if not txt:
+                stop = True
+                break
+            toudp(host, port, txt)
+        if stop:
+            break
+
+main()
