@@ -1,0 +1,20 @@
+{% if table.bulk %}
+<form{{ table.bulk.attrs }}><input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}"/>
+{% endif %}
+
+    {% include 'iommi/table/table_tag.html' %}
+
+    {% if table.bulk %}
+        {{ table.bulk_container.iommi_open_tag }}
+
+        {{ table.bulk.h_tag }}
+        {{ table.bulk.errors }}
+        {{ table.bulk.render_fields }}
+        {{ table.bulk.render_actions }}
+
+        {{ table.bulk_container.iommi_close_tag }}
+    {% endif %}
+
+{% if table.bulk %}
+</form>
+{% endif %}
