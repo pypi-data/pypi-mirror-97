@@ -1,0 +1,78 @@
+*** Settings ***
+Library           ExcelLibrary
+Library           Collections
+Library           OperatingSystem
+Library           String
+Library           DateTime
+Library           Collections
+
+*** Keywords ***
+Open excel test data
+    [Arguments]    ${TEST_DATA}    ${FOLDER}    ${FILE_DATA}
+    ${PATH_READ}    OperatingSystem.Join Path    ${TEST_DATA}    ${FOLDER}    ${FILE_DATA}
+    ExcelLibrary.Open Excel Document    ${PATH_READ}    ${FOLDER}
+
+Count rows test data
+    [Arguments]    ${FOLDER}
+    ExcelLibrary.Switch Current Excel Document    ${FOLDER}
+    ${COUNT_ROW}    ExcelLibrary.Read Excel Column    1
+    ${COUNT_ROW}    Get Length    ${COUNT_ROW}
+    [Return]    ${COUNT_ROW}
+
+Read row test data
+    [Arguments]    ${FOLDER}    ${ROW}
+    ExcelLibrary.Switch Current Excel Document    ${FOLDER}
+    ${TITEL_EXCEL}    ExcelLibrary.Read Excel Row    1
+    ${READ_ROW}    ExcelLibrary.Read Excel Row    ${ROW}
+    ${EXCEL_DICTIONARY}    Create Dictionary
+    FOR    ${TITEL}    ${ROW_MESSAGE}    IN ZIP    ${TITEL_EXCEL}    ${READ_ROW}
+        ${SET_ROW}    Set Variable If    '${ROW_MESSAGE}'=='None'    ${EMPTY}    ${ROW_MESSAGE}
+        Set To Dictionary    ${EXCEL_DICTIONARY}    ${TITEL}    ${SET_ROW}
+    END
+    [Return]    ${EXCEL_DICTIONARY}
+
+Close excel test data
+    [Arguments]    ${FOLDER}
+    ExcelLibrary.Switch Current Excel Document    ${FOLDER}
+    ExcelLibrary.Close Current Excel Document
+
+Result Configurations
+    [Arguments]    ${TEST_RESULTS}    ${SHEETNAME}    ${ROW}    ${DATA}
+    Create Directory    ${TEST_RESULTS}/${SHEETNAME}
+    ${COUNTFILE}    List Files In Directory    ${TEST_RESULTS}/${SHEETNAME}    *.xlsx
+    ${COUNTFILE}    Count Values In List    ${COUNTFILE}    Result.xlsx
+    Run Keyword If    ${COUNTFILE}>0    Copy File    ${TEST_RESULTS}/${SHEETNAME}/Result.xlsx    ${TEST_RESULTS}/${SHEETNAME}/Result_Copy.xlsx
+    Run Keyword If    ${COUNTFILE}>0    ExcelLibrary.Open Excel Document    ${TEST_RESULTS}/${SHEETNAME}/Result.xlsx    ${SHEETNAME}s
+    ...    ELSE    ExcelLibrary.Create Excel Document    ${SHEETNAME}s
+    ${KEY}    Get Dictionary Keys    ${DATA}    sort_keys=False
+    ${VALUE}    Get Dictionary Values    ${DATA}    sort_keys=False
+    ExcelLibrary.Write Excel Row    1    ${KEY}
+    ExcelLibrary.Write Excel Row    ${ROW}    ${VALUE}
+    ExcelLibrary.Save Excel Document    ${TEST_RESULTS}/${SHEETNAME}/Result.xlsx
+    Copy File    ${TEST_RESULTS}/${SHEETNAME}/Result.xlsx    ${TEST_RESULTS}/${SHEETNAME}/Result_Copy.xlsx
+    ${DATEFORMAT}    Get Modified Time    ${TEST_RESULTS}/${SHEETNAME}/Result_Copy.xlsx    year,month,day,hour,min
+    Move File    ${TEST_RESULTS}/${SHEETNAME}/Result_Copy.xlsx    ${TEST_RESULTS}/${SHEETNAME}/Result_${DATEFORMAT}[0]${DATEFORMAT}[1]${DATEFORMAT}[2]T${DATEFORMAT}[3]${DATEFORMAT}[4].xlsx
+    ExcelLibrary.Close Current Excel Document
+
+Compare Data Table
+    [Arguments]    ${TITEL_EXCEL}    ${DATA}
+    ${EXCEL_DICTIONARY}    Create Dictionary
+    FOR    ${TITEL}    ${DATA_MESSAGE}    IN ZIP    ${TITEL_EXCEL}    ${DATA}
+        Set To Dictionary    ${EXCEL_DICTIONARY}    ${TITEL}    ${DATA_MESSAGE}
+    END
+    [Return]    ${EXCEL_DICTIONARY}
+
+Reports Excel
+    [Arguments]    ${TEST_RESULTS}    ${dirResult}    ${ResultTitle}    ${ResultData}    ${ROW}=2
+    ${DATA_1}    Compare data table    ${ResultTitle}    ${ResultData}
+    Result Configurations    ${TEST_RESULTS}    ${dirResult}    ${ROW}    ${DATA_1}
+
+Append To Result Data
+    [Arguments]    @{Data}
+    ${LIST_VALUE}    Create List    @{Data}
+    [Return]    ${LIST_VALUE}
+
+Append To Result Title
+    [Arguments]    @{Title}
+    ${LIST_KEY}    Create List    @{Title}
+    [Return]    ${LIST_KEY}
