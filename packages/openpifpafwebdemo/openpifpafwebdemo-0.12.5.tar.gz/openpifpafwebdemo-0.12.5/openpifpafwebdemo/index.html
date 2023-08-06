@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+
+{% block head %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="static/style.css?v={{version}}">
+{% end %}
+
+
+{% block content %}
+<div id="capture">
+  <video controls autoplay muted playsinline></video>
+  <button class="nextCamera"><i class="fas fa-video"></i></button>
+  <button class="screenCapture"><i class="fas fa-desktop"></i></button>
+  <canvas style="display: none" width={{width_height[0]}} height={{width_height[1]}}></canvas>
+</div>
+<div id="visualization">
+  <canvas style="max-width:100%; max-height:98vh;" width=640 height=480></canvas>
+</div>
+
+<div style="font-size: 200%">
+  FPS = <em><span id="fps">0</span></em>
+</div>
+<div class="feedlink">
+  Server-sent event feed: <a id="feedlink"></a>
+</div>
+{% end %}
+
+
+{% block log %}
+{% end %}
+
+
+{% block footer %}
+
+<script src="//webrtc.github.io/adapter/adapter-latest.js" type="text/javascript"></script>
+<script src="static/frontend.js?v={{version}}"></script>
+
+{% end %}
