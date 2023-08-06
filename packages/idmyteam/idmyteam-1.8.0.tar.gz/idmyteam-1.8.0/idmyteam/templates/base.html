@@ -1,0 +1,76 @@
+{% load define_action %}
+{% load static %}
+<html lang="en">
+<head>
+    <!-- custom meta -->
+    <title>{{ title }}</title>
+    <meta name="keywords" content="{{ meta.keywords }}">
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="viewport" content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
+    <link rel="shortcut icon" href="{% static 'images/icon_red.svg' %}">
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+
+    <!-- Third party JavaScript -->
+    <script src="{% static 'js/materialize.min.js' %}"></script>
+    {% block scripts %}{% endblock %}
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Cutive+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:100,300,400,500,700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    {% block css %}{% endblock %}
+
+    <!-- Custom JS -->
+    <script src="{% static 'js/script.js' %}"></script>
+
+    <!-- custom JS -->
+    {% block js %}{% endblock %}
+</head>
+
+<body>
+<nav class="z-depth-0">
+    <div class="nav-wrapper">
+        <a href="/" class="brand-logo">{% get_logo %}</a>
+        <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+        <ul class="right hide-on-med-and-down">
+            {% include "base/nav.html" %}
+        </ul>
+        <ul class="side-nav" id="mobile-demo">
+            {% include "base/nav.html" %}
+        </ul>
+    </div>
+</nav>
+<div class="content" align="center">
+    {% if title %} <h2><strong>{{ title }}</strong></h2> {% endif %}
+    {% if error_message or success_message %}
+        <div class="row" id="alert-box">
+            <div class="col s12 m12">
+                <div class="card {% if error_message %}red{% else %}green{% endif %} darken-1">
+                    <div class="row">
+                        <div class="col s12 m10">
+                            <div class="card-content white-text">
+                                {% if error_message %}
+                                    <i class="material-icons">warning</i> {{ error_message|safe }}
+                                {% else %}
+                                    🎉 {{ success_message }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col s12 m2">
+                            <i class="material-icons alert-icon" id="alert-close" aria-hidden="true">close</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
