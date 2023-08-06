@@ -1,0 +1,70 @@
+#########
+Changelog
+#########
+
+Version 1.1.0
+=============
+
+* Important: Support for Firebird 4 TIMEZONE is broken (for FB4 RC1). It will be fixed in
+  next driver version.
+* Build scheme changed to `PEP 517`.
+* Various changes to documentation and type hint adjustments.
+* Changed: `.DriverConfig.db_defaults` and `.DriverConfig.server_defaults` are now created
+  as `optional` (introduced by firebird-base 1.2.0), so configuration file does not require
+  `firebird.db.defaults` and `firebird.server.defaults` sections (even empty).
+* Fix: unregistered bug in `InfoProvider`.
+* Fix: unregistered bug in `FirebirdAPI` initialization.
+
+Version 1.0.0
+=============
+
+* Added support for schema and monitor modules from `firebird-lib`_ package.
+* Documentation: adjustments to css.
+
+Version 0.8.0
+=============
+
+The driver is no longer *beta*, and is now considered as **stable** for Firebird 3.0 (support for Firebird 4 is still evolving till final release).
+
+* Documentation, both in code and separate (especially Usage Guide).
+* Added support for new FB4 data types in ARRAY fields.
+* Refactoring in driver hooks.
+* New `.Cursor.call_procedure()` method.
+* Refactoring and fixes in Server and its services.
+
+Version 0.7.0
+=============
+
+* Added support for new FB4 data types (TIME/TIMESTAMP WITH TIMEZONE, DECFLOAT[16|34] and
+  extended DECIMAL/NUMERIC via INT128 storage).
+
+Version 0.6.0
+=============
+
+* More documentation.
+* Initial support for Firebird 4+ (interfaces and other definitions). Includes support for
+  interface versions.
+* `Service` renamed to `Server`. Selected functionality moved to inner objects (relates to
+  FB4+ support).
+* New module: `~firebird.driver.config` - Driver configuration
+* New module: `~firebird.driver.interfaces` - Interface wrappers for Firebird new API
+* Changed module: `~firebird.driver.types`
+
+  - Interface wrapper moved to separate module
+  - Buffer managers moved to `~firebird.driver.core` module
+* Changed module: `~firebird.driver.core`
+
+  - `connect()`, `create_database()` and `connect_server()` now use driver configuration.
+  - Simplified/unified transaction isolation specification.
+  - Emit warnings when objects with allocated Firebird resources are disposed (by Python
+    GC) without prior call to `close()`.
+  - Trace instrumentation removed. Use dynamic trace configuration from firebird-base 0.6.0.
+  - `Connection` and `Transaction` information moved to inner objects accessible via `info`
+    properties (relates to FB4+ support).
+
+Version 0.5.0
+=============
+
+Initial release.
+
+.. _firebird-lib: https://pypi.org/project/firebird-lib/
