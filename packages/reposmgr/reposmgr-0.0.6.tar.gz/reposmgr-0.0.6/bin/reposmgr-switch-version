@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# Switches to the given git version. Either git TAG or git branch. It
+# requires "repomgm" to be available on PATH. By default works on the
+# main repo.
+#
+# Usage:
+#
+#   $> reposmgr-switch-version <tag-name-or-branch-name> [repo-name]
+
+
+# Name of tag or branch
+NAME="$1"
+if [ "$NAME" = "" ]; then
+    echo "[ERROR] you didn't provide tag or branch name"
+    exit 1;
+fi
+
+
+# If not privided we'll assume the default repo which is cua-project
+REPO_NAME="$2"
+MAIN_REPO=$(reposmgr main_repo)
+if [ "$REPO_NAME" = "" ]; then
+    REPO_NAME=$MAIN_REPO
+fi
+REPO_PATH=$(reposmgr repo_property $REPO_NAME path)
+
+
+# If TESTING_SWITCH_VERSION_SCRIPT is set to true, the script is
+# working in debug mode. Does nothing and only allows to check what
+# it's gonna do next.
+if [ "$TESTING_SWITCH_VERSION_SCRIPT" = "true" ]; then
+    echo "[INFO][TEST-ONLY] MAIN_REPO=$MAIN_REPO"
+    echo "[INFO][TEST-ONLY] REPO_NAME=$REPO_NAME"
+    echo "[INFO][TEST-ONLY] REPO_PATH=$REPO_PATH"
+    echo "[INFO][TEST-ONLY] NAME=$NAME"
+    exit 0;
+fi
+
+
+cd $REPO_PATH
+
+
+git show-branch TAG-$NAME >/dev/null 2>&1
+if [ "$?" = "0" ]; then
+    echo "[INFO] LOCAL TAG branch found";
+    git checkout TAG-$NAME || exit 1
+    exit 0;
+fi
+
+
+git describe --exact-match --tags $NAME >/dev/null 2>&1
+if [ "$?" = "0" ]; then
+    echo "[INFO] TAG found";
+    git checkout -b TAG-$NAME tags/$NAME || exit 2
+    exit 0;
+fi
+
+
+git show-branch $NAME >/dev/null 2>&1
+if [ "$?" = "0" ]; then
+    echo "[INFO] LOCAL branch found";
+    git checkout $NAME || exit 3
+    exit 0;
+fi
+
+
+git ls-remote --heads origin $NAME | grep -sw "$NAME" 2>&1>/dev/null
+if [ "$?" = "0" ]; then
+    echo "[INFO] REMOTE branch found";
+    git branch --track $NAME origin/$NAME || exit 4
+    git checkout $NAME || exit 5
+    exit 0;
+fi
+
+
+echo "[ERROR] no such brach/tag $NAME for repo: $REPO_PATH";
+exit 6;

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+repo_names=$(reposmgr properties name)
+for name in $repo_names; do
+    repo_path=$(reposmgr repo_property $name path)
+    echo "==============================="
+    echo "$(reposmgr repo_property $name url)"
+    echo "$repo_path"
+    if [ ! -d $repo_path ]; then
+        echo "   ----"
+        echo "    [ERROR] Directory does *NOT* exists"
+        echo "   ----"
+        continue
+    fi
+    (
+        cd $repo_path
+        echo "   ----"
+        git status | sed "s/^/    /g"
+        echo "   ----"
+        git log --oneline -n 3 | sed "s/^/    /g"
+    )
+done

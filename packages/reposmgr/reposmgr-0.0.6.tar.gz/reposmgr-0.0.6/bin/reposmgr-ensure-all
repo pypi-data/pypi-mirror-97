@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# The purpose is trivial => invoke "ensure-repo" for all the repos.
+#
+# Usage:
+#
+#    $> reposmgr-ensure-all
+#
+if [ "$1" = "--dry" ]; then
+    opts="--dry"
+else
+    opts="--no-dry"  # ...value doesn't really matter, just not "--dry"
+fi
+
+
+repo_names=$(reposmgr properties name)
+for name in $repo_names; do
+    echo "==============================="
+    reposmgr-ensure-repo $name $opts
+done

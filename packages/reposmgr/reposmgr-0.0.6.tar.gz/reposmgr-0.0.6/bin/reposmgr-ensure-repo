@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Usage:
+#
+#   $> reposmgr-ensure-repo <repo-name>
+#
+# <repo-name> - one of repo names available in REPOS_FILE (/srv/.repos by default)
+#
+# Ensures given repo is available / is cloned.
+#
+REPOS_FILE=${REPOS_FILE:=/srv/.repos}
+
+
+name=$1
+if [ "$2" = "--dry" ]; then
+    dry="yes"
+else
+    dry="no"
+fi
+
+
+path=$(reposmgr repo_property $name path 2>/dev/null)
+if [ $? -ne 0 ]; then
+    # The repo-name probably doesn't exists
+    echo "[ERROR] Cannot get 'path' for repo \"$name\"."
+    echo "        Typo in repo-name (\"$name\")?"
+    exit 1;
+fi
+
+
+repo_url=$(reposmgr repo_property $name url)
+clone_url=$(reposmgr repo_property $name clone_url)
+
+
+if [ -d "$path" ]; then
+    echo "[INFO] Directory '$path' exists. Nothing todo."
+    exit 0;
+fi
+
+
+echo "[INFO] Directory doesn't exists. Cloning from $repo_url."
+
+
+if [ "$dry" = "yes" ]; then
+    echo "[INFO][DRY] command to run: git clone $clone_url $path"
+else
+    (
+        # If you won't change directory I'll get: fatal: Could not
+        # change back to '/root': Permission denied
+        cd $APP_ROOT
+        git clone $clone_url $path
+    )
+fi
+
+
+if [ $? -ne 0 ]; then
+    echo "[ERROR] Something went wrong while cloning repo: $repo_url"
+    echo "        command to clone by hand:"
+    echo ""
+    echo "        \$> git clone $clone_url $path"
+    exit 1;
+fi
+
+
+echo "[INFO] ...done.";

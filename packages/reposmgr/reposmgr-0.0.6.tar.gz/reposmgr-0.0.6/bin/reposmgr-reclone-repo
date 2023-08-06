@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Re-clone given repo (by name)
+
+
+export NAME="$1"
+if [ "NAME" = "" ]; then
+    echo "[ERROR] You need to provide repo name to re-clone."
+    exit 1;
+fi
+
+
+repo_path=$(reposmgr repo_property $NAME path 2>/dev/null)
+if [ $? -ne 0 ]; then
+    # The repo-name probably doesn't exists
+    echo "[ERROR] Cannot get 'path' for repo \"$name\"."
+    echo "        Typo in repo-name (\"$name\")?"
+    exit 1;
+fi
+
+
+rm -rf $repo_path
+reposmgr-ensure-repo $NAME

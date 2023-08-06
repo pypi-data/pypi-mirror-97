@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Update given repository.
+#
+# Usage:
+#
+#    reposmgr-update-repo <repo-name>
+#
+REPO_NAME="$1"
+if [ "$REPO_NAME" = "" ]; then
+    echo "[ERROR] You need to provide name of repository."
+    exit 1;
+fi
+
+
+repo_path=$(reposmgr repo_property $REPO_NAME path)
+echo "==============================="
+cd $repo_path && pwd
+git pull || exit 1
+git status || exit 2
