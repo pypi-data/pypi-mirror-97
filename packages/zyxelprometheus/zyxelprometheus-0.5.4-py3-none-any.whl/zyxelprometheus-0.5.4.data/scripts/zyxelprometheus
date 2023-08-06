@@ -1,0 +1,48 @@
+#!python
+# zyxelprometheus
+# Copyright (C) 2020 Andrew Wilkinson
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+
+from zyxelprometheus import get_arguments, login, logout, prometheus, scrape_ifconfig, scrape_xdsl, serve
+from zyxelprometheus import InvalidArguments
+
+def main():
+    try:
+        args = get_arguments(sys.argv[1:])
+    except InvalidArguments as e:
+        sys.stderr.write(f"Invalid Arguments: {e.args[0]}\n")
+        sys.exit(1)
+
+    if args.serve:
+        serve(args)
+    else:
+        session = login(args.host, args.user, args.passwd)
+        xdsl = scrape_xdsl(session) if not args.ifconfig_only else None
+        ifconfig = scrape_ifconfig(session) if not args.xdsl_only else None
+
+        if args.raw:
+            if xdsl is not None:
+                print(xdsl)
+            if ifconfig is not None:
+                print(repr(ifconfig))
+        else:
+            print(prometheus(xdsl, ifconfig))
+
+        logout(session)
+
+if __name__ == "__main__":
+    main()
