@@ -1,0 +1,1 @@
+import{p as c,b as e}from"./p-ef311aba.js";c().then(c=>e([["p-yovsipcl",[[1,"lwc-limepkg-scrive",{platform:[16],context:[16],document:[32],config:[32],includePerson:[32]}]]],["p-fn68l2pc",[[1,"lwc-limepkg-scrive-loader",{platform:[16],context:[16]}]]]],c));
