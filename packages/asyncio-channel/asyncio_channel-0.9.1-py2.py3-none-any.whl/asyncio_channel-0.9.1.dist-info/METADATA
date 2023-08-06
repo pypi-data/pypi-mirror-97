@@ -1,0 +1,50 @@
+Metadata-Version: 2.1
+Name: asyncio-channel
+Version: 0.9.1
+Summary: Asynchronous channels and utilities.
+Home-page: https://github.com/ebb29c/asyncio-channel
+License: UNKNOWN
+Author: ebb29c
+Author-email: 
+Requires-Python: ~=3.7
+Description-Content-Type: text/markdown
+Classifier: Development Status :: 4 - Beta
+Classifier: Framework :: AsyncIO
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Dist: pytest ~=5.4 ; extra == "test"
+Requires-Dist: pytest-asyncio ~=0.11 ; extra == "test"
+Requires-Dist: pytest-cov ~=2.8 ; extra == "test"
+Requires-Dist: flake8 ~=3.7 ; extra == "test"
+Project-URL: Documentation, https://github.com/ebb29c/asyncio-channel/blob/main/docs/api.md
+Provides-Extra: test
+
+Asynchronous channels for communication and synchronization between `asyncio` coroutines.
+
+```python
+from asyncio_channel import create_channel
+
+# Create a new channel.
+ch = create_channel()
+
+# Put an item on the channel; block until the item is accepted.
+await ch.put(x)
+
+# Take an item from the channel; block until an item is available.
+x = await ch.take()
+
+# Do something each time an item is put on the channel.
+async for x in ch:
+	do_something(x)
+	do_something_else(x)
+# Iteration stops when the channel is closed and drained.
+```
+
+Also contains several utilities for piping items between channels, mixing multiple input channels, routing messages by topic, and more.
+
