@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# NGINX (mainline branch)
+sudo apt install curl gnupg2 ca-certificates lsb-release -y
+echo "deb http://nginx.org/packages/mainline/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+sudo apt-key fingerprint ABF5BD827BD9BF62
+sudo apt update
+sudo apt install nginx -y
+
+cat >/tmp/nginx_conf <<EOF
+pcre_jit on;
+user www-data;
+worker_processes auto;
+worker_rlimit_nofile 2048;
+# uncomment below line if you dont need accuracy log time or request uuid 
+# timer_resolution 10ms;
+
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+    use epoll;
+    multi_accept on;
+    accept_mutex off;
+    accept_mutex_delay 200ms;
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/nginx.conf
+
+cat >/tmp/nginx_conf <<EOF
+server_tokens off;
+index index.php index.htm index.html;
+
+add_header X-Frame-Options SAMEORIGIN;
+add_header X-Content-Type-Options nosniff;
+add_header X-XSS-Protection "1; mode=block";
+
+open_file_cache max=100000 inactive=20s;
+open_file_cache_valid 30s;
+open_file_cache_min_uses 2;
+open_file_cache_errors on;
+
+sendfile on;
+tcp_nopush on;
+tcp_nodelay on;
+
+default_type application/octet-stream;
+
+# access log is off on default to boost I/O disk
+access_log off;
+error_log /var/log/nginx/error.log crit;
+
+keepalive_timeout 30;
+# do not larger than worker_connections/2
+keepalive_requests 512;
+
+# close connection if 30s client is not responding
+send_timeout 30;
+# close client connection if it's timeout 
+reset_timedout_connection on;
+
+# if client is too slowwwwww, it is not worthy
+client_header_timeout 10s;
+# if body size is larger, it stores in temp file
+client_body_buffer_size 16k;
+# 10mb body size is enough, increase if you want
+client_max_body_size 10m;
+# 10mb (above size) / 5 / 60 = 35KB/s client upload speed
+client_body_timeout 5m;
+# common header size
+client_header_buffer_size 4k;
+# max header size
+large_client_header_buffers 4 8k;
+
+types_hash_max_size 2048;
+
+gzip on;
+gzip_disable "msie6";
+gzip_min_length 1000;
+gzip_vary on;
+gzip_proxied any;
+# level 1 is worthy
+gzip_comp_level 1;
+gzip_buffers 16 8k;
+gzip_http_version 1.1;
+gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/conf.d/00-nginx.conf
+
+cat >/tmp/nginx_conf <<EOF
+fastcgi_split_path_info ^(.+\\.php)(/.+)$;
+try_files \$fastcgi_script_name =404;
+
+fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+
+set \$path_info \$fastcgi_path_info;
+fastcgi_param PATH_INFO \$path_info;
+fastcgi_param HTTP_PROXY "";
+
+fastcgi_index index.php;
+fastcgi_read_timeout 60;
+fastcgi_buffering on;
+fastcgi_buffer_size 64k;
+fastcgi_buffers 8 64k;
+
+include fastcgi_params;
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/fastcgi_snippets
+
+cat >/tmp/nginx_conf <<EOF
+ssl_session_timeout 60m;
+ssl_protocols TLSv1.1 TLSv1.2;
+ssl_ciphers 'ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DHE+AES128:!ADH:!AECDH:!MD5';
+ssl_session_cache shared:SSL:30m;
+ssl_prefer_server_ciphers on;
+ssl_dhparam /etc/nginx/certs/dhparam.pem;
+add_header Strict-Transport-Security "max-age=31536000";
+
+location ~ /\\.  {
+    deny all;
+    access_log off;
+    log_not_found off;
+    return 404;
+}
+location ~* ^.+\\.(?:css|cur|js|jpe?g|gif|htc|ico|png|xml|otf|ttf|eot|woff|svg)\$ {
+    try_files \$uri =404;
+    access_log off;
+    expires 30d;
+}
+location ~* \\.(eot|ttf|woff)\$ {
+    add_header Access-Control-Allow-Origin '*';
+}
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/server_snipets
+
+openssl rand 2048 > ~/.rnd
+sudo mkdir /etc/nginx/ssl
+sudo mkdir /etc/nginx/certs
+sudo mkdir /usr/share/nginx/acme-challenge
+echo "nginx   soft    nofile  5000" | sudo tee -a /etc/security/limits.conf
+echo "nginx   hard    nofile  10000" | sudo tee -a /etc/security/limits.conf
+sudo openssl dhparam -dsaparam -out /etc/nginx/certs/dhparam.pem 2048
+
+cat >/tmp/nginx_conf <<EOF
+#!/bin/sh
+
+FILE=/tmp/reload_nginx
+if test -f "\$FILE"; then
+    rm "\$FILE"
+    sudo systemctl reload nginx.service
+    exit 0
+fi
+exit 1
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/ssl/cron_reload_nginx.sh
+
+cat >/tmp/nginx_conf <<EOF
+#!/bin/sh
+
+FILE=/tmp/reload_nginx
+touch "\$FILE"
+exit 0
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/ssl/reload_nginx.sh
+
+sudo chmod +x /etc/nginx/ssl/cron_reload_nginx.sh
+sudo chmod +x /etc/nginx/ssl/reload_nginx.sh
+echo "* * * * * root /etc/nginx/ssl/cron_reload_nginx.sh" | sudo tee -a /etc/crontab
+
+sudo systemctl enable nginx.service
+sudo systemctl restart nginx.service
+
+# Install lego acme
+
+cat >/tmp/nginx_conf <<EOF
+#/bin/sh
+
+echo "\n===== Automated Renew Certificates ====="
+
+while IFS='|' read -r domain email
+do
+    echo -e "\n- Trying to renew domain \$domain of \$email"
+    sudo /usr/bin/lego -a -k rsa2048 --path /var/lego --email \$email --domains \$domain --http --http.webroot=/usr/share/nginx/acme-challenge renew --days 30 --renew-hook="/etc/nginx/ssl/reload_nginx.sh"
+done < ~/.renew_domains
+
+echo "\n===== DONE ====="
+EOF
+sudo mv /tmp/nginx_conf /etc/nginx/ssl/renew_certs.sh
+
+sudo chmod +x /etc/nginx/ssl/renew_certs.sh
+echo "0 0 */5 * * root /etc/nginx/ssl/renew_certs.sh" | sudo tee -a /etc/crontab
+
+wget https://github.com/go-acme/lego/releases/download/v4.2.0/lego_v4.2.0_linux_amd64.tar.gz && mkdir lego_linux && tar xf lego_v4.2.0_linux_amd64.tar.gz -C lego_linux && chmod +x lego_linux/lego && sudo mv lego_linux/lego /usr/bin/lego && rm -f lego_v4.2.0_linux_amd64.tar.gz && rm -rf lego_linux
+sudo mkdir -p /var/lego/certificates
