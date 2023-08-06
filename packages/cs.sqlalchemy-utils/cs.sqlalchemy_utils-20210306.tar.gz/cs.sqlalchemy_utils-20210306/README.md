@@ -1,0 +1,328 @@
+Assorted utility functions to support working with SQLAlchemy.
+
+*Latest release 20210306*:
+* Rename _state to state, making it public.
+* Some other internal changes.
+
+## Function `auto_session(function)`
+
+Decorator to run a function in a session if one is not presupplied.
+The function `function` runs within a transaction,
+nested if the session already exists.
+
+See `with_session` for details.
+
+## Class `BasicTableMixin`
+
+Useful methods for most tables.
+
+### Method `BasicTableMixin.lookup(*, session, **criteria)`
+
+Return iterable of row entities matching `criteria`.
+
+### Method `BasicTableMixin.lookup1(*, session, **criteria)`
+
+Return the row entity matching `criteria`, or `None` if no match.
+
+## Function `find_json_field(column_value, field_name, *, infill=False)`
+
+Descend a JSONable Python object `column_value`
+to `field_name`.
+Return `column_value` (possibly infilled), `final_field`, `final_field_name`.
+
+This supports database row columns which are JSON columns.
+
+Parameters:
+* `column_value`: the original value of the column
+* `field_name`: the field within the column to locate
+* `infill`: optional keyword parameter, default `False`.
+  If true,
+  `column_value` and its innards will be filled in as `dict`s
+  to allow deferencing the `field_name`.
+
+The `field_name` is a `str`
+consisting of a period (`'.'`) separated sequence of field parts.
+Each field part becomes a key to index the column mapping.
+These keys are split into the leading field parts
+and the final field part,
+which is returned as `final_field_name` above.
+
+The `final_field` return value above
+is the mapping within which `final_field_value` may lie
+and where `final_field_value` may be set.
+Note: it may not be present.
+
+If a leading key is missing and `infill` is true
+the corresponding part of the `column_value` is set to an empty dictionary
+in order to allow deferencing the leading key.
+This includes the case when `column_value` itself is `None`,
+which is why the `column_value` is part of the return.
+
+If a leading key is missing and `infill` is false
+this function will raise a `KeyError`
+for the portion of the `field_name` which failed.
+
+Examples:
+
+    >>> find_json_field({'a':{'b':{}}}, 'a.b')
+    ({'a': {'b': {}}}, {'b': {}}, 'b')
+    >>> find_json_field({'a':{}}, 'a.b')
+    ({'a': {}}, {}, 'b')
+    >>> find_json_field({'a':{'b':{}}}, 'a.b.c.d')
+    Traceback (most recent call last):
+        ...
+    KeyError: 'a.b.c'
+    >>> find_json_field({'a':{'b':{}}}, 'a.b.c.d', infill=True)
+    ({'a': {'b': {'c': {}}}}, {}, 'd')
+    >>> find_json_field(None, 'a.b.c.d')
+    Traceback (most recent call last):
+        ...
+    KeyError: 'a'
+    >>> find_json_field(None, 'a.b.c.d', infill=True)
+    ({'a': {'b': {'c': {}}}}, {}, 'd')
+
+## Function `get_json_field(column_value, field_name, *, default=None)`
+
+Return the value of `field_name` from `column_value`
+or a defaault if the field is not present.
+
+Parameters:
+* `column_value`: the original value of the column
+* `field_name`: the field within the column to locate
+* `default`: default value to return if the field is not present,
+  default: `None`
+
+Examples:
+
+    >>> get_json_field({'a': 1}, 'a')
+    1
+    >>> get_json_field({'b': 1}, 'a')
+    >>> get_json_field({'a': {}}, 'a.b')
+    >>> get_json_field({'a': {'b': 2}}, 'a.b')
+    2
+
+## Class `HasIdMixin`
+
+Include an "id" `Column` as the primary key.
+
+## Function `json_column(*da, **dkw)`
+
+Class decorator to declare a virtual column name on a table
+where the value resides inside a JSON column of the table.
+
+Parameters:
+* `cls`: the class to annotate
+* `attr`: the virtual column name to present as a row attribute
+* `json_field_name`: the field within the JSON column
+  used to store this value,
+  default the same as `attr`
+* `json_column_name`: the name of the associated JSON column,
+  default `'info'`
+* `default`: the default value returned by the getter
+  if the field is not present,
+  default `None`
+
+Example use:
+
+    Base = declarative_base()
+    ...
+    @json_column('virtual_name', 'json.field.name')
+    class TableClass(Base):
+      ...
+
+This annotates the class with a `.virtual_name` property
+which can be accessed or set,
+accessing or modifying the associated JSON column
+(in this instance, the column `info`,
+accessing `info['json']['field']['name']`).
+
+## Function `log_level(*da, **dkw)`
+
+Decorator for functions which wraps calls to the function
+in a context manager, optionally supplying the context
+as the first argument to the called function.
+
+## Class `ORM(cs.resources.MultiOpenMixin)`
+
+A convenience base class for an ORM class.
+
+This defines a `.Base` attribute which is a new `DeclarativeBase`
+and provides various Session related convenience methods.
+It is also a `MultiOpenMixin` subclass
+supporting nested open/close sequences and use as a context manager.
+
+Subclasses must define the following:
+* `.Session`: a factory in their own `__init__`, typically
+  `self.Session=sessionmaker(bind=engine)`
+* `.startup` and `.shutdown` methods to support the `MultiOpenMixin`,
+  even if these just `pass`
+
+### Method `ORM.auto_session(method)`
+
+Decorator to run a method in a session derived from this ORM
+if a session is not presupplied.
+
+See `with_session` for details.
+
+### Method `ORM.orm_method(method)`
+
+Decorator for ORM subclass methods
+to set the shared state `orm` to `self`.
+
+### Method `ORM.session(self, *a, **kw)`
+
+Context manager to issue a new session and close it down.
+
+Note that this performs a `COMMIT` or `ROLLBACK` at the end.
+
+## Function `orm_auto_session(method)`
+
+Decorator to run a method in a session derived from `self.orm`
+if a session is not presupplied.
+Intended to assist classes with a `.orm` attribute.
+
+See `with_session` for details.
+
+## Function `orm_method(method)`
+
+Decorator for ORM subclass methods
+to set the shared state `orm` to `self`.
+
+## Function `set_json_field(column_value, field_name, value, *, infill=False)`
+
+Set a new `value` for `field_name` of `column_value`.
+Return the new `column_value`.
+
+Parameters:
+* `column_value`: the original value of the column
+* `field_name`: the field within the column to locate
+* `value`: the value to store as `field_name`
+* `infill`: optional keyword parameter, default `False`.
+  If true,
+  `column_value` and its innards will be filled in as `dict`s
+  to allow deferencing the `field_name`.
+
+As with `find_json_field`,
+a true `infill` may modify `column_value` to provide `field_name`
+which is why this function returns the new `column_value`.
+
+Examples:
+
+    >>> set_json_field({'a': 2}, 'a', 3)
+    {'a': 3}
+    >>> set_json_field({'a': 2, 'b': {'c': 5}}, 'b.c', 4)
+    {'a': 2, 'b': {'c': 4}}
+    >>> set_json_field({'a': 2}, 'b.c', 4)
+    Traceback (most recent call last):
+        ...
+    KeyError: 'b'
+    >>> set_json_field({'a': 2}, 'b.c', 4, infill=True)
+    {'a': 2, 'b': {'c': 4}}
+    >>> set_json_field(None, 'b.c', 4, infill=True)
+    {'b': {'c': 4}}
+
+## Class `SQLAState(cs.threads.State,_thread._local)`
+
+Thread local state for SQLAlchemy ORM and session.
+
+### Method `SQLAState.auto_session(self, *, orm=None)`
+
+Context manager to use the current session
+if not `None`, otherwise to make one using `orm` or `self.orm`.
+
+### Method `SQLAState.new_session(self, *, orm=None)`
+
+Context manager to create a new session from `orm` or `self.orm`.
+
+## Function `using_session(orm=None, session=None)`
+
+A context manager to prepare an SQLAlchemy session
+for use by a suite.
+
+Parameters:
+* `orm`: optional reference ORM,
+  an object with a `.session()` method for creating a new session.
+  Default: if needed, obtained from the global `state.orm`.
+* `session`: optional existing session.
+  Default: the global `state.session` if not `None`,
+  otherwise created by `orm.session()`.
+
+If a new session is created, the new session and reference ORM
+are pushed onto the globals `state.session` and `state.orm`
+respectively.
+
+If an existing session is reused,
+the suite runs within a savepoint from `session.begin_nested()`.
+
+## Function `with_orm(function, *a, orm=None, **kw)`
+
+Call `function` with the supplied `orm` in the shared state.
+
+## Function `with_session(function, *a, orm=None, session=None, **kw)`
+
+Call `function(*a,session=session,**kw)`, creating a session if required.
+The function `function` runs within a transaction,
+nested if the session already exists.
+If a new session is created
+it is set as the default session in the shared state.
+
+This is the inner mechanism of `@auto_session` and
+`ORM.auto_session`.
+
+Parameters:
+* `function`: the function to call
+* `a`: the positional parameters
+* `orm`: optional ORM class with a `.session()` context manager method
+  such as the `ORM` base class supplied by this module.
+* `session`: optional existing ORM session
+* `kw`: other keyword arguments, passed to `function`
+
+One of `orm` or `session` must be not `None`; if `session`
+is `None` then one is made from `orm.session()` and used as
+a context manager.
+
+The `session` is also passed to `function` as
+the keyword parameter `session` to support nested calls.
+
+# Release Log
+
+
+
+*Release 20210306*:
+* Rename _state to state, making it public.
+* Some other internal changes.
+
+*Release 20201025*:
+* New BasicTableMixin and HasIdMixin classes with useful methods and a typical `id` Column respectively.
+* Assorted fixes and improvements.
+
+*Release 20190830.1*:
+Have the decorators set .__module__.
+
+*Release 20190830*:
+@json_column: small docstring improvement.
+
+*Release 20190829*:
+* Bugfix @json_column setter: mark the column as modified for the ORM.
+* New push_log_level context manager and @log_level decorator to temporarily change the SQLAlchemy logging handler level.
+
+*Release 20190812*:
+* Make ORM a MultiOpenMixin.
+* get_json_field: use forgotten `default` parameter.
+* Other minor changes.
+
+*Release 20190526*:
+* Support for virtual columns mapped to a JSON column interior value:
+* New functions find_json_field, get_json_field, set_json_field.
+* New decorator @json_column for declaritive_base tables.
+
+*Release 20190517*:
+* Make ORM._Session private session factory the public ORM.Session factory for external use.
+* with_session: preexisting sessions still trigger a session.begin_nested, removes flush/commit tension elsewhere.
+
+*Release 20190403*:
+* Rename @ORM.orm_auto_session to @ORM.auto_session.
+* New @orm_auto_session decorator for methods of objects with a .orm attribute.
+
+*Release 20190319.1*:
+Initial release. ORM base class, @auto_session decorator.
