@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: dyntwist
+Version: 1.4.0
+Summary: Discover resolving dynamic DNS domains based on keywords.
+Home-page: https://github.com/wesinator/dyntwist
+Author: wesinator
+Author-email: 13hurdw@gmail.com
+License: UNKNOWN
+Description: # dyntwist
+        
+        Discover resolving dynamic DNS domains based on keywords.
+        
+        #### Usage
+        ```python
+        import dyntwist
+        
+        result = dyntwist.dyntwist("solarwinds")
+        for r in results:
+            if r.get("dns"):
+                ip  = r["dns"][0]
+                if ip != "174.128.255.252" and ip != "0.0.0.0":
+                    print(r)
+        ```
+        
+        example result snippet:
+        ```python
+        {'domain': 'solarwinds.001www.com', 'dns': ['0.0.0.0']}
+        {'domain': 'solarwinds.16-b.it', 'dns': ['0.0.0.0']}
+        {'domain': 'solarwinds.32-b.it', 'dns': ['0.0.0.0']}
+        {'domain': 'solarwinds.64-b.it', 'dns': ['0.0.0.0']}
+        ```
+        
+        #### Caveats
+         - Designed to work on unix style paths (for loading file lists)
+        
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
