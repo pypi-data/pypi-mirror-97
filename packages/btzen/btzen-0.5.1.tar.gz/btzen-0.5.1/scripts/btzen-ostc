@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+#
+# BTZen - library to asynchronously access Bluetooth devices.
+#
+# Copyright (C) 2015-2020 by Artur Wroblewski <wrobell@riseup.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+Connect to OSTC dive computer and show last 20 dives.
+
+See also
+
+    http://git.savannah.nongnu.org/cgit/kenozooid.git/tree/kenozooid/driver/hwos
+"""
+
+import argparse
+import asyncio
+import logging
+import struct
+from collections import namedtuple
+from cytoolz import itertoolz as itz
+from cytoolz.functoolz import identity
+from datetime import datetime
+from functools import partial
+
+from btzen import Serial, ConnectionManager
+
+logger = logging.getLogger(__name__)
+
+DiveHeader = namedtuple('DiveHeader', ['size', 'datetime', 'depth', 'duration', 'dive_number', 'version'])
+to_int = partial(int.from_bytes, byteorder='little', signed=False)
+to_timestamp = lambda value: datetime(value[0] + 2000, *value[1:])
+to_depth = lambda v: v * 9.80665 / 1000
+to_duration = lambda v: (to_int(v[:2]) * 60 + int(v[2])) / 60
+header_parsers = (to_int, to_timestamp, to_depth, to_duration) + (identity,) * 2
+
+def parse_header(item):
+    item = struct.unpack('<3s5sH3sHB', item)
+    values = zip(header_parsers, item)
+    values = (p(v) for p, v in values)
+    return DiveHeader._make(values)
+
+async def start(dev):
+    await dev.write(b'\xbb')
+    value = await dev.read(2)
+    assert value == b'\xbb\x4d', 'got: {}'.format(value)
+
+async def stop(dev):
+    await dev.write(b'\xff')
+    # NOTE: do not wait for the response as device is disconnected now
+    # value = await dev.read(2)
+    # assert value == b'\xffM', 'got: {}'.format(value)
+
+async def display(dev, msg):
+    msg = '{:16.16}'.format(msg).encode()
+
+    await dev.write(b'\x6e')
+    value = await dev.read(1)
+    assert value == b'\x6e'
+    await dev.write(msg)
+    value = await dev.read(1)
+    assert value == b'\x4d'
+
+async def read_data(dev, count):
+    await start(dev)
+    await display(dev, 'BTZen Connected')
+
+    try:
+        await dev.write(b'\x6d')
+        headers = await dev.read(4098)
+        headers = headers[1:-1]
+
+        # get 20 latests dives
+        items = itz.partition(16, headers)
+        # convert back to bytes, see https://github.com/pytoolz/cytoolz/issues/102
+        # also filter unused headers
+        items = (bytes(v) for v in items if v[-1] != 0xff)
+        items = (parse_header(v) for v in items)
+        items = itz.tail(count, items)
+        items = reversed(items)
+
+        for k, header in enumerate(items, 1):
+            fmt = '{:3d}: {:%Y-%m-%d %H:%M} {:5.1f}m {:5.1f}\''.format
+            print(fmt(k, header.datetime, header.depth, header.duration))
+    finally:
+        await stop(dev)
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--verbose', default=False, action='store_true',
+    help='show debug log'
+)
+parser.add_argument(
+    '-c', '--count', default=20, type=int,
+    help='number of dives to show'
+)
+parser.add_argument('device', help='MAC address of device')
+args = parser.parse_args()
+
+if args.verbose:
+    logging.basicConfig(level=logging.DEBUG)
+
+loop = asyncio.get_event_loop()
+
+dev = Serial(args.device)
+manager = ConnectionManager()
+manager.add(dev)
+
+try:
+    task = asyncio.wait(
+        [manager, read_data(dev, args.count)],
+        return_when=asyncio.FIRST_COMPLETED,
+    )
+    loop.run_until_complete(task)
+finally:
+    # connection manager closes all devices
+    manager.close()
+
+# vim: sw=4:et:ai
