@@ -1,0 +1,33 @@
+{# 因为 description 不支持 \n 换行符，需要使用 html 标签 #}
+{# 以下为创建 task 时 description 字段的模板 #}
+
+<div><span style="font-size: x-large;color: #c7c7cc;">【所属模块】</span></div>
+
+<div>
+    <span style="font-size: medium;color: #c7c7cc;margin-left: 10px;">
+        {{ '→'.join([custom_field_1, custom_field_2]) }}
+    </span>
+</div>
+<br/>
+
+<div><span style="font-size: x-large;color: #ff9500;">【前置条件】</span></div>
+
+{% for line in precondition.strip().splitlines() %}
+<div><span style="font-size: medium;margin-left: 10px;">{{ line }}</span></div>
+{% endfor %}
+
+<br/>
+
+<div><span style="font-size: x-large;color: #ff766f;">【用例步骤】</span></div>
+
+{% for line in case_steps.strip().splitlines() %}
+<div><span style="font-size: medium;margin-left: 10px;">{{ line }}</span></div>
+{% endfor %}
+
+<br/>
+
+<div><span style="font-size: x-large;color: #359746;">【预期结果】</span></div>
+
+{% for line in expectation.strip().splitlines() %}
+<div><span style="font-size: medium;margin-left: 10px;">{{ line }}</span></div>
+{% endfor %}
