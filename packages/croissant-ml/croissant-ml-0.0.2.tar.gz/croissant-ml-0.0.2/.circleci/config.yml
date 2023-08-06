@@ -1,0 +1,112 @@
+jobs:
+  build38: &test-template
+    executor: 
+      name: python/default
+      tag: "3.8"
+    steps:
+      - checkout
+      - run:
+          command: |
+            pip install .
+          name: Install
+      - run:
+          command: |
+            # pytest would be a dep in requirements.txt
+            python -m pytest --cov croissant --cov-report xml
+            bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+          name: Test
+
+  build377:
+    <<: *test-template
+    executor:
+      name: python/default
+      tag: "3.7.7"
+
+  lint:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          command: |
+            pip install flake8
+            # `|| true` to force exit code 0 even if no files found
+            CHANGED_PYFILES=$(git diff --name-only --diff-filter AM origin/master | grep .py || true)
+            echo "List of changed files:"
+            echo ${CHANGED_PYFILES}
+            echo ${CHANGED_PYFILES} | xargs -r flake8 --count
+          name: Lint
+
+  mlflow-cli:
+    docker:
+      - image: ubuntu:bionic
+    steps:
+      - checkout
+      - run:
+          name: Setup Miniconda
+          command: |
+            apt update
+            apt install -y wget git
+            cd $HOME
+            wget "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh" -O miniconda.sh
+            printf '%s' "879457af6a0bf5b34b48c12de31d4df0ee2f06a8e68768e5758c3293b2daf688 miniconda.sh" | sha256sum -c
+            bash miniconda.sh -b -p $HOME/miniconda
+            # make ENV vars available to next run steps
+            echo "export PATH=$HOME/miniconda/bin:$PATH" >> $BASH_ENV
+            echo "export CONDA_BASE=$HOME/miniconda" >> $BASH_ENV
+      - run:
+          name: Install mlflow
+          command: |
+            . $CONDA_BASE/etc/profile.d/conda.sh
+            conda activate base
+            pip install mlflow
+      - run:
+          name: Run Mlflow CLI
+          command: |
+            . $CONDA_BASE/etc/profile.d/conda.sh
+            export MLFLOW_TRACKING_URI=$HOME/tracking
+            export ARTIFACT_URI=$HOME/artifacts
+            export MYEXPERIMENT=test_experiment
+            conda activate base
+            mlflow experiments create \
+              --experiment-name ${MYEXPERIMENT} \
+              --artifact-location ${ARTIFACT_URI}
+            mlflow run . \
+              --backend local \
+              --experiment-name ${MYEXPERIMENT} \
+              -P training_data=$PWD/test/resources/dev_train_rois.json \
+              -P test_data=$PWD/test/resources/dev_test_rois.json \
+              -P max_iter=10
+
+  docker:
+    machine: true
+    steps:
+      - checkout
+      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run: docker build --build-arg MYBRANCH=${CIRCLE_BRANCH} -t alleninstitutepika/croissant:${CIRCLE_SHA1} docker/
+      - run: docker run --entrypoint /bin/bash alleninstitutepika/croissant:${CIRCLE_SHA1} -c "conda run -n myenv pytest"
+      - run: docker push alleninstitutepika/croissant:${CIRCLE_SHA1}
+
+orbs:
+  python: circleci/python@0.3.2
+version: 2.1
+workflows:
+  main:
+    jobs:
+      - build377
+      - build38
+      - lint
+      - mlflow-cli:
+          requires:
+            - build377
+            - build38
+            - lint
+      - docker:
+          requires:
+            - build377
+            - build38
+            - lint
+          filters:
+            branches:
+              only:
+                - master
+                - /.*docker.*/
