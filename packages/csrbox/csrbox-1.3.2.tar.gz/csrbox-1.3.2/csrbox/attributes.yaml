@@ -1,0 +1,4452 @@
+
+misa:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  csr_op: 
+    - |-
+      compressed_enabled::`MISA:begin
+        Bit#(size) readdata = zeroExtend(rg_misa);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        if (rg_misa[2] == 1 && word[2] == 0)
+          word[2] = req.pc_1;
+        rg_misa <= truncate(word);
+      end
+    - |-
+      not compressed_enabled::`MISA:begin
+        Bit#(size) readdata = zeroExtend(rg_misa);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_misa <= truncate(word);
+      end
+  size:
+mscratch:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mstatus:
+  action_method:
+    required: True
+    def_arguments: 
+      - method Action ma_set_mstatus_mpie (Bit#(1) _mpie);
+      - method Action ma_set_mstatus_mpp (Bit#(2) _mpp);
+      - method Action ma_set_mstatus_mie (Bit#(1) _mie);
+      - method Action ma_set_mstatus_spie (Bit#(1) _spie);
+      - method Action ma_set_mstatus_spp (Bit#(1) _spp);
+      - method Action ma_set_mstatus_sie (Bit#(1) _sie);
+      - method Action ma_set_mstatus_upie (Bit#(1) _upie);
+      - method Action ma_set_mstatus_uie (Bit#(1) _uie);
+      - method Action ma_set_mstatus_mprv (Bit#(1) _mprv);
+    dec_body: 
+      - |-
+        method Action ma_set_mstatus_mpie (Bit#(1) _mpie);
+          rg_mstatus_mpie <= _mpie;
+        endmethod
+        method Action ma_set_mstatus_mpp (Bit#(2) _mpp);
+          rg_mstatus_mpp <= _mpp;
+        endmethod
+        method Action ma_set_mstatus_mie (Bit#(1) _mie);
+          rg_mstatus_mie <= _mie;
+        endmethod
+        method Action ma_set_mstatus_spie (Bit#(1) _spie);
+          rg_mstatus_spie <= _spie;
+        endmethod
+        method Action ma_set_mstatus_spp (Bit#(1) _spp);
+          rg_mstatus_spp <= _spp;
+        endmethod
+        method Action ma_set_mstatus_sie (Bit#(1) _sie);
+          rg_mstatus_sie <= _sie;
+        endmethod
+        method Action ma_set_mstatus_upie (Bit#(1) _upie);
+          rg_mstatus_upie <= _upie;
+        endmethod
+        method Action ma_set_mstatus_uie (Bit#(1) _uie);
+          rg_mstatus_uie <= _uie;
+        endmethod
+        method Action ma_set_mstatus_mprv (Bit#(1) _mprv);
+          rg_mstatus_mprv <= _mprv;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_mstatus_mpie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_mpp, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_mie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_spie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_spp, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_sie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_upie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_uie, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mstatus_mprv, ma_core_req"*)'
+mie:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mip:
+  additional_regs:
+    - supervisor_enabled::Wire#(Bit#(1)) wr_ex_seip <- mkWire();
+    - debug_enabled::Wire#(Bit#(1)) wr_debug_haltint <- mkWire();
+    - debug_enabled::Wire#(Bit#(1)) wr_debug_resumeint <- mkWire();
+  action_method:
+    required: True
+    def_arguments: 
+      - method Action ma_set_mip_meip (Bit#(1) _meip);
+      - method Action ma_set_mip_mtip (Bit#(1) _mtip);
+      - method Action ma_set_mip_msip (Bit#(1) _msip);
+      - supervisor_enabled::method Action ma_set_mip_seip (Bit#(1) _seip);
+      - debug_enabled::method Action ma_debug_haltint (Bit#(1) _int);
+      - debug_enabled::method Action ma_debug_resumeint (Bit#(1) _int);
+    dec_body:
+      - |-
+        method Action ma_set_mip_meip (Bit#(1) _meip);
+          rg_mip_meip <= _meip;
+        endmethod
+        method Action ma_set_mip_mtip (Bit#(1) _mtip);
+          rg_mip_mtip <= _mtip;
+        endmethod
+        method Action ma_set_mip_msip (Bit#(1) _msip);
+          rg_mip_msip <= _msip;
+        endmethod
+      - |-
+        supervisor_enabled::method Action ma_set_mip_seip (Bit#(1) _seip);
+          wr_ex_seip <= _seip;
+        endmethod
+      - |- 
+        debug_enabled::method Action ma_debug_resumeint (Bit#(1) _int);
+          wr_debug_resumeint <= _int;
+        endmethod
+        method Action ma_debug_haltint (Bit#(1) _int);
+          wr_debug_haltint <= _int;
+        endmethod
+    global: True
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_mip_meip, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mip_mtip, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_mip_msip, ma_core_req"*)'
+  csr_op: 
+    - |-
+      supervisor_enabled::`MIP:begin
+          Bit#(size) readdata = truncate(rg_mip) | {'d0,wr_ex_seip,8'd0};
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, truncate(rg_mip), op);
+          rg_mip <= word;
+      end
+    - |-
+      not supervisor_enabled::`MIP:begin
+          Bit#(size) readdata = truncate(rg_mip);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, truncate(rg_mip), op);
+          rg_mip <= word;
+      end
+mtvec:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mepc:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_mepc (Bit#(size) _mepc);'
+    dec_body: 
+     - |-
+       method Action ma_set_mepc (Bit#(size) _mepc);
+         rg_mepc <= _mepc;
+       endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_mepc, ma_core_req"*)'
+mcause:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_mcause (Bit#(size) _cause);'
+    dec_body: 
+      - |-
+        method Action ma_set_mcause (Bit#(size) _cause);
+          rg_mcause <= _cause;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_mcause, ma_core_req"*)'
+mtval:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_mtval (Bit#(size) _tval);'
+    dec_body: 
+      - |-
+        method Action ma_set_mtval (Bit#(size) _tval);
+          rg_mtval <= _tval;
+        endmethod
+
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_mtval, ma_core_req"*)'
+mcycle:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+    dec_body: 
+      - 'truncate(rg_mcycle[1])'
+  size:
+  depends_on_csr:
+    - 'mcountinhibit'
+  reg_instantiation: '    Reg#(Bit#(64)) rg_mcycle[2] <- mkCReg(2,0);'
+  csr_op: 
+    - |-
+      `MCYCLE : begin
+          Bit#(size) readdata = truncate(rg_mcycle[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_mcycle[1][size-1:0] <= word;
+      end
+
+  module_body: |-
+    rule rl_increment_cycle;
+      rg_mcycle[0] <= rg_mcycle[0] + 1;
+    endrule
+
+minstret:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_incr_minstret();'
+    dec_body: 
+      - |-
+        method Action ma_incr_minstret();
+          rg_minstret[0] <= rg_minstret[0] + 1;
+        endmethod
+    global: True
+  value_method:
+    required: True
+    dec_body: 
+      - 'truncate(rg_minstret[1])'
+  size:
+  depends_on_csr:
+    - 'mcountinhibit'
+  reg_instantiation: '    Reg#(Bit#(64)) rg_minstret[2] <- mkCReg(2,0);'
+  csr_op: 
+    - |-
+      `MINSTRET : begin
+          Bit#(size) readdata = truncate(rg_minstret[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_minstret[1][size-1:0] <= word;
+      end
+
+mcycleh:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mcycle[1])'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+    - |-
+      `MCYCLEH : begin
+          Bit#(size) readdata = truncateLSB(rg_mcycle[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_mcycle[1][63:32] <= word;
+      end
+
+minstreth:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: 
+      - ''
+    global: False
+  value_method:
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_minstret[1])'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+    - |-
+      `MINSTRETH : begin
+          Bit#(size) readdata = truncateLSB(rg_minstret[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_minstret[1][63:32] <= word;
+      end
+mvendorid:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhartid:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+marchid:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mimpid:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+frm:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  csr_op: 
+    - |-
+      `FRM: begin
+        Bit#(xlen) readdata = zeroExtend(rg_frm);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_frm <= truncate(word);
+        rg_mstatus_fs <= 2'b11;
+      end
+    
+fflags:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_fflags (Bit#(5) _fflags);'
+    dec_body:  
+      - |-
+        method Action ma_set_fflags (Bit#(5) _fflags);
+          if((_fflags|truncate(rg_fflags)) != truncate(rg_fflags))begin
+            rg_fflags <= zeroExtend(_fflags|truncate(rg_fflags));
+            rg_mstatus_fs <= 'b11;
+          end
+        endmethod
+    global: True
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*preempts="ma_core_req, ma_set_fflags"*)'
+  csr_op: 
+    - |-
+      `FFLAGS: begin
+          Bit#(xlen) readdata = zeroExtend(rg_fflags);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_fflags <= truncate(word);
+          rg_mstatus_fs <= 2'b11;
+      end
+fcsr:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  reg_instantiation: 'Reg#(Bit#(8)) rg_fcsr = concatReg2(rg_frm, rg_fflags);'
+  csr_op: 
+    - |-
+      `FCSR: begin
+          Bit#(xlen) readdata = zeroExtend(rg_fcsr);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_fflags <= truncate(word);
+          rg_frm <= word[7:5];
+          rg_mstatus_fs <= 2'b11;
+      end
+  depends_on_csr:
+    - 'frm'
+    - 'fflags'
+timeh:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_time)'
+  size:
+  csr_op: 
+    - |-
+      `TIMEH : begin
+          Bit#(size) readdata = truncateLSB(rg_time);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+cycleh:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  depends_on_csr:
+    - 'mcycleh'
+  csr_op: 
+    - |-
+      `CYCLEH : begin
+          Bit#(size) readdata = truncateLSB(rg_mcycle[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+instreth:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  depends_on_csr:
+    - 'minstreth'
+  csr_op: 
+    - |-
+      `INSTRETH : begin
+          Bit#(size) readdata = truncateLSB(rg_minstret[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+time:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_time (Bit#(64) _time);'
+    dec_body: 
+      - |-
+        method Action ma_set_time (Bit#(64) _time);
+          rg_time <= _time;
+        endmethod
+    global: True
+  value_method:
+    required: True
+    dec_body: 
+      - 'truncate(rg_time)'
+  reg_instantiation: '    Reg#(Bit#(64)) rg_time<- mkReg(0);'
+  csr_op: 
+    - |-
+      `TIME : begin
+          Bit#(size) readdata = truncate(rg_time);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+  size:
+cycle:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  depends_on_csr:
+    - 'mcycle'
+  csr_op: 
+    - |-
+      `CYCLE : begin
+          Bit#(size) readdata = truncate(rg_mcycle[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+instret:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  depends_on_csr:
+    - 'minstret'
+  csr_op: 
+    - |-
+      `INSTRET : begin
+          Bit#(size) readdata = truncate(rg_minstret[1]);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+pmpaddr0:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg0'
+pmpaddr1:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg0'
+pmpaddr2:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg0'
+pmpaddr3:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg0'
+pmpaddr4:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg0'
+    - 'xlen==32::pmpcfg1'
+pmpaddr5:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg0'
+    - 'xlen==32::pmpcfg1'
+pmpaddr6:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg0'
+    - 'xlen==32::pmpcfg1'
+pmpaddr7:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg0'
+    - 'xlen==32::pmpcfg1'
+pmpaddr8:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg2'
+pmpaddr9:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg2'
+pmpaddr10:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg2'
+pmpaddr11:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg2'
+pmpaddr12:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg2'
+    - 'xlen==32::pmpcfg3'
+pmpaddr13:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg2'
+    - 'xlen==32::pmpcfg3'
+pmpaddr14:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg2'
+    - 'xlen==32::pmpcfg3'
+pmpaddr15:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg2'
+    - 'xlen==32::pmpcfg3'
+pmpaddr16:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg4'
+pmpaddr17:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg4'
+pmpaddr18:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg4'
+pmpaddr19:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg4'
+pmpaddr20:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg4'
+    - 'xlen==32::pmpcfg5'
+pmpaddr21:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg4'
+    - 'xlen==32::pmpcfg5'
+pmpaddr22:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg4'
+    - 'xlen==32::pmpcfg5'
+pmpaddr23:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg4'
+    - 'xlen==32::pmpcfg5'
+pmpaddr24:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg6'
+pmpaddr25:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg6'
+pmpaddr26:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg6'
+pmpaddr27:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg6'
+pmpaddr28:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg6'
+    - 'xlen==32::pmpcfg7'
+pmpaddr29:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg6'
+    - 'xlen==32::pmpcfg7'
+pmpaddr30:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg6'
+    - 'xlen==32::pmpcfg7'
+pmpaddr31:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg6'
+    - 'xlen==32::pmpcfg7'
+pmpaddr32:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg8'
+pmpaddr33:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg8'
+pmpaddr34:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg8'
+pmpaddr35:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg8'
+pmpaddr36:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg8'
+    - 'xlen==32::pmpcfg9'
+pmpaddr37:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg8'
+    - 'xlen==32::pmpcfg9'
+pmpaddr38:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg8'
+    - 'xlen==32::pmpcfg9'
+pmpaddr39:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg8'
+    - 'xlen==32::pmpcfg9'
+pmpaddr40:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg10'
+pmpaddr41:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg10'
+pmpaddr42:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg10'
+pmpaddr43:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg10'
+pmpaddr44:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg10'
+    - 'xlen==32::pmpcfg11'
+pmpaddr45:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg10'
+    - 'xlen==32::pmpcfg11'
+pmpaddr46:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg10'
+    - 'xlen==32::pmpcfg11'
+pmpaddr47:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg10'
+    - 'xlen==32::pmpcfg11'
+pmpaddr48:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg12'
+pmpaddr49:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg12'
+pmpaddr50:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg12'
+pmpaddr51:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg12'
+pmpaddr52:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg12'
+    - 'xlen==32::pmpcfg13'
+pmpaddr53:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg12'
+    - 'xlen==32::pmpcfg13'
+pmpaddr54:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg12'
+    - 'xlen==32::pmpcfg13'
+pmpaddr55:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg12'
+    - 'xlen==32::pmpcfg13'
+pmpaddr56:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg14'
+pmpaddr57:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg14'
+pmpaddr58:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg14'
+pmpaddr59:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'pmpcfg14'
+pmpaddr60:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg14'
+    - 'xlen==32::pmpcfg15'
+pmpaddr61:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg14'
+    - 'xlen==32::pmpcfg15'
+pmpaddr62:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg14'
+    - 'xlen==32::pmpcfg15'
+pmpaddr63:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'xlen==64::pmpcfg14'
+    - 'xlen==32::pmpcfg15'
+pmpcfg0:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg1:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg2:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg3:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg4:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg5:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg6:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg7:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg8:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg9:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg10:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg11:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg12:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg13:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg14:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+pmpcfg15:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mcounteren:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmcounter3h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter3)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+    - |-
+      `MHPMCOUNTER3H : begin
+          Bit#(size) readdata = truncateLSB(rg_mhpmcounter3);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, readdata, op);
+          rg_mhpmcounter3[63:32] <= word;
+      end
+  depends_on_csr:
+    - 'mhpmevent3'
+    - 'mcountinhibit'
+mhpmcounter4h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+       - 'truncateLSB(rg_mhpmcounter4)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER4H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter4);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter4[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent4'
+    - 'mcountinhibit'
+mhpmcounter5h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter5)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER5H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter5);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter5[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent5'
+    - 'mcountinhibit'
+mhpmcounter6h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter6)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER6H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter6);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter6[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent6'
+    - 'mcountinhibit'
+mhpmcounter7h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter7)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER7H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter7);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter7[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent7'
+    - 'mcountinhibit'
+mhpmcounter8h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter8)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER8H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter8);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter8[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent8'
+    - 'mcountinhibit'
+mhpmcounter9h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter9)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER9H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter9);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter9[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent9'
+    - 'mcountinhibit'
+mhpmcounter10h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter10)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER10H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter10);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter10[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent10'
+    - 'mcountinhibit'
+mhpmcounter11h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter11)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER11H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter11);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter11[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent11'
+    - 'mcountinhibit'
+mhpmcounter12h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter12)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER12H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter12);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter12[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent12'
+    - 'mcountinhibit'
+mhpmcounter13h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter13)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER13H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter13);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter13[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent13'
+    - 'mcountinhibit'
+mhpmcounter14h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter14)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER14H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter14);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter14[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent14'
+    - 'mcountinhibit'
+mhpmcounter15h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter15)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER15H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter15);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter15[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent15'
+    - 'mcountinhibit'
+mhpmcounter16h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter16)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER16H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter16);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter16[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent16'
+    - 'mcountinhibit'
+mhpmcounter17h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter17)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER17H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter17);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter17[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent17'
+    - 'mcountinhibit'
+mhpmcounter18h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter18)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER18H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter18);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter18[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent18'
+    - 'mcountinhibit'
+mhpmcounter19h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter19)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER19H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter19);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter19[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent19'
+    - 'mcountinhibit'
+mhpmcounter20h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter20)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER20H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter20);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter20[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent20'
+    - 'mcountinhibit'
+mhpmcounter21h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter21)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER21H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter21);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter21[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent21'
+    - 'mcountinhibit'
+mhpmcounter22h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter22)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER22H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter22);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter22[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent22'
+    - 'mcountinhibit'
+mhpmcounter23h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter23)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER23H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter23);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter23[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent23'
+    - 'mcountinhibit'
+mhpmcounter24h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter24)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER24H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter24);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter24[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent24'
+    - 'mcountinhibit'
+mhpmcounter25h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter25)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER25H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter25);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter25[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent25'
+    - 'mcountinhibit'
+mhpmcounter26h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter26)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER26H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter26);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter26[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent26'
+    - 'mcountinhibit'
+mhpmcounter27h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter27)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER27H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter27);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter27[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent27'
+    - 'mcountinhibit'
+mhpmcounter28h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter28)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER28H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter28);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter28[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent28'
+    - 'mcountinhibit'
+mhpmcounter29h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter29)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER29H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter29);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter29[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent29'
+    - 'mcountinhibit'
+mhpmcounter30h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter30)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER30H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter30);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter30[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent30'
+    - 'mcountinhibit'
+mhpmcounter31h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method: 
+    required: True
+    dec_body: 
+      - 'truncateLSB(rg_mhpmcounter31)'
+  size:
+  reg_instantiation: ''
+  csr_op: 
+  - |-
+    `MHPMCOUNTER31H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter31);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+        let word = fn_csr_op(req.writedata, readdata, op);
+        rg_mhpmcounter31[63:32] <= word;
+    end
+  depends_on_csr:
+    - 'mhpmevent31'
+    - 'mcountinhibit'
+mhpmcounter3:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent3'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc3;
+      rg_mhpmcounter3 <= rg_mhpmcounter3 + zeroExtend(~rg_mcountinhibit[3]&wr_events[rg_mhpmevent3]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc3"*)'
+mhpmcounter4:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent4'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc4;
+      rg_mhpmcounter4 <= rg_mhpmcounter4 + zeroExtend(~rg_mcountinhibit[4]&wr_events[rg_mhpmevent4]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc4"*)'
+mhpmcounter5:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent5'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc5;
+      rg_mhpmcounter5 <= rg_mhpmcounter5 + zeroExtend(~rg_mcountinhibit[5]&wr_events[rg_mhpmevent5]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc5"*)'
+mhpmcounter6:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent6'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc6;
+      rg_mhpmcounter6 <= rg_mhpmcounter6 + zeroExtend(~rg_mcountinhibit[6]&wr_events[rg_mhpmevent6]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc6"*)'
+mhpmcounter7:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent7'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc7;
+      rg_mhpmcounter7 <= rg_mhpmcounter7 + zeroExtend(~rg_mcountinhibit[7]&wr_events[rg_mhpmevent7]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc7"*)'
+mhpmcounter8:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent8'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc8;
+      rg_mhpmcounter8 <= rg_mhpmcounter8 + zeroExtend(~rg_mcountinhibit[8]&wr_events[rg_mhpmevent8]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc8"*)'
+mhpmcounter9:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent9'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc9;
+      rg_mhpmcounter9 <= rg_mhpmcounter9 + zeroExtend(~rg_mcountinhibit[9]&wr_events[rg_mhpmevent9]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc9"*)'
+mhpmcounter10:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent10'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc10;
+      rg_mhpmcounter10 <= rg_mhpmcounter10 + zeroExtend(~rg_mcountinhibit[10]&wr_events[rg_mhpmevent10]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc10"*)'
+mhpmcounter11:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent11'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc11;
+      rg_mhpmcounter11 <= rg_mhpmcounter11 + zeroExtend(~rg_mcountinhibit[11]&wr_events[rg_mhpmevent11]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc11"*)'
+mhpmcounter12:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent12'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc12;
+      rg_mhpmcounter12 <= rg_mhpmcounter12 + zeroExtend(~rg_mcountinhibit[12]&wr_events[rg_mhpmevent12]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc12"*)'
+mhpmcounter13:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent13'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc13;
+      rg_mhpmcounter13 <= rg_mhpmcounter13 + zeroExtend(~rg_mcountinhibit[13]&wr_events[rg_mhpmevent13]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc13"*)'
+mhpmcounter14:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent14'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc14;
+      rg_mhpmcounter14 <= rg_mhpmcounter14 + zeroExtend(~rg_mcountinhibit[14]&wr_events[rg_mhpmevent14]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc14"*)'
+mhpmcounter15:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent15'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc15;
+      rg_mhpmcounter15 <= rg_mhpmcounter15 + zeroExtend(~rg_mcountinhibit[15]&wr_events[rg_mhpmevent15]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc15"*)'
+mhpmcounter16:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent16'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc16;
+      rg_mhpmcounter16 <= rg_mhpmcounter16 + zeroExtend(~rg_mcountinhibit[16]&wr_events[rg_mhpmevent16]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc16"*)'
+mhpmcounter17:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent17'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc17;
+      rg_mhpmcounter17 <= rg_mhpmcounter17 + zeroExtend(~rg_mcountinhibit[17]&wr_events[rg_mhpmevent17]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc17"*)'
+mhpmcounter18:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent18'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc18;
+      rg_mhpmcounter18 <= rg_mhpmcounter18 + zeroExtend(~rg_mcountinhibit[18]&wr_events[rg_mhpmevent18]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc18"*)'
+mhpmcounter19:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent19'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc19;
+      rg_mhpmcounter19 <= rg_mhpmcounter19 + zeroExtend(~rg_mcountinhibit[19]&wr_events[rg_mhpmevent19]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc19"*)'
+mhpmcounter20:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent20'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc20;
+      rg_mhpmcounter20 <= rg_mhpmcounter20 + zeroExtend(~rg_mcountinhibit[20]&wr_events[rg_mhpmevent20]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc20"*)'
+mhpmcounter21:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent21'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc21;
+      rg_mhpmcounter21 <= rg_mhpmcounter21 + zeroExtend(~rg_mcountinhibit[21]&wr_events[rg_mhpmevent21]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc21"*)'
+mhpmcounter22:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent22'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc22;
+      rg_mhpmcounter22 <= rg_mhpmcounter22 + zeroExtend(~rg_mcountinhibit[22]&wr_events[rg_mhpmevent22]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc22"*)'
+mhpmcounter23:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent23'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc23;
+      rg_mhpmcounter23 <= rg_mhpmcounter23 + zeroExtend(~rg_mcountinhibit[23]&wr_events[rg_mhpmevent23]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc23"*)'
+mhpmcounter24:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent24'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc24;
+      rg_mhpmcounter24 <= rg_mhpmcounter24 + zeroExtend(~rg_mcountinhibit[24]&wr_events[rg_mhpmevent24]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc24"*)'
+mhpmcounter25:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent25'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc25;
+      rg_mhpmcounter25 <= rg_mhpmcounter25 + zeroExtend(~rg_mcountinhibit[25]&wr_events[rg_mhpmevent25]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc25"*)'
+mhpmcounter26:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent26'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc26;
+      rg_mhpmcounter26 <= rg_mhpmcounter26 + zeroExtend(~rg_mcountinhibit[26]&wr_events[rg_mhpmevent26]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc26"*)'
+mhpmcounter27:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent27'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc27;
+      rg_mhpmcounter27 <= rg_mhpmcounter27 + zeroExtend(~rg_mcountinhibit[27]&wr_events[rg_mhpmevent27]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc27"*)'
+mhpmcounter28:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent28'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc28;
+      rg_mhpmcounter28 <= rg_mhpmcounter28 + zeroExtend(~rg_mcountinhibit[28]&wr_events[rg_mhpmevent28]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc28"*)'
+mhpmcounter29:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent29'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc29;
+      rg_mhpmcounter29 <= rg_mhpmcounter29 + zeroExtend(~rg_mcountinhibit[29]&wr_events[rg_mhpmevent29]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc29"*)'
+mhpmcounter30:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent30'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc30;
+      rg_mhpmcounter30 <= rg_mhpmcounter30 + zeroExtend(~rg_mcountinhibit[30]&wr_events[rg_mhpmevent30]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc30"*)'
+mhpmcounter31:
+  additional_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+  additional_top_regs:
+    - Wire#(Bit#(`mhpm_eventcount)) wr_events <- mkWire();
+    - mkConnection(grp_name.ma_events, wr_events);
+  additional_top_method:
+    - method Action ma_events(Bit#(`mhpm_eventcount) events);
+  additional_top_method_body:
+    - |-
+      method Action ma_events(Bit#(`mhpm_eventcount) events);
+        wr_events <= events;
+      endmethod
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+  depends_on_csr:
+    - 'mhpmevent31'
+    - 'mcountinhibit'
+  module_body: |-
+    rule rl_increment_mhpmc31;
+      rg_mhpmcounter31 <= rg_mhpmcounter31 + zeroExtend(~rg_mcountinhibit[31]&wr_events[rg_mhpmevent31]);
+    endrule
+
+  mod_attributes:
+    - '(*preempts = "ma_core_req, rl_increment_mhpmc31"*)'
+mhpmevent3:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent4:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent5:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent6:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent7:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent8:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent9:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent10:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent11:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent12:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent13:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent14:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent15:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent16:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent17:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent18:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent19:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent20:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent21:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent22:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent23:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent24:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent25:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent26:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent27:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent28:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent29:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent30:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+mhpmevent31:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: True
+  size:
+hpmcounter3h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+    - |-
+      `HPMCOUNTER3H : begin
+          Bit#(size) readdata = truncateLSB(rg_mhpmcounter3);
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+      end
+hpmcounter4h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:  
+  csr_op: 
+  - |-
+    `HPMCOUNTER4H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter4);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter5h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:  
+  csr_op: 
+  - |-
+    `HPMCOUNTER5H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter5);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter6h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER6H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter6);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter7h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER7H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter7);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter8h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER8H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter8);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter9h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER9H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter9);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter10h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER10H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter10);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter11h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER11H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter11);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter12h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER12H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter12);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter13h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER13H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter13);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter14h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER14H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter14);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter15h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER15H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter15);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter16h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER16H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter16);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter17h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER17H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter17);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter18h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER18H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter18);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter19h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER19H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter19);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter20h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER20H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter20);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter21h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER21H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter21);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter22h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER22H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter22);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter23h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER23H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter23);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter24h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER24H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter24);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter25h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER25H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter25);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter26h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER26H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter26);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter27h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER27H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter27);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter28h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER28H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter28);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter29h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER29H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter29);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter30h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER30H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter30);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter31h:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER31H : begin
+        Bit#(size) readdata = truncateLSB(rg_mhpmcounter31);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter3:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER3 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter3);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter4:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER4 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter4);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter5:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER5 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter5);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter6:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER6 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter6);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter7:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER7 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter7);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter8:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER8 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter8);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter9:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER9 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter9);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter10:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER10 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter10);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter11:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER11 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter11);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter12:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER12 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter12);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter13:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER13 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter13);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter14:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER14 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter14);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter15:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER15 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter15);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter16:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER16 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter16);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter17:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER17 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter17);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter18:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER18 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter18);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter19:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER19 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter19);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter20:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER20 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter20);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter21:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER21 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter21);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter22:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER22 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter22);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter23:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER23 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter23);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter24:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER24 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter24);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter25:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER25 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter25);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter26:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER26 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter26);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter27:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER27 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter27);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter28:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER28 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter28);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter29:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER29 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter29);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter30:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+    global: False
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER30 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter30);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+hpmcounter31:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: False
+  size:
+  csr_op: 
+  - |-
+    `HPMCOUNTER31 : begin
+        Bit#(size) readdata = truncate(rg_mhpmcounter31);
+        rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+    end
+mcountinhibit:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+sstatus:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: False
+  size:
+sip:
+  additional_regs:
+    - Wire#(Bit#(1)) wr_ex_seip <- mkWire();
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+  csr_op: 
+    - |-
+      `SIP : begin
+          Bit#(size) readdata = truncate(rg_sip) | {'d0,wr_ex_seip,8'd0};
+          rg_resp_to_core <= CSRResponse{hit:True, data: readdata};
+          let word = fn_csr_op(req.writedata, truncate(rg_sip), op);
+          rg_sip <= word;
+      end
+sie:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+satp:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+sscratch:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+scounteren:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+scause:
+  action_method:
+    required: True 
+    def_arguments: 
+      - 'method Action ma_set_scause (Bit#(size) _cause);'
+    dec_body: 
+      - |-
+        method Action ma_set_scause (Bit#(size) _cause);
+          rg_scause <= _cause;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_scause, ma_core_req"*)'
+stval:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_stval (Bit#(size) _tval);'
+    dec_body: 
+      - |-
+        method Action ma_set_stval (Bit#(size) _tval);
+          rg_stval <= _tval;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_stval, ma_core_req"*)'
+sepc:
+  action_method:
+    required: True 
+    def_arguments: 
+      - 'method Action ma_set_sepc (Bit#(size) _epc);'
+    dec_body: 
+      - |-
+        method Action ma_set_sepc (Bit#(size) _epc);
+          rg_sepc <= _epc;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_sepc, ma_core_req"*)'
+stvec:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+mideleg:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+medeleg:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+ustatus:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: False
+  size:
+uip:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: False
+  size:
+uie:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: False
+  size:
+uscratch:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+ucause:
+  action_method:
+    required: True 
+    def_arguments: 
+      - 'method Action ma_set_ucause (Bit#(size) _cause);'
+    dec_body: 
+      - |-
+        method Action ma_set_ucause (Bit#(size) _cause);
+          rg_ucause <= _cause;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_ucause, ma_core_req"*)'
+utval:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_utval (Bit#(size) _tval);'
+    dec_body: 
+      - |-
+        method Action ma_set_utval (Bit#(size) _tval);
+          rg_utval <= _tval;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_utval, ma_core_req"*)'
+uepc:
+  action_method:
+    required: True 
+    def_arguments: 
+      - 'method Action ma_set_uepc (Bit#(size) _epc);'
+    dec_body: 
+      - |-
+        method Action ma_set_uepc (Bit#(size) _epc);
+          rg_uepc <= _epc;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_uepc, ma_core_req"*)'
+utvec:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+sideleg:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+sedeleg:
+  action_method:
+    required: False
+    def_arguments: ''
+    dec_body: ''
+  value_method:
+    required: True
+  size:
+dpc:
+  action_method:
+    required: True
+    def_arguments: 
+      - 'method Action ma_set_dpc (Bit#(size) _dpc);'
+    dec_body: 
+     - |-
+       method Action ma_set_dpc (Bit#(size) _dpc);
+         rg_dpc <= _dpc;
+       endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_dpc, ma_core_req"*)'
+dcsr:
+  action_method:
+    required: True
+    def_arguments: 
+      - method Action ma_set_dcsr_cause (Bit#(3) _cause);
+      - method Action ma_set_dcsr_prv (Bit#(2) _prv);
+    dec_body: 
+      - |-
+        method Action ma_set_dcsr_cause (Bit#(3) _cause);
+          rg_dcsr_cause <= _cause;
+        endmethod
+        method Action ma_set_dcsr_prv (Bit#(2) _prv);
+          rg_dcsr_prv <= _prv;
+        endmethod
+    global: False
+  value_method:
+    required: True
+  size:
+  mod_attributes:
+    - '(*mutually_exclusive = "ma_set_dcsr_prv, ma_core_req"*)'
+    - '(*mutually_exclusive = "ma_set_dcsr_cause, ma_core_req"*)'
