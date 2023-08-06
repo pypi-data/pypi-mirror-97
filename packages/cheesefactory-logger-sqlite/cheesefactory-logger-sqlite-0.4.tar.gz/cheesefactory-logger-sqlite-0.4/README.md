@@ -1,0 +1,250 @@
+# cheesefactory-logger-sqlite
+
+-----------------
+
+##### An interface for logging to a SQLite database.
+[![PyPI Latest Release](https://img.shields.io/pypi/v/cheesefactory-logger-sqlite.svg)](https://pypi.org/project/cheesefactory-logger-sqlite/)
+[![PyPI status](https://img.shields.io/pypi/status/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-logger-sqlite/)
+[![PyPI download month](https://img.shields.io/pypi/dm/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-logger-sqlite/)
+[![PyPI download week](https://img.shields.io/pypi/dw/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-logger-sqlite/)
+[![PyPI download day](https://img.shields.io/pypi/dd/cheesefactory-logger-sqlite.svg)](https://pypi.python.org/pypi/cheesefactory-logger-sqlite/)
+
+### Main Features
+
+* Log to a SQLite database
+* Table fields are user-defined. 
+* Ability to archive (rotate) database files.
+* Query the log table.
+* Make a dump of the log table.
+
+
+#### Note: This package is still in beta status. As such, future versions may not be backwards compatible and features may change.
+
+
+## Recent Changes
+* v0.4: The `CfLogSqlite.result` attribute no longer exists. `CfLogSqlite.read_records()` now directly 
+returns a list of query results.
+
+
+## Installation
+The source is hosted at https://bitbucket.org/hellsgrannies/cheesefactory-logger-sqlite
+
+```sh
+pip install cheesefactory-logger-sqlite
+```
+
+## Dependencies
+
+None
+
+### Basic Usage
+
+```python
+from cheesefactory_logger_sqlite import CfLogSqlite
+
+field_list = {
+    'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+    'action': 'TEXT',
+    'action_ok': 'INTEGER',
+    'client': 'TEXT',
+    'local_host': 'TEXT',
+    'local_path': 'TEXT',
+    'notes': 'TEXT',
+    'preserve_mtime': 'INTEGER',
+    'preserve_mtime_ok': 'INTEGER',
+    'redo': 'INTEGER',
+    'remote_host': 'TEXT',
+    'remote_path': 'TEXT',
+    'remove_source': 'INTEGER',
+    'remove_source_ok': 'INTEGER',
+    'size': 'INTEGER',
+    'size_match_ok': 'INTEGER',
+    'status': 'INTEGER',
+    'suffix': 'TEXT',
+    'suffix_ok': 'INTEGER',
+    'timestamp': 'TEXT DEFAULT CURRENT_TIMESTAMP',
+}
+
+log = CfLogSqlite.connect(
+    database_path='/app/log.sqlite', 
+    create=True, 
+    field_list=field_list
+)
+```
+
+* _database_path_ (str): Path to SQLite database file.
+* _create_ (str): Create a new SQLite database file if it does not exist?
+* _field_list_ (dict): A dictionary of field name "keys" paired with field type "values".
+
+
+### INSERT and UPDATE log entries
+
+```python
+# This is an INSERT. CfLogSqlite.write_kwargs() always returns a primary key (pk)
+
+pk = log.write_kwargs(
+    action='GET', client='CfTester', local_host='192.168.1.1', local_path='/tmp', preserve_mtime=1,
+    remote_host='172.16.1.1', remote_path='/upload', remove_source=1, status=0
+)
+
+
+
+# Here is another way to do the same thing...
+data = {
+    'action': 'GET', 'client': 'CfTester', 'local_host': '192.168.1.1', 'local_path': '/tmp5',
+    'preserve_mtime': 1, 'remote_host': '172.16.1.1', 'remote_path': '/upload'
+}
+data['remove_source'] = 1
+data['status'] = 0
+log.write_kwargs(**data)
+
+
+
+# If "pk" is defined, then write_kwargs becomes an UPDATE for the row matching pk's value. 
+
+log.write_kwargs(
+    pk=pk,
+    preserve_mtime_ok=1, remove_source_ok=1, size=2232, notes='not done yet'
+)
+```
+
+**NOTE:** When doing an UPDATE, the field that acts as the table's primary key is auto-detected. If 
+the table does not have a primary key then an UPDATE cannot happen. CfLogSqlite does not support
+UPDATEs on tables with more than one primary key.
+
+```python
+# Another UPDATE
+
+log.write_kwargs(
+    pk=pk,
+    notes='done', status=0
+)
+
+# Another INSERT 
+
+pk = log.write_kwargs(
+    action='GET', client='CfTester', local_host='192.168.1.1', local_path='/tmp5', preserve_mtime=1,
+    remote_host='172.16.1.1', remote_path='/upload5', remove_source=1, status=0
+)
+
+# An UPDATE for the last "pk" captured.
+
+log.write_kwargs(
+    pk=pk,
+    preserve_mtime_ok=0, remove_source_ok=1, size=245, notes='not done yet'
+)
+```
+
+### Reading entries
+
+**Changed in 0.4:** The `CfLogSqlite.result` attribute no longer exists. `CfLogSqlite.read_records()` 
+now directly returns a list of query results.
+
+```python
+results = log.read_records()
+
+# Using the earlier examples, here is an example what result contains. A list of tuples:
+(1, 'GET', None, 'CfTester', '192.168.1.1', '/tmp', 'done', 1, 1, None, '172.16.1.1', 
+ '/upload', 1, 1, 2232, None, 0, None, None),
+(2, 'GET', None, 'CfTester', '192.168.1.1', '/tmp5', 'done', 1, 0, None, '172.16.1.1', 
+ '/upload5', 1, 1, 245, None, 1, None, None),
+(3, 'GET', None, 'CfTester', '192.168.1.1', '/tmp4', 'done', 0, 1, None, '172.16.1.1', 
+ '/upload4', 1, 0, 274, None, 1, None, None)
+
+# CfLogSqlite.read_records() selects all fields specified in CfLogSqlite.field_list. You may
+# filter the query by using a WHERE clause, like this:
+results = log.read_records(where="size = 245 AND client = 'CfTester'")
+
+# Now the value of results equals:
+(2, 'GET', None, 'CfTester', '192.168.1.1', '/tmp5', 'done', 1, 0, None, '172.16.1.1', 
+ '/upload5', 1, 1, 245, None, 1, None, None),
+```
+
+This package is to be used by cheesefactory-sftp, cheesefactory-smb, etc. as a way to 
+not only keep a log of file transactions, but also to see if a file has already 
+been transferred. 
+
+The technique: If **only new** files are to be moved, grab a file listing
+from the file system (along with, perhaps, file sizes), then compare it to a list of 
+files from the SQLite database:
+
+```python
+results = log.read_records(where="local_path = '/dir1/file12.txt AND size = 24314'")
+
+if len(results) == 0:
+    # Transfer the file
+```
+
+
+### Making a table dump
+
+```python
+from cheesefactory_logger_sqlite import CfLogSqlite
+
+field_list = {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'action': 'TEXT',
+        'action_ok': 'INTEGER',
+        'client': 'TEXT',
+        'local_host': 'TEXT',
+        'local_path': 'TEXT',
+    }
+
+log = CfLogSqlite.connect(
+    database_path='/app/log.sqlite', 
+    create=True, 
+    field_list=field_list
+)
+
+log.write_kwargs(action='GET', action_ok=1, client='test run', local_host='192.10.10.4',
+                 local_path='/tmp/here.txt')
+log.write_kwargs(action='PUT', action_ok=1, client='test run', local_host='192.10.10.4',
+                 local_path='/tmp/here2.txt')
+log.write_kwargs(action='GET', action_ok=0, client='test run', local_host='192.10.10.4',
+                 local_path='/tmp/here3.txt')
+log.write_kwargs(action='GET', action_ok=0, client='test run', local_host='192.10.10.4',
+                 local_path='/tmp/here3.txt')
+log.write_kwargs(action='GET', action_ok=1, client='client3', local_host='192.10.70.4',
+                 local_path='/tmp/here3.txt')
+log.write_kwargs(action='PUT', action_ok=1, client='test run', local_host='192.10.60.4',
+                 local_path='/tmp/here5.txt')
+log.write_kwargs(action='GET', action_ok=0, client='client4', local_host='192.10.50.4',
+                 local_path='/tmp/here4.txt')
+
+dump = log.dump_table()
+
+# The value of dump is a string containing:
+
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \ 
+"(1, 'GET', 1, 'test run', '192.10.10.4', '/tmp/here.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(2, 'PUT', 1, 'test run', '192.10.10.4', '/tmp/here2.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(3, 'GET', 0, 'test run', '192.10.10.4', '/tmp/here3.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(4, 'GET', 0, 'test run', '192.10.10.4', '/tmp/here3.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(5, 'GET', 1, 'client3', '192.10.70.4', '/tmp/here3.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(6, 'PUT', 1, 'test run', '192.10.60.4', '/tmp/here5.txt');\n" \
+"INSERT INTO mytable (id, action, action_ok, client, local_host, local_path) VALUES " \
+"(7, 'GET', 0, 'client4', '192.10.50.4', '/tmp/here4.txt');\n"
+
+# You also have the option of excluding the primary key field, changing the target table name
+# and adding a WHERE clause:
+
+dump = log.dump_table(exclude_pk=True, where='action_ok = 0', target_table='new_table')
+
+# The value of dump:
+
+"INSERT INTO new_table (action, action_ok, client, local_host, local_path) VALUES " \
+"('GET', 0, 'test run', '192.10.10.4', '/tmp/here3.txt');\n" \
+"INSERT INTO new_table (action, action_ok, client, local_host, local_path) VALUES " \
+"('GET', 0, 'test run', '192.10.10.4', '/tmp/here3.txt');\n" \
+"INSERT INTO new_table (action, action_ok, client, local_host, local_path) VALUES " \
+"('GET', 0, 'client4', '192.10.50.4', '/tmp/here4.txt');\n"
+```
+
+
+
+#### Note: This package is still in beta status. As such, future versions may not be backwards compatible and features may change.
