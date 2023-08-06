@@ -1,0 +1,4917 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "OPSI_DATABASE-INSIGHTS" "1" "Mar 08, 2021" "2.21.5" "OCI CLI Command Reference"
+.SH NAME
+opsi_database-insights \- 
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+Logical grouping used for Operations Insights database\-targeted operations.
+.SH AVAILABLE COMMANDS
+.INDENT 0.0
+.IP \(bu 2
+ingest\-sql\-bucket
+.IP \(bu 2
+ingest\-sql\-plan\-lines
+.IP \(bu 2
+ingest\-sql\-text
+.IP \(bu 2
+list
+.IP \(bu 2
+list\-sql\-plans
+.IP \(bu 2
+list\-sql\-searches
+.IP \(bu 2
+list\-sql\-texts
+.IP \(bu 2
+summarize\-database\-insight\-resource\-capacity\-trend
+.IP \(bu 2
+summarize\-database\-insight\-resource\-forecast\-trend
+.IP \(bu 2
+summarize\-database\-insight\-resource\-statistics
+.IP \(bu 2
+summarize\-database\-insight\-resource\-usage
+.IP \(bu 2
+summarize\-database\-insight\-resource\-usage\-trend
+.IP \(bu 2
+summarize\-database\-insight\-resource\-utilization\-insight
+.IP \(bu 2
+summarize\-sql\-insights
+.IP \(bu 2
+summarize\-sql\-plan\-insights
+.IP \(bu 2
+summarize\-sql\-response\-time\-distributions
+.IP \(bu 2
+summarize\-sql\-statistics
+.IP \(bu 2
+summarize\-sql\-statistics\-time\-series
+.IP \(bu 2
+summarize\-sql\-statistics\-time\-series\-by\-plan
+.UNINDENT
+.SS \fBingest\-sql\-bucket\fP
+.SS Description
+.sp
+The sqlbucket endpoint takes in a JSON payload, persists it in Operations Insights ingest pipeline.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights ingest\-sql\-bucket [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-if\-match [text]
+.UNINDENT
+.sp
+Used for optimistic concurrency control. In the update or delete call for a resource, set the \fIif\-match\fP parameter to the value of the etag from a previous get, create, or update response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource\(aqs current etag value.
+.INDENT 0.0
+.TP
+.B \-\-items [complex type]
+.UNINDENT
+.sp
+List of SQL Bucket Metric Entries.
+.sp
+This option is a JSON list with items of type SqlBucket.  For documentation on SqlBucket please see our API reference: \fI\%https://docs.cloud.oracle.com/api/#/en/operationsinsights/20200630/datatypes/SqlBucket\fP\&.
+This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the \fI\%file://path/to/file\fP syntax.
+.sp
+The \fB\-\-generate\-param\-json\-input\fP option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the \fI\%file://\fP syntax.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBingest\-sql\-plan\-lines\fP
+.SS Description
+.sp
+The SqlPlanLines endpoint takes in a JSON payload, persists it in Operation Insights ingest pipeline.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights ingest\-sql\-plan\-lines [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-if\-match [text]
+.UNINDENT
+.sp
+Used for optimistic concurrency control. In the update or delete call for a resource, set the \fIif\-match\fP parameter to the value of the etag from a previous get, create, or update response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource\(aqs current etag value.
+.INDENT 0.0
+.TP
+.B \-\-items [complex type]
+.UNINDENT
+.sp
+List of SQL Plan Line Entries.
+.sp
+This option is a JSON list with items of type SqlPlanLine.  For documentation on SqlPlanLine please see our API reference: \fI\%https://docs.cloud.oracle.com/api/#/en/operationsinsights/20200630/datatypes/SqlPlanLine\fP\&.
+This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the \fI\%file://path/to/file\fP syntax.
+.sp
+The \fB\-\-generate\-param\-json\-input\fP option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the \fI\%file://\fP syntax.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBingest\-sql\-text\fP
+.SS Description
+.sp
+The SqlText endpoint takes in a JSON payload, persists it in Operation Insights ingest pipeline. Disclaimer: SQL text being uploaded explicitly via APIs is not masked. Any sensitive literals contained in the sqlFullText column should be masked prior to ingestion.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights ingest\-sql\-text [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-if\-match [text]
+.UNINDENT
+.sp
+Used for optimistic concurrency control. In the update or delete call for a resource, set the \fIif\-match\fP parameter to the value of the etag from a previous get, create, or update response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource\(aqs current etag value.
+.INDENT 0.0
+.TP
+.B \-\-items [complex type]
+.UNINDENT
+.sp
+List of SQL Text Entries.
+.sp
+This option is a JSON list with items of type SqlText.  For documentation on SqlText please see our API reference: \fI\%https://docs.cloud.oracle.com/api/#/en/operationsinsights/20200630/datatypes/SqlText\fP\&.
+This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the \fI\%file://path/to/file\fP syntax.
+.sp
+The \fB\-\-generate\-param\-json\-input\fP option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the \fI\%file://\fP syntax.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\fP
+.SS Description
+.sp
+Lists database insight resources
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights list [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results. If you provide this option, then you cannot provide the \fB\-\-limit\fP option.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-fields [text]
+.UNINDENT
+.sp
+Specifies the fields to return in a database summary response. By default all fields are returned if omitted.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+compartmentId, databaseDisplayName, databaseHostNames, databaseName, databaseType, databaseVersion, definedTags, freeformTags
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+For list pagination. The maximum number of results per page, or items to return in a paginated "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&. Example: \fI50\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-page\-size [integer]
+.UNINDENT
+.sp
+When fetching results, the number of results to fetch per call. Only valid when used with \fB\-\-all\fP or \fB\-\-limit\fP, and ignored otherwise.
+.INDENT 0.0
+.TP
+.B \-\-sort\-by [text]
+.UNINDENT
+.sp
+Database insight list sort options. If \fIfields\fP parameter is selected, the \fIsortBy\fP parameter must be one of the fields specified.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+databaseDisplayName, databaseName, databaseType
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-sql\-plans\fP
+.SS Description
+.sp
+Query SQL Warehouse to list the plan xml for a given SQL execution plan. This returns a SqlPlanCollection object, but is currently limited to a single plan.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights list\-sql\-plans [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.INDENT 0.0
+.TP
+.B \-\-plan\-hash [text]
+.UNINDENT
+.sp
+Unique plan hash for a SQL Plan of a particular SQL Statement. Example: \fI9820154385\fP
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-sql\-searches\fP
+.SS Description
+.sp
+Search SQL by SQL Identifier across databases and get the SQL Text and the details of the databases executing the SQL for a given time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights list\-sql\-searches [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results.
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBlist\-sql\-texts\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the full SQL Text for a SQL.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights list\-sql\-texts [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+One or more unique SQL_IDs for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-all
+.UNINDENT
+.sp
+Fetches all pages of results.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-capacity\-trend\fP
+.SS Description
+.sp
+Returns response with time series data (endTimestamp, capacity, baseCapacity) for the time period specified. The maximum time range for analysis is 2 years, hence this is intentionally not paginated.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-capacity\-trend [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-sort\-by [text]
+.UNINDENT
+.sp
+Sorts using end timestamp , capacity or baseCapacity
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+baseCapacity, capacity, endTimestamp
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-utilization\-level [text]
+.UNINDENT
+.sp
+Filter by utilization level by the following buckets:   \- HIGH_UTILIZATION: DBs with utilization greater or equal than 75.   \- LOW_UTILIZATION: DBs with utilization lower than 25.   \- MEDIUM_HIGH_UTILIZATION: DBs with utilization greater or equal than 50 but lower than 75.   \- MEDIUM_LOW_UTILIZATION: DBs with utilization greater or equal than 25 but lower than 50.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+HIGH_UTILIZATION, LOW_UTILIZATION, MEDIUM_HIGH_UTILIZATION, MEDIUM_LOW_UTILIZATION
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-forecast\-trend\fP
+.SS Description
+.sp
+Get Forecast predictions for CPU and Storage resources since a time in the past.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-forecast\-trend [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-confidence [integer]
+.UNINDENT
+.sp
+This parameter is used to change data\(aqs confidence level, this data is ingested by the forecast algorithm. Confidence is the probability of an interval to contain the expected population parameter. Manipulation of this value will lead to different results. If not set, default confidence value is 95%.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-forecast\-days [integer]
+.UNINDENT
+.sp
+Number of days used for utilization forecast analysis.
+.INDENT 0.0
+.TP
+.B \-\-forecast\-model [text]
+.UNINDENT
+.sp
+Choose algorithm model for the forecasting. Possible values:   \- LINEAR: Uses linear regression algorithm for forecasting.   \- ML_AUTO: Automatically detects best algorithm to use for forecasting.   \- ML_NO_AUTO: Automatically detects seasonality of the data for forecasting using linear or seasonal algorithm.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+LINEAR, ML_AUTO, ML_NO_AUTO
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-statistic [text]
+.UNINDENT
+.sp
+Choose the type of statistic metric data to be used for forecasting.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+AVG, MAX
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-utilization\-level [text]
+.UNINDENT
+.sp
+Filter by utilization level by the following buckets:   \- HIGH_UTILIZATION: DBs with utilization greater or equal than 75.   \- LOW_UTILIZATION: DBs with utilization lower than 25.   \- MEDIUM_HIGH_UTILIZATION: DBs with utilization greater or equal than 50 but lower than 75.   \- MEDIUM_LOW_UTILIZATION: DBs with utilization greater or equal than 25 but lower than 50.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+HIGH_UTILIZATION, LOW_UTILIZATION, MEDIUM_HIGH_UTILIZATION, MEDIUM_LOW_UTILIZATION
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-statistics\fP
+.SS Description
+.sp
+Lists the Resource statistics (usage,capacity, usage change percent, utilization percent, base capacity, isAutoScalingEnabled) for each database filtered by utilization level
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-statistics [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-forecast\-days [integer]
+.UNINDENT
+.sp
+Number of days used for utilization forecast analysis.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-insight\-by [text]
+.UNINDENT
+.sp
+Return data of a specific insight Possible values are High Utilization, Low Utilization, Any ,High Utilization Forecast, Low Utilization Forecast
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+For list pagination. The maximum number of results per page, or items to return in a paginated "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&. Example: \fI50\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-percentile [integer]
+.UNINDENT
+.sp
+Percentile values of daily usage to be used for computing the aggregate resource usage.
+.INDENT 0.0
+.TP
+.B \-\-sort\-by [text]
+.UNINDENT
+.sp
+The order in which resource statistics records are listed
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+databaseName, databaseType, usage, usageChangePercent, utilizationPercent
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-usage\fP
+.SS Description
+.sp
+A cumulative distribution function is used to rank the usage data points per database within the specified time period. For each database, the minimum data point with a ranking > the percentile value is included in the summation. Linear regression functions are used to calculate the usage change percentage.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-usage [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-percentile [integer]
+.UNINDENT
+.sp
+Percentile values of daily usage to be used for computing the aggregate resource usage.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-usage\-trend\fP
+.SS Description
+.sp
+Returns response with time series data (endTimestamp, usage, capacity) for the time period specified. The maximum time range for analysis is 2 years, hence this is intentionally not paginated.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-usage\-trend [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-sort\-by [text]
+.UNINDENT
+.sp
+Sorts using end timestamp, usage or capacity
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+capacity, endTimestamp, usage
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-database\-insight\-resource\-utilization\-insight\fP
+.SS Description
+.sp
+Gets resources with current utilization (high and low) and projected utilization (high and low) for a resource type over specified time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-database\-insight\-resource\-utilization\-insight [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-resource\-metric [text]
+.UNINDENT
+.sp
+Filter by resource metric. Supported values are CPU and STORAGE.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-forecast\-days [integer]
+.UNINDENT
+.sp
+Number of days used for utilization forecast analysis.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-insights\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the performance insights for SQLs taking greater than X% database time for a given time period across the given databases or database types.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-insights [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-time\-pct\-greater\-than [text]
+.UNINDENT
+.sp
+Filter sqls by percentage of db time.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-plan\-insights\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the performance insights on the execution plans for a given SQL for a given time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-plan\-insights [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-response\-time\-distributions\fP
+.SS Description
+.sp
+Query SQL Warehouse to summarize the response time distribution of query executions for a given SQL for a given time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-response\-time\-distributions [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-statistics\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the performance statistics for SQLs taking greater than X% database time for a given time period across the given databases or database types.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-statistics [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-category [text]
+.UNINDENT
+.sp
+Filter sqls by one or more performance categories.
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+CHANGING_PLANS, DEGRADING, DEGRADING_CHANGING_PLANS, DEGRADING_CHANGING_PLANS_AND_INCREASING_CPU, DEGRADING_CHANGING_PLANS_AND_INCREASING_INEFFICIENT_WAIT, DEGRADING_CHANGING_PLANS_AND_INCREASING_IO, DEGRADING_INCREASING_CPU, DEGRADING_INCREASING_INEFFICIENT_WAIT, DEGRADING_INCREASING_IO, DEGRADING_INEFFICIENT, DEGRADING_VARIANT, IMPROVING, INEFFICIENT, INEFFICIENT_CHANGING_PLANS, INEFFICIENT_CHANGING_PLANS_AND_INCREASING_INEFFICIENT_WAIT, INEFFICIENT_INCREASING_INEFFICIENT_WAIT, VARIANT, VARIANT_CHANGING_PLANS, VARIANT_CHANGING_PLANS_AND_INCREASING_CPU, VARIANT_CHANGING_PLANS_AND_INCREASING_INEFFICIENT_WAIT, VARIANT_CHANGING_PLANS_AND_INCREASING_IO, VARIANT_INCREASING_CPU, VARIANT_INCREASING_INEFFICIENT_WAIT, VARIANT_INCREASING_IO, VARIANT_INEFFICIENT
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-database\-time\-pct\-greater\-than [text]
+.UNINDENT
+.sp
+Filter sqls by percentage of db time.
+.INDENT 0.0
+.TP
+.B \-\-database\-type [text]
+.UNINDENT
+.sp
+Filter by one or more database type. Possible values are ADW\-S, ATP\-S, ADW\-D, ATP\-D
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ADW\-D, ADW\-S, ATP\-D, ATP\-S
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-limit [integer]
+.UNINDENT
+.sp
+For list pagination. The maximum number of results per page, or items to return in a paginated "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&. Example: \fI50\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-sort\-by [text]
+.UNINDENT
+.sp
+The field to use when sorting SQL statistics. Example: databaseTimeInSec
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+averageActiveSessions, changeInAverageActiveSessionsInPct, changeInCpuTimeInPct, changeInExecutionsPerHourInPct, changeInInefficiencyInPct, changeInInefficientWaitTimeInPct, changeInIoTimeInPct, changeInResponseTimeInPct, cpuTimeInSec, databaseTimeInSec, databaseTimePct, executionsCount, executionsPerHour, inefficiencyInPct, inefficientWaitTimeInSec, ioTimeInSec, planCount, responseTimeInSec, variability
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sort\-order [text]
+.UNINDENT
+.sp
+The sort order to use, either ascending (\fIASC\fP) or descending (\fIDESC\fP).
+.sp
+Accepted values are:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ASC, DESC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+One or more unique SQL_IDs for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-statistics\-time\-series\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the performance statistics time series for a given SQL across given databases for a given time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-statistics\-time\-series [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Optional list of database \fI\%OCIDs\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SS \fBsummarize\-sql\-statistics\-time\-series\-by\-plan\fP
+.SS Description
+.sp
+Query SQL Warehouse to get the performance statistics time series for a given SQL by execution plans for a given time period.
+.SS Usage
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+oci opsi database\-insights summarize\-sql\-statistics\-time\-series\-by\-plan [OPTIONS]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Required Parameters
+.INDENT 0.0
+.TP
+.B \-\-compartment\-id, \-c [text]
+.UNINDENT
+.sp
+The \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the compartment.
+.INDENT 0.0
+.TP
+.B \-\-database\-id [text]
+.UNINDENT
+.sp
+Required \fI\%OCID\fP <\fBhttps://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm\fP> of the database.
+.INDENT 0.0
+.TP
+.B \-\-sql\-identifier [text]
+.UNINDENT
+.sp
+Unique SQL_ID for a SQL Statement. Example: \fI6rgjh9bjmy2s7\fP
+.SS Optional Parameters
+.INDENT 0.0
+.TP
+.B \-\-analysis\-time\-interval [text]
+.UNINDENT
+.sp
+Specify time period in ISO 8601 format with respect to current time. Default is last 30 days represented by P30D. If timeInterval is specified, then timeIntervalStart and timeIntervalEnd will be ignored. Examples  P90D (last 90 days), P4W (last 4 weeks), P2M (last 2 months), P1Y (last 12 months), . Maximum value allowed is 25 months prior to current time (P25M).
+.INDENT 0.0
+.TP
+.B \-\-from\-json [text]
+.UNINDENT
+.sp
+Provide input to this command as a JSON document from a file using the \fI\%file://path\-to/file\fP syntax.
+.sp
+The \fB\-\-generate\-full\-command\-json\-input\fP option can be used to generate a sample json file to be used with this command option. The key names are pre\-populated and match the command option names (converted to camelCase format, e.g. compartment\-id \-\-> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+.sp
+Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+.sp
+For examples on usage of this option, please see our "using CLI with advanced JSON options" link: \fI\%https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions\fP
+.INDENT 0.0
+.TP
+.B \-\-page [text]
+.UNINDENT
+.sp
+For list pagination. The value of the \fIopc\-next\-page\fP response header from the previous "List" call. For important details about how pagination works, see \fI\%List Pagination\fP <\fBhttps://docs.cloud.oracle.com/Content/API/Concepts/usingapi.htm#nine\fP>\&.
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-end [datetime]
+.UNINDENT
+.sp
+Analysis end time in UTC in ISO 8601 format(exclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). timeIntervalStart and timeIntervalEnd are used together. If timeIntervalEnd is not specified, current time is used as timeIntervalEnd.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-time\-interval\-start [datetime]
+.UNINDENT
+.sp
+Analysis start time in UTC in ISO 8601 format(inclusive). Example 2019\-10\-30T00:00:00Z (yyyy\-MM\-ddThh:mm:ssZ). The minimum allowed value is 2 years prior to the current day. timeIntervalStart and timeIntervalEnd parameters are used together. If analysisTimeInterval is specified, this parameter is ignored.
+.sp
+The following datetime formats are supported:
+.SS UTC with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ss.sssTZD
+Example: 2017\-09\-15T20:30:00.123Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T20:30:00Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS UTC with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T20:30Z
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00.456\-08:00, 2017\-09\-15T12:30:00.456\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone without milliseconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mm:ssTZD
+Example: 2017\-09\-15T12:30:00\-08:00, 2017\-09\-15T12:30:00\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Timezone with minute precision
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DDTHH:mmTZD
+Example: 2017\-09\-15T12:30\-08:00, 2017\-09\-15T12:30\-0800
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Short date and time
+.sp
+The timezone for this date and time will be taken as UTC (Needs to be surrounded by single or double quotes)
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: \(aqYYYY\-MM\-DD HH:mm\(aq or "YYYY\-MM\-DD HH:mm"
+Example: \(aq2017\-09\-15 17:25\(aq
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Date Only
+.sp
+This date will be taken as midnight UTC of that day
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Format: YYYY\-MM\-DD
+Example: 2017\-09\-15
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Epoch seconds
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Example: 1412195400
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SS Global Parameters
+.sp
+Use \fBoci \-\-help\fP for help on global parameters.
+.sp
+\fB\-\-auth\-purpose\fP, \fB\-\-auth\fP, \fB\-\-cert\-bundle\fP, \fB\-\-cli\-rc\-file\fP, \fB\-\-config\-file\fP, \fB\-\-debug\fP, \fB\-\-defaults\-file\fP, \fB\-\-endpoint\fP, \fB\-\-generate\-full\-command\-json\-input\fP, \fB\-\-generate\-param\-json\-input\fP, \fB\-\-help\fP, \fB\-\-latest\-version\fP, \fB\-\-no\-retry\fP, \fB\-\-opc\-client\-request\-id\fP, \fB\-\-opc\-request\-id\fP, \fB\-\-output\fP, \fB\-\-profile\fP, \fB\-\-query\fP, \fB\-\-raw\-output\fP, \fB\-\-region\fP, \fB\-\-release\-info\fP, \fB\-\-request\-id\fP, \fB\-\-version\fP, \fB\-?\fP, \fB\-d\fP, \fB\-h\fP, \fB\-v\fP
+.SH AUTHOR
+Oracle
+.SH COPYRIGHT
+2016, 2021, Oracle
+.\" Generated by docutils manpage writer.
+.
