@@ -1,0 +1,421 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>tap2sna.py &#8212; SkoolKit 8.4 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tap2sna-py">
+<h1>tap2sna.py<a class="headerlink" href="#tap2sna-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span></code> [options] INPUT snapshot.z80</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span></code> &#64;FILE [args]</div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span></code> converts a TAP or TZX file (which may be inside a zip archive)
+into a Z80 snapshot. INPUT may be the full URL to a remote zip archive or
+TAP/TZX file, or the path to a local file. Arguments may be read from FILE
+instead of (or as well as) being given on the command line.</p>
+</div>
+<div class="section" id="options">
+<h2>OPTIONS<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>-d, –output-dir <cite>DIR</cite></dt>
+<dd>Write the snapshot file in this directory.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>Overwrite an existing snapshot.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-p, –stack <cite>STACK</cite></dt>
+<dd>Set the stack pointer. This option is equivalent to <code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">sp=STACK</span></code>.
+<cite>STACK</cite> must be a decimal number, or a hexadecimal number prefixed by ‘0x’.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--ram <var>OPERATION</var></span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Perform a load, move or poke operation on the memory snapshot being built, or
+initialise the system variables. Do <code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">help</span></code> for more information, or
+see the sections on the <code class="docutils literal notranslate"><span class="pre">LOAD</span></code>, <code class="docutils literal notranslate"><span class="pre">MOVE</span></code>, <code class="docutils literal notranslate"><span class="pre">POKE</span></code> and <code class="docutils literal notranslate"><span class="pre">SYSVARS</span></code>
+operations below. This option may be used multiple times.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>–reg name=value</dt>
+<dd>Set the value of a register. Do <code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">help</span></code> for more information, or see
+the section on <code class="docutils literal notranslate"><span class="pre">REGISTERS</span></code> below. This option may be used multiple times.</dd>
+<dt>-s, –start <cite>START</cite></dt>
+<dd>Set the start address to JP to. This option is equivalent to
+<code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">pc=START</span></code>. <cite>START</cite> must be a decimal number, or a hexadecimal number
+prefixed by ‘0x’.</dd>
+<dt>–state name=value</dt>
+<dd>Set a hardware state attribute. Do <code class="docutils literal notranslate"><span class="pre">--state</span> <span class="pre">help</span></code> for more information, or
+see the section on <code class="docutils literal notranslate"><span class="pre">HARDWARE</span> <span class="pre">STATE</span></code> below. This option may be used multiple
+times.</dd>
+<dt>-u, –user-agent <cite>AGENT</cite></dt>
+<dd>Set the User-Agent header used in an HTTP(S) request.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-V</span>, <span class="option">--version</span></kbd></td>
+<td>Show the SkoolKit version number and exit.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="load-operations">
+<h2>LOAD OPERATIONS<a class="headerlink" href="#load-operations" title="Permalink to this headline">¶</a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">tap2sna.py</span></code> loads bytes from every data block on the tape, using
+the start address given in the corresponding header. For tapes that contain
+headerless data blocks, headers with incorrect start addresses, or irrelevant
+blocks, the <code class="docutils literal notranslate"><span class="pre">--ram</span></code> option can be used to load bytes from specific blocks at
+the appropriate addresses. The syntax is:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">load=[+]block[+],start[,length,step,offset,inc]</span></code></div>
+</div>
+</div>
+<p>where the parameters have the following meanings:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">block</span></code></dt>
+<dd>The tape block number; the first block is 1, the next is 2, etc. Attach a ‘+’
+prefix to load the first byte of the block (which is usually the flag byte),
+and a ‘+’ suffix to load the last byte (which is usually the parity byte).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">start</span></code></dt>
+<dd>The destination address at which to start loading.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">length</span></code></dt>
+<dd>The number of bytes to load (optional; defaults to the number of bytes
+remaining in the block).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">step</span></code></dt>
+<dd>This number is added to the destination address after each byte is loaded
+(optional; default=1).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">offset</span></code></dt>
+<dd>This number is added to the destination address before a byte is loaded, and
+subtracted after the byte is loaded (optional; default=0). It is analogous to
+the offset <code class="docutils literal notranslate"><span class="pre">d</span></code> in the <code class="docutils literal notranslate"><span class="pre">LD</span> <span class="pre">(IX+d),L</span></code> operation that is commonly used in
+load routines to copy the byte just loaded from tape (<code class="docutils literal notranslate"><span class="pre">L</span></code>) into memory.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">inc</span></code></dt>
+<dd>After <code class="docutils literal notranslate"><span class="pre">step</span></code> is added to the destination address, this number is added too
+if the result overflowed past 65535 (optional; default=0).</dd>
+</dl>
+<p>A single tape block can be loaded in two or more stages; for example:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">load=2,32768,2048</span></code> # Load the first 2K at 32768</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">load=2,0xC000</span></code>     # Load the remainder at 49152</div>
+</div>
+</div>
+</div>
+<div class="section" id="move-operations">
+<h2>MOVE OPERATIONS<a class="headerlink" href="#move-operations" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--ram</span></code> option can be used to move a block of bytes from one location to
+another before saving the snapshot.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">move=src,N,dest</span></code></div>
+</div>
+</div>
+<p>This moves a block of <code class="docutils literal notranslate"><span class="pre">N</span></code> bytes from <code class="docutils literal notranslate"><span class="pre">src</span></code> to <code class="docutils literal notranslate"><span class="pre">dest</span></code>. For example:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">move=32512,256,32768</span></code>     # Move 32512-32767 to 32768-33023</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">move=0x9c00,0x100,0x9d00</span></code> # Move 39936-40191 to 40192-40447</div>
+</div>
+</div>
+</div>
+<div class="section" id="poke-operations">
+<h2>POKE OPERATIONS<a class="headerlink" href="#poke-operations" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--ram</span></code> option can be used to POKE values into the snapshot before saving
+it.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">poke=A[-B[-C]],[^+]V</span></code></div>
+</div>
+</div>
+<p>This does <code class="docutils literal notranslate"><span class="pre">POKE</span> <span class="pre">N,V</span></code> for <code class="docutils literal notranslate"><span class="pre">N</span></code> in <code class="docutils literal notranslate"><span class="pre">{A,</span> <span class="pre">A+C,</span> <span class="pre">A+2C...,</span> <span class="pre">B}</span></code>, where:</p>
+<p><code class="docutils literal notranslate"><span class="pre">A</span></code> is the first address to POKE</p>
+<p><code class="docutils literal notranslate"><span class="pre">B</span></code> is the last address to POKE (optional; default is <code class="docutils literal notranslate"><span class="pre">A</span></code>)</p>
+<p><code class="docutils literal notranslate"><span class="pre">C</span></code> is the step (optional; default=1)</p>
+<p><code class="docutils literal notranslate"><span class="pre">V</span></code> is the value to POKE; prefix the value with ‘^’ to perform an XOR
+operation, or ‘+’ to perform an ADD operation</p>
+<p>For example:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">poke=0x6000,0x10</span></code>     # POKE 24576,16</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">poke=30000-30002,^85</span></code> # Perform ‘XOR 85’ on addresses 30000-30002</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">poke=40000-40004-2,1</span></code> # POKE 40000,1: POKE 40002,1: POKE 40004,1</div>
+</div>
+</div>
+</div>
+<div class="section" id="sysvars-operation">
+<h2>SYSVARS OPERATION<a class="headerlink" href="#sysvars-operation" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--ram</span></code> option can be used to initialise the system variables at
+23552-23754 (5C00-5CCA) with values suitable for a 48K ZX Spectrum.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--ram</span> <span class="pre">sysvars</span></code></div>
+</div>
+</div>
+</div>
+<div class="section" id="registers">
+<h2>REGISTERS<a class="headerlink" href="#registers" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--reg</span></code> option sets the value of a register in the snapshot.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">name=value</span></code></div>
+</div>
+</div>
+<p>For example:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">hl=32768</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">b=0x1f</span></code></div>
+</div>
+</div>
+<p>To set the value of an alternate (shadow) register, use the ‘^’ prefix:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">^hl=10072</span></code></div>
+</div>
+</div>
+<p>Recognised register names are:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">^a</span></code>, <code class="docutils literal notranslate"><span class="pre">^b</span></code>, <code class="docutils literal notranslate"><span class="pre">^bc</span></code>, <code class="docutils literal notranslate"><span class="pre">^c</span></code>, <code class="docutils literal notranslate"><span class="pre">^d</span></code>, <code class="docutils literal notranslate"><span class="pre">^de</span></code>, <code class="docutils literal notranslate"><span class="pre">^e</span></code>, <code class="docutils literal notranslate"><span class="pre">^f</span></code>, <code class="docutils literal notranslate"><span class="pre">^h</span></code>, <code class="docutils literal notranslate"><span class="pre">^hl</span></code>, <code class="docutils literal notranslate"><span class="pre">^l</span></code>,</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">bc</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">de</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">f</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">hl</span></code>, <code class="docutils literal notranslate"><span class="pre">l</span></code>,</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">ix</span></code>, <code class="docutils literal notranslate"><span class="pre">iy</span></code>, <code class="docutils literal notranslate"><span class="pre">pc</span></code>, <code class="docutils literal notranslate"><span class="pre">r</span></code>, <code class="docutils literal notranslate"><span class="pre">sp</span></code></div>
+</div>
+</div>
+<p>The default value for each register is 0, with the following exceptions:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">i=63</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">iy=23610</span></code></div>
+</div>
+</div>
+</div>
+<div class="section" id="hardware-state">
+<h2>HARDWARE STATE<a class="headerlink" href="#hardware-state" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--state</span></code> option sets a hardware state attribute.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--state</span> <span class="pre">name=value</span></code></div>
+</div>
+</div>
+<p>Recognised attribute names and their default values are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">border</span></code></dt>
+<dd>border colour (default=0)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">iff</span></code></dt>
+<dd>interrupt flip-flop: 0=disabled, 1=enabled (default=1)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">im</span></code></dt>
+<dd>interrupt mode (default=1)</dd>
+</dl>
+</div>
+<div class="section" id="reading-arguments-from-a-file">
+<h2>READING ARGUMENTS FROM A FILE<a class="headerlink" href="#reading-arguments-from-a-file" title="Permalink to this headline">¶</a></h2>
+<p>For complex snapshots that require many <code class="docutils literal notranslate"><span class="pre">--ram</span></code>, <code class="docutils literal notranslate"><span class="pre">--reg</span></code> or <code class="docutils literal notranslate"><span class="pre">--state</span></code>
+options to build, it may be more convenient to store the arguments to
+<code class="docutils literal notranslate"><span class="pre">tap2sna.py</span></code> in a file. For example, if the file <code class="docutils literal notranslate"><span class="pre">game.t2s</span></code> has the
+following contents:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">;</div>
+<div class="line">; tap2sna.py file for GAME</div>
+<div class="line">;</div>
+<div class="line">http://example.com/pub/games/GAME.zip</div>
+<div class="line">game.z80</div>
+<div class="line">–ram load=4,32768         # Load the fourth block at 32768</div>
+<div class="line">–ram move=40960,512,43520 # Move 40960-41471 to 43520-44031</div>
+<div class="line">–ram sysvars              # Initialise the system variables</div>
+<div class="line">–state iff=0              # Disable interrupts</div>
+<div class="line">–stack 32768              # Stack at 32768</div>
+<div class="line">–start 34816              # Start at 34816</div>
+</div>
+</div>
+<p>then:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span> <span class="pre">&#64;game.t2s</span></code></div>
+</div>
+</div>
+<p>will create <code class="docutils literal notranslate"><span class="pre">game.z80</span></code> as if the arguments specified in <code class="docutils literal notranslate"><span class="pre">game.t2s</span></code> had been
+given on the command line.</p>
+</div>
+<div class="section" id="tzx-support">
+<h2>TZX SUPPORT<a class="headerlink" href="#tzx-support" title="Permalink to this headline">¶</a></h2>
+<p>Support for TZX files is limited to block types 0x10 (standard speed data),
+0x11 (turbo speed data) and 0x14 (pure data).</p>
+</div>
+<div class="section" id="examples">
+<h2>EXAMPLES<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Extract the TAP or TZX file from a remote zip archive and convert it into a
+Z80 snapshot:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span> <span class="pre">ftp://example.com/game.zip</span> <span class="pre">game.z80</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Extract the TAP or TZX file from a zip archive, and convert it into a Z80
+snapshot with the program counter set to 32768:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span> <span class="pre">--reg</span> <span class="pre">pc=32768</span> <span class="pre">game.zip</span> <span class="pre">game.z80</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Convert a TZX file into a Z80 snapshot by loading the third block on the
+tape at 25000:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span> <span class="pre">--ram</span> <span class="pre">load=3,25000</span> <span class="pre">game.tzx</span> <span class="pre">game.z80</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Convert a TZX file into a Z80 snapshot using options read from the file
+<code class="docutils literal notranslate"><span class="pre">game.t2s</span></code>:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tap2sna.py</span> <span class="pre">&#64;game.t2s</span> <span class="pre">game.tzx</span> <span class="pre">game.z80</span></code></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tap2sna.py</a><ul>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li><a class="reference internal" href="#options">OPTIONS</a></li>
+<li><a class="reference internal" href="#load-operations">LOAD OPERATIONS</a></li>
+<li><a class="reference internal" href="#move-operations">MOVE OPERATIONS</a></li>
+<li><a class="reference internal" href="#poke-operations">POKE OPERATIONS</a></li>
+<li><a class="reference internal" href="#sysvars-operation">SYSVARS OPERATION</a></li>
+<li><a class="reference internal" href="#registers">REGISTERS</a></li>
+<li><a class="reference internal" href="#hardware-state">HARDWARE STATE</a></li>
+<li><a class="reference internal" href="#reading-arguments-from-a-file">READING ARGUMENTS FROM A FILE</a></li>
+<li><a class="reference internal" href="#tzx-support">TZX SUPPORT</a></li>
+<li><a class="reference internal" href="#examples">EXAMPLES</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/man/tap2sna.py.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Richard Dymond.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

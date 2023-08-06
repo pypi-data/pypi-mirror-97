@@ -1,0 +1,419 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>skool2html.py &#8212; SkoolKit 8.4 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="skool2html-py">
+<h1>skool2html.py<a class="headerlink" href="#skool2html-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> [options] SKOOLFILE [REFFILE…]</p>
+</div>
+<div class="section" id="description">
+<h2>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> converts a skool file and ref files to HTML. When SKOOLFILE
+is ‘-‘, <code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> reads from standard input.</p>
+</div>
+<div class="section" id="options">
+<h2>OPTIONS<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-1</span>, <span class="option">--asm-one-page</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Write all routines and data blocks to a single page. This option is shorthand
+for <code class="docutils literal notranslate"><span class="pre">-c</span> <span class="pre">Game/AsmSinglePage=1</span></code>.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-a</span>, <span class="option">--asm-labels</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Use ASM labels (defined by <code class="docutils literal notranslate"><span class="pre">&#64;label</span></code> directives).</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-c, –config <cite>S/L</cite></dt>
+<dd>Add the line <cite>L</cite> to the ref file section <cite>S</cite>; this option may be used
+multiple times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-C</span>, <span class="option">--create-labels</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Create default labels for unlabelled instructions. This option is intended
+for use alongside the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-d, –output-dir <cite>DIR</cite></dt>
+<dd>Specify the directory in which to write files; the default output directory
+is the current working directory.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-D</span>, <span class="option">--decimal</span></kbd></td>
+<td>Write the disassembly in decimal.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-H</span>, <span class="option">--hex</span></kbd></td>
+<td>Write the disassembly in hexadecimal.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-I, –ini <cite>param=value</cite></dt>
+<dd>Set the value of a configuration parameter (see <code class="docutils literal notranslate"><span class="pre">CONFIGURATION</span></code>),
+overriding any value found in <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>. This option may be used
+multiple times.</dd>
+<dt>-j, –join-css <cite>NAME</cite></dt>
+<dd>Concatenate CSS files into a single file with this name.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--lower</span></kbd></td>
+<td>Write the disassembly in lower case.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-o</span>, <span class="option">--rebuild-images</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Overwrite existing image files.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--package-dir</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Show the path to the skoolkit package directory and exit.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-P, –pages <cite>PAGES</cite></dt>
+<dd>Write only these pages (when using <code class="docutils literal notranslate"><span class="pre">--write</span> <span class="pre">P</span></code>); <cite>PAGES</cite> is a
+comma-separated list of page IDs.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td>Be quiet.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-r, –ref-sections <cite>PREFIX</cite></dt>
+<dd>Show the default ref file sections whose names start with <cite>PREFIX</cite> and exit.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-R</span>, <span class="option">--ref-file</span></kbd></td>
+<td>Show the entire default ref file and exit.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--search-dirs</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Show the locations that <code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> searches for resources.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-S, –search <cite>DIR</cite></dt>
+<dd>Add this directory to the resource search path; this option may be used
+multiple times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--show-config</span></kbd></td>
+<td>Show configuration parameter values.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t</span>, <span class="option">--time</span></kbd></td>
+<td>Show timings.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-T, –theme <cite>THEME</cite></dt>
+<dd>Specify the CSS theme to use; this option may be used multiple times. See the
+section on <code class="docutils literal notranslate"><span class="pre">THEMES</span></code> below.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--upper</span></kbd></td>
+<td>Write the disassembly in upper case.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>–var <cite>name=value</cite></dt>
+<dd>Define a variable that can be used by the <code class="docutils literal notranslate"><span class="pre">&#64;if</span></code> directive and the
+<code class="docutils literal notranslate"><span class="pre">#EVAL</span></code>, <code class="docutils literal notranslate"><span class="pre">#IF</span></code> and <code class="docutils literal notranslate"><span class="pre">#MAP</span></code> macros. This option may be used multiple
+times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-V</span>, <span class="option">--version</span></kbd></td>
+<td>Show the SkoolKit version number and exit.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-w, –write <cite>X</cite></dt>
+<dd><p class="first">Write only these files, where <cite>X</cite> is one or more of:</p>
+<div class="last line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">d</span></code> = Disassembly files   <code class="docutils literal notranslate"><span class="pre">o</span></code> = Other code</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">i</span></code> = Disassembly index   <code class="docutils literal notranslate"><span class="pre">P</span></code> = Other pages</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">m</span></code> = Memory maps</div>
+</div>
+</div>
+</dd>
+<dt>-W, –writer <cite>CLASS</cite></dt>
+<dd>Specify the HTML writer class to use; this option is shorthand for
+<code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Config/HtmlWriterClass=CLASS</span></code>.</dd>
+</dl>
+</div>
+<div class="section" id="files">
+<h2>FILES<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> searches the following directories for ref files, CSS files,
+JavaScript files, font files, and files listed in the [Resources] section of
+the ref file:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line">- The directory containing the skool file named on the command line</div>
+<div class="line">- The current working directory</div>
+<div class="line">- ./resources</div>
+<div class="line">- ~/.skoolkit</div>
+<div class="line">- $PACKAGE_DIR/resources</div>
+<div class="line">- Any other directories specified by the <code class="docutils literal notranslate"><span class="pre">-S</span></code>/<code class="docutils literal notranslate"><span class="pre">--search</span></code> option</div>
+</div>
+<p>where $PACKAGE_DIR is the directory in which the skoolkit package is installed
+(as shown by <code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">-p</span></code>). When you need a reminder of these
+locations, run <code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">-s</span></code>.</p>
+</div>
+<div class="section" id="themes">
+<h2>THEMES<a class="headerlink" href="#themes" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">-T</span></code> option sets the CSS theme. For example, if <code class="docutils literal notranslate"><span class="pre">game.ref</span></code> specifies
+the CSS files to use thus:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">[Game]</div>
+<div class="line">StyleSheet=skoolkit.css;game.css</div>
+</div>
+</div>
+<p>then:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">-T</span> <span class="pre">dark</span> <span class="pre">-T</span> <span class="pre">wide</span> <span class="pre">game.skool</span></code></div>
+</div>
+</div>
+<p>will use the following CSS files, if they exist, in the order listed:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">skoolkit.css</div>
+<div class="line">skoolkit-dark.css</div>
+<div class="line">skoolkit-wide.css</div>
+<div class="line">game.css</div>
+<div class="line">game-dark.css</div>
+<div class="line">game-wide.css</div>
+<div class="line">dark.css</div>
+<div class="line">wide.css</div>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>CONFIGURATION<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> will read configuration from a file named <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code> in
+the current working directory or in <code class="docutils literal notranslate"><span class="pre">~/.skoolkit</span></code>, if present. The recognised
+configuration parameters are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">AsmLabels:</th><td class="field-body">Use ASM labels (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or don’t (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">AsmOnePage:</th><td class="field-body">Write all routines and data blocks to a single page (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or to
+multiple pages (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Base:</th><td class="field-body">Convert addresses and instruction operands to hexadecimal (<code class="docutils literal notranslate"><span class="pre">16</span></code>) or
+decimal (<code class="docutils literal notranslate"><span class="pre">10</span></code>), or leave them as they are (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Case:</th><td class="field-body">Write the disassembly in lower case (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or upper case (<code class="docutils literal notranslate"><span class="pre">2</span></code>), or
+leave it as it is (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">CreateLabels:</th><td class="field-body">Create default labels for unlabelled instructions (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or
+don’t (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">JoinCss:</th><td class="field-body">If specified, concatenate CSS files into a single file with this
+name.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">OutputDir:</th><td class="field-body">Write files in this directory (default: <code class="docutils literal notranslate"><span class="pre">.</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Quiet:</th><td class="field-body">Be quiet (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or verbose (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">RebuildImages:</th><td class="field-body">Overwrite existing image files (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or leave them alone
+(<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Search:</th><td class="field-body">Directory to add to the resource search path. To specify two or more
+directories, separate them with commas.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Theme:</th><td class="field-body">CSS theme to use. To specify two or more themes, separate them with
+commas.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Time:</th><td class="field-body">Show timings (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or don’t (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+</tbody>
+</table>
+<p>Configuration parameters must appear in a <code class="docutils literal notranslate"><span class="pre">[skool2html]</span></code> section. For
+example, to make <code class="docutils literal notranslate"><span class="pre">skool2html.py</span></code> use ASM labels and write the disassembly in
+hexadecimal by default (without having to use the <code class="docutils literal notranslate"><span class="pre">-H</span></code> and <code class="docutils literal notranslate"><span class="pre">-a</span></code> options on
+the command line), add the following section to <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[skool2html]
+AsmLabels=1
+Base=16
+</pre></div>
+</div>
+<p>Configuration parameters may also be set on the command line by using the
+<code class="docutils literal notranslate"><span class="pre">--ini</span></code> option. Parameter values set this way will override any found in
+<code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>.</p>
+</div>
+<div class="section" id="examples">
+<h2>EXAMPLES<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Build the entire HTML disassembly for ‘game’:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">game.skool</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Build the entire HTML disassembly for ‘game’ in lower case, using
+hexadecimal notation, in the <code class="docutils literal notranslate"><span class="pre">html</span></code> directory:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">-d</span> <span class="pre">html</span> <span class="pre">-l</span> <span class="pre">-H</span> <span class="pre">game.skool</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Write only the ‘Bugs’ and ‘Pokes’ pages for ‘game’:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2html.py</span> <span class="pre">-w</span> <span class="pre">P</span> <span class="pre">-P</span> <span class="pre">Bugs,Pokes</span> <span class="pre">game.skool</span></code></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">skool2html.py</a><ul>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li><a class="reference internal" href="#options">OPTIONS</a></li>
+<li><a class="reference internal" href="#files">FILES</a></li>
+<li><a class="reference internal" href="#themes">THEMES</a></li>
+<li><a class="reference internal" href="#configuration">CONFIGURATION</a></li>
+<li><a class="reference internal" href="#examples">EXAMPLES</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/man/skool2html.py.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Richard Dymond.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

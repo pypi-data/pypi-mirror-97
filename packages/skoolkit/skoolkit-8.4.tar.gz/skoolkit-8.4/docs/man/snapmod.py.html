@@ -1,0 +1,225 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>snapmod.py &#8212; SkoolKit 8.4 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="snapmod-py">
+<h1>snapmod.py<a class="headerlink" href="#snapmod-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">snapmod.py</span></code> [options] in.z80 [out.z80]</p>
+</div>
+<div class="section" id="description">
+<h2>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">snapmod.py</span></code> modifies the registers and RAM in a 48K Z80 snapshot.</p>
+</div>
+<div class="section" id="options">
+<h2>OPTIONS<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>Overwrite an existing snapshot.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-m, –move <cite>src,size,dest</cite></dt>
+<dd>Move a block of bytes of the given size from ‘src’ to ‘dest’. This option may
+be used multiple times. ‘src’, ‘size’ and ‘dest’ must each be a decimal
+number, or a hexadecimal number prefixed by ‘0x’.</dd>
+<dt>-p, –poke <cite>a[-b[-c]],[^+]v</cite></dt>
+<dd>POKE N,v for N in {a, a+c, a+2c…, b}. Prefix ‘v’ with ‘^’ to perform an
+XOR operation, or ‘+’ to perform an ADD operation. This option may be used
+multiple times. ‘a’, ‘b’, ‘c’ and ‘v’ must each be a decimal number, or a
+hexadecimal number prefixed by ‘0x’.</dd>
+<dt>-r, –reg <cite>name=value</cite></dt>
+<dd>Set the value of a register. Do <code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">help</span></code> for more information, or see
+the section on <code class="docutils literal notranslate"><span class="pre">REGISTERS</span></code> below. This option may be used multiple times.</dd>
+<dt>-s, –state <cite>name=value</cite></dt>
+<dd>Set a hardware state attribute. Do <code class="docutils literal notranslate"><span class="pre">--state</span> <span class="pre">help</span></code> for more information, or
+see the section on <code class="docutils literal notranslate"><span class="pre">HARDWARE</span> <span class="pre">STATE</span></code> below. This option may be used multiple
+times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-V</span>, <span class="option">--version</span></kbd></td>
+<td>Show the SkoolKit version number and exit.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="registers">
+<h2>REGISTERS<a class="headerlink" href="#registers" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--reg</span></code> option sets the value of a register in the snapshot.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">name=value</span></code></div>
+</div>
+</div>
+<p>For example:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">hl=32768</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">b=0x1f</span></code></div>
+</div>
+</div>
+<p>To set the value of an alternate (shadow) register, use the ‘^’ prefix:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--reg</span> <span class="pre">^hl=10072</span></code></div>
+</div>
+</div>
+<p>Recognised register names are:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">^a</span></code>, <code class="docutils literal notranslate"><span class="pre">^b</span></code>, <code class="docutils literal notranslate"><span class="pre">^bc</span></code>, <code class="docutils literal notranslate"><span class="pre">^c</span></code>, <code class="docutils literal notranslate"><span class="pre">^d</span></code>, <code class="docutils literal notranslate"><span class="pre">^de</span></code>, <code class="docutils literal notranslate"><span class="pre">^e</span></code>, <code class="docutils literal notranslate"><span class="pre">^f</span></code>, <code class="docutils literal notranslate"><span class="pre">^h</span></code>, <code class="docutils literal notranslate"><span class="pre">^hl</span></code>, <code class="docutils literal notranslate"><span class="pre">^l</span></code>,</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">bc</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">de</span></code>, <code class="docutils literal notranslate"><span class="pre">e</span></code>, <code class="docutils literal notranslate"><span class="pre">f</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">hl</span></code>, <code class="docutils literal notranslate"><span class="pre">l</span></code>,</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">ix</span></code>, <code class="docutils literal notranslate"><span class="pre">iy</span></code>, <code class="docutils literal notranslate"><span class="pre">pc</span></code>, <code class="docutils literal notranslate"><span class="pre">r</span></code>, <code class="docutils literal notranslate"><span class="pre">sp</span></code></div>
+</div>
+</div>
+</div>
+<div class="section" id="hardware-state">
+<h2>HARDWARE STATE<a class="headerlink" href="#hardware-state" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">--state</span></code> option sets a hardware state attribute.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">--state</span> <span class="pre">name=value</span></code></div>
+</div>
+</div>
+<p>Recognised attribute names are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">border</span></code></dt>
+<dd>border colour</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">iff</span></code></dt>
+<dd>interrupt flip-flop: 0=disabled, 1=enabled</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">im</span></code></dt>
+<dd>interrupt mode</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>EXAMPLES<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Set the value of the HL register pair to 0 in game.z80:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">snapmod.py</span> <span class="pre">-f</span> <span class="pre">-r</span> <span class="pre">hl=0</span> <span class="pre">game.z80</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">POKE the value 23 into address 32768 in game.z80, and write the resultant
+snapshot to poked.z80:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">snapmod.py</span> <span class="pre">-p</span> <span class="pre">32768,23</span> <span class="pre">game.z80</span> <span class="pre">poked.z80</span></code></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">snapmod.py</a><ul>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li><a class="reference internal" href="#options">OPTIONS</a></li>
+<li><a class="reference internal" href="#registers">REGISTERS</a></li>
+<li><a class="reference internal" href="#hardware-state">HARDWARE STATE</a></li>
+<li><a class="reference internal" href="#examples">EXAMPLES</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/man/snapmod.py.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Richard Dymond.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

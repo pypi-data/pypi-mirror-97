@@ -1,0 +1,373 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>skool2asm.py &#8212; SkoolKit 8.4 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="skool2asm-py">
+<h1>skool2asm.py<a class="headerlink" href="#skool2asm-py" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2asm.py</span></code> [options] FILE</p>
+</div>
+<div class="section" id="description">
+<h2>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2asm.py</span></code> converts a skool file into an ASM file that can be used by a
+Z80 assembler. The ASM file is written to standard output. When FILE is ‘-‘,
+<code class="docutils literal notranslate"><span class="pre">skool2asm.py</span></code> reads from standard input.</p>
+</div>
+<div class="section" id="options">
+<h2>OPTIONS<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--create-labels</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Create default labels for unlabelled instructions.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-D</span>, <span class="option">--decimal</span></kbd></td>
+<td>Write the disassembly in decimal.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-E, –end <cite>ADDR</cite></dt>
+<dd>Stop converting at this address. <cite>ADDR</cite> must be a decimal number, or a
+hexadecimal number prefixed by ‘0x’.</dd>
+<dt>-f, –fixes <cite>N</cite></dt>
+<dd><p class="first">Apply fixes; <cite>N</cite> may be one of:</p>
+<div class="last line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">0: None (default)</div>
+<div class="line">1: &#64;ofix only</div>
+<div class="line">2: &#64;ofix and &#64;bfix</div>
+<div class="line">3: &#64;ofix, &#64;bfix and &#64;rfix (implies <code class="docutils literal notranslate"><span class="pre">-r</span></code>)</div>
+</div>
+</div>
+</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-F</span>, <span class="option">--force</span></kbd></td>
+<td>Force conversion of the entire skool file, ignoring any <code class="docutils literal notranslate"><span class="pre">&#64;start</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&#64;end</span></code> directives.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-H</span>, <span class="option">--hex</span></kbd></td>
+<td>Write the disassembly in hexadecimal.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-I, –ini <cite>param=value</cite></dt>
+<dd>Set the value of a configuration parameter (see <code class="docutils literal notranslate"><span class="pre">CONFIGURATION</span></code>),
+overriding any value found in <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>. This option may be used
+multiple times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--lower</span></kbd></td>
+<td>Write the disassembly in lower case.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--package-dir</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Show the path to the skoolkit package directory and exit.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-P, –set <cite>property=value</cite></dt>
+<dd>Set the value of an ASM writer property (see <code class="docutils literal notranslate"><span class="pre">ASM</span> <span class="pre">WRITER</span> <span class="pre">PROPERTIES</span></code>). This
+option may be used multiple times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--quiet</span></kbd></td>
+<td>Be quiet. This option suppresses both the timing information, and the message
+about the AsmWriter class being used, but does not suppress warnings.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-r</span>, <span class="option">--rsub</span></kbd></td>
+<td>Apply safe substitutions (&#64;ssub) and relocatability substitutions (&#64;rsub)
+(implies <code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">1</span></code>).</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--show-config</span></kbd></td>
+<td>Show configuration parameter values.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--ssub</span></kbd></td>
+<td>Apply safe substitutions (&#64;ssub).</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-S, –start <cite>ADDR</cite></dt>
+<dd>Start converting at this address. <cite>ADDR</cite> must be a decimal number, or a
+hexadecimal number prefixed by ‘0x’.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--upper</span></kbd></td>
+<td>Write the disassembly in upper case.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>–var <cite>name=value</cite></dt>
+<dd>Define a variable that can be used by the <code class="docutils literal notranslate"><span class="pre">&#64;if</span></code> directive and the
+<code class="docutils literal notranslate"><span class="pre">#EVAL</span></code>, <code class="docutils literal notranslate"><span class="pre">#IF</span></code> and <code class="docutils literal notranslate"><span class="pre">#MAP</span></code> macros. This option may be used multiple
+times.</dd>
+</dl>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-V</span>, <span class="option">--version</span></kbd></td>
+<td>Show the SkoolKit version number and exit.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-w</span>, <span class="option">--no-warnings</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Suppress warnings.</td></tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>-W, –writer <cite>CLASS</cite></dt>
+<dd>Specify the ASM writer class to use; this will override any &#64;writer directive
+in the skool file.</dd>
+</dl>
+</div>
+<div class="section" id="configuration">
+<h2>CONFIGURATION<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">skool2asm.py</span></code> will read configuration from a file named <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code> in
+the current working directory or in <code class="docutils literal notranslate"><span class="pre">~/.skoolkit</span></code>, if present. The recognised
+configuration parameters are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Base:</th><td class="field-body">Convert addresses and instruction operands to hexadecimal (<code class="docutils literal notranslate"><span class="pre">16</span></code>) or
+decimal (<code class="docutils literal notranslate"><span class="pre">10</span></code>), or leave them as they are (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Case:</th><td class="field-body">Write the disassembly in lower case (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or upper case (<code class="docutils literal notranslate"><span class="pre">2</span></code>), or
+leave it as it is (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">CreateLabels:</th><td class="field-body">Create default labels for unlabelled instructions (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or
+don’t (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Quiet:</th><td class="field-body">Be quiet (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or verbose (<code class="docutils literal notranslate"><span class="pre">0</span></code>, the default).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Set-property:</th><td class="field-body">Set an ASM writer property value (see <code class="docutils literal notranslate"><span class="pre">ASM</span> <span class="pre">WRITER</span>
+<span class="pre">PROPERTIES</span></code>), e.g. <code class="docutils literal notranslate"><span class="pre">Set-bullet=+</span></code>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Templates:</th><td class="field-body">File from which to read custom ASM templates.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Warnings:</th><td class="field-body">Show warnings (<code class="docutils literal notranslate"><span class="pre">1</span></code>, the default), or suppress them (<code class="docutils literal notranslate"><span class="pre">0</span></code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Configuration parameters must appear in a <code class="docutils literal notranslate"><span class="pre">[skool2asm]</span></code> section. For example,
+to make <code class="docutils literal notranslate"><span class="pre">skool2asm.py</span></code> write the disassembly in hexadecimal with a line width
+of 120 characters by default (without having to use the <code class="docutils literal notranslate"><span class="pre">-H</span></code> and <code class="docutils literal notranslate"><span class="pre">-P</span></code>
+options on the command line), add the following section to <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[skool2asm]
+Base=16
+Set-line-width=120
+</pre></div>
+</div>
+<p>Configuration parameters may also be set on the command line by using the
+<code class="docutils literal notranslate"><span class="pre">--ini</span></code> option. Parameter values set this way will override any found in
+<code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code>.</p>
+</div>
+<div class="section" id="asm-writer-properties">
+<h2>ASM WRITER PROPERTIES<a class="headerlink" href="#asm-writer-properties" title="Permalink to this headline">¶</a></h2>
+<p>Recognised ASM writer property names and their default values are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">bullet:</th><td class="field-body">The bullet character(s) to use for list items specified in a <code class="docutils literal notranslate"><span class="pre">#LIST</span></code>
+macro (default: <code class="docutils literal notranslate"><span class="pre">*</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">comment-width-min:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">The minimum width of the instruction comment field
+(default: <code class="docutils literal notranslate"><span class="pre">10</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">crlf:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">1</span></code> to use CR+LF to terminate lines, or <code class="docutils literal notranslate"><span class="pre">0</span></code> to use the system
+default (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">handle-unsupported-macros:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">How to handle an unsupported macro: <code class="docutils literal notranslate"><span class="pre">1</span></code> to expand
+it to an empty string, or <code class="docutils literal notranslate"><span class="pre">0</span></code> to exit with an error (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">indent:</th><td class="field-body">The number of spaces by which to indent instructions (default: <code class="docutils literal notranslate"><span class="pre">2</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">instruction-width:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">The width of the instruction field (default: <code class="docutils literal notranslate"><span class="pre">23</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">label-colons:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">1</span></code> to append a colon to labels, or <code class="docutils literal notranslate"><span class="pre">0</span></code> to leave labels
+unadorned (default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">line-width:</th><td class="field-body">The maximum width of each line (default: <code class="docutils literal notranslate"><span class="pre">79</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">tab:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">1</span></code> to use a tab character to indent instructions, or <code class="docutils literal notranslate"><span class="pre">0</span></code> to use
+spaces (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">table-border-horizontal:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">The character to use for the horizontal borders of a
+table defined by a <code class="docutils literal notranslate"><span class="pre">#TABLE</span></code> macro (default: <code class="docutils literal notranslate"><span class="pre">-</span></code>). If two characters are
+specified, the first is used for the external borders and the second is used
+for the internal borders.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">table-border-join:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">The character to use for the horizontal and vertical border
+joins of a table defined by a <code class="docutils literal notranslate"><span class="pre">#TABLE</span></code> macro (default: <code class="docutils literal notranslate"><span class="pre">+</span></code>).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">table-border-vertical:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">The character to use for the vertical borders of a
+table defined by a <code class="docutils literal notranslate"><span class="pre">#TABLE</span></code> macro (default: <code class="docutils literal notranslate"><span class="pre">|</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">table-row-separator:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">The character used to separate non-header cells in
+adjacent rows of a table defined by a <code class="docutils literal notranslate"><span class="pre">#TABLE</span></code> macro. By default, such
+cells are not separated.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">warnings:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">1</span></code> to print any warnings that are produced while writing ASM
+output (after parsing the skool file), or <code class="docutils literal notranslate"><span class="pre">0</span></code> to suppress them (default:
+<code class="docutils literal notranslate"><span class="pre">1</span></code>).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">wrap-column-width-min:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">The minimum width of a wrappable table column (default:
+<code class="docutils literal notranslate"><span class="pre">10</span></code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Property values may be set in <code class="docutils literal notranslate"><span class="pre">skoolkit.ini</span></code> by using the <code class="docutils literal notranslate"><span class="pre">Set-property</span></code>
+configuration parameter (see <code class="docutils literal notranslate"><span class="pre">CONFIGURATION</span></code>), or on the command line by
+using the <code class="docutils literal notranslate"><span class="pre">--set</span></code> option, or in the skool file by using the <code class="docutils literal notranslate"><span class="pre">&#64;set</span></code>
+directive.</p>
+</div>
+<div class="section" id="examples">
+<h2>EXAMPLES<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Convert <code class="docutils literal notranslate"><span class="pre">game.skool</span></code> into an ASM file named <code class="docutils literal notranslate"><span class="pre">game.asm</span></code>:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2asm.py</span> <span class="pre">game.skool</span> <span class="pre">&gt;</span> <span class="pre">game.asm</span></code></div>
+</div>
+</div>
+</li>
+<li><p class="first">Convert <code class="docutils literal notranslate"><span class="pre">game.skool</span></code> into an ASM file, applying &#64;ssub substitutions and
+creating default labels for unlabelled instructions in the process:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">skool2asm.py</span> <span class="pre">-s</span> <span class="pre">-c</span> <span class="pre">game.skool</span> <span class="pre">&gt;</span> <span class="pre">game.asm</span></code></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">skool2asm.py</a><ul>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li><a class="reference internal" href="#options">OPTIONS</a></li>
+<li><a class="reference internal" href="#configuration">CONFIGURATION</a></li>
+<li><a class="reference internal" href="#asm-writer-properties">ASM WRITER PROPERTIES</a></li>
+<li><a class="reference internal" href="#examples">EXAMPLES</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/man/skool2asm.py.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SkoolKit 8.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Richard Dymond.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>
