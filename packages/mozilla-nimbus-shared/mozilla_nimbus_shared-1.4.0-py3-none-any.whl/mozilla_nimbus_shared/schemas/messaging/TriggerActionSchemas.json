@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/TriggerActionSchemas",
+  "definitions": {
+    "TriggerActionSchemas": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openURL"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user loads a new URL that matches the provided `hosts` or `patterns`"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openArticleURL"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user loads a document that is Reader Mode compatible"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "openBookmarkedURL"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user adds a bookmark from the URL bar star icon"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "frequentVisits"
+            },
+            "params": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of urls we should match against"
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of Match pattern compatible strings to match against"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time a user navigates (or switches tab to) to any of the `hosts` or `patterns` arguments but additionally provides information about the number of accesses to the matched domain."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "newSavedLogin"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "description": "Happens every time the user adds or updates a login"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "const": "contentBlocking"
+            },
+            "params": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "params"
+          ],
+          "description": "Happens every time Firefox blocks the loading of a page script/asset/resource that matches the one of the tracking behaviours specifid through params. See https://searchfox.org/mozilla-central/rev/8ccea36c4fb09412609fb738c722830d7098602b/uriloader/base/nsIWebProgressListener.idl#336"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,584 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/NormandyRecipe",
+  "definitions": {
+    "NormandyRecipe": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "description": "The primary key of the recipe"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the recipe, for usage in internal systems"
+        },
+        "action_name": {
+          "type": "string",
+          "description": "The name of the action to enact"
+        },
+        "arguments": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ShowHeartbeatArguments"
+            },
+            {
+              "$ref": "#/definitions/PreferenceRolloutArguments"
+            },
+            {
+              "$ref": "#/definitions/PreferenceRollbackArguments"
+            },
+            {
+              "$ref": "#/definitions/PreferenceExperimentArguments"
+            },
+            {
+              "$ref": "#/definitions/OptOutStudyArguments"
+            },
+            {
+              "$ref": "#/definitions/MultiPreferenceExperimentArguments"
+            },
+            {
+              "$ref": "#/definitions/MessagingExperimentArguments"
+            },
+            {
+              "$ref": "#/definitions/BranchedAddonStudyArguments"
+            },
+            {
+              "$ref": "#/definitions/AddonRolloutArguments"
+            },
+            {
+              "$ref": "#/definitions/AddonRollbackArguments"
+            }
+          ],
+          "description": "The arguments to pass to the action"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "action_name",
+        "arguments"
+      ],
+      "description": "A Normandy recipe"
+    },
+    "ShowHeartbeatArguments": {
+      "type": "object",
+      "properties": {
+        "surveyId": {
+          "type": "string",
+          "description": "Slug unique identifying this survey in telemetry"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message to show to the user"
+        },
+        "learnMoreMessage": {
+          "type": "string",
+          "description": "Text to display in the \"learn more\" link"
+        },
+        "learnMoreUrl": {
+          "type": "string",
+          "description": "URL to show to the user when the click the \"learn more\" link"
+        },
+        "postAnswerUrl": {
+          "type": "string",
+          "description": "URL to redirect the user to after rating Firefox or clicking the engagement button"
+        },
+        "thanksMessage": {
+          "type": "string",
+          "description": "Thanks message to show to the user after they've rated Firefox"
+        },
+        "engagementButtonLabel": {
+          "type": "string",
+          "description": "Text for the engagement button.\n\nIf specified, this button will be shown instead of rating stars."
+        },
+        "includeTelemetryUUID": {
+          "type": "boolean",
+          "description": "Include unique user ID in post-answer-url and Telemetry"
+        },
+        "repeatOption": {
+          "type": "string",
+          "enum": [
+            "once",
+            "xdays",
+            "nag"
+          ],
+          "description": "Determines how often a prompt is shown executes"
+        },
+        "repeatEvery": {
+          "type": "number",
+          "description": "For repeatOption=xdays, how often (in days) the prompt is displayed"
+        }
+      },
+      "required": [
+        "surveyId",
+        "message",
+        "learnMoreMessage",
+        "learnMoreUrl",
+        "postAnswerUrl",
+        "thanksMessage"
+      ],
+      "description": "This action shows a single survey"
+    },
+    "PreferenceRolloutArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for the rollout, used in telemetry and rollbacks",
+          "pattern": "^[a-z0-9\\-_]+$"
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "preferenceName": {
+                "type": "string",
+                "description": "Full dotted path of the preference being changed"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "boolean"
+                ],
+                "description": "Value to set the preference to"
+              }
+            },
+            "required": [
+              "preferenceName",
+              "value"
+            ]
+          },
+          "description": "The preferences to change, and their values"
+        }
+      },
+      "required": [
+        "slug",
+        "preferences"
+      ],
+      "description": "Change preferences permanently"
+    },
+    "PreferenceRollbackArguments": {
+      "type": "object",
+      "properties": {
+        "rolloutSlug": {
+          "type": "string",
+          "description": "Unique identifier for the rollout to undo"
+        }
+      },
+      "required": [
+        "rolloutSlug"
+      ],
+      "description": "Undo a preference rollout"
+    },
+    "PreferenceExperimentArguments": {
+      "type": "object",
+      "properties": {
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this branch of the experiment.",
+                "pattern": "^[A-Za-z0-9\\-_]+$"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "boolean"
+                ],
+                "description": "Value to set the preference to for this branch"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users who should be grouped into this branch.",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "slug",
+              "value",
+              "ratio"
+            ],
+            "description": "A branch in a preference experiment"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "preferenceName": {
+          "type": "string",
+          "description": "Full dotted path of the preference that controls this experiment"
+        },
+        "preferenceType": {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "boolean"
+          ],
+          "description": "Data type of the preference that controls this experiment"
+        },
+        "preferenceBranchType": {
+          "type": "string",
+          "enum": [
+            "user",
+            "default"
+          ],
+          "description": "Controls whether the default or user value of the preference is modified."
+        },
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for this experiment",
+          "pattern": "^[A-Za-z0-9\\-_]+$"
+        },
+        "experimentDocumentUrl": {
+          "type": "string",
+          "description": "URL of a document describing the experiment",
+          "default": [
+            {}
+          ],
+          "format": "uri"
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        },
+        "isHighVolume": {
+          "type": "boolean",
+          "description": "If true, marks the preference as a high population experiment that should be excluded from certain types of telemetry.",
+          "default": false
+        }
+      },
+      "required": [
+        "branches",
+        "preferenceName",
+        "preferenceType",
+        "preferenceBranchType",
+        "slug",
+        "experimentDocumentUrl"
+      ],
+      "description": "Run a feature experiment activated by a preference"
+    },
+    "OptOutStudyArguments": {
+      "type": "object",
+      "properties": {
+        "addonUrl": {
+          "type": "string",
+          "description": "URL of the add-on XPI file to install",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "User-facing name of the study",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "User-facing description of the study",
+          "minLength": 1
+        },
+        "extensionApiId": {
+          "type": "number",
+          "description": "The record ID of the extension used for Normandy API calls."
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study"
+        }
+      },
+      "required": [
+        "addonUrl",
+        "name",
+        "description",
+        "extensionApiId"
+      ],
+      "description": "Enroll a user in an opt-out add-on study"
+    },
+    "MultiPreferenceExperimentArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for this experiment",
+          "pattern": "^[A-Za-z0-9\\-_]+$"
+        },
+        "userFacingDescription": {
+          "type": "string",
+          "description": "User-facing name of the experiment",
+          "minLength": 1
+        },
+        "userFacingName": {
+          "type": "string",
+          "description": "User-facing description of the experiment",
+          "minLength": 1
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this branch of the experiment",
+                "pattern": "^[A-Za-z0-9\\-_]+$"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users that should be grouped into this branch"
+              },
+              "preferences": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "preferenceValue": {
+                      "type": [
+                        "number",
+                        "string",
+                        "boolean"
+                      ],
+                      "description": "Value for this preference when this branch is chosen"
+                    },
+                    "preferenceBranchType": {
+                      "type": "string",
+                      "enum": [
+                        "user",
+                        "default"
+                      ],
+                      "description": "Data type of the preference that controls this experiment"
+                    },
+                    "preferenceType": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "integer",
+                        "boolean"
+                      ],
+                      "description": "Data type of the preference that controls this experiment"
+                    }
+                  },
+                  "required": [
+                    "preferenceValue",
+                    "preferenceBranchType",
+                    "preferenceType"
+                  ]
+                },
+                "description": "The set of preferences to be set if this branch is chosen"
+              }
+            },
+            "required": [
+              "slug",
+              "ratio",
+              "preferences"
+            ],
+            "description": "A branch in a multi-preference experiment"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "experimentDocumentUrl": {
+          "type": "string",
+          "description": "URL of a document describing the experiment",
+          "format": "uri",
+          "default": ""
+        },
+        "isHighPopulation": {
+          "type": "boolean",
+          "description": "Marks the preference experiment as a high population experiment, that should be excluded from certain types of telemetry.",
+          "default": false
+        },
+        "isHighVolume": {
+          "type": "boolean",
+          "description": "Incorrect version of `isHighPopulation`. Included here for compatibility, but should not be used."
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        }
+      },
+      "required": [
+        "slug",
+        "userFacingDescription",
+        "userFacingName",
+        "branches"
+      ],
+      "description": "Run a feature experiment activated by a set of preferences"
+    },
+    "MessagingExperimentArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for this experiment",
+          "pattern": "^[A-Za-z0-9\\-_]+$"
+        },
+        "userFacingName": {
+          "type": "string",
+          "description": "User-facing name of the experiment",
+          "minLength": 1
+        },
+        "userFacingDescription": {
+          "type": "string",
+          "description": "User-facing description of the experiment",
+          "minLength": 1
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this branch of the experiment"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users who should be grouped into this branch",
+                "minimum": 1
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of experiment groups that can be used to exclude or select related experiments. May be empty."
+              },
+              "value": {
+                "type": "object",
+                "additionalProperties": {},
+                "description": "Message content"
+              }
+            },
+            "required": [
+              "slug",
+              "ratio",
+              "groups",
+              "value"
+            ],
+            "description": "Messaging experiment branch"
+          },
+          "description": "List of experimental branches"
+        },
+        "experimentDocumentUrl": {
+          "type": "string",
+          "description": "URL of a document describing the experiment",
+          "format": "uri",
+          "default": ""
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        }
+      },
+      "required": [
+        "slug",
+        "userFacingName",
+        "userFacingDescription",
+        "branches",
+        "experimentDocumentUrl"
+      ],
+      "description": "Messaging experiment"
+    },
+    "BranchedAddonStudyArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Machine-readable identifier",
+          "minLength": 1
+        },
+        "userFacingName": {
+          "type": "string",
+          "description": "User-facing name of the experiment",
+          "minLength": 1
+        },
+        "userFacingDescription": {
+          "type": "string",
+          "description": "User-facing description of the experiment",
+          "minLength": 1
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this this branch of the experiment"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users who should be grouped into this branch"
+              },
+              "extensionApiId": {
+                "type": "number",
+                "description": "The record ID of the add-on uploaded to the Normandy server"
+              }
+            },
+            "required": [
+              "slug",
+              "ratio",
+              "extensionApiId"
+            ],
+            "description": "A branched add-on study branch"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        }
+      },
+      "required": [
+        "slug",
+        "userFacingName",
+        "userFacingDescription",
+        "branches"
+      ],
+      "description": "Enroll a user in an add-on experiment, with managed branches"
+    },
+    "AddonRolloutArguments": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for the rollout, used in telemetry and rollbacks",
+          "pattern": "^[a-z0-9\\-_]+$"
+        },
+        "extensionApiId": {
+          "type": "number",
+          "description": "The record ID of the extension used for Normandy API calls"
+        }
+      },
+      "required": [
+        "slug",
+        "extensionApiId"
+      ],
+      "description": "Install an add-on permanently"
+    },
+    "AddonRollbackArguments": {
+      "type": "object",
+      "properties": {
+        "rolloutSlug": {
+          "type": "string",
+          "description": "Unique identifier of the rollout to undo",
+          "pattern": "^[a-z0-9\\-_]+$"
+        }
+      },
+      "required": [
+        "rolloutSlug"
+      ],
+      "description": "Undo an add-on rollout"
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/PreferenceExperimentArguments",
+  "definitions": {
+    "PreferenceExperimentArguments": {
+      "type": "object",
+      "properties": {
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "description": "Unique identifier for this branch of the experiment.",
+                "pattern": "^[A-Za-z0-9\\-_]+$"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "boolean"
+                ],
+                "description": "Value to set the preference to for this branch"
+              },
+              "ratio": {
+                "type": "number",
+                "description": "Ratio of users who should be grouped into this branch.",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "slug",
+              "value",
+              "ratio"
+            ],
+            "description": "A branch in a preference experiment"
+          },
+          "description": "List of experimental branches",
+          "minItems": 1
+        },
+        "preferenceName": {
+          "type": "string",
+          "description": "Full dotted path of the preference that controls this experiment"
+        },
+        "preferenceType": {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "boolean"
+          ],
+          "description": "Data type of the preference that controls this experiment"
+        },
+        "preferenceBranchType": {
+          "type": "string",
+          "enum": [
+            "user",
+            "default"
+          ],
+          "description": "Controls whether the default or user value of the preference is modified."
+        },
+        "slug": {
+          "type": "string",
+          "description": "Unique identifier for this experiment",
+          "pattern": "^[A-Za-z0-9\\-_]+$"
+        },
+        "experimentDocumentUrl": {
+          "type": "string",
+          "description": "URL of a document describing the experiment",
+          "default": [
+            {}
+          ],
+          "format": "uri"
+        },
+        "isEnrollmentPaused": {
+          "type": "boolean",
+          "description": "If true, new users will not be enrolled in the study.",
+          "default": false
+        },
+        "isHighVolume": {
+          "type": "boolean",
+          "description": "If true, marks the preference as a high population experiment that should be excluded from certain types of telemetry.",
+          "default": false
+        }
+      },
+      "required": [
+        "branches",
+        "preferenceName",
+        "preferenceType",
+        "preferenceBranchType",
+        "slug",
+        "experimentDocumentUrl"
+      ],
+      "description": "Run a feature experiment activated by a preference"
+    }
+  }
+}
