@@ -1,0 +1,157 @@
+Metadata-Version: 2.1
+Name: nbgitpuller-link
+Version: 0.2
+Summary: Create an nbgitpuller link
+Home-page: https://github.com/mdpiper/nbgitpuller-link
+Author: Mark Piper
+Author-email: mark.piper@colorado.edu
+License: MIT License
+Keywords: jupyter,jupyterhub,notebook,git
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Education
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: click
+Requires-Dist: validators
+
+![PyPI](https://img.shields.io/pypi/v/nbgitpuller-link)
+[![Build/Test CI](https://github.com/mdpiper/nbgitpuller-link/actions/workflows/build-test-ci.yml/badge.svg)](https://github.com/mdpiper/nbgitpuller-link/actions/workflows/build-test-ci.yml)
+
+# nbgitpuller-link
+
+Generate an [nbgitpuller](https://jupyterhub.github.io/nbgitpuller/index.html) link
+through a command-line interface or Python code.
+
+## Installation
+
+Install the latest stable release of *nbgitpuller-link* with `pip`:
+```
+pip install nbgitpuller-link
+```
+
+Or install from source:
+After cloning or downloading the *nbgitpuller-link* [repository](https://github.com/mdpiper/nbgitpuller-link),
+change into the repository directory
+and install the package with `pip`:
+```
+pip install .
+```
+
+## Examples
+
+The *nbgitpuller-link* package includes a CLI and a Python API.
+The repository holds short [examples](https://github.com/mdpiper/nbgitpuller-link/tree/main/examples)
+of both, which are adapted here.
+
+### Shell
+
+To see how to use the CLI,
+call `nbgitpuller-link` with the `--help` option:
+```bash
+$ nbgitpuller-link --help
+Usage: nbgitpuller-link [OPTIONS]
+
+  Generate an nbgitpuller link to load a repository on a JupyterHub
+
+Options:
+  --version                   Show the version and exit.
+  --jupyterhub-url TEXT       Target JupyterHub for link.  [required]
+  --repository-url TEXT       Source repository for link.  [required]
+  --branch TEXT               Branch to use from source repository.  [default:
+                              main]
+  --launch-path TEXT          Relative path to file or directory in source
+                              repository to launch on target JupyterHub.
+                              [default: ]
+  --interface [notebook|lab]  Open with classic Jupyter Notebook interface or
+                              next-generation JupyterLab.  [default: notebook]
+  --help                      Show this message and exit.
+``` 
+
+Generate a link to load a repository on a JupyterHub,
+specifying the file to launch
+and the branch to use:
+```bash
+nbgitpuller-link \
+    --jupyterhub-url=https://csdms.rc.colorado.edu \
+    --repository-url=https://github.com/csdms/espin \
+    --branch=main \
+    --launch-path=lessons/jupyter/index.ipynb
+```
+
+The resulting link:
+```bash
+https://csdms.rc.colorado.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fcsdms%2Fespin&urlpath=tree%2Fespin%2Flessons%2Fjupyter%2Findex.ipynb&branch=main
+```
+
+### Python
+
+Start a Python session and import the `Link` class from the *nbgitpuller-link* package:
+```python
+from nbgitpuller_link import Link
+```
+
+Generate a link though a `Link` instance:
+```python
+linker = Link(
+    jupyterhub_url="https://csdms.rc.colorado.edu",
+    repository_url="https://github.com/csdms/espin",
+    branch="main",
+    launch_path="lessons/jupyter/index.ipynb",
+    interface="lab",
+    )
+```
+Note that this example uses the JupyterLab interface.
+
+The `link` property holds the URL:
+```python
+print("The nbgitpuller link is:\n{}".format(linker.link))
+```
+```
+The nbgitpuller link is:
+https://csdms.rc.colorado.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fcsdms%2Fespin&urlpath=lab%2Ftree%2Fespin%2Flessons%2Fjupyter%2Findex.ipynb%3Fautodecode&branch=main
+```
+
+Changes: nbgitpuller-link
+=========================
+
+0.2 (2021-03-04)
+----------------
+
+* Add choice of classic Notebook or JupyterLab interface
+* Test against known link
+
+
+0.1 (2021-02-28)
+----------------
+
+* Initial release
+
+MIT License
+===========
+
+Copyright (c) 2021 Mark Piper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
