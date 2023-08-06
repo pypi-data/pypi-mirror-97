@@ -1,0 +1,185 @@
+"""
+Use these functions to get historical climate data.
+"""
+from dweather_client.http_queries import get_station_csv, get_dataset_cell, get_metadata, get_heads
+from dweather_client.aliases_and_units import \
+    lookup_station_alias, STATION_UNITS_LOOKUP as SUL, METRIC_TO_IMPERIAL as M2I, IMPERIAL_TO_METRIC as I2M, FLASK_DATASETS, UNIT_ALIASES
+from dweather_client.ipfs_errors import AliasNotFound, DataMalformedError
+from dweather_client.grid_utils import snap_to_grid, conventional_lat_lon_to_cpc, cpc_lat_lon_to_conventional
+from dweather_client.http_queries import flask_query, get_prismc_dict
+from dweather_client.struct_utils import tupleify
+import datetime, pytz, csv
+from astropy import units as u
+import pandas as pd
+import numpy as np
+from timezonefinder import TimezoneFinder
+
+
+def get_gridcell_history(
+        lat,
+        lon,
+        dataset,
+        snap_lat_lon_to_closest_valid_point=True,
+        also_return_snapped_coordinates=False,
+        protocol='https',
+        # return_result_as_dataframe=False, TODO
+        also_return_metadata=False,
+        use_imperial_units=True,
+        return_result_as_counter=False):
+    """
+    Get the historical timeseries data for a gridded dataset in a dictionary,
+    or, if return_result_as_counter is set to True, as a collections.Counter
+
+    This is a dictionary of dates: climate values for a given dataset and 
+    lat, lon.
+
+    If snap_lat_lon_to_closest_valid_point is set to True (which it is
+    by default), returns the history for the closest valid lat lon as
+    determined by the dataset's metadata resolution.
+
+    protocol is set to 'https' by default, but can also be set to
+    'ipfs'. There are performance tradeoffs depending on which protocol is
+    selected.
+
+    return_result_as_counter is set to False by default, but if it is set
+    to true, the historical timeseries will be returned as a collections.Counter
+    instead of as a dict. collections.Counter is useful for performance sensitive
+    aggregations, for example as in grid_utils.get_polygon_df
+
+    also_return_metadata is set to False by default, but if set to True,
+    returns the metadata next to the dict/counter within a tuple.
+
+    use_imperial_units is set to True by default, but if set to False,
+    will get the appropriate metric unit from aliases_and_units
+    """
+    metadata = get_metadata(get_heads()[dataset])
+
+    # set up units
+    str_u = metadata['unit of measurement']
+    with u.imperial.enable():
+        dweather_unit = UNIT_ALIASES[str_u] if str_u in UNIT_ALIASES else u.Unit(str_u)
+    converter = None
+    # if imperial is desired and dweather_unit is imperial   
+    if use_imperial_units and (dweather_unit in M2I): 
+        converter = M2I[dweather_unit]
+    # if metric is desired and dweather_unit is imperial
+    elif (not use_imperial_units) and (dweather_unit in I2M): 
+        converter = I2M[dweather_unit]
+
+    # get dataset-specific "no observation" value
+    missing_value = metadata["missing value"]
+
+    # snap to grid if desired
+    # rtma is quasi gridded so we don't snap that here
+    if snap_lat_lon_to_closest_valid_point and "rtma" not in dataset:
+       lat, lon = snap_to_grid(lat, lon, metadata)
+
+    if "cpcc" in dataset:
+        raise DatasetError("Not supporting cpcc yet, use cpc.")
+
+    # stopgap implementation of using flask app
+    if dataset in FLASK_DATASETS:
+        history_dict = {}
+        (lat, lon), resp_dict = flask_query(dataset, lat, lon)
+        for k in resp_dict:
+            val = np.nan if resp_dict[k] == missing_value else float(resp_dict[k])
+            datapoint = val * dweather_unit
+            if converter is not None:
+                datapoint = converter(datapoint)
+            history_dict[k] = datapoint
+
+    # another sort of stopgap, there should be a single "gridded linked list" loader
+    elif "prismc" in dataset:
+        history_dict = {}
+        resp_dict = get_prismc_dict(lat, lon, dataset)
+        for k in resp_dict:
+            val = np.nan if resp_dict[k] == missing_value else resp_dict[k]
+            datapoint = val * dweather_unit
+            if converter is not None:
+                datapoint = converter(datapoint)
+            history_dict[k] = datapoint
+        
+    # Try a timezone-based transformation on the times in case we're using an hourly set.
+    try:
+        tf = TimezoneFinder()
+        local_tz = pytz.timezone(tf.timezone_at(lng=lon, lat=lat))
+        tz_history_dict = {}
+        for time in history_dict:
+            tz_history_dict[pytz.utc.localize(time).astimezone(local_tz)] = history_dict[time]
+        history_dict = tz_history_dict
+    except AttributeError: #datetime.date (daily sets) doesn't work with this, only datetime.datetime (hourly sets)
+        pass
+
+    result = history_dict
+    if also_return_metadata:
+        result = tupleify(result) + ({"metadata": metadata},)
+    if also_return_snapped_coordinates:
+        result = tupleify(result) + ({"snapped to": (lat, lon)},)
+    return result
+
+def get_storm_history():
+    pass
+
+def get_station_history(
+        station_id,
+        weather_variable,
+        dataset='ghcnd',
+        protocol='https',
+        return_result_as_dataframe=False,
+        use_imperial_units=True):
+    """
+    Takes in a station id and a weather variable.
+
+    Gets the csv body associated with the station_id, defaulting to the
+    ghcnd dataset. Pass in dataset='ghcnd-imputed-daily' for imputed,
+    though note that ghcndi is only temperature as of this writing.
+
+    Passing in use_imperial_units=False will return results in metric. 
+    Imperial is the default as Arbol is based in the USA and the bulk of our 
+    deals are done in imperial.
+
+        'SNWD' or alias 'snow depth' -- the depth of snow at the time of the
+        observation
+        'SNOW' or alias 'snowfall -- the total snowfall observed since the
+        last observation
+        '' or alias 'snow water equivalent' -- the water level in inches
+        equivalent to the amount of snow currently on the ground at the
+        time of the observation.
+
+    The GHCN column names are fairly esoteric so a column_lookup
+    dictionary will try to find a valid GHCN column name for common 
+    aliases.
+
+    """
+    csv_text = get_station_csv(station_id, station_dataset=dataset)
+    column = lookup_station_alias(weather_variable)
+    dict_results = {}
+    reader = csv.reader(csv_text.split('\n'))
+    headers = next(reader)
+    date_col = headers.index('DATE')
+    data_col = headers.index(column)
+    data = {}
+    for row in reader:
+        try:
+            if row[data_col] == '':
+                continue
+        except IndexError:
+            continue
+        datapoint = SUL[column]['vectorize'](float(row[data_col]))
+        if use_imperial_units:
+            datapoint = SUL[column]['imperialize'](datapoint)
+        data[datetime.datetime.strptime(row[date_col], "%Y-%m-%d").date()] = datapoint
+    dict_results[column] = data
+
+    if return_result_as_dataframe == False:
+        return dict_results
+    else:
+        intermediate_dict = {}
+        intermediate_dict["DATE"] = [date for date in dict_results[column]]
+        intermediate_dict[column] = [dict_results[column][date] for date in dict_results[column]]
+        df = pd.DataFrame.from_dict(intermediate_dict)
+        df.DATE = pd.to_datetime(df.DATE)
+        df.index = df["DATE"]
+        df.drop(df.columns[0], axis=1, inplace=True)
+        return df
+
