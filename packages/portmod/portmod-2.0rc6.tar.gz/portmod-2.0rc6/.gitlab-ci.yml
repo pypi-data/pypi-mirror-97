@@ -1,0 +1,125 @@
+image: registry.gitlab.com/portmod/portmod/rust:latest
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache
+    - .venv/
+    - ~/.cache/portmod
+    - target
+    - portmod/portmod.cpython-*
+
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+  - python -V # Print out python version for debugging
+  - rustc -V
+  - virtualenv .venv
+  - source .venv/bin/activate
+
+inquisitor:
+  stage: test
+  script:
+  - mkdir -p .cache/tmp
+  - pip install -e .[test] --cache-dir .cache/pip
+  - rm -r .cache/openmw || true
+  - git clone https://gitlab.com/portmod/openmw-mods.git .cache/openmw --depth 1 || true
+  - cd .cache/openmw
+  - git fetch --all
+  - git reset --hard origin/master
+  - python ${CI_PROJECT_DIR}/bin/inquisitor scan
+
+install:
+  stage: build
+  script:
+  - mkdir -p .cache/tmp
+  - pip install -e .[test] --cache-dir .cache/pip
+
+lint:
+  stage: test
+  script:
+  - pip install --upgrade flake8 pylint setuptools_rust
+  - shopt -s globstar
+  - flake8 --exclude .venv,--max-line-length=88 --filename '*.py,*.pybuild'
+  # - pylint -E **/*.py
+  - cargo clippy -- -D warnings
+
+pytest:
+  stage: test
+  script:
+    - pytest --cov=portmod --cov=pybuild --log-level NOTSET
+    - coverage xml --include='portmod/*' -o coverage.portmod.xml
+    - coverage xml --include='pybuild/*' -o coverage.pybuild.xml
+    - sed -i "s=<source>.*</source>=<source>./</source>=g" coverage.*.xml
+  artifacts:
+    reports:
+      cobertura:
+        - coverage.portmod.xml
+        - coverage.pybuild.xml
+
+mypy:
+  stage: test
+  script:
+  - shopt -s globstar
+  - pip install --upgrade mypy
+  - mypy portmod/**/*.py pybuild/**/*.py
+
+format:
+  stage: test
+  script:
+  - pip install --upgrade black isort
+  - shopt -s globstar
+  - black --diff --check **/*.{py,pybuild}
+  - cargo fmt -- --check -l
+  - isort --diff --check portmod pybuild bin
+
+deploy:
+  image: quay.io/pypa/manylinux2014_x86_64
+  stage: deploy
+  only:
+  - tags
+  before_script:
+  - /opt/python/cp36-cp36m/bin/pip -V
+  script:
+  - /opt/python/cp36-cp36m/bin/pip install twine "setuptools!=50.0" setuptools_rust
+  - ./tools/build-wheels.sh
+  - /opt/python/cp36-cp36m/bin/python setup.py check sdist
+  - /opt/python/cp36-cp36m/bin/python -m twine upload dist/*
+
+sast:
+  inherit:
+    default: false
+  stage: test
+
+gemnasium-python-dependency_scanning:
+  inherit:
+    default: false
+  stage: test
+
+include:
+- template: Security/SAST.gitlab-ci.yml
+- template: Dependency-Scanning.gitlab-ci.yml
+
+pages:
+  stage: deploy
+  script:
+    - pip install --upgrade sphinx sphinx-autodoc-typehints sphinx_rtd_theme
+    - ./mkdoc.sh
+    - mv apidoc/_build/html/ public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

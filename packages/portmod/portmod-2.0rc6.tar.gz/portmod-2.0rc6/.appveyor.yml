@@ -1,0 +1,112 @@
+image:
+  - macos
+  - Visual Studio 2019
+
+artifacts:
+  - path: dist\*
+
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+
+  cache:
+    - .env
+    - .cache
+    - 'C:\Users\appveyor\.cargo'
+    - 'C:\Users\appveyor\.rustup'
+    - "target"
+
+  environment:
+    PATH: 'C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;c:\python36-x64\Scripts;C:\Users\appveyor\AppData\Roaming\Python\Python36\Scripts;C:\Program Files\Sandboxie;C:\Users\appveyor\.cargo\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\cmd'
+    PYTHON: "C:\\Python36-x64"
+    PYTHON_EXEC: "C:\\Python36-x64\\python.exe"
+    PYTHON_VERSION: "3.6.x"
+    PYTHON_ARCH: "64"
+    LANG: "en_US.utf8"
+
+  before_build:
+  - ps: |
+      if (!(Test-Path .cache/SandboxieInstall64-v5.47.1.exe)) {
+          New-Item -ItemType Directory -Force -Path .cache
+          iwr https://github.com/sandboxie-plus/Sandboxie/releases/download/0.6.7/Sandboxie-Classic-x64-v5.47.1.exe -OutFile .cache/SandboxieInstall64-v5.47.1.exe
+      }
+      if (!(Test-Path .cache/rustup-init.exe)) {
+          iwr https://win.rustup.rs/x86_64 -OutFile .cache/rustup-init.exe
+      }
+      .cache\SandboxieInstall64-v5.47.1.exe /S /install
+      .cache/rustup-init.exe --default-toolchain stable -y --quiet
+      Invoke-Expression "$env:PYTHON_EXEC -m pip install pip --upgrade --user"
+      Invoke-Expression "$env:PYTHON_EXEC -m pip install virtualenv --upgrade --user"
+
+  build_script:
+  - cmd: |
+      virtualenv .venv -p python36
+      .venv\Scripts\activate
+      pip install -e .[test] --cache-dir .cache/pip
+
+  test_script:
+  - virtualenv .venv -p python36
+  - .venv\Scripts\activate
+  - pytest --log-level NOTSET
+
+  deploy_script:
+  - IF %APPVEYOR_REPO_TAG% == true (git diff)
+  - IF %APPVEYOR_REPO_TAG% == true (git reset --hard)
+  - IF %APPVEYOR_REPO_TAG% == true (pip3 install twine)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python36-x64\\python.exe -m pip install setuptools_rust)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python37-x64\\python.exe -m pip install setuptools_rust)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python38-x64\\python.exe -m pip install setuptools_rust)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python39-x64\\python.exe -m pip install setuptools_rust)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python36-x64\\python.exe setup.py bdist_wheel)
+  - IF %APPVEYOR_REPO_TAG% == true (rmdir /s /q build\\lib)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python37-x64\\python.exe setup.py bdist_wheel)
+  - IF %APPVEYOR_REPO_TAG% == true (rmdir /s /q build\\lib)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python38-x64\\python.exe setup.py bdist_wheel)
+  - IF %APPVEYOR_REPO_TAG% == true (rmdir /s /q build\\lib)
+  - IF %APPVEYOR_REPO_TAG% == true (C:\\Python39-x64\\python.exe setup.py bdist_wheel)
+  - IF %APPVEYOR_REPO_TAG% == true (twine upload dist/*.whl)
+
+-
+  matrix:
+    only:
+      - image: macos
+  cache:
+    - .venv
+    - .cache
+    - $HOME/.cargo
+    - $HOME/.rustup
+    - target
+  environment:
+    LANG: "en_US.utf8"
+
+  build_script:
+    - export PATH="/Users/appveyor/Library/Python/3.9/bin:$HOME/.cargo/bin:$PATH"
+    - which python3
+    - python3 -m pip install virtualenv pip --upgrade --user
+    - virtualenv .venv
+    - source .venv/bin/activate
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh
+    - chmod +x rustup.sh
+    - ./rustup.sh --default-toolchain stable -y --quiet
+    - python3 -m pip install -e .[test] --cache-dir .cache/pip
+  test_script:
+    - pytest --cov=portmod --cov=pybuild_ --log-level NOTSET
+
+  deploy_script: |
+    if [ $APPVEYOR_REPO_TAG = true ]; then
+        pip3 install twine
+        ~/venv3.6/bin/pip install setuptools_rust
+        ~/venv3.7/bin/pip install setuptools_rust
+        ~/venv3.8/bin/pip install setuptools_rust
+        ~/venv3.9/bin/pip install setuptools_rust
+        ~/venv3.6/bin/python setup.py bdist_wheel
+        rm -r build/lib
+        ~/venv3.7/bin/python setup.py bdist_wheel
+        rm -r build/lib
+        ~/venv3.8/bin/python setup.py bdist_wheel
+        rm -r build/lib
+        ~/venv3.9/bin/python setup.py bdist_wheel
+        twine upload dist/*.whl
+    fi
