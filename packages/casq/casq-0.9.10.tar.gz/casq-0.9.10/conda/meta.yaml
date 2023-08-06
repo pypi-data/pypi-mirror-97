@@ -1,0 +1,50 @@
+{% set setup_data = load_setup_py_data()}
+
+package:
+  name: {{ setup_data['name']|lower }}
+  version: {{ setup_data['version'] }}
+
+source:
+  path: ../
+
+build:
+  number: 0
+  entry_points:
+    - {{ setup_data['entry_points']['console_scripts'] }}
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+  noarch: python
+
+requirements:
+  host:
+  {% for package in setup_data['setup_requires'] %}
+    - {{ package }}
+  {% endfor %}
+  {% for package in setup_data['install_requires'] %}
+    - {{ package }}
+  {% endfor %}
+    - python {{ setup_data['python_requires'] }}
+  run:
+  {% for package in setup_data['install_requires'] %}
+    - {{ package }}
+  {% endfor %}
+    - python {{ setup_data['python_requires'] }}
+
+test:
+  imports:
+    - {{ setup_data['name'] }}
+  requires:
+  {% for package in setup_data['tests_require'] %}
+    - {{ package }}
+  {% endfor %}
+  commands:
+    - casq --help
+    - pytest
+
+about:
+  home: {{ setup_data['url'] }}
+  license: "GNU General Public v3 (GPLv3)"
+  license_family: {{ setup_data['license'] }}
+  license_file: LICENSE
+  summary: {{ setup_data['description'] }}
+  doc_url: {{ setup_data['project_urls']['Documentation'] }}
+  dev_url: {{ setup_data['project_urls']['Code'] }}
