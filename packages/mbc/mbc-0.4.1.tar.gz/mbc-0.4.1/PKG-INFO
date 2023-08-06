@@ -1,0 +1,57 @@
+Metadata-Version: 2.1
+Name: mbc
+Version: 0.4.1
+Summary: Wrapper for the moonbots api
+Home-page: https://github.com/VadyChel/MoonbotsClient
+Author-email: zyzel19@gmail.com
+License: UNKNOWN
+Description: # Wrapper for the moonbots api
+        > Wrapper for the moonbots api with webhook and auto post data supporting
+        
+        # How to install?
+        > From pip:
+        > ```
+        > pip install mbc
+        > ```
+        > From source:
+        > ```
+        > pip install git+https://github.com/VadyChel/MoonbotsClient
+        > ```
+        
+        # Examples
+        Simple usage:
+        ```py
+        from mbc import MoonbotsClient, HTTPException
+        from discord.ext import commands, tasks
+        
+        
+        class MBCExample(commands.Cog):
+            def __init__(self, bot):
+                self.bot = bot
+                self.mclient = MoonbotsClient(
+                    bot=self.bot,
+                    api_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                    autopost=False        
+                )
+                self.post_stat_loop.start()
+        
+            @tasks.loop(hours=3)
+            async def post_stat_loop(self):
+                await self.bot.wait_until_ready()
+                try:
+                    await self.mclient.post_stat()
+                except HTTPException:
+                    print("Failed to post bot stat")
+        
+        
+        def setup(client):
+            client.add_cog(MBCExample(client))
+        ```
+        
+        Other examples you can see in [examples directory](https://github.com/VadyChel/MoonbotsClient/tree/main/examples)
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
