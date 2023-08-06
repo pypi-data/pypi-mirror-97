@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} Model4 {% endblock title %}
+
+{% block content %} 
+<h3> Model4 - FormSet </h3>
+<form action="{% url 'model4-formset' pk %}" method="post">
+	{% csrf_token %}
+	{{ formset.management_form }}
+	{% for form in formset %}
+		{{ form }}
+		<br>
+		<br>
+	{% endfor %}
+	<input type="submit" value="Insert">
+</form>
+{% endblock content %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %} Model1 {% endblock title %}
+
+{% block content %} 
+<h3> Model1 - View </h3>
+	<a href="{% url 'model1-add' %}"><h4> Add object </h4></a>
+	<a href="{% url 'model1-formset' %}"><h4> Add object (formset) </h4></a>
+	<table>
+	<tr>
+		<th>Model1 Objects</th>
+	</tr>
+	{% for obj in data %}
+		<tr>
+			<td>
+				<a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock content %}
