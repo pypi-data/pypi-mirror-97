@@ -1,0 +1,90 @@
+Metadata-Version: 2.1
+Name: waylay-beta
+Version: 0.2.0
+Summary: beta release of the Waylay Python SDK
+Home-page: https://docs-io.waylay.io/#/api/sdk/python
+Author: Waylay
+Author-email: info@waylay.io
+License: ISC
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: httpx
+Requires-Dist: simple-rest-client
+Requires-Dist: appdirs
+Requires-Dist: python-jose
+Requires-Dist: pandas
+Requires-Dist: isodate
+Requires-Dist: joblib
+Requires-Dist: tqdm
+Requires-Dist: python-dateutil ; python_version == "3.6"
+Requires-Dist: dataclasses ; python_version == "3.6"
+Requires-Dist: typing-extensions ; python_version == "3.6"
+Requires-Dist: typing-extensions ; python_version == "3.7"
+Provides-Extra: dev
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: pytest-cov ; extra == 'dev'
+Requires-Dist: pytest-mock ; extra == 'dev'
+Requires-Dist: mock ; extra == 'dev'
+Requires-Dist: pylint ; extra == 'dev'
+Requires-Dist: pycodestyle ; extra == 'dev'
+Requires-Dist: pydocstyle ; extra == 'dev'
+Requires-Dist: autopep8 ; extra == 'dev'
+Requires-Dist: mypy ; extra == 'dev'
+Requires-Dist: typing-inspect ; extra == 'dev'
+Requires-Dist: sklearn ; extra == 'dev'
+Requires-Dist: pdoc ; extra == 'dev'
+
+
+# waylay-beta
+
+This Python SDK helps you to connect with the REST APIs of the Waylay Platform.
+
+It provides a selection of services and utilities, focused on supporting our data science users:
+* importing an querying _timeseries_ data.
+* uploading your own _machine learning models_ for usage in the _Waylay Rule Engine_
+* provisioning waylay _resources_ and _resource types_.
+
+The SDK is optimised for interactive usage in [Jupyter Notebooks](https://jupyter.org/).
+
+## Prerequisites
+This package requires a python runtime `3.6` or higher.
+For datascience purposes you typically want to prepare a anaconda environment:
+```bash
+conda create --name my_waylay_env python=3.8
+conda activate my_waylay_env
+conda install jupyter
+pip install waylay-beta # .. or any of the other installation methods below
+jupyter notebook 
+```
+
+## Installation
+
+```bash
+pip install waylay-beta
+```
+
+## Quickstart
+
+* Login to the waylay console, and get hold of an _API key, API secret_ pair \[*>Settings>Authentication keys*\] 
+  > `[Enterprise]` [https:://console.waylay.io](https://console.waylay.io/administration/settings/keys) <br>
+  > `[IO]` [https:://console-io.waylay.io](https://console-io.waylay.io/administration/settings/keys)
+
+* Create an SDK client
+  ```python
+  from waylay import WaylayConfig, WaylayClient
+  waylay_client = WaylayClient.from_profile()
+  ```
+  On first usage, this will prompt for an authentication endpoint,
+  > `[Enterprise]` accounts-api.waylay.io (default)<br> 
+  > `[IO]` accounts-api-io.waylay.io
+
+  and your _API key/API secret_ credentials. 
+
+For more details see 
+> `[Enterprise]` [https://docs.waylay.io](https://docs.waylay.io/api/sdk/python/)<br>
+> `[IO]` [https://docs-io.waylay.io](https://docs-io.waylay.io/#/api/sdk/python)
+
+## Usage Examples
+See [demo notebooks](https://github.com/waylayio/demo-general/tree/master/python-sdk) for the usage examples supported in the current release.
+
