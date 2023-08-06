@@ -1,0 +1,39 @@
+{
+    "paths" : {
+	"config_root": "config/",
+	"content_root": "content/",
+	"design_root": "design/",
+	"template_dir": "templates/",
+	"resource_dir": "resources/",
+	"module_dir": "modules/",
+	"build_root": "build/",
+	"profiles_file": "config/profiles.json",
+	"extensions_root": "extensions",
+	"command_handlers_dir": "commands",
+	"file_processing_handlers_dir": "file_processing"
+    },
+    "content_file_types": [ "xml", "png", "jpg", "svg" ],
+    "action_commands" : {
+	"build" : [
+	    { "type": "internal", "command": "build" }
+	],
+	"deploy" : [
+	    { "type": "external",
+	      "command": "rsync -e \"/usr/bin/ssh\" -av --exclude=/.well-known/ --delete {{paths.profile_build_dir}}/ {{deploy_destination}}"
+	    }
+	],
+	"tidy" : [
+	    { "type": "external", "command": "rm -f *~" },
+	    { "type": "external", "command": "rm -f content/*~ content/*/*~ content/*/*/*~ content/*/*/*/*~"},
+	    { "type": "external", "command": "rm -f design/templates/*~"},
+	    { "type": "external", "command": "rm -f design/resources/css/*~"},
+	    { "type": "external", "command": "rm -f design/resources/js/*~ design/resources/js/*/*~"},
+	    { "type": "external", "command": "rm -f design/resources/py/*~ design/resources/py/*/*~"},
+	    { "type": "external", "command": "rm -f design/modules/*/*~"},
+	    { "type": "external", "command": "rm -f config/*~"}
+	],
+	"nuke" : [
+	    { "type": "external", "command": "rm -fr {{paths.profile_build_dir}}"}
+	]
+    }
+}
