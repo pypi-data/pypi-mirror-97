@@ -1,0 +1,29 @@
+module the_total_bird 1.0;
+
+require {
+        type var_run_t;
+        type ifconfig_t;
+        type bgp_port_t;
+        type bfd_control_port_t;
+        type unreserved_port_t;
+
+        class capability { chown dac_override dac_read_search fowner fsetid net_bind_service setgid setuid };
+	    class tcp_socket { accept listen name_bind name_connect };
+        class sock_file { create setattr unlink write };
+        class udp_socket name_bind;
+}
+
+#============= ifconfig_t ==============
+
+allow ifconfig_t bfd_control_port_t:udp_socket name_bind;
+allow ifconfig_t bgp_port_t:tcp_socket { name_bind name_connect };
+allow ifconfig_t unreserved_port_t:udp_socket name_bind;
+allow ifconfig_t self:capability { chown dac_override dac_read_search fowner fsetid net_bind_service setgid setuid };
+allow ifconfig_t self:tcp_socket listen;
+allow ifconfig_t self:tcp_socket accept;
+allow ifconfig_t unreserved_port_t:udp_socket name_bind;
+allow ifconfig_t var_run_t:sock_file { create setattr unlink write };
+
+# sudo checkmodule -M -m -o the_total_bird.mod the_total_bird.te
+# sudo semodule_package -o the_total_bird.pp -m the_total_bird.mod
+# sudo semodule -i the_total_bird.pp 
