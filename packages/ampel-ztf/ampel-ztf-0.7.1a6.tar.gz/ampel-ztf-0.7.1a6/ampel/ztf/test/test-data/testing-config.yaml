@@ -1,0 +1,153 @@
+db:
+  databases:
+  - name: data
+    collections:
+    - name: stock
+      indexes:
+      - index:
+        - field: _id
+        - field: channel
+        args:
+          unique: true
+    - name: t0
+      indexes:
+      - field: stock
+    - name: t1
+      indexes:
+      - field: stock
+    - name: t2
+      indexes:
+      - index:
+        - field: stock
+        - field: channel
+      - field: status
+    role:
+      r: logger
+      w: writer
+  - name: ext
+    collections:
+    - name: counter
+      indexes: null
+    - name: journal
+      indexes: null
+    role:
+      r: logger
+      w: logger
+  - name: var
+    collections:
+    - name: logs
+      indexes:
+      - field: run
+      - field: stock
+        args:
+          sparse: true
+      - field: channel
+        args:
+          sparse: true
+    - name: events
+      indexes: null
+    - name: beacon
+      indexes: null
+    - name: troubles
+      indexes: null
+    role:
+      r: logger
+      w: logger
+  prefix: AmpelTest
+  mongo_options:
+    serverSelectionTimeoutMS: 1
+channel:
+  EXAMPLE_TNS_MSIP:
+    channel: EXAMPLE_TNS_MSIP
+    purge:
+      content:
+        delay: 100
+        format: json
+        unify: true
+        compress: true
+      logs:
+        delay: 50
+        format: csv
+        compress: true
+        header: false
+    active: true
+    hash: 71181859740809111
+    distrib: ampel-contrib-sample
+    source: conf/ampel-contrib-sample/channel/EXAMPLE_TNS_MSIP.json
+    contact: ampel@desy.de
+    access:
+    - ZTF
+    - ZTF_PUB
+    policy: []
+    template: ztf_uw_public
+unit:
+  controller: {}
+  admin:
+    ZiStockIngester:
+      fqn: ampel.ztf.ingest.ZiStockIngester
+      base:
+      - StockIngester
+      - AbsStockIngester
+      - AbsIngester
+      distrib: ampel-ztf
+      file: conf/ampel-ztf/ampel.json
+    ZiAlertContentIngester:
+      fqn: ampel.ztf.ingest.ZiAlertContentIngester
+      base:
+      - AbsAlertContentIngester
+      - AbsIngester
+      distrib: ampel-ztf
+      file: conf/ampel-ztf/ampel.json
+    PhotoCompoundIngester:
+      fqn: ampel.ingest.PhotoCompoundIngester
+      base:
+      - AbsCompoundIngester
+      - AbsIngester
+      distrib: ampel-photometry
+      file: conf/ampel-photometry/ampel.json
+    PhotoT2Ingester:
+      fqn: ampel.ingest.PhotoT2Ingester
+      base:
+      - AbsStateT2Ingester
+      - AbsT2Ingester
+      - AbsIngester
+      distrib: ampel-photometry
+      file: conf/ampel-photometry/ampel.json
+  base:
+    ZiT1Combiner:
+      fqn: ampel.ztf.ingest.ZiT1Combiner
+      base:
+      - T1PhotoCombiner
+      - T1DefaultCombiner
+      - AbsT1Unit
+      distrib: ampel-ztf
+      file: conf/ampel-ztf/ampel.json
+    DemoLightCurveT2Unit:
+      fqn: ampel.demo.unit.base.DemoLightCurveT2Unit
+      base:
+      - AbsLightCurveT2Unit
+      - AbsCustomStateT2Unit
+      distrib: ampel-photometry
+      file: conf/ampel-photometry/ampel.yaml
+      hash: 8908276891490169
+    T2LightCurveSummary:
+      fqn: ampel.ztf.t2.T2LightCurveSummary
+      base:
+      - AbsLightCurveT2Unit
+      - AbsCustomStateT2Unit
+      distrib: ampel-ztf
+      file: conf/ampel-ztf/ampel.json
+      hash: 32143468895309973
+  core: {}
+  aux: {}
+alias:
+  t0: {}
+  t1: {}
+  t2: {}
+  t3: {}
+resource:
+  mongo: mongodb://localhost:27017
+  ampel-ztf/archive: denada
+  ampel-ztf/kafka:
+    broker: gregor
+    group: samsa
