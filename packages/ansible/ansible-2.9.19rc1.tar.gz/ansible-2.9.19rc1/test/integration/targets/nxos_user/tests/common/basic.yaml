@@ -1,0 +1,92 @@
+---
+- debug: msg="START connection={{ ansible_connection }} nxos_user basic test"
+- debug: msg="Using provider={{ connection.transport }}"
+  when: ansible_connection == "local"
+
+- name: Remove old entries of user
+  nxos_user: &cleanup
+    aggregate:
+      - { name: ansibletest1 }
+      - { name: ansibletest2 }
+      - { name: ansibletest3 }
+      - { name: ansibletest_role }
+    provider: "{{ connection }}"
+    state: absent
+
+# Start tests
+- name: Create user
+  nxos_user:
+    name: ansibletest1
+    roles: network-operator
+    provider: "{{ connection }}"
+    state: present
+  register: result
+
+- debug: msg="{{result}}"
+
+- assert:
+    that:
+      - 'result.changed == true'
+      - '"username" in result.commands[0]'
+      - '"role network-operator" in result.commands[0]'
+
+- name: Collection of users
+  nxos_user:
+    aggregate:
+      - { name: ansibletest2 }
+      - { name: ansibletest3 }
+    provider: "{{ connection }}"
+    state: present
+    roles: network-admin
+  register: result
+
+- assert:
+    that:
+      - 'result.changed == true'
+
+- name: Create a custom role
+  nxos_config:
+    lines:
+      - role name customrole
+
+- name: Attempt to create a user with a valid custom role
+  nxos_user:
+    name: ansibletest_role
+    role: customrole
+    state: present
+  register: result
+
+- assert:
+    that:
+      - result.changed == True
+      - result.failed == False
+      - '"username ansibletest_role role customrole" in result.commands'
+
+- name: Attempt to create user with invalid role (should fail)
+  nxos_user:
+    name: ansibletest_role
+    role: invalid_role
+    state: present
+  register: result
+  ignore_errors: True
+
+- assert:
+    that:
+      - result.failed == True
+      - '"invalid role specified" in result.msg'
+
+- name: tearDown
+  nxos_user: *cleanup
+  register: result
+
+- assert:
+    that:
+      - 'result.changed == true'
+      - '"no username" in result.commands[0]'
+
+- name: Delete custom role
+  nxos_config:
+    lines:
+      - no role name customrole
+
+- debug: msg="END connection={{ ansible_connection }} nxos_user basic test"

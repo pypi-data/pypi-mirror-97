@@ -1,0 +1,29 @@
+- name: Kill all mongod processes
+  command: pkill  -{{ kill_signal }} mongod
+  ignore_errors: true
+
+- name: Kill all mongos processes
+  command: pkill  -{{ kill_signal }} mongos
+  ignore_errors: true
+
+- name: Wait for ports to get out of TIME_WAIT
+  wait_for:
+    port: '{{ item }}'
+    state: drained
+  with_sequence: start=3001 end=3006
+
+- name: Remove all mongod folders
+  file:
+    path: "{{ remote_tmp_dir }}/{{ item }}"
+    state: absent
+  with_items:
+    - mongod3001
+    - mongod3002
+    - mongod3003
+    - mongod3004
+    - mongod3005
+    - mongod3006
+    - config
+
+- name: Remove all mongod sock files
+  shell: rm -Rf /tmp/mongodb*.sock
