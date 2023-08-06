@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>copyparty</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/splash.css">
+</head>
+
+<body>
+    <div id="wrap">
+        <p>hello {{ this.uname }}</p>
+
+        <h1>you can browse these:</h1>
+        <ul>
+            {% for mp in rvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <h1>you can upload to:</h1>
+        <ul>
+            {% for mp in wvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <h1>login for more:</h1>
+        <ul>
+            <form method="post" enctype="multipart/form-data" action="/">
+                <input type="hidden" name="act" value="login" />
+                <input type="password" name="cppwd" />
+                <input type="submit" value="Login" />
+            </form>
+        </ul>
+    </div>
+    <script>
+
+if (window.localStorage && localStorage.getItem('darkmode') == 1)
+    document.documentElement.setAttribute("class", "dark");
+
+</script>
+</body>
+</html>
