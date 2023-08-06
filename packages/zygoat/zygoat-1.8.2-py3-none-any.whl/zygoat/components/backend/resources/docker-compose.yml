@@ -1,0 +1,14 @@
+db:
+    image: postgres:11
+    ports:
+        - "5432:5432"
+    environment:
+        - POSTGRES_PASSWORD=postgres
+backend:
+    build:
+        context: backend
+        dockerfile: Dockerfile.local
+    volumes:
+        - ./backend:/code
+    depends_on:
+        - db
