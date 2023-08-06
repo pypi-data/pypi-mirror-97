@@ -1,0 +1,99 @@
+Metadata-Version: 2.1
+Name: flowty
+Version: 1.1.7
+Summary: Flowty Network Optimization Solver
+Home-page: https://flowty.ai
+Author: Flowty
+Author-email: info@flowty.ai
+License: UNKNOWN
+Keywords: Optimization,Nework Optimization,Combinatorial Optimization,Linear Programming,Integer Programming,Operations Research,Mathematical Programming
+Platform: UNKNOWN
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: cffi (>=1.14.5)
+Requires-Dist: pycparser (>=2.20)
+
+# Flowty
+
+Install with
+
+```sh
+pip install flowty
+```
+
+## Windows
+
+Install the [64-bit version of python](https://docs.python.org/3/using/windows.html).
+
+## Linux
+
+Install [Fortran](https://gcc.gnu.org/fortran/) to work with the [BLAS](https://www.netlib.org/blas/) and [LAPACK](https://www.netlib.org/lapack/).
+
+On `apt-get` compatible distributions do
+
+```sh
+apt-get update
+apt-get install libgfortran5
+```
+
+## Quick Start
+
+Let's solve [the vehicle routing problem with time windows](https://docs.flowty.ai/examples/vrptw/). 
+
+The objective is to minimize the total cost of routing vehicles from a central depot to a set of customers. Each customer must be visited exactly once within a specified time window to deliver their required demand, each customer has a service time it takes to unload the vehicle (modeled within the out-going travel time), and each vehicle has a maximum capacity of goods to deliver. If a vehicle arrives early it is allowed to wait for the customer's time window to start.
+
+```python
+# Vehicle Routing Problem with Time Windows
+
+from flowty import Model, xsum
+from flowty.datasets import vrp_rep
+
+bunch = vrp_rep.fetch_vrp_rep("solomon-1987-r1", instance="R102_025")
+name, n, es, c, d, Q, t, a, b, x, y = bunch["instance"]
+
+m = Model()
+
+# one graph, it is identical for all vehicles
+g = m.addGraph(obj=c, edges=es, source=0, sink=n - 1, L=1, U=n - 2, type="B")
+
+# adds resources variables to the graph.
+# demand and capacity
+m.addResourceDisposable(
+    graph=g, consumptionType="V", weight=d, boundsType="V", lb=0, ub=Q, name="d"
+)
+
+# travel time and customer time windows
+m.addResourceDisposable(
+    graph=g, consumptionType="E", weight=t, boundsType="V", lb=a, ub=b, name="t"
+)
+
+# set partition constriants ensure customers are only visited once
+for i in range(n)[1:-1]:
+    m += xsum(x * 1 for x in g.vars if i == x.source) == 1
+
+# packing set - at most one of these variables can be set. Helps the algorithm
+for i in range(n)[1:-1]:
+    m.addPackingSet([x for x in g.vars if i == x.source])
+
+status = m.optimize()
+print(f"ObjectiveValue {m.objectiveValue}")
+
+# get the variable values
+for var in m.vars:
+    if var.x > 0:
+        print(f"{var.name} = {var.x}")
+```
+
+Visit [docs.flowy.ai](https://docs.flowty.ai) to get to know more.
+
+## License
+
+The community license is a license to the general community which may have limited
+features and additional restrictions. For an unlimited commercial, academic or trial
+license contact Flowty at [info@flowty.ai](mailto:info@flowty.ai).
+
+
