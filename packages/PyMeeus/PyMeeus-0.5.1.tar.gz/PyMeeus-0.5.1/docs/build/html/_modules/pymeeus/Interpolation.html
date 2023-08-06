@@ -1,0 +1,932 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pymeeus.Interpolation &mdash; PyMeeus 0.5.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyMeeus
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../core/index.html">Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bodies/index.html">Bodies</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Usage Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyMeeus</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pymeeus.Interpolation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pymeeus.Interpolation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="c1"># PyMeeus: Python module implementing astronomical algorithms.</span>
+<span class="c1"># Copyright (C) 2018  Dagoberto Salazar</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">degrees</span>
+
+<span class="kn">from</span> <span class="nn">pymeeus.base</span> <span class="k">import</span> <span class="n">TOL</span>
+<span class="kn">from</span> <span class="nn">pymeeus.Angle</span> <span class="k">import</span> <span class="n">Angle</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: Interpolation</span>
+<span class="sd">   :synopsis: Basic interpolation routines</span>
+<span class="sd">   :license: GNU Lesser General Public License v3 (LGPLv3)</span>
+
+<span class="sd">.. moduleauthor:: Dagoberto Salazar</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Interpolation"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation">[docs]</a><span class="k">class</span> <span class="nc">Interpolation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class Interpolation deals with finding intermediate values to those given</span>
+<span class="sd">    in a table.</span>
+
+<span class="sd">    Besides the basic interpolation, this class also provides methods to find</span>
+<span class="sd">    the extrema (maximum or minimum value) in a given interval (if present),</span>
+<span class="sd">    and it also has methods to find roots (the values of the argument &#39;x&#39; for</span>
+<span class="sd">    which the function &#39;y&#39; becomes zero).</span>
+
+<span class="sd">    Please note that it seems that Meeus uses the Bessel interpolation method</span>
+<span class="sd">    (Chapter 3). However, this class uses the Newton interpolation method</span>
+<span class="sd">    because it is (arguably) more flexible regarding the number of entries</span>
+<span class="sd">    provided in the interpolation table.</span>
+
+<span class="sd">    The constructor takes pairs of (x, y) values from the table of interest.</span>
+<span class="sd">    These pairs of values can be given as a sequence of int/floats, tuples,</span>
+<span class="sd">    lists or Angles. It is also possible to provide an Interpolation object to</span>
+<span class="sd">    the constructor in order to get a copy.</span>
+
+<span class="sd">    .. note:: When using Angles, be careful with the 360-to-0 discontinuity.</span>
+
+<span class="sd">    If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">    positions are considered to belong to the &#39;x&#39; set, while the values in the</span>
+<span class="sd">    even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">    provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is build</span>
+<span class="sd">    from 0 onwards with steps of length 1.</span>
+
+<span class="sd">    Please keep in mind that a minimum of two data pairs are needed in order to</span>
+<span class="sd">    carry out any interpolation. If only one value pair is provided, a</span>
+<span class="sd">    ValueError exception will be raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Interpolation.__init__"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Interpolation constructor.</span>
+
+<span class="sd">        This takes pairs of (x, y) values from the table of interest. These</span>
+<span class="sd">        pairs of values can be given as a sequence of int/floats, tuples, lists</span>
+<span class="sd">        or Angles. It is also possible to provide an Interpolation object to</span>
+<span class="sd">        the constructor in order to get a copy.</span>
+
+<span class="sd">        .. note:: When using Angles, be careful with the 360-to-0 discontinuity</span>
+
+<span class="sd">        If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">        positions are considered to belong to the &#39;x&#39; set, while the values in</span>
+<span class="sd">        the even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">        provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is</span>
+<span class="sd">        build from 0 onwards with steps of length 1.</span>
+
+<span class="sd">        Please keep in mind that a minimum of two data pairs are needed in</span>
+<span class="sd">        order to carry out any interpolation. If only one value pair is</span>
+<span class="sd">        provided, a ValueError exception will be raised.</span>
+
+<span class="sd">        :param args: Input tabular values, or another Interpolation object.</span>
+<span class="sd">        :type args: int, float, list, tuple, :py:class:`Angle`,</span>
+<span class="sd">           :py:class:`Interpolation`</span>
+
+<span class="sd">        :returns: Interpolation object.</span>
+<span class="sd">        :rtype: :py:class:`Interpolation`</span>
+<span class="sd">        :raises: ValueError if not enough input data pairs are provided.</span>
+<span class="sd">        :raises: TypeError if input values are of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i._x)</span>
+<span class="sd">        [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(i._y)</span>
+<span class="sd">        [2, 4, 6, 8, 10, 12]</span>
+<span class="sd">        &gt;&gt;&gt; j = Interpolation([3, -8, 1, 12, 2, 5, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(j._x)</span>
+<span class="sd">        [0, 1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(j._y)</span>
+<span class="sd">        [3, -8, 1, 12, 2, 5, 8]</span>
+<span class="sd">        &gt;&gt;&gt; k = Interpolation(3, -8, 1, 12, 2, 5, 8)</span>
+<span class="sd">        &gt;&gt;&gt; print(k._x)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">        &gt;&gt;&gt; print(k._y)</span>
+<span class="sd">        [12, 5, -8]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span> <span class="o">=</span> <span class="n">TOL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># Let&#39;s use &#39;set()&#39; method to handle the setup</span></div>
+
+    <span class="k">def</span> <span class="nf">_order_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to put the data points in ascending order w.r.t. &#39;x&#39;.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Let&#39;s work with copies of the original lists</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+
+        <span class="n">xnew</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ynew</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="c1"># Get the index of the minimum value</span>
+            <span class="n">imin</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="c1"># Append the current minimum value to the new &#39;x&#39; list</span>
+            <span class="n">xnew</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">])</span>
+            <span class="c1"># Store the *position* of the current minimum value to new &#39;y&#39; list</span>
+            <span class="n">ynew</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imin</span><span class="p">)</span>
+            <span class="c1"># The current minimum value will no longer be the minimum</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmax</span>
+
+        <span class="c1"># In the new &#39;y&#39; list, substitute the positions by the real values</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+        <span class="c1"># Store the results in the corresponding fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">xnew</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">ynew</span>
+
+<div class="viewcode-block" id="Interpolation.set"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method used to define the value pairs of Interpolation object.</span>
+
+<span class="sd">        This takes pairs of (x, y) values from the table of interest. These</span>
+<span class="sd">        pairs of values can be given as a sequence of int/floats, tuples,</span>
+<span class="sd">        lists, or Angles. It is also possible to provide an Interpolation</span>
+<span class="sd">        object to this method in order to get a copy.</span>
+
+<span class="sd">        .. note:: When using Angles, be careful with the 360-to-0 discontinuity</span>
+
+<span class="sd">        If a sequence of int, floats or Angles is given, the values in the odd</span>
+<span class="sd">        positions are considered to belong to the &#39;x&#39; set, while the values in</span>
+<span class="sd">        the even positions belong to the &#39;y&#39; set. If only one tuple or list is</span>
+<span class="sd">        provided, it is assumed that it is the &#39;y&#39; set, and the &#39;x&#39; set is</span>
+<span class="sd">        build from 0 onwards with steps of length 1.</span>
+
+<span class="sd">        Please keep in mind that a minimum of two data pairs are needed in</span>
+<span class="sd">        order to carry out any interpolation. If only one value pair is</span>
+<span class="sd">        provided, a ValueError exception will be raised.</span>
+
+<span class="sd">        :param args: Input tabular values, or another Interpolation object.</span>
+<span class="sd">        :type args: int, float, list, tuple, :py:class:`Angle`</span>
+
+<span class="sd">        :returns: None.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raises: ValueError if not enough input data pairs are provided.</span>
+<span class="sd">        :raises: TypeError if input values are of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation()</span>
+<span class="sd">        &gt;&gt;&gt; i.set([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i._x)</span>
+<span class="sd">        [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(i._y)</span>
+<span class="sd">        [2, 4, 6, 8, 10, 12]</span>
+<span class="sd">        &gt;&gt;&gt; j = Interpolation()</span>
+<span class="sd">        &gt;&gt;&gt; j.set([3, -8, 1, 12, 2, 5, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(j._x)</span>
+<span class="sd">        [0, 1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        &gt;&gt;&gt; print(j._y)</span>
+<span class="sd">        [3, -8, 1, 12, 2, 5, 8]</span>
+<span class="sd">        &gt;&gt;&gt; k = Interpolation(3, -8, 1, 12, 2, 5, 8)</span>
+<span class="sd">        &gt;&gt;&gt; print(k._x)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">        &gt;&gt;&gt; print(k._y)</span>
+<span class="sd">        [12, 5, -8]</span>
+<span class="sd">        &gt;&gt;&gt; m = Interpolation(k)</span>
+<span class="sd">        &gt;&gt;&gt; print(m._x)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">        &gt;&gt;&gt; print(m._y)</span>
+<span class="sd">        [12, 5, -8]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Clean up the internal data tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># If no arguments are given, return. Internal data tables are empty</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># If we have only one argument, it can be a single value or tuple/list</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Interpolation</span><span class="p">):</span>  <span class="c1"># Copy constructor</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_x</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_y</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_table</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_tol</span>
+                <span class="k">return</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)):</span>
+                <span class="c1"># Insuficient data to interpolate. Raise ValueError exception</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">seq</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Read input values into &#39;y&#39;, and create &#39;x&#39;</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="c1"># Insuficient data to interpolate. Raise ValueError exception</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># Check if they have the same length. If not, make them equal</span>
+                <span class="n">length_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="n">length_min</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="n">length_min</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Read input values into &#39;x&#39; and &#39;y&#39;</span>
+                    <span class="k">for</span> <span class="n">xval</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xval</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yval</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># In this case, no combination of input values is valid</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of input values&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If there is an odd number of arguments, drop the last one</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># Check that all the arguments are ints, floats or Angles</span>
+            <span class="n">all_numbers</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">all_numbers</span> <span class="o">=</span> <span class="p">(</span><span class="n">all_numbers</span>
+                               <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)))</span>
+            <span class="c1"># If any of the values failed the test, raise an exception</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">all_numbers</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span>
+            <span class="c1"># Now, extract the data: Odds are x&#39;s, evens are y&#39;s</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># After self._x is found, confirm that x&#39;s are different to each other</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input: Values in &#39;x&#39; are equal&quot;</span><span class="p">)</span>
+        <span class="c1"># Order the data points if needed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_order_points</span><span class="p">()</span>
+        <span class="c1"># Create table containing Newton coefficientes, only if values given</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_table</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Interpolation.__str__"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method used when trying to print the object.</span>
+
+<span class="sd">        :returns: Internal tabular values as strings.</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; print(i)</span>
+<span class="sd">        X: [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        Y: [2, 4, 6, 8, 10, 12]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xstr</span> <span class="o">=</span> <span class="s2">&quot;X: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">ystr</span> <span class="o">=</span> <span class="s2">&quot;Y: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xstr</span> <span class="o">+</span> <span class="n">ystr</span></div>
+
+<div class="viewcode-block" id="Interpolation.__repr__"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method providing the &#39;official&#39; string representation of the object.</span>
+<span class="sd">        It provides a valid expression that could be used to recreate the</span>
+<span class="sd">        object.</span>
+
+<span class="sd">        :returns: As string with a valid expression to recreate the object</span>
+<span class="sd">        :rtype: string</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; repr(i)</span>
+<span class="sd">        &#39;Interpolation([1, 2, 3, 4, 5, 6], [2, 4, 6, 8, 10, 12])&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interpolation.__len__"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the number of interpolation points (x, y, pairs)</span>
+<span class="sd">        stored in this :class:`Interpolation` object.</span>
+
+<span class="sd">        :returns: Number of interpolation points internally stored</span>
+<span class="sd">        :rtype: int</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])</span>
+<span class="sd">        &gt;&gt;&gt; len(i)</span>
+<span class="sd">        6</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interpolation.get_tolerance"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.get_tolerance">[docs]</a>    <span class="k">def</span> <span class="nf">get_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the internal tolerance value used for comparisons.</span>
+
+<span class="sd">        .. note:: The default tolerance value is TOL.</span>
+
+<span class="sd">        :returns: Internal tolerance.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span></div>
+
+<div class="viewcode-block" id="Interpolation.set_tolerance"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.set_tolerance">[docs]</a>    <span class="k">def</span> <span class="nf">set_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Changes the internal tolerance value used for comparisons.</span>
+
+<span class="sd">        :param tol: New tolerance value.</span>
+<span class="sd">        :type tol: int, float</span>
+
+<span class="sd">        :returns: None</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to compute coefficients of Newton interpolation method.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_newton_diff</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_newton_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Auxiliary method to compute the elements of the Newton table.</span>
+
+<span class="sd">        :param start: Starting index</span>
+<span class="sd">        :type start: int</span>
+<span class="sd">        :param end: Ending index</span>
+<span class="sd">        :type end: int</span>
+
+<span class="sd">        :returns: Resulting value of the element of the Newton table.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">start</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>  <span class="c1"># Let&#39;s make a copy, just in case</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_newton_diff</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                   <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_newton_diff</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">end</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">val</span>
+
+<div class="viewcode-block" id="Interpolation.__call__"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to interpolate the function at a given &#39;x&#39;.</span>
+
+<span class="sd">        :param x: Point where the interpolation will be carried out.</span>
+<span class="sd">        :type x: int, float, :py:class:`Angle`</span>
+
+<span class="sd">        :returns: Resulting value of the interpolation.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        :raises: ValueError if input value is outside of interpolation range.</span>
+<span class="sd">        :raises: TypeError if input value is of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; i = Interpolation([7, 8, 9], [0.884226, 0.877366, 0.870531])</span>
+<span class="sd">        &gt;&gt;&gt; y = round(i(8.18125), 6)</span>
+<span class="sd">        &gt;&gt;&gt; print(y)</span>
+<span class="sd">        0.876125</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if input value is of correct type</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)):</span>
+            <span class="c1"># Check if &#39;x&#39; already belongs to the data table</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># We don&#39;t need to look further</span>
+            <span class="c1"># Check if Newton coefficients table is not empty</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Internal table is empty. Use set().&quot;</span><span class="p">)</span>
+            <span class="c1"># Check that x is within interpolation table values</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input value outside of interpolation range.&quot;</span><span class="p">)</span>
+            <span class="c1"># Horner&#39;s method is used to efficiently compute the result</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">val</span>
+
+            <span class="k">return</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interpolation.derivative"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.derivative">[docs]</a>    <span class="k">def</span> <span class="nf">derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to compute the derivative from interpolation polynomial.</span>
+
+<span class="sd">        :param x: Point where the interpolation derivative will be carried out.</span>
+<span class="sd">        :type x: int, float, :py:class:`Angle`</span>
+
+<span class="sd">        :returns: Resulting value of the interpolation derivative.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        :raises: ValueError if input value is outside of interpolation range.</span>
+<span class="sd">        :raises: TypeError if input value is of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; m = Interpolation([-1.0, 0.0, 1.0], [-2.0, 3.0, 2.0])</span>
+<span class="sd">        &gt;&gt;&gt; m.derivative(-1.0)</span>
+<span class="sd">        8.0</span>
+<span class="sd">        &gt;&gt;&gt; m.derivative(0.5)</span>
+<span class="sd">        -1.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if input value is of correct type</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">)):</span>
+            <span class="c1"># Check that x is within interpolation table values</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input value outside of interpolation range.&quot;</span><span class="p">)</span>
+            <span class="c1"># If we only have two interpolation points, derivative is simple</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                        <span class="n">s</span> <span class="o">=</span> <span class="mf">1.0</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                                <span class="n">s</span> <span class="o">*=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">val</span> <span class="o">+=</span> <span class="n">s</span>
+                    <span class="n">res</span> <span class="o">+=</span> <span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interpolation.root"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.root">[docs]</a>    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to find the root inside the [xl, xh] range.</span>
+
+<span class="sd">        This method applies, in principle, the Newton method to find the root;</span>
+<span class="sd">        however, if conditions are such that Newton method may not bei properly</span>
+<span class="sd">        behaving or converging, then it switches to the linear Interpolation</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        If values xl, xh are not given, the limits of the interpolation table</span>
+<span class="sd">        values will be used.</span>
+
+<span class="sd">        .. note:: This method returns a ValueError exception if the</span>
+<span class="sd">           corresponding yl = f(xl) and yh = f(xh) values have the same sign.</span>
+<span class="sd">           In that case, the method assumes there is no root in the [xl, xh]</span>
+<span class="sd">           interval.</span>
+
+<span class="sd">        .. note:: If any of the xl, xh values is beyond the limits given by the</span>
+<span class="sd">           interpolation values, its value will be set to the corresponding</span>
+<span class="sd">           limit.</span>
+
+<span class="sd">        .. note:: If xl == xh (and not zero), a ValueError exception is raised.</span>
+
+<span class="sd">        .. note:: If the method doesn&#39;t converge within max_iter ierations,</span>
+<span class="sd">           then a ValueError exception is raised.</span>
+
+<span class="sd">        :param xl: Lower limit of interval where the root will be looked for.</span>
+<span class="sd">        :type xl: int, float, :py:class:`Angle`</span>
+<span class="sd">        :param xh: Higher limit of interval where the root will be looked for.</span>
+<span class="sd">        :type xh: int, float, :py:class:`Angle`</span>
+<span class="sd">        :param max_iter: Maximum number of iterations allowed.</span>
+<span class="sd">        :type max_iter: int</span>
+
+<span class="sd">        :returns: Root of the interpolated function within [xl, xh] interval.</span>
+<span class="sd">        :rtype: int, float, :py:class:`Angle`</span>
+<span class="sd">        :raises: ValueError if yl = f(xl), yh = f(xh) have same sign.</span>
+<span class="sd">        :raises: ValueError if xl == xh.</span>
+<span class="sd">        :raises: ValueError if maximum number of iterations is exceeded.</span>
+<span class="sd">        :raises: TypeError if input value is of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; m = Interpolation([-1.0, 0.0, 1.0], [-2.0, 3.0, 2.0])</span>
+<span class="sd">        &gt;&gt;&gt; round(m.root(), 8)</span>
+<span class="sd">        -0.72075922</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the limits of the interpolation table</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Check if input value is of correct type</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">xl</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">))</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xh</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Angle</span><span class="p">))):</span>
+            <span class="c1"># Check if BOTH values are zero</span>
+            <span class="k">if</span> <span class="n">xl</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">xh</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">xl</span> <span class="o">=</span> <span class="n">xmin</span>
+                <span class="n">xh</span> <span class="o">=</span> <span class="n">xmax</span>
+            <span class="c1"># Check if limits are equal</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xl</span> <span class="o">-</span> <span class="n">xh</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid limits: xl and xh values are equal&quot;</span><span class="p">)</span>
+            <span class="c1"># Put limits in order. Swap them if necessary</span>
+            <span class="k">if</span> <span class="n">xl</span> <span class="o">&gt;</span> <span class="n">xh</span><span class="p">:</span>
+                <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span> <span class="o">=</span> <span class="n">xh</span><span class="p">,</span> <span class="n">xl</span>
+            <span class="c1"># Check limits against interpolation table. Reset if necessary</span>
+            <span class="k">if</span> <span class="n">xl</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">xl</span> <span class="o">=</span> <span class="n">xmin</span>
+            <span class="k">if</span> <span class="n">xh</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">xh</span> <span class="o">=</span> <span class="n">xmax</span>
+            <span class="n">yl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">xl</span><span class="p">)</span>
+            <span class="n">yh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">xh</span><span class="p">)</span>
+            <span class="c1"># Check for a couple special cases</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">yl</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">xl</span>  <span class="c1"># xl is a root</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">yh</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">xh</span>  <span class="c1"># xh is a root</span>
+            <span class="c1"># Check if signs of ordinates are the same</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">yl</span> <span class="o">*</span> <span class="n">yh</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid interval: Probably no root exists&quot;</span><span class="p">)</span>
+            <span class="c1"># We are good to go. First option: Newton&#39;s root-finding method</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">xl</span> <span class="o">+</span> <span class="n">xh</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>  <span class="c1"># Start in the middle of interval</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">num_iter</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Count the number of iterations</span>
+            <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">num_iter</span> <span class="o">&gt;=</span> <span class="n">max_iter</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Too many iterations: Probably no root</span><span class="se">\</span>
+<span class="s2">                                     exists&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">num_iter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">yp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="c1"># If derivative is too small, switch to linear interpolation</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">xl</span> <span class="o">*</span> <span class="n">yh</span> <span class="o">-</span> <span class="n">xh</span> <span class="o">*</span> <span class="n">yl</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">yh</span> <span class="o">-</span> <span class="n">yl</span><span class="p">)</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="o">/</span> <span class="n">yp</span>
+                    <span class="c1"># Check if x is within limits</span>
+                    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">xmin</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">xmax</span><span class="p">:</span>
+                        <span class="c1"># Switch to linear interpolation</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">xl</span> <span class="o">*</span> <span class="n">yh</span> <span class="o">-</span> <span class="n">xh</span> <span class="o">*</span> <span class="n">yl</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">yh</span> <span class="o">-</span> <span class="n">yl</span><span class="p">)</span>
+                        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">yl</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">xl</span> <span class="o">=</span> <span class="n">x</span>
+                    <span class="n">yl</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">xh</span> <span class="o">=</span> <span class="n">x</span>
+                    <span class="n">yh</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid input value&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interpolation.minmax"><a class="viewcode-back" href="../../core/Interpolation.html#pymeeus.Interpolation.Interpolation.minmax">[docs]</a>    <span class="k">def</span> <span class="nf">minmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to find the minimum or maximum inside the [xl, xh] range.</span>
+
+<span class="sd">        Finding the minimum or maximum (extremum) of a function within a given</span>
+<span class="sd">        interval is akin to find the root of its derivative. Therefore, this</span>
+<span class="sd">        method creates an interpolation object for the derivative function, and</span>
+<span class="sd">        calls the root method of that object. See :meth:`root` method for more</span>
+<span class="sd">        details.</span>
+
+<span class="sd">        If values xl, xh are not given, the limits of the interpolation table</span>
+<span class="sd">        values will be used.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           This method returns a ValueError exception if the corresponding</span>
+<span class="sd">           derivatives yl&#39; = f&#39;(xl) and yh&#39; = f&#39;(xh) values have the same sign.</span>
+<span class="sd">           In that case, the method assumes there is no extremum in the</span>
+<span class="sd">           [xl, xh] interval.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">           If any of the xl, xh values is beyond the limits given by the</span>
+<span class="sd">           interpolation values, its value will be set to the corresponding</span>
+<span class="sd">           limit.</span>
+
+<span class="sd">        .. note:: If xl == xh (and not zero), a ValueError exception is raised.</span>
+
+<span class="sd">        .. note:: If the method doesn&#39;t converge within max_iter ierations,</span>
+<span class="sd">           then a ValueError exception is raised.</span>
+
+<span class="sd">        :param xl: Lower limit of interval where a extremum will be looked for.</span>
+<span class="sd">        :type xl: int, float, :py:class:`Angle`</span>
+<span class="sd">        :param xh: Higher limit of interval where extremum will be looked for.</span>
+<span class="sd">        :type xh: int, float, :py:class:`Angle`</span>
+<span class="sd">        :param max_iter: Maximum number of iterations allowed.</span>
+<span class="sd">        :type max_iter: int</span>
+
+<span class="sd">        :returns: Extremum of interpolated function within [xl, xh] interval.</span>
+<span class="sd">        :rtype: int, float, :py:class:`Angle`</span>
+<span class="sd">        :raises: ValueError if yl = f(xl), yh = f(xh) have same sign.</span>
+<span class="sd">        :raises: ValueError if xl == xh.</span>
+<span class="sd">        :raises: ValueError if maximum number of iterations is exceeded.</span>
+<span class="sd">        :raises: TypeError if input value is of wrong type.</span>
+
+<span class="sd">        &gt;&gt;&gt; m = Interpolation([-1.0, 0.0, 1.0], [-2.0, 3.0, 2.0])</span>
+<span class="sd">        &gt;&gt;&gt; round(m.minmax(), 8)</span>
+<span class="sd">        0.33333333</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Compute the derivatives for the current data</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="n">xi</span><span class="p">))</span>
+        <span class="c1"># Create a new Interpolation object</span>
+        <span class="n">prime</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="c1"># Find the root within that object, and return it</span>
+        <span class="k">return</span> <span class="n">prime</span><span class="o">.</span><span class="n">root</span><span class="p">(</span><span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+    <span class="c1"># Let&#39;s define a small helper function</span>
+    <span class="k">def</span> <span class="nf">print_me</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+
+    <span class="c1"># Let&#39;s now work with the Interpolation class</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="mi">35</span> <span class="o">*</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** Use of Interpolation class&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mi">35</span> <span class="o">*</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;i = Interpolation([5, 3, 6, 1, 2, 4, 9], [10, 6, 12, 2, 4, 8])&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NOTE:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   a. They are ordered in &#39;x&#39;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   b. The extra value in &#39;x&#39; was dropped&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Use the copy constructor</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We can easily make a copy of an Interpolation object&quot;</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;j = Interpolation(i)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get the number of interpolation points stored</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;Number or interpolation points in &#39;j&#39;&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>  <span class="c1"># 6</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;j = Interpolation([0.0, 1.0, 3.0], [-1.0, -2.0, 2.0])&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;j(2)&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;j(0.5)&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="c1"># Test with a value already in the data table</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;j(1)&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># We can interpolate Angles too</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">(</span>
+        <span class="p">[</span><span class="mf">27.0</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">,</span> <span class="mf">28.5</span><span class="p">,</span> <span class="mf">29.0</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mf">36.125</span><span class="p">),</span>
+            <span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mf">24.606</span><span class="p">),</span>
+            <span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mf">15.486</span><span class="p">),</span>
+            <span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mf">8.694</span><span class="p">),</span>
+            <span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mf">4.133</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;k = Interpolation([27.0, 27.5, 28.0, 28.5, 29.0],</span><span class="se">\n\</span>
+<span class="s2">                      [Angle(0, 54, 36.125), Angle(0, 54, 24.606),</span><span class="se">\n\</span>
+<span class="s2">                       Angle(0, 54, 15.486), Angle(0, 54, 8.694),</span><span class="se">\n\</span>
+<span class="s2">                       Angle(0, 54, 4.133)])&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;k(28.278)&quot;</span><span class="p">,</span> <span class="n">Angle</span><span class="p">(</span><span class="n">k</span><span class="p">(</span><span class="mf">28.278</span><span class="p">))</span><span class="o">.</span><span class="n">dms_str</span><span class="p">())</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;m = Interpolation([-1.0, 0.0, 1.0], [-2.0, 3.0, 2.0])&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="c1"># Get interpolated values</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m(-0.5)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m(0.5)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="c1"># Get derivatives</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m&#39;(-1.0)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m&#39;(-0.5)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m&#39;(0.0)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m&#39;(0.5)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m&#39;(1.0)&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+    <span class="c1"># Get the root within the interval</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m.root()&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">root</span><span class="p">())</span>
+    <span class="c1"># Get the extremum within the interval</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;m.minmax()&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">minmax</span><span class="p">())</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Interpolation</span><span class="p">(</span>
+        <span class="p">[</span><span class="mf">29.43</span><span class="p">,</span> <span class="mf">30.97</span><span class="p">,</span> <span class="mf">27.69</span><span class="p">,</span> <span class="mf">28.11</span><span class="p">,</span> <span class="mf">31.58</span><span class="p">,</span> <span class="mf">33.05</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="mf">0.4913598528</span><span class="p">,</span>
+            <span class="mf">0.5145891926</span><span class="p">,</span>
+            <span class="mf">0.4646875083</span><span class="p">,</span>
+            <span class="mf">0.4711658342</span><span class="p">,</span>
+            <span class="mf">0.5236885653</span><span class="p">,</span>
+            <span class="mf">0.5453707057</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin(29.5)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">(</span><span class="mf">29.5</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin(30.0)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">(</span><span class="mf">30.0</span><span class="p">))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin(30.5)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">(</span><span class="mf">30.5</span><span class="p">))</span>
+    <span class="c1"># Derivative must be adjusted because degrees were used instead of radians</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin&#39;(29.5)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">29.5</span><span class="p">)))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin&#39;(30.0)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)))</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sqrt(3.0)/2.0</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">print_me</span><span class="p">(</span><span class="s2">&quot;sin&#39;(30.5)</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mf">30.5</span><span class="p">)))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Dagoberto Salazar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
