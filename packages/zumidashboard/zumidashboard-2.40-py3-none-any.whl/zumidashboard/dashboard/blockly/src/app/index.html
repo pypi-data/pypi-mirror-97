@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="google" value="notranslate">
+    <title>Blockly for Zumi</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="vendor/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <link href="vendor/bootstrap.min.css" rel="stylesheet">
+    <script src="vendor/bootstrap.min.js"></script>
+    <script src="./socket.io.js"></script>
+    <script src="./blockly-lib/blockly_compressed.js"></script>
+    <script src="./blockly-lib/blocks_compressed.js"></script>
+    <script src="./blockly-lib/javascript_compressed.js"></script>
+    <script src="./blockly-lib/python_compressed.js"></script>
+</head>
+
+<body class="active-notification">
+    <div id="cover-spin"></div>
+    <div class="notification-chrome">Blockly for Zumi is still in testing. Make sure to check <a class="link" href="http://robolink.com/blockly-min-requirements" target="_blank">system requirements</a>, and please report any issues on our <a class="link" href="http://forum.robolink.com" target="_blank"> forum</a><a class="close-notification" href="#"><i class="glyphicon glyphicon-remove"></i></a></div>
+    <table width="100%" height="100%">
+        <h4 id="coDroneLabel"></h4>
+        <div id="notification" class="alert alert-success">
+            <span></span>
+        </div>
+        <tr style="display: none;">
+            <td>
+                <nav class="navbar">
+                    <label class="btn btn-default" style="display: none;">
+              <span class="glyphicon glyphicon-folder-open"></span>&nbsp; Open <input type="file" id="file-input" style="display: none;">
+          </label>
+                </nav>
+                </h1>
+            </td>
+            <td class="farSide">
+
+            </td>
+        </tr>
+        <tr style="display: none;">
+            <td colspan=2>
+                <table width="100%" style="display: none;">
+                    <tr id="tabRow" height="1em">
+                        <td id="tab_blocks" class="tabon">...</td>
+                        <td class="tabmin">&nbsp;</td>
+                        <td id="tab_javascript" class="taboff">JavaScript</td>
+                        <td class="tabmin">&nbsp;</td>
+                        <td id="tab_python" class="taboff">Python</td>
+                        <td class="tabmin">&nbsp;</td>
+                        <td class="tabmax">
+                            <button id="trashButton" class="notext" title="...">
+                <img src='../../media/1x1.gif' class="trash icon21">
+              </button>
+                            <button id="linkButton" class="notext" title="...">
+                <img src='../../media/1x1.gif' class="link icon21">
+              </button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="99%" colspan=2 id="content_area">
+            </td>
+        </tr>
+    </table>
+
+
+    <div id="content_blocks" class="content">
+        <div id="panel"></div>
+        <div id="connectMenu"></div>
+        <div id="masterWorkspace"></div>
+        <div id="jupyterConsole"></div>
+        <div class="title"><img src="./images/logo_blockyrobolink.svg" />
+            <!-- <div style="height:88px;" id="selectDevice"></div> -->
+
+        </div>
+        <div class="navbar-btn-xml">
+
+            <button class="buttonTab active" id="juniorXmlBtn">junior</button>
+            <button class="buttonTab" id="seniorXmlBtn">senior</button>
+            <button class="buttonTab" type="button" id="masterXmlBtn">master</button>
+        </div>
+        <div id="burgerMenu"></div>
+    </div>
+
+    <pre id="content_python" class="content"></pre>
+
+    <xml id="juniorXml" style="display: none">
+        <category name="Flight Commands">
+            <block type="take_off_junior"></block>
+            <block type="land_junior"></block>
+            <block type="emergencyStop_junior"></block>
+            <block type="go_direction_junior"></block>
+            <block type="go_direction_junior_3"></block>
+            <!-- <block type="turn_degree_junior_2"></block> -->
+            <block type="turn_junior_3"></block>
+            <block type="rotate_180_junior"></block>
+            <!-- <block type="gotoheight_junior"></block> -->
+            <block type="hover_junior"></block>
+        </category>
+        <category name="Flight Sequences">
+            <block type="flySquare_junior"></block>
+            <block type="flyCircle_junior"></block>
+            <block type="flySpiral_junior"></block>
+            <!-- <block type="flyTriangle_junior"></block> -->
+            <block type="flyHop_junior"></block>
+            <block type="flysway_junior"></block>
+            <block type="flyZigzag_junior"></block>
+        </category>
+        <category name="Status Checkers">
+            <block type="isCodeRunning_junior"></block>
+            <!-- <block type="onTakeoff_junior"></block> -->
+            <!-- <block type="onCrash_junior"></block> -->
+            <!-- <block type="onUpsideDown_junior"></block> -->
+            <!--
+      <block type="isReadyToFly_junior"></block>
+      <block type="isUpsideDown_junior"></block>
+      <block type="isFlying_junior"></block>
+      <block type="onLowBattery_junior"></block> -->
+
+            <!-- <block type="isFlying_junior"></block> -->
+        </category>
+        <category name="Sensors ">
+            <!-- <block type="getHeight_junior"></block>
+            <block type="getBatteryPercentage_junior"></block>
+            <block type="getGyroData_junior"></block>
+            <block type="var_block"></block>
+            <block type="show_var_data"></block> -->
+        </category>
+        <category name="Lights">
+            <block type="setArmColor_junior"></block>
+            <block type="setArmPattern_junior"></block>
+            <block type="setEyeColor_junior"></block>
+            <block type="setEyePattern_junior"></block>
+            <block type="eye_strobe_junior"></block>
+            <block type="arm_strobe_junior"></block>
+            <block type="eye_off_junior"></block>
+            <block type="arm_off_junior"></block>
+        </category>
+        <category name="Sound">
+            <!-- <block type="playsound_junior"></block>
+      <block type="setvolume_junior"></block> -->
+        </category>
+        <category name="Keyboard Input">
+            <block type="whenKeyPress_junior"></block>
+            <block type="whenKeyPressGet_junior"></block>
+        </category>
+        <category name="%{BKY_CATLOGIC}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+        </category>
+        <category name="%{BKY_CATLOOPS}">
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_forEach"></block>
+            <block type="controls_flow_statements"></block>
+        </category>
+        <category name="%{BKY_CATMATH}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic">
+                <value name="A">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="B">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_single">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">9</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_trig">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">45</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constant"></block>
+            <block type="math_number_property">
+                <value name="NUMBER_TO_CHECK">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_round">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">3.1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_on_list"></block>
+            <block type="math_modulo">
+                <value name="DIVIDEND">
+                    <shadow type="math_number">
+                        <field name="NUM">64</field>
+                    </shadow>
+                </value>
+                <value name="DIVISOR">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constrain">
+                <value name="VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">50</field>
+                    </shadow>
+                </value>
+                <value name="LOW">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_int">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_float"></block>
+        </category>
+        <category name="Timing">
+            <block type="wait_junior"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE">
+            <block type="variables_get_blah"></block>
+        </category>
+    </xml>
+
+    <xml id="juniorZumiXml" style="display: none">
+        <category name="Driving">
+            <block type="zumi_forward_seconds_junior"></block>
+            <block type="zumi_reverse_seconds_junior"></block>  
+            <block type="zumi_turn_left_junior"></block>
+            <block type="zumi_turn_right_junior"></block>
+            <block type="zumi_brake_junior"></block>  
+            <block type="zumi_left_u_turn_junior"></block>
+            <block type="zumi_right_u_turn_junior"></block>
+            <block type="zumi_parallel_park_junior"></block>
+        </category>
+        <category name="Shapes">
+            <block type="zumi_triangle_junior"></block>
+            <block type="zumi_square_junior"></block>
+            <block type="zumi_rectangle_junior"></block>
+            <block type="zumi_circle_junior"></block>
+            <block type="zumi_figure_8_junior"></block>
+            <block type="zumi_j_turn_junior"></block>
+            <!-- <block type="zumi_get_distance_junior"></block> -->
+        </category>
+        <category name="Screen">
+            <block type="zumi_draw_text_junior"></block>
+            <block type="zumi_sad_junior"></block>
+            <block type="zumi_closed_eyes_junior"></block>
+            <block type="zumi_sleepy_eyes_junior"></block>
+            <block type="zumi_happy_eyes_junior"></block>
+            <block type="zumi_glimmer_eyes_junior"></block>
+            <block type="zumi_blinking_eyes_junior"></block>
+            <block type="zumi_angry_eyes_junior"></block>
+            <block type="zumi_open_eyes_junior"></block>
+        </category>
+        <category name="Sounds">
+            <block type="play_note_junior"></block>
+            <block type="zumi_angry_sound_junior"></block>
+            <block type="zumi_happy_sound_junior"></block>
+            <block type="zumi_blink_sound_junior"></block>
+            <block type="zumi_celebrate_sound_junior"></block>
+            <block type="zumi_wake_up_sound_junior"></block>
+            <block type="zumi_desoriented_sound_junior"></block>
+            <block type="zumi_oops_front_junior"></block>
+            <block type="zumi_oops_back_junior"></block>
+        </category>
+        <category name="Sensors">
+          <!--   <block type="zumi_face_detected_junior"></block>
+            <block type="zumi_camera_show_junior"></block>
+            <block type="zumi_take_photo_junior"></block> -->
+        </category>
+<!--         <category name="Eyes">
+            <block type="zumi_sleep_junior"></block>
+            <block type="zumi_wakeup_junior"></block>
+            <block type="zumi_blink_junior"></block>
+            <block type="zumi_excited_junior"></block>
+            <block type="zumi_look_left_junior"></block>
+            <block type="zumi_look_right_junior"></block>
+            <block type="zumi_sad_junior"></block>
+            <block type="zumi_hello_junior"></block>
+            <block type="zumi_glimmer_junior"></block>
+            <block type="zumi_happy_junior"></block>
+        </category> -->
+        <category name="Lights">
+            <block type="zumi_lights_on_junior"></block>
+            <block type="zumi_lights_off_junior"></block>
+            <block type="zumi_headlights_on_junior"></block>
+            <block type="zumi_headlights_off_junior"></block>
+            <block type="zumi_brake_lights_on_junior"></block>
+            <block type="zumi_brake_lights_off_junior"></block>
+            <block type="zumi_hazard_lights_on_junior"></block>
+            <block type="zumi_hazard_lights_off_junior"></block>
+            <block type="zumi_signal_left_on_junior"></block>
+            <block type="zumi_signal_left_off_junior"></block>
+            <block type="zumi_signal_right_on_junior"></block>
+            <block type="zumi_signal_right_off_junior"></block>
+        </category>
+        <!-- <category name="Deep Learning" >
+      <block type="zumi_smile_detected_junior"></block>
+      <block type="zumi_collect_smile_junior"></block>
+    </category> -->
+        <category name="%{BKY_CATLOGIC}">
+            <block type="text_print"></block>
+            <block type="text"></block>
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+        </category>
+        <category name="%{BKY_CATLOOPS}">
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_forEach"></block>
+            <block type="controls_flow_statements"></block>
+        </category>
+        <category name="Timing">
+            <block type="zumi_wait_junior"></block>
+        </category>
+        <category name="%{BKY_CATMATH}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic">
+                <value name="A">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="B">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_single">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">9</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_trig">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">45</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constant"></block>
+            <block type="math_number_property">
+                <value name="NUMBER_TO_CHECK">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_round">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">3.1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_on_list"></block>
+            <block type="math_modulo">
+                <value name="DIVIDEND">
+                    <shadow type="math_number">
+                        <field name="NUM">64</field>
+                    </shadow>
+                </value>
+                <value name="DIVISOR">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constrain">
+                <value name="VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">50</field>
+                    </shadow>
+                </value>
+                <value name="LOW">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_int">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_float"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE">
+            <block type="variables_get_blah"></block>
+        </category>
+    </xml>
+
+    <xml id="seniorZumiXml" style="display: none">
+        <category name="Engine">
+            <block type="zumi_turn_left_senior"></block>
+            <block type="zumi_turn_right_senior"></block>
+            <block type="zumi_forward_senior"></block>
+            <block type="zumi_forward_duration_senior"></block>
+            <block type="zumi_reverse_senior"></block>
+            <block type="zumi_reverse_duration_senior"></block>
+            <block type="zumi_engine_set_speed_junior"></block>
+            <block type="zumi_stop_senior"></block>
+        </category>
+        <category name="Infrared">
+            <block type="zumi_jedi_drive_senior"></block>
+        </category>
+        <category name="Speaker">
+            <block type="zumi_play_sound_senior"></block>
+        </category>
+        <category name="Personality">
+            <block type="zumi_personality_act_senior"></block>
+        </category>
+        <category name="Camera">
+            <block type="zumi_face_detected_senior"></block>
+            <block type="zumi_camera_show_senior"></block>
+            <block type="zumi_take_photo_senior"></block>
+        </category>
+        <category name="Eyes">
+            <block type="zumi_sleep_junior"></block>
+            <block type="zumi_wakeup_junior"></block>
+            <block type="zumi_blink_junior"></block>
+            <block type="zumi_excited_junior"></block>
+            <block type="zumi_look_left_junior"></block>
+            <block type="zumi_look_right_junior"></block>
+            <block type="zumi_sad_junior"></block>
+            <block type="zumi_hello_junior"></block>
+            <block type="zumi_glimmer_junior"></block>
+            <block type="zumi_happy_junior"></block>
+        </category>
+        <category name="Lights">
+            <block type="zumi_lights_on_senior"></block>
+            <block type="zumi_lights_off_senior"></block>
+        </category>
+        <category name="%{BKY_CATLOGIC}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+        </category>
+        <category name="%{BKY_CATLOOPS}">
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_forEach"></block>
+            <block type="controls_flow_statements"></block>
+        </category>
+        <category name="Timing">
+            <block type="zumi_wait_junior"></block>
+        </category>
+        <category name="%{BKY_CATMATH}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic">
+                <value name="A">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="B">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_single">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">9</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_trig">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">45</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constant"></block>
+            <block type="math_number_property">
+                <value name="NUMBER_TO_CHECK">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_round">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">3.1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_on_list"></block>
+            <block type="math_modulo">
+                <value name="DIVIDEND">
+                    <shadow type="math_number">
+                        <field name="NUM">64</field>
+                    </shadow>
+                </value>
+                <value name="DIVISOR">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constrain">
+                <value name="VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">50</field>
+                    </shadow>
+                </value>
+                <value name="LOW">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_int">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_float"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE">
+            <block type="variables_get_blah"></block>
+        </category>
+    </xml>
+
+    <xml id="seniorXml" style="display: none">
+        <category name="Flight Commands">
+            <block type="take_off_senior"></block>
+            <block type="land_senior"></block>
+            <block type="emergencyStop_senior"></block>
+            <block type="move_senior"></block>
+            <block type="turn_senior"></block>
+            <!-- <block type="turn_degree_senior"></block> -->
+            <!-- <block type="gotoheight_senior"></block> -->
+            <block type="hover_senior"></block>
+        </category>
+        <category name="Flight Variables">
+            <block type="setRoll_senior"></block>
+            <block type="setPitch_senior"></block>
+            <block type="setYaw_senior"></block>
+            <block type="setThrottle_senior"></block>
+            <block type="moveFlight_senior"></block>
+            <block type="moveNoParams_senior"></block>
+            <block type="getRoll_senior"></block>
+            <block type="getPitch_senior"></block>
+            <block type="getYaw_senior"></block>
+            <block type="getThrottle_senior"></block>
+        </category>
+        <category name="Computer Vision">
+
+        </category>
+        <category name="Status Checkers">
+            <block type="isCodeRunning_senior"></block>
+            <!-- <block type="isReadyToFly_senior"></block>
+      <block type="isUpsideDown_senior"></block>
+      <block type="isFlying_senior"></block> -->
+            <!-- <block type="onTakeoff_senior"></block> -->
+            <!-- <block type="onUpsideDown_senior"></block>
+      <block type="onSideways_senior"></block>
+      <block type="onFlying_senior"></block>
+      <block type="onLanding_senior"></block>
+      <block type="onEmergencyStop_senior"></block>
+      <block type="onCrash_senior"></block>
+      <block type="onFreeFall_senior"></block>
+      <block type="onIdle_senior"></block> -->
+            <!-- <block type="onLowBattery_senior"></block> -->
+        </category>
+        <category name="Sensors">
+            <!-- <block type="getHeight_senior"></block>
+      <block type="getPressure_senior"></block>
+      <block type="getTemperature_senior"></block>
+      <block type="getAccelerometer_senior"></block>
+      <block type="getAngularSpeed_senior"></block>
+      <block type="getOpticalFlow_senior"></block>
+      <block type="getState_senior"></block>
+      <block type="getAngles_senior"></block>
+      <block type="getBatteryVoltage_senior"></block>
+      <block type="getBatteryPercentage_senior"></block>
+      <block type="getTrim_senior"></block> -->
+    </category>
+        <category name="Lights">
+            <!-- <block type="setArmRGB_senior"></block> -->
+            <block type="setArmColor_senior"></block>
+            <block type="setEyeColor_senior"></block>
+            <block type="setArmDefaultColor_senior"></block>
+            <block type="setEyeDefaultColor_senior"></block>
+            <block type="setArmPattern_senior"></block>
+            <block type="setEyePattern_senior"></block>
+            <block type="setDefaultEyePattern_senior"></block>
+            <block type="setDefaultArmPattern_senior"></block>
+            <block type="arm_strobe_senior"></block>
+            <block type="eye_strobe_senior"></block>
+            <block type="arm_default_strobe_senior"></block>
+            <block type="eye_default_strobe_senior"></block>
+            <block type="arm_off_senior"></block>
+            <block type="eye_off_senior"></block>
+            <!-- <block type="setEyeRGB_senior"></block>
+      <block type="setAllLED_senior"></block>
+      <block type="setArmDefaltLED_senior"></block>
+      <block type="setEyeDefaltLED_senior"></block>
+      <block type="setAllDefaltLED_senior"></block>
+      <block type="resetLED_senior"></block> -->
+        </category>
+        <category name="Sound">
+        </category>
+        <category name="Keyboard Input">
+            <block type="whenKeyPress_junior"></block>
+            <block type="whenKeyPressGet_junior"></block>
+        </category>
+        <category name="%{BKY_CATLOGIC}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+            <block type="logic_null"></block>
+            <block type="logic_ternary"></block>
+            <block type="text_print"></block>
+            <block type="console_log"></block>
+
+        </category>
+        <category name="%{BKY_CATLOOPS}">
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_forEach"></block>
+            <block type="controls_flow_statements"></block>
+        </category>
+        <category name="%{BKY_CATMATH}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic">
+                <value name="A">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="B">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_single">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">9</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_trig">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">45</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constant"></block>
+            <block type="math_number_property">
+                <value name="NUMBER_TO_CHECK">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_round">
+                <value name="NUM">
+                    <shadow type="math_number">
+                        <field name="NUM">3.1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_on_list"></block>
+            <block type="math_modulo">
+                <value name="DIVIDEND">
+                    <shadow type="math_number">
+                        <field name="NUM">64</field>
+                    </shadow>
+                </value>
+                <value name="DIVISOR">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_constrain">
+                <value name="VALUE">
+                    <shadow type="math_number">
+                        <field name="NUM">50</field>
+                    </shadow>
+                </value>
+                <value name="LOW">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_int">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_float"></block>
+        </category>
+        <category name="Timing">
+            <block type="wait_senior"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE">
+            <block type="variables_get_blah"></block>
+        </category>
+        <category name="%{BKY_CATFUNCTIONS}" custom="PROCEDURE"></category>
+    </xml>
+
+    <div id="masterXml" style="display:none;">
+
+
+    </div>
+
+    <script src="ble-lib/bundle.js"></script>
+</body>
+
+</html>

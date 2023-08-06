@@ -1,0 +1,28 @@
+<html>
+<head>
+  <title>Test RF connection</title>
+</head>
+<body>
+  <h1>Test websocket --> python server</h1>
+  <h2>Status: <span id="connected">{{ connected }}</span></h2>
+  <br>
+  <br>
+  <center><button id="takeOff" type="text">Take Off</button></center>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      $('#takeOff').click(function() {
+          socket.emit('takeOff');
+      });
+      var url = "http://" + "192.168.1.11" + ":" + "5000";
+      var socket = io.connect(url + "/dd");
+      socket.on('msg', function(msg) {
+        $("#connected").html(msg.count);
+      });
+    });
+  </script>
+</body>
+
+</html>
