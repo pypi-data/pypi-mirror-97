@@ -1,0 +1,97 @@
+TODOs HARD
+- test on windows - create an exe
+- handle addresses instead of numeric IPs
+- info/debug messages re-partition
+- GUI?
+- implement * for rm/get/put
+
+TODOs
+- errors refactor
+- the approach of return an outcome does not make sense with multiple command
+    probably its just better to print directly in the command
+
+- why when multiple files with the same (insensitive) name exists, get -s does not work properly?
+
+TO_DEBUGs
+- convert %s -> fstringpy
+- why after transfer some files to SD (using USB), put -S tries to overwrite all (mtime problem)?
+- don't throw commexecerror on xls() xtree() xfind()    (WTF?)
+- fix get for FILEs which adds \.                       (cant remember what this means)
+- fix 1000MB might happen => 1 characters of space to keep into account
+- testing get/put for single file sharing
+
+DONEs
+- provide suggestion/completion even for options?
+- consider adding another logging level
+- --sync with GET and PUT
+- allow -d <dest> for get and put
+- transfer reverses order (GET 10 11 12..)
+- alias supporting multiple commands?
+- separating commands by \n or ;
+- command `set` for set variables
+- ctr+c while transferring - check for put
+- get -sp * -> creates folder 'samples' by itself
+- s now is -NS not only -N - check for put
+- -S does not work
+- .esrc as execute every line
+- don't show "." in put -p
+- don't show already existent folders for put -sp [get -sp]
+
+
+
+[WARN]  {easyshare.utils.c:49} set_int failed: 'NoneType' object has no attribute '_handle'
+[WARN]  {easyshare.utils.c:56} get_int failed: 'NoneType' object has no attribute '_handle'
+
+[ERROR] {easyshare.es.client:393} CommandExecutionError: ['REXEC_DISABLED']
+Traceback (most recent call last):
+  File "/home/stefano/Develop/easyshare/easyshare/es/client.py", line 384, in execute_command
+    executor(args, None) # will be provided by decorators
+  File "/home/stefano/Develop/easyshare/easyshare/es/client.py", line 194, in wrapper
+    api(client, args, conn)
+  File "/home/stefano/Develop/easyshare/easyshare/es/client.py", line 221, in require_unix_wrapper
+    return api(client, args, conn)
+  File "/home/stefano/Develop/easyshare/easyshare/es/client.py", line 749, in rshell
+    ensure_success_response(rshell_resp)
+  File "/home/stefano/Develop/easyshare/easyshare/es/client.py", line 96, in ensure_success_response
+    raise CommandExecutionError(formatted_errors_from_error_response(resp))
+easyshare.es.client.CommandExecutionError: ['REXEC_DISABLED']
+[DEBUG] {easyshare.es.shell} Command outcome: ['REXEC_DISABLED']
+[WARN]  {easyshare.es.errors:267} err expected of type int or str, found <class 'list'>
+[WARN]  {easyshare.es.errors:268}   File "/usr/lib/python3.8/runpy.py", line 193, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+
+  File "/usr/lib/python3.8/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/__main__.py", line 215, in <module>
+    main()
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/__main__.py", line 205, in main
+    shell.input_loop()
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/shell.py", line 139, in input_loop
+    self.execute(command_line)
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/shell.py", line 152, in execute
+    self._execute_multi(self._split_command(cmd))
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/shell.py", line 196, in _execute_multi
+    print_errors(outcome)
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/errors.py", line 255, in print_errors
+    _print_error(e)
+
+  File "/home/stefano/Develop/easyshare/easyshare/es/errors.py", line 268, in _print_error
+    log.w(stacktrace(color=ansi.FG_YELLOW))
+
+  File "/home/stefano/Develop/easyshare/easyshare/utils/inspection.py", line 23, in stacktrace
+    return fg("\n".join(traceback.format_stack()), color)
+
+
+
+
+
+stefano-arch.animehd:/ —— /home/stefano/Develop/easyshare> o animehd2
+Write failed
+
+
