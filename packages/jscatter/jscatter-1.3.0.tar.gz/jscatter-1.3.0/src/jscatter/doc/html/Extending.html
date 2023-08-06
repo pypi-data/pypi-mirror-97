@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>14. Extending/Contributing/Fortran &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="15. Tips" href="tips.html" />
+    <link rel="prev" title="13. Examples" href="examples.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tips.html" title="15. Tips"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="13. Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">14. </span>Extending/Contributing/Fortran</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="extending-contributing-fortran">
+<h1><span class="section-number">14. </span>Extending/Contributing/Fortran<a class="headerlink" href="#extending-contributing-fortran" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt>There are different ways to extend Jscatter by new models.</dt><dd><ul class="simple">
+<li><p>Write a python function (see Beginners Guide).</p></li>
+<li><p>Write a Fortran function (preferred &gt;f90) with a wrapper that contains the documentation.</p></li>
+<li><p>Use Cython or numba …. (for experts, not the scope here).</p></li>
+</ul>
+</dd>
+</dl>
+<p>The simplest way is writing a python function as most functions are written like that.
+The function should contain the basic model without background or other trivial contributions needed
+for fitting of real data. These should be added in user defined functions as the user may be better
+know how he wants to treat the background.</p>
+<p>Contribution of a single function or a complete module dealing with a new topic are welcome.
+As Users should know what it is about, the documentation is important and should contain
+a scientific reference about the models.</p>
+<p><strong>Contributors accept that all new modules or functions included will be covered by the GPLv3 or later.</strong></p>
+<p>If modules or code from other projects under OpenSource are used the respective License
+and Copyright should be mentioned and respected in the source code.
+Please give important contributions also in the documentation.</p>
+<p><strong>Using Fortran</strong></p>
+<p><a class="reference external" href="http://wiki.c2.com/?PrematureOptimization">Premature optimization is the root of all evil – DonaldKnuth</a></p>
+<p>The speedup to use more sophisticated methods is not too big (not x100) if the numpy and scipy functions
+were used.</p>
+<p>Here an example with a factor of about 6:</p>
+<p>The main part of the cloudScattering function is evaluation of</p>
+<div class="math">
+<p><img src="_images/math/81d8e5b54ed3f3bbde9258b5dc4381df8056f1f2.svg" alt="F(q)= \sum_N b_i(q) e^{iqr}"/></p>
+</div><p>For e.g. N=20000 . We calc <img class="math" src="_images/math/50eb60e1602c3a39c8987984c53829790411a1d5.svg" alt="S(Q)=F(q) \cdot F^*(q) = |F(q)|^2"/> and pass <img class="math" src="_images/math/3e13a4750153e587872eba7051e5d49e068697f6.svg" alt="F(q)"/>
+for calculation of <img class="math" src="_images/math/5ada772b9f363bfdf31b118b8b98567881a81425.svg" alt="S(q) = &lt; |F(q)|^2 &gt;"/> and <img class="math" src="_images/math/9d66bfc844586a44c892c59caa7409e90f7b7f10.svg" alt="beta =|&lt; F(q) &gt;|^2 / &lt; |F(q)|^2 &gt;"/>
+for spherical averaging.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_scattering</span><span class="p">(</span><span class="n">point</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">blength</span><span class="p">,</span><span class="n">formfactor</span><span class="p">):</span>
+     <span class="n">fa</span><span class="o">=</span><span class="n">blength</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">formfactor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">formfactor</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+     <span class="n">qx</span><span class="o">=</span><span class="n">q</span><span class="o">*</span><span class="n">point</span>
+     <span class="n">iqr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,ji&#39;</span><span class="p">,</span><span class="n">qx</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+     <span class="n">beiqrsum</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,i&#39;</span><span class="p">,</span><span class="n">fa</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">iqr</span><span class="p">))</span>
+     <span class="n">Sq</span><span class="o">=</span><span class="n">beiqrsum</span><span class="o">*</span><span class="n">beiqrsum</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+     <span class="k">return</span> <span class="n">q</span><span class="p">,</span><span class="n">Sq</span><span class="o">.</span><span class="n">real</span><span class="p">,</span><span class="n">beiqrsum</span><span class="o">.</span><span class="n">real</span>
+</pre></div>
+</div>
+<p>The main work is done in np.einsum and np.exp(iqr) which both are already compiled C functions
+(standard numpy function). We may loose time in coming back to python between these steps.</p>
+<p>We can reach a speedup of a factor of 6 if we use a Fortran function and use this in _scattering.
+The speedup is higher if the computation was done in Python loops (very inefficient),
+but we use numpy not to do this in Python loops. The speedup depends strongly on the model and how it is
+implemented. Often one is happy if the python meanders.</p>
+<p>The Fortran function/subroutine should be encapsulated in a module as it looks cleaner
+and the module may contain several functions. Additional it works smoothest in combination with
+f2py to use a module of functions only (always give intent(in) properly for smooth working).
+To avoid conflicts and dependency problems it is convenient to copy all needed routines into this module.
+Please respect Copyrights</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>module cloud
+    implicit none
+    use typesandconstants
+    use utils
+contains
+
+function ffq(point,r,q,blength,formfactor) result(ff)
+    ! point point on unit sphere 3 x 1
+    real(dp), intent(in) :: point(:)
+    real(dp)             :: ff(3)
+    .....see fortran/cloud.f95 for all declarations
+
+    fa=blength*interpolatesorted(sizerms*q, formfactor(1,:), formfactor(2,:))
+    qx=q*point
+    iqr= j1 * matmul( r,qx)
+    Fq= sum( fa* exp(iqr) )
+    ff(1)=q
+    ff(2)=real(Fq*conjg( Fq ) )
+    ff(3)=real(Fq)
+
+end function ffq
+end module
+</pre></div>
+</div>
+<p>A function interface and the compilation is done by f2py resulting in a shared object file
+here fsca.so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f2py</span> <span class="o">-</span><span class="n">c</span> <span class="n">filename</span><span class="o">.</span><span class="n">f95</span> <span class="o">-</span><span class="n">m</span> <span class="n">fsca</span>
+</pre></div>
+</div>
+<p>The module can be imported and used like any other function in a module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fsca</span>
+<span class="k">def</span> <span class="nf">scattering_f</span><span class="p">(</span><span class="n">point</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">blength</span><span class="p">,</span><span class="n">formfactor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A doc is needed if it should be used</span>
+<span class="sd">    Parameters...</span>
+<span class="sd">    Returns.....</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span><span class="o">=</span><span class="n">fsca</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">ffq</span><span class="p">(</span><span class="n">point</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">blength</span><span class="p">,</span><span class="n">formfactor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+</pre></div>
+</div>
+<p>The wrapper is also needed if this function should be called by parallel (using multiprocessing).
+The reason is that the parallel processed function needs to be serialized and f2py functions cannot.
+The wrapper can.</p>
+<p>If multiprocessing is desired and each process needs to get large arrays
+the python multiprocessing uses a lot of memory (without shared memory each process gets a pickled copy)
+In this case Fortran with OpenMP is easier for multiprocessing with shared memory.</p>
+<p>This is used in cloudScattering and tested with gfortran.
+Different compiler options for OpenMP with other compilers may lead to failure.
+The speedup is not very big. In a similar example as above (with individual atomic formfactors)
+its about 1.5 speedup on 6 core ryzen for a very complex function.
+In that specific case the reduced memory was worth it.</p>
+<p><strong>Including in Jscatter clone</strong></p>
+<p>For contributing or your own development you need to clone the Jscatter repository
+(See gitlab for documentation.)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">biehl</span><span class="o">/</span><span class="n">jscatter</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>To use the Jscatter clone do in the main clone directory (dont forget the last point “.” )</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>The install procedure compiles and builds the wrapper for all source files in the <em>source</em> folder.
+Additional a link to the clone is placed in your python <em>site-packages</em> folder.</p>
+<p>To include a new function in Jscatter package we only need to place the working Fortran module in the
+<em>source</em> folder and repeat the above command. The setup procedure ads the new function to the fscatter module
+The function is accessible in a Jscatter module after import of fscatter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fscatter</span>
+<span class="n">data</span><span class="o">=</span><span class="n">fscatter</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">ffq</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="o">.....</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The module can be imported were needed and the python wrapper with documentation
+can be placed in the appropriate module where it is used.</p>
+<p>If you are happy and want to contribute, sent it to the author or use a merge request on gitlab.</p>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="BeginnersGuide.html">1. Beginners Guide / Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">13. Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">19. Changelog</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter"><span class="section-number">13. </span>Examples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tips.html"
+                        title="next chapter"><span class="section-number">15. </span>Tips</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Extending.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tips.html" title="15. Tips"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="13. Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">14. </span>Extending/Contributing/Fortran</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

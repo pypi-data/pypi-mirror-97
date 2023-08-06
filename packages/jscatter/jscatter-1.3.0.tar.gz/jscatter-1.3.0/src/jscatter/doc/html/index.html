@@ -1,0 +1,781 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jscatter’s documentation &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Beginners Guide / Help" href="BeginnersGuide.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BeginnersGuide.html" title="1. Beginners Guide / Help"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Jscatter’s documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="jscatter-s-documentation">
+<h1>Jscatter’s documentation<a class="headerlink" href="#jscatter-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><strong>The aim of Jscatter is treatment of experimental data and models</strong>:</p>
+<a class="reference internal image-reference" href="_images/Jscatter.jpeg"><img alt="Jscatter Logo" class="align-right" src="_images/Jscatter.jpeg" style="width: 200px; height: 200px;" /></a>
+<ul class="simple">
+<li><p>Reading and analyzing experimental data with associated attributes as temperature, wavevector, comment, ….</p></li>
+<li><p>Multidimensional fitting taking attributes into account.</p></li>
+<li><p>Providing useful models for <strong>neutron and X-ray scattering</strong> form factors, structure factors
+and dynamic models (quasi elastic neutron scattering) and other topics.</p></li>
+<li><p>Simplified plotting with paper ready quality.</p></li>
+<li><p>Easy model building for non programmers.</p></li>
+<li><p>Python scripts/Jupyter Notebooks to document data evaluation and modelling.</p></li>
+</ul>
+<p><a class="reference external" href="https://mybinder.org/v2/gl/biehl%2Fjscatter/master?filepath=src%2Fjscatter%2Fexamples%2Fnotebooks"><img alt="link to mybinder" src="https://img.shields.io/badge/launch-jscatter-F5A252.svg?logo=data:image/png;base64,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" /></a>  <a class="reference external" href="https://doi.org/10.1371/journal.pone.0218789"><img alt="citation" src="https://img.shields.io/badge/DOI-10.1371%2Fjournal.pone.0218789-blue" /></a>  <a class="reference external" href="https://pypi.org/project/jscatter/"><img alt="install" src="https://img.shields.io/pypi/v/jscatter?labelColor=black?logoColor=blue:alt:PyPI" /></a> <a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="license" src="https://img.shields.io/badge/license-GPLv3-orange" /></a> <a class="reference external" href="https://pypi.org/project/jscatter/"><img alt="pyversion" src="https://img.shields.io/pypi/pyversions/jscatter?color=orange:alt:PyPI-PythonVersion" /></a> <a class="reference external" href="https://jscatter.readthedocs.io/en/latest/"><img alt="Read the Docs" src="https://img.shields.io/readthedocs/jscatter?color=orange" /></a> <a class="reference external" href="https://jscatter.readthedocs.io/en/latest/BeginnersGuide.html"><img alt="Beginners Guide" src="https://img.shields.io/badge/Beginners-Guide-orange" /></a></p>
+<p><strong>Main concept</strong></p>
+<ul class="simple">
+<li><p>Link data from experiment, analytical model or simulation with attributes as .temperature, .wavevector, .pressure,…</p></li>
+<li><p>Methods for fitting, filter, merging,… using the attributes by name.</p></li>
+<li><p>Provide an extensible library with common theories/models for fitting of physical models.</p></li>
+<li><p>Allowing evaluation even of hundreds of datasets using scripts.</p></li>
+</ul>
+<ol class="arabic simple">
+<li><p><strong>Data organisation</strong></p></li>
+</ol>
+<blockquote>
+<div><p>Multiple measurements are stored in a <a class="reference internal" href="dataList.html#jscatter.dataarray.dataList" title="jscatter.dataarray.dataList"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataList</span></code></a> (subclass of list) containing
+<a class="reference internal" href="dataArray.html#jscatter.dataarray.dataArray" title="jscatter.dataarray.dataArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataArray</span></code></a> (subclass of numpy ndarray) for each measurement.
+Both allow attributes to contain additional information of the measurement and
+have special attributes as .X,.Y,.eY,…- for convenience and easy reading.
+See <a class="reference internal" href="BeginnersGuide.html#what-are-dataarray-datalist"><span class="std std-ref">What are dataArray/dataList</span></a>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Read/Write data</strong></p></li>
+</ol>
+<blockquote>
+<div><p>The intention is to read everything (with comments) from an ASCII file to use it later if needed.
+Multiple measurement files can be read at once and then filtered according to attributes to get subsets.
+See <a class="reference internal" href="BeginnersGuide.html#reading-ascii-files"><span class="std std-ref">Reading ASCII files</span></a>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><strong>Fitting</strong></p></li>
+</ol>
+<blockquote>
+<div><p>Multidimensional, attribute dependent fitting (least square Levenberg-Marquardt,
+differential evolution, …from scipy.optimize). Attributes are used automatically as fixed fit parameters.
+See <a class="reference internal" href="BeginnersGuide.html#fitting-experimental-data"><span class="std std-ref">Fitting experimental data</span></a>, <a class="reference internal" href="dataList.html#jscatter.dataarray.dataList.fit" title="jscatter.dataarray.dataList.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, <a class="reference internal" href="examples.html#d-fits-with-attributes"><span class="std std-ref">1D fits with attributes</span></a>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p><strong>Plotting</strong></p></li>
+</ol>
+<blockquote>
+<div><p>The aim is to provide one line plotting commands to allow a fast view on data,
+with the possibility to pretty up the plots.</p>
+<ul class="simple">
+<li><p>We use an adaption of Xmgrace for 2D plots (a wrapper; see <a class="reference internal" href="GracePlot.html#graceplot"><span class="std std-ref">GracePlot</span></a>) as it allows
+interactive publication ready output in high quality for 2D plots and is much faster than matplotlib.</p></li>
+<li><p>A small matplotlib interface <a class="reference internal" href="mpl.html#mpl"><span class="std std-ref">mpl</span></a> is provided and
+matplotlib can be used as it is (e.g. for 3D plots).</p></li>
+<li><p>Still any other plotting package can be used.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p><strong>Model Library</strong></p></li>
+</ol>
+<blockquote>
+<div><p>By intention the user should write own models or modify existing ones to combine different contributions
+(to include e.g. a background, instrument resolution, …).</p>
+<p>Models can be defined as normal functions within a script or in interactive session
+of (I)python. See <a class="reference internal" href="examples.html#how-to-build-simple-models"><span class="std std-ref">How to build simple models</span></a> and <a class="reference internal" href="examples.html#how-to-build-a-more-complex-model"><span class="std std-ref">How to build a more complex model</span></a> .</p>
+<p>The <strong>model library</strong> contains general purpose routines e.g. for vectorized quadrature (<a class="reference internal" href="formel.html#formel"><span class="std std-ref">formel</span></a>)
+or specialised models for scattering in <a class="reference internal" href="formfactor.html#formfactor-ff"><span class="std std-ref">formfactor (ff)</span></a>, <a class="reference internal" href="structurefactor.html#structurefactor-sf"><span class="std std-ref">structurefactor (sf)</span></a>
+and <a class="reference internal" href="dynamic.html#dynamic"><span class="std std-ref">dynamic</span></a>.
+Models save parameters as attributes for later access/documentation.
+The model library can also be used for other purposes and may be extended by users need.</p>
+</div></blockquote>
+<p><strong>Some special functions</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="formel.html#jscatter.formel.scatteringLengthDensityCalc" title="jscatter.formel.scatteringLengthDensityCalc"><code class="xref py py-func docutils literal notranslate"><span class="pre">scatteringLengthDensityCalc()</span></code></a> -&gt; Electron density, coh and inc neutron scattering length, mass</p></li>
+<li><p><a class="reference internal" href="formel.html#jscatter.formel.waterdensity" title="jscatter.formel.waterdensity"><code class="xref py py-func docutils literal notranslate"><span class="pre">waterdensity()</span></code></a> -&gt; Density of water (H2O/D2O) with inorganic substances</p></li>
+<li><p><a class="reference internal" href="formel.html#jscatter.formel.sedimentationProfile" title="jscatter.formel.sedimentationProfile"><code class="xref py py-func docutils literal notranslate"><span class="pre">sedimentationProfile()</span></code></a> -&gt; The Lamm equation of sedimenting particles</p></li>
+<li><p><a class="reference internal" href="structurefactor.html#jscatter.structurefactor.RMSA" title="jscatter.structurefactor.RMSA"><code class="xref py py-func docutils literal notranslate"><span class="pre">RMSA()</span></code></a> -&gt; Rescaled MSA structure factor for dilute charged colloidal dispersions</p></li>
+<li><p><a class="reference internal" href="structurefactor.html#jscatter.structurefactor.hydrodynamicFunct" title="jscatter.structurefactor.hydrodynamicFunct"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydrodynamicFunct()</span></code></a> -&gt; Hydrodynamic function from hydrodynamic pair interaction</p></li>
+<li><p><a class="reference internal" href="formfactor.html#jscatter.formfactor.multiShellSphere" title="jscatter.formfactor.multiShellSphere"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiShellSphere()</span></code></a> -&gt; Formfactor of multi shell spherical particles</p></li>
+<li><p><a class="reference internal" href="formfactor.html#jscatter.formfactor.multiShellCylinder" title="jscatter.formfactor.multiShellCylinder"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiShellCylinder()</span></code></a> -&gt; Formfactor of multi shell cylinder particles with caps</p></li>
+<li><p><a class="reference internal" href="formfactor.html#jscatter.cloudscattering.orientedCloudScattering" title="jscatter.cloudscattering.orientedCloudScattering"><code class="xref py py-func docutils literal notranslate"><span class="pre">orientedCloudScattering()</span></code></a> -&gt; 2D scattering of an oriented cloud of scatterers</p></li>
+<li><p><a class="reference internal" href="dynamic.html#jscatter.dynamic.finiteZimm" title="jscatter.dynamic.finiteZimm"><code class="xref py py-func docutils literal notranslate"><span class="pre">finiteZimm()</span></code></a> -&gt; Zimm model with internal friction -&gt; intermediate scattering function</p></li>
+<li><p><a class="reference internal" href="dynamic.html#jscatter.dynamic.diffusionHarmonicPotential" title="jscatter.dynamic.diffusionHarmonicPotential"><code class="xref py py-func docutils literal notranslate"><span class="pre">diffusionHarmonicPotential()</span></code></a> -&gt; Diffusion in harmonic potential-&gt; intermediate scattering function</p></li>
+<li><p><a class="reference internal" href="sas.html#jscatter.smallanglescattering.smear" title="jscatter.smallanglescattering.smear"><code class="xref py py-func docutils literal notranslate"><span class="pre">smear()</span></code></a> -&gt; Smearing enabling simultaneous fits of differently smeared SANS/SAXS data</p></li>
+<li><p><a class="reference internal" href="sas.html#jscatter.smallanglescattering.desmear" title="jscatter.smallanglescattering.desmear"><code class="xref py py-func docutils literal notranslate"><span class="pre">desmear()</span></code></a> -&gt; Desmearing according to the Lake algorithm for the above</p></li>
+<li><p><a class="reference internal" href="sas.html#jscatter.smallanglescattering.waterXrayScattering" title="jscatter.smallanglescattering.waterXrayScattering"><code class="xref py py-func docutils literal notranslate"><span class="pre">waterXrayScattering()</span></code></a> -&gt; Absolute scattering of water with components (salt, buffer)</p></li>
+</ul>
+<dl class="simple">
+<dt><strong>How to use Jscatter</strong></dt><dd><p>see <a class="reference internal" href="examples.html#label-examples"><span class="std std-ref">Examples</span></a> and <a class="reference internal" href="BeginnersGuide.html#beginners-guide-help"><span class="std std-ref">Beginners Guide / Help</span></a> or
+try Jscatter live at <a class="reference external" href="https://mybinder.org/v2/gl/biehl%2Fjscatter/master?filepath=src%2Fjscatter%2Fexamples%2Fnotebooks"><img alt="link to mybinder" src="https://img.shields.io/badge/launch-jscatter-F5A252.svg?logo=data:image/png;base64,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" /></a> .</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import jscatter and numpy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+
+<span class="c1"># read the data (16 dataArrays) with attributes as q, Dtrans .... into dataList</span>
+<span class="n">i5</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span> <span class="o">+</span> <span class="s1">&#39;/iqt_1hho.dat&#39;</span><span class="p">)</span>
+
+<span class="c1"># define a model for the fit</span>
+<span class="n">diffusion</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">A</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavevector</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span> <span class="n">A</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">wavevector</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">e</span>
+
+<span class="c1"># do the fit</span>
+<span class="c1"># single valued start parameters are the same for all 16 dataArrays</span>
+<span class="c1"># list start parameters [...] indicate independent fitting for dataArrays</span>
+<span class="c1"># the command line shows progress and the final result, which is found in i5.lastfit</span>
+<span class="n">i5</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">diffusion</span><span class="p">,</span>                         <span class="c1"># the fit function</span>
+       <span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.08</span><span class="p">],</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">},</span>        <span class="c1"># free start parameters</span>
+       <span class="n">fixpar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>                       <span class="c1"># fixed parameters</span>
+       <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;wavevector&#39;</span><span class="p">:</span> <span class="s1">&#39;q&#39;</span><span class="p">})</span>  <span class="c1"># map names from model to data</span>
+
+<span class="c1"># open plot with results and residuals</span>
+<span class="n">i5</span><span class="o">.</span><span class="n">showlastErrPlot</span><span class="p">(</span><span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+
+<span class="c1"># open a plot with fixed size and plot data and fit result</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)</span>
+<span class="c1"># plot the data with Q values in legend as symbols</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i5</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">legend</span><span class="o">=</span><span class="s1">&#39;Q=$q&#39;</span><span class="p">)</span>
+<span class="c1"># plot fit results in lastfit as lines without symbol or legend</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i5</span><span class="o">.</span><span class="n">lastfit</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># pretty up if needed</span>
+<span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">charsize</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;I(Q,t)/I(Q,0)&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">charsize</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t / ns&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">charsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;I(Q,t) as measured by Neutron Spinecho Spectroscopy&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">1.3</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;for diffusion a single exp. decay&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">360</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;f(t)=A*e\S-Q\S2\N\SDt&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">charsize</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># optional; save in different formats</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;DiffusionFit.agr&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;DiffusionFit.png&#39;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/DiffusionFit.jpg"><img alt="Picture about diffusion fit" class="align-center" src="_images/DiffusionFit.jpg" style="height: 300px;" /></a>
+<p><strong>Shortcuts</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="n">js</span><span class="o">.</span><span class="n">showDoc</span><span class="p">()</span>                  <span class="c1"># Show html documentation in browser</span>
+<span class="n">exampledA</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;test.dat&#39;</span><span class="p">)</span>   <span class="c1"># shortcut to create dataArray from file</span>
+<span class="n">exampledL</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="s1">&#39;test.dat&#39;</span><span class="p">)</span>   <span class="c1"># shortcut to create dataList from file</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">()</span>                  <span class="c1"># create plot in XmGrace</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">mplot</span><span class="p">()</span>                  <span class="c1"># create plot in matplotlib</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">exampledL</span><span class="p">)</span>             <span class="c1"># plot the read dataList</span>
+</pre></div>
+</div>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jscatter.usempl</span></code>(*args)</p></td>
+<td><p>Switch between using mpl and grace in dataArray/dataList fitting.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jscatter.headless</span></code>(*args)</p></td>
+<td><p>Switch to headless mode (NO-GUI) to work on a cluster.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jscatter.version</span></code></p></td>
+<td><p>Jscatter version</p></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line">If not otherwise stated in the files:</div>
+<div class="line"><br /></div>
+<div class="line">written by Ralf Biehl at the Forschungszentrum Jülich ,</div>
+<div class="line">Jülich Center for Neutron Science 1 and Institute of Complex Systems 1</div>
+<div class="line-block">
+<div class="line">Jscatter is a program to read, analyse and plot data</div>
+<div class="line">Copyright (C) 2015-2019  Ralf Biehl</div>
+<div class="line"><br /></div>
+<div class="line">This program is free software: you can redistribute it and/or modify</div>
+<div class="line">it under the terms of the GNU General Public License as published by</div>
+<div class="line">the Free Software Foundation, either version 3 of the License, or</div>
+<div class="line">(at your option) any later version.</div>
+<div class="line"><br /></div>
+<div class="line">This program is distributed in the hope that it will be useful,</div>
+<div class="line">but WITHOUT ANY WARRANTY; without even the implied warranty of</div>
+<div class="line">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</div>
+<div class="line">GNU General Public License for more details.</div>
+<div class="line"><br /></div>
+<div class="line">You should have received a copy of the GNU General Public License</div>
+<div class="line">along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</div>
+</div>
+</div>
+<span class="target" id="module-jscatter"></span></div>
+<div class="section" id="jscatter-package-contents">
+<h1>Jscatter package contents<a class="headerlink" href="#jscatter-package-contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="BeginnersGuide.html">1. Beginners Guide / Help</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#what-are-dataarray-datalist">1.1. What are dataArray/dataList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#first-basic-examples">1.2. First basic examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="BeginnersGuide.html#a-parabolic-fit">1.2.1. A parabolic fit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BeginnersGuide.html#a-bit-more-complex-data">1.2.2. A bit more complex data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#reading-ascii-files">1.3. Reading ASCII files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#creating-from-numpy-arrays">1.4. Creating from numpy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#manipulating-dataarray-datalist">1.5. Manipulating dataArray/dataList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#indexing-dataarray-datalist-and-reducing">1.6. Indexing dataArray/dataList and reducing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#fitting-experimental-data">1.7. Fitting experimental data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#why-fits-may-fail">1.8. Why Fits may fail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#plot-experimental-data-and-fit-result">1.9. Plot experimental data and fit result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#save-data-and-fit-results">1.10. Save data and fit results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BeginnersGuide.html#additional-stuff">1.11. Additional stuff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataArray.html">2. dataArray</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataArray.html#dataarray-class">2.1. dataArray Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArray.html#attribute-methods">2.2. Attribute Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArray.html#fit-methods">2.3. Fit Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArray.html#housekeeping-methods">2.4. Housekeeping Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataArray.html#convenience">2.5. Convenience</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataList.html">3. dataList</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataList.html#datalist-class">3.1. dataList Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataList.html#attribute-methods">3.2. Attribute Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataList.html#fit-methods">3.3. Fit Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataList.html#housekeeping-methods">3.4. Housekeeping Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="formel.html">4. formel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#functions">4.1. Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#quadrature">4.2. Quadrature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#distribution-of-parameters">4.3. Distribution of parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#centrifugation">4.4. Centrifugation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#nmr">4.5. NMR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#material-data">4.6. Material Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#other-stuff">4.7. other Stuff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formel.html#constants-and-tables">4.8. Constants and Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sas.html">5. smallanglescattering (sas)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sas.html#sas-smear-desmear-1d">5.1. SAS smear/desmear 1D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sas.html#sas-convenience">5.2. SAS convenience</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sas.html#module-jscatter.sasimagelib">5.3. 2D sasImage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sas.html#sasimage-methods">5.3.1. sasImage methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sas.html#d-sasimage-convenience">5.4. 2D sasImage convenience</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sas.html#housekeeping">5.5. Housekeeping</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="formfactor.html">6. formfactor (ff)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="formfactor.html#form-factors">6.1. Form Factors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formfactor.html#cloud-of-scatterers">6.2. Cloud of scatterers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structurefactor.html">7. structurefactor (sf)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structurefactor.html#structure-factors">7.1. Structure Factors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structurefactor.html#hydrodynamics">7.2. Hydrodynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structurefactor.html#pair-correlation">7.3. Pair Correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structurefactor.html#lattice">7.4. Lattice</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html">8. dynamic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#transform-between-domains">8.1. Transform between domains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#time-domain">8.2. Time domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#frequency-domain">8.3. Frequency domain</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GracePlot.html">11. Plotting in XmGrace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="GracePlot.html#graceplot">11.1. GracePlot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GracePlot.html#gracegraph">11.2. GraceGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GracePlot.html#helper-classes">11.3. Helper Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mpl.html">12. mpl</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mpl.html#plot">12.1. Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpl.html#figures">12.2. Figures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpl.html#axes">12.3. Axes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">13. Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#in-a-nutshell">13.1. In a nutshell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#how-to-build-simple-models">13.2. How to build simple models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#how-to-build-a-more-complex-model">13.3. How to build a more complex model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#d-fits-with-attributes">13.4. 1D fits with attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#d-fitting">13.5. 2D fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#simple-diffusion-fit-of-not-so-simple-diffusion-case">13.6. Simple diffusion fit of not so simple diffusion case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#how-to-smooth-xray-data-and-make-an-inset-in-the-plot">13.7. How to smooth Xray data and make an inset in the plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#analyse-sas-data">13.8. Analyse SAS data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#how-to-fit-sans-data-including-the-resolution-for-different-detector-distances">13.9. How to fit SANS data including the resolution for different detector distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#fitting-multiple-smeared-data-together">13.10. Fitting multiple smeared data together</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#smearing-and-desmearing-of-sax-and-sans-data">13.11. Smearing and desmearing of SAX and SANS data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#a-long-example-for-diffusion-and-how-to-analyze-step-by-step">13.12. A long example for diffusion and how to analyze step by step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#sedimentation-of-two-particle-sizes-and-resulting-scattering-a-simulation">13.13. Sedimentation of two particle sizes and resulting scattering: a Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#create-a-stacked-chart-of-some-curves">13.14. Create a stacked chart of some curves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#a-comparison-of-different-dynamic-models-in-frequency-domain">13.15. A comparison of different dynamic models in frequency domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#protein-incoherent-scattering-in-frequency-domain">13.16. Protein incoherent scattering in frequency domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#fitting-a-multishellcylinder-in-various-ways">13.17. Fitting a multiShellcylinder in various ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#hydrodynamic-function">13.18. Hydrodynamic function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#multilamellar-vesicles">13.19. Multilamellar Vesicles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#d-oriented-scattering">13.20. 2D oriented scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#fitting-the-2d-scattering-of-a-lattice">13.21. Fitting the 2D scattering of a lattice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#a-nano-cube-build-of-different-lattices">13.22. A nano cube build of different lattices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#using-cloudscattering-as-fit-model">13.23. Using cloudscattering as fit model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#linear-pearls-with-connecting-coils">13.24. Linear Pearls with connecting coils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">17. Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#dependencies">17.1. Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#pip-installation-upgrade">17.2. Pip installation/upgrade</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#linux">17.3. Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#macos-intel">17.4. MacOs (Intel)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#windows">17.5. Windows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Installation.html#windows-subsystem-for-linux-wsl-with-ubuntu-way">17.5.1. Windows Subsystem for Linux (WSL) with Ubuntu way</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Installation.html#anaconda-way">17.5.2. Anaconda way</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#jupyter-notebook">17.6. Jupyter Notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#using-a-cluster-headless-mode">17.7. Using a cluster/headless mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#testing">17.8. Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#troubleshooting-and-tips">17.9. Troubleshooting and tips</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">19. Changelog</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>numpy, scipy  -&gt;  Mandatory, automatically installed by pip</p></li>
+<li><p>cubature      -&gt;  Mandatory for multidimensional quadrature</p></li>
+<li><p>Pillow        -&gt;  Mandatory, for reading of SAXS images, automatic install by pip</p></li>
+<li><p>matplotlib    -&gt;  Mandatory, for 3D plots and on Windows</p></li>
+<li><p>Ipython       -&gt;  Optional, for convenience as a powerful python shell</p></li>
+<li><p>gfortran      -&gt;  Optional, without some functions dont work or use a slower python version</p></li>
+<li><p>xmgrace       -&gt;  Optional, preferred plotting on Unix like (use matplotlib on Windows)</p></li>
+</ul>
+<p>Installation of gfortran/xmgrace may need root privileges. Use “sudo” on Linux and MacOS if needed.</p>
+</div>
+<div class="section" id="pip-installation-upgrade">
+<h2>Pip installation/upgrade<a class="headerlink" href="#pip-installation-upgrade" title="Permalink to this headline">¶</a></h2>
+<p>As user (without root access) this will install to your home directory (by default to path ~/.local/).
+Prepend sudo if it should install to the system python.</p>
+<p>(use pip3 if NOT your default Python, latest python2.7 compatible version was 1.1.0)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span>
+</pre></div>
+</div>
+<p>To upgrade to latest version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span> <span class="o">--</span><span class="n">upgrade</span>
+</pre></div>
+</div>
+<p>Install from a local repository (development versions):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">pre</span> <span class="o">--</span><span class="n">find</span><span class="o">-</span><span class="n">links</span> <span class="o">/</span><span class="n">where</span><span class="o">/</span><span class="n">the</span><span class="o">/</span><span class="n">file</span><span class="o">/</span><span class="ow">is</span><span class="o">/</span><span class="n">saved</span>
+
+<span class="n">options</span>
+<span class="o">--</span><span class="n">user</span>       <span class="p">:</span> <span class="n">Install</span> <span class="ow">in</span> <span class="n">user</span> <span class="n">directory</span> <span class="p">(</span><span class="n">folder</span> <span class="n">defined</span> <span class="n">by</span> <span class="n">PYTHONUSERBASE</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">default</span> <span class="o">~/.</span><span class="n">local</span><span class="p">)</span>
+<span class="o">--</span><span class="n">find</span><span class="o">-</span><span class="n">links</span> <span class="p">:</span> <span class="n">look</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">given</span> <span class="n">path</span> <span class="k">for</span> <span class="n">package</span> <span class="n">links</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span> <span class="n">development</span> <span class="n">releases</span>
+<span class="o">--</span><span class="n">upgrade</span>    <span class="p">:</span> <span class="n">to</span> <span class="n">install</span> <span class="n">upgrades</span> <span class="n">also</span> <span class="k">for</span> <span class="n">dependencies</span>
+<span class="o">--</span><span class="n">pre</span>        <span class="p">:</span> <span class="n">to</span> <span class="n">install</span> <span class="n">also</span> <span class="n">development</span> <span class="n">versions</span>
+</pre></div>
+</div>
+<p>Installation directly from  from git repository branch. For different branch use branch name
+e.g. as development version use dev.
+(You may need a user account)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">biehl</span><span class="o">/</span><span class="n">jscatter</span><span class="o">.</span><span class="n">git</span><span class="nd">@master</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linux">
+<h2>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Ubuntu, all Debian related</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span>  <span class="c1"># install gcc and more</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">gfortran</span> <span class="n">grace</span> <span class="n">python</span><span class="o">-</span><span class="n">matplotlib</span>  <span class="c1"># or python3-matplotlib e.g. Debian,Fedora, RedHat</span>
+<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">cython</span>
+<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">ipython</span>
+<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span>
+</pre></div>
+</div>
+</li>
+<li><p>CentOs, Suse, Fedora … do same as above but with yum/zypper…</p></li>
+<li><p>Manjaro Linux (yaourt asks for permission as root or prepend sudo as above)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># install gfortran</span>
+<span class="n">yaourt</span> <span class="n">gcc</span><span class="o">-</span><span class="n">fortran</span>
+<span class="c1"># install xmgrace (only found in AUR), fonts are needed for the interface, fonts are loaded after restart</span>
+<span class="n">yaourt</span> <span class="n">xorg</span><span class="o">-</span><span class="n">fonts</span><span class="o">-</span><span class="mi">75</span> <span class="n">xorg</span><span class="o">-</span><span class="n">fonts</span><span class="o">-</span><span class="mi">100</span> <span class="n">grace</span><span class="o">-</span><span class="n">openmotif</span> <span class="n">python</span><span class="o">-</span><span class="n">matplotlib</span>
+<span class="c1"># tk might be missing for tkinter as matplotlib backend</span>
+<span class="n">sudo</span> <span class="n">pacman</span> <span class="o">-</span><span class="n">S</span> <span class="n">tk</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">ipython</span> <span class="n">cython</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span>
+</pre></div>
+</div>
+</li>
+<li><p>CONTIN in DLS module (Only if needed).</p>
+<p>See DLS module documentation for details how to get and compile the original fortran code.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="macos-intel">
+<h2>MacOs (Intel)<a class="headerlink" href="#macos-intel" title="Permalink to this headline">¶</a></h2>
+<p><strong>Homebrew</strong> is a MacOs package manager. The following should work on Catalina and BigSur.</p>
+<p>Install Homebrew first as given on their web page (see <a class="reference external" href="https://brew.sh/">Homebrew</a>).
+Homebrew installs things to /usr/local/ so you don’t need sudo permissions.</p>
+<p>Append the following line to your .zshrc file and restart the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># set Path to point to homebrew
+export PATH=/usr/local/bin:/usr/local/share/python:$PATH
+# XQuartz needs this to use flatNamespace correctly with grace (error was something with Vendorshell...)
+export DYLD_LIBRARY_PATH=/opt/X11/lib/flat_namespace
+</pre></div>
+</div>
+<p>Install XQuartz, gcc and xmgrace from Homebrew:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># install XQuartz from homebrew cask (NOT from the AppStore, because of above setting)</span>
+<span class="n">brew</span> <span class="n">cask</span> <span class="n">install</span> <span class="n">xquartz</span>
+<span class="c1"># install xmgrace and gfortran (included in gcc)</span>
+<span class="n">brew</span> <span class="n">install</span> <span class="n">gcc</span> <span class="n">grace</span>
+<span class="c1"># maybe its necessary to relink if old links from previous install are there</span>
+<span class="n">brew</span> <span class="n">link</span> <span class="o">--</span><span class="n">overwrite</span> <span class="n">gcc</span>
+<span class="n">brew</span> <span class="n">link</span> <span class="o">--</span><span class="n">overwrite</span> <span class="n">grace</span>
+</pre></div>
+</div>
+<p>You may use the system python (omit the next line) or a new version from Homebrew which needs to be installed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># install python from homebrew (by default python3)</span>
+<span class="n">brew</span> <span class="n">install</span> <span class="n">python</span>
+</pre></div>
+</div>
+<p>Install needed things via pip.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># then use pip (this should call python3 and use pip3)</span>
+<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">ipython</span> <span class="n">cython</span>
+<span class="c1"># dependencies are installed automatically</span>
+<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span>
+<span class="c1"># check if which python is used ( brew: /usr/local/bin/python, MacOS: /usr/local/Library/Frameworks/..../python3 )</span>
+<span class="n">which</span> <span class="n">python3</span>
+</pre></div>
+</div>
+<p>Troubles</p>
+<blockquote>
+<div><ul>
+<li><p>If you have trouble like <cite>missing xcrun ..</cite> you might have to re-register it or update it to the latest version.
+Try <cite>xcode-select –install</cite>.</p></li>
+<li><p>In newer MacOs (e.g. Catalina) you may get an error “stdio.h not found”
+which is related to the missing /usr/local/include folder as decided by Apple.
+Add to .zshrc or corresponding to include this path in CPATH:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">CPATH</span><span class="o">=/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="windows-subsystem-for-linux-wsl-with-ubuntu-way">
+<h3>Windows Subsystem for Linux (WSL) with Ubuntu way<a class="headerlink" href="#windows-subsystem-for-linux-wsl-with-ubuntu-way" title="Permalink to this headline">¶</a></h3>
+<p>A new way is based on  Windows Subsystem for Linux (WSL), which
+“lets developers run GNU/Linux environment
+– including most command-line tools, utilities, and applications – directly on Windows,
+unmodified, without the overhead of a virtual machine.”
+(See <a class="reference external" href="https://docs.microsoft.com/de-de/windows/wsl/about">WSL</a> , use WSL2)</p>
+<p>This allows to use any Linux application including XmGrace or Linux editors.
+You work on the same filesystem as your Windows user account without the need of
+syncing folders or using a shared folder from a virtual machine.
+Also gfortran compiled code is working.</p>
+<p>The basic procedure is to activate WSL, install Linux and Xserver, add your needed Linux software in the usual way.</p>
+<ul>
+<li><p>Install <strong>WSL1</strong> (Please check for the update to WSL2 on following site)</p>
+<p>See <a class="reference external" href="https://docs.microsoft.com/de-de/windows/wsl/install-win10">https://docs.microsoft.com/de-de/windows/wsl/install-win10</a></p>
+</li>
+<li><p>Then <strong>install a linux distribution</strong> of choice from Windows store (tested with Ubuntu 18.04).
+(The install is per user, so do it under your user account, NOT as administrator)</p>
+<p>Open a terminal, start bash and set user and password for Linux.
+(See <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/initialize-distro">https://docs.microsoft.com/en-us/windows/wsl/initialize-distro</a> )</p>
+</li>
+<li><p>For graphical applications: <strong>Install Xserver</strong> VcXsrv (or an other Xserver).</p>
+<p>See e.g. <a class="reference external" href="https://seanthegeek.net/234/graphical-linux-applications-bash-ubuntu-windows/">https://seanthegeek.net/234/graphical-linux-applications-bash-ubuntu-windows/</a> .
+Download from <a class="reference external" href="https://sourceforge.net/projects/vcxsrv/">https://sourceforge.net/projects/vcxsrv/</a> .
+Install (start always manually or add to Windows autostart).</p>
+<p>For WSL2 : If you start vcxsrv on windows check in the last option window that “Disable access controll” is checked
+to allow connections from WSL. If you save the configuration it might remind the settings.</p>
+<p>See <a class="reference external" href="https://techcommunity.microsoft.com/t5/windows-dev-appconsult/running-wsl-gui-apps-on-windows-10/ba-p/1493242">https://techcommunity.microsoft.com/t5/windows-dev-appconsult/running-wsl-gui-apps-on-windows-10/ba-p/1493242</a></p>
+</li>
+<li><p><strong>Configure bash</strong> to use the local X server</p>
+<p>Add this to .bashrc  dependent on using WSL1 or WSL2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export DISPLAY=localhost:0.0 # WSL1
+export DISPLAY=$(grep -m 1 nameserver /etc/resolv.conf | awk &#39;{print $2}&#39;):0.0 # WSL2
+</pre></div>
+</div>
+<p>or run this inside bash with the above line in double quotes “” e.g for WSL1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="s2">&quot;export DISPLAY=localhost:0.0&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">~/.</span><span class="n">bashrc</span>
+</pre></div>
+</div>
+<p>Restart bash or load again .bashrc <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.bashrc</span></code></p>
+</li>
+<li><p><strong>Install</strong> xmgrace, python3 and <strong>Jscatter</strong> in Linux subsystem</p>
+<p>open terminal, start bash</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">upgrade</span>                                   <span class="c1"># upgrade linux</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">pip</span> <span class="n">ipython3</span> <span class="n">gfortran</span> <span class="n">gcc</span>   <span class="c1"># python, ipython and pip3</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">numpy</span> <span class="n">python3</span><span class="o">-</span><span class="n">matplotlib</span> <span class="n">xmgrace</span> <span class="n">python</span><span class="o">-</span><span class="n">tk</span>  <span class="c1"># mainly for graphical output</span>
+<span class="n">pip3</span> <span class="n">install</span> <span class="n">cython</span>
+<span class="n">pip3</span> <span class="n">install</span> <span class="n">jscatter</span>                                            <span class="c1"># jscatter, scipy, Pillow...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><p>Run test and example.</p>
+</div></blockquote>
+</div>
+<div class="section" id="anaconda-way">
+<h3>Anaconda way<a class="headerlink" href="#anaconda-way" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.anaconda.com/distribution">Anaconda</a> is a python distribution as alternative
+with numpy, scipy, matplotlib, Ipython preinstalled.
+Need of sudo depends on how Anaconda was installed (root or user).
+Maybe the matplotlib backend needs to be configured on Windows to work properly.
+XmGrace is not working on native Windows.</p>
+<p>And there was more to adjust, when i stopped waisting my time.
+In my testcase it was a pain, but test and examples work (no Xmgrace, no fortran).</p>
+<p>I strongly advise to use the  <strong>WSL way</strong> from above, as it is easier to install, update and use.
+And even gfortran is working in WSL!!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># install jscatter on working anaconda environment</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">jscatter</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="jupyter-notebook">
+<h2>Jupyter Notebook<a class="headerlink" href="#jupyter-notebook" title="Permalink to this headline">¶</a></h2>
+<p>Jscatter works on Jupyter Notebooks. You may try Jscatter live at <a class="reference external" href="https://mybinder.org/v2/gl/biehl%2Fjscatter/master?filepath=src%2Fjscatter%2Fexamples%2Fnotebooks"><img alt="link to mybinder" src="https://img.shields.io/badge/launch-jscatter-F5A252.svg?logo=data:image/png;base64,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" /></a>.</p>
+<p>The example notebooks are included in the example subfolder of your Jscatter installation
+or can be downloaded from
+<a class="reference external" href="https://gitlab.com/biehl/jscatter/tree/master/src/jscatter/examples/notebooks">Gitlab/Jscatter</a> .</p>
+<p>To install jscatter on a server Jupyter installation (Jscatter not preinstalled)
+prepend this on your script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>import sys
+# install jscatter as user in the current Jupyter kernel
+!{sys.executable} -m pip install jscatter
+</pre></div>
+</div>
+<p>There is some trouble with inline plots (which are not interactive and cannot be updated)
+dependent on the installed backend. This is related to the used matplotlib backend.</p>
+<p>Use this (before importing anything else) to get interactive plots inline.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">notebook</span>
+</pre></div>
+</div>
+<p>Then import Jscatter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+
+<span class="n">js</span><span class="o">.</span><span class="n">usempl</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># use matplotlib</span>
+<span class="n">js</span><span class="o">.</span><span class="n">usempl</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># default, use grace on your computer with xmgrace in external window.</span>
+</pre></div>
+</div>
+<p>If you work over http on a server (usual no display of Xwindows applications) use the same to
+switch to matplotlib.</p>
+</div>
+<div class="section" id="using-a-cluster-headless-mode">
+<h2>Using a cluster/headless mode<a class="headerlink" href="#using-a-cluster-headless-mode" title="Permalink to this headline">¶</a></h2>
+<p>For long running scripts or fitting one might want to use a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Computer_cluster">cluster</a>.</p>
+<p>Cluster allow often no graphical output (as they are used e.g. trough ssh running a script.).
+To run your script as usual (after testing on your PC) Jscatter implements a <em>headless</em> mode
+which can be activated using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="n">js</span><span class="o">.</span><span class="n">headless</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In <em>headless</em> mode all errPlots are saved automatically to <em>lastErrPlot.agr</em> and open matplotlib plots
+are saved as <em>lastopenedplots_i.png</em> if js.mpl.show() is used.
+Both allow to retrieve an updated graphical output as stored image instead of updated windows.</p>
+<p>Please save important plots in the usual way to store them with a useful name.
+Additional any data output should be saved in the usual way.
+Xmgrace is advantageous as .agr format allows later change of the plots including rescaling.</p>
+<p>Examples are also adapted and saved to jscatterExamples/example_name/
+under the current working directory.</p>
+<dl>
+<dt>For experts:</dt><dd><p>Xmgrace uses <em>gracebat</em> and matplotlib uses the non-interactive backend “Agg”.</p>
+<p>For matplotlib create figures using <em>fig=js.mpl.mplot</em> or <em>fig=matplotlib.figure.Figure</em>
+and later save by <em>fig.savefig</em>. Dont use pyplot as it generates errors in headless mode without interactive loop.</p>
+</dd>
+</dl>
+<p>To switch back it is best to restart ipython (at least for matplotlib).</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>You can test basic functionality of jscatter after installation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="n">js</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">doTest</span><span class="p">()</span>
+<span class="c1">#basic graphics and fitting</span>
+<span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">runExample</span><span class="p">(</span><span class="s1">&#39;example_SinusoidalFitting.py&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The Example shows :</dt><dd><ul class="simple">
+<li><p>3 sine fit plots with one sine</p></li>
+<li><p>a fit plot with 5 sine curves fitted simultaneous</p></li>
+<li><p>a simple plot with 5 points ( phase against Amplitude of the 5 sines)</p></li>
+</ul>
+</dd>
+</dl>
+<p>During development:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">test</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="troubleshooting-and-tips">
+<h2>Troubleshooting and tips<a class="headerlink" href="#troubleshooting-and-tips" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>For testing and playing around without disturbing your productive environment you migth use
+<a class="reference external" href="https://virtualenv.pypa.io">https://virtualenv.pypa.io</a> .</p>
+<p>virtualenv is a tool to create isolated Python environments.</p>
+</li>
+<li><p>If xmgrace is not found by jscatter (<code class="docutils literal notranslate"><span class="pre">`module</span> <span class="pre">'jscatter'</span> <span class="pre">has</span> <span class="pre">no</span> <span class="pre">attribute</span> <span class="pre">'grace'`</span></code>) the path to
+the executable may be not on your PATH variable.</p>
+<p>Check this by calling xmgrace in a shell, if it is started it should work.</p>
+<p>If xmgrace is not starting, add accordingly the installation path to your PATH variable.
+For e.g. bash add in your .bashrc (for zsh on MacOs .zshrc) on my CentOS</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=/usr/local/bin:$(PATH)
+</pre></div>
+</div>
+<p>Restart the shell after changing.</p>
+</li>
+<li><dl>
+<dt>To open .agr files by klicking add a new file association e.g. to KDE.</dt><dd><ul>
+<li><p>In SystemSettings/FileAssociations add a new type xmgrace.</p></li>
+<li><p>Inside this add FilenamePatterns ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>.agr’ and similar.</p></li>
+<li><dl class="simple">
+<dt>In ‘ApplicationPreferenceOrder’ add xmgrace and edit this new application :</dt><dd><p>In General :  edit name to “xmgrace” (keep it).
+In Application : edit name to “xmgracefree” and command to “xmgrace -free”.
+This will open files in free floating size format.</p>
+</dd>
+</dl>
+<p>In ‘ApplicationPreferenceOrder’ add again application xmgrace (no changes)
+The second opens files in fixed size format (no ‘-free’).</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="BeginnersGuide.html">1. Beginners Guide / Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">13. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">19. Changelog</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="BeginnersGuide.html"
+                        title="next chapter"><span class="section-number">1. </span>Beginners Guide / Help</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BeginnersGuide.html" title="1. Beginners Guide / Help"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Jscatter’s documentation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jscatter.examples &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.examples</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for jscatter.examples</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># written by Ralf Biehl at the Forschungszentrum Jülich ,</span>
+<span class="c1"># Jülich Center for Neutron Science 1 and Institute of Complex Systems 1</span>
+<span class="c1">#    Jscatter is a program to read, analyse and plot data</span>
+<span class="c1">#    Copyright (C) 2015-2019  Ralf Biehl</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Some examples to show how to use Jscatter.</span>
+
+<span class="sd">Functions show the code or run the examples in example directory.</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">graceplot</span>
+<span class="kn">from</span> <span class="nn">.particlesWithInteraction</span> <span class="kn">import</span> <span class="n">particlesWithInteraction</span>
+
+<span class="n">platformname</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">uname</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">_path_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">_expath</span> <span class="o">=</span> <span class="n">_path_</span>
+<span class="n">datapath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_expath</span><span class="p">,</span> <span class="s1">&#39;exampleData&#39;</span><span class="p">)</span>
+<span class="n">imagepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_expath</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_multiple_replace</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">rep_dict</span><span class="p">):</span>
+    <span class="c1"># from https://stackoverflow.com/questions/6116978/how-to-replace-multiple-substrings-of-a-string</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rep_dict</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)]),</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">rep_dict</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)],</span> <span class="n">string</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_multiple_replace2</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">rep_dict</span><span class="p">):</span>
+    <span class="c1"># from https://stackoverflow.com/questions/6116978/how-to-replace-multiple-substrings-of-a-string</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rep_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">string</span>
+
+
+<span class="n">mplotreplace</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.grace(&#39;</span><span class="p">:</span> <span class="s1">&#39;.mplot(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.plot(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Plot(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.save(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Save(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.xaxis(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Xaxis(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.yaxis(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Yaxis(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.legend(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Legend(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.clear(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Clear(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.title(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Title(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.subtitle(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Subtitle(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.multi(&#39;</span><span class="p">:</span> <span class="s1">&#39;.Multi(&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.agr&#39;</span><span class="p">:</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;.text&#39;</span><span class="p">:</span> <span class="s1">&#39;.Text&#39;</span><span class="p">,</span>
+                <span class="s2">&quot;(r&#39;&quot;</span><span class="p">:</span> <span class="s2">&quot;(&#39;&quot;</span><span class="p">,</span>
+                <span class="s1">&#39;.line&#39;</span><span class="p">:</span> <span class="s1">&#39;.Arrow&#39;</span><span class="p">,</span>
+                <span class="sa">r</span><span class="s1">&#39;\xp&#39;</span><span class="p">:</span> <span class="s1">&#39;pi&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\N&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;new_graph&#39;</span><span class="p">:</span> <span class="s1">&#39;Subplot&#39;</span><span class="p">,</span>
+                <span class="p">}</span>
+<span class="n">headlessreplace</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fig.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_0.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig0.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_0.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig1.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_1.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig2.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_2.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig3.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_3.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig4.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_4.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;fig5.show()&#39;</span><span class="p">:</span> <span class="s1">&#39;fig.savefig(&quot;lastopenedplots_5.png&quot;)&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;pyplot.show&#39;</span><span class="p">:</span> <span class="s1">&#39;js.mpl.show&#39;</span><span class="p">,</span>
+                   <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_getexamples</span><span class="p">():</span>
+    <span class="n">exfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">_expath</span> <span class="o">+</span> <span class="s1">&#39;/example_*.py&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">exfiles</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="showExampleList"><a class="viewcode-back" href="../../examples.html#jscatter.examples.showExampleList">[docs]</a><span class="k">def</span> <span class="nf">showExampleList</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Show an updated list of all examples.</span>
+
+<span class="sd">    Currently availible examples ::</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Example path : &#39;</span><span class="p">,</span> <span class="n">_expath</span><span class="p">)</span>
+    <span class="n">exfiles</span> <span class="o">=</span> <span class="n">_getexamples</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ff</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">exfiles</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">ff</span><span class="p">))</span></div>
+
+
+<span class="c1"># string with example filenames for documentation appended to __doc__</span>
+<span class="n">_examplelist</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;      </span><span class="si">{0:}</span><span class="s1">  </span><span class="si">{1:}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">ff</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ff</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_getexamples</span><span class="p">())])</span>
+<span class="n">showExampleList</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">_examplelist</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="runExample"><a class="viewcode-back" href="../../examples.html#jscatter.examples.runExample">[docs]</a><span class="k">def</span> <span class="nf">runExample</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="n">usempl</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run example.</span>
+
+<span class="sd">    Example and saved files go to JscatterExamples/example_name in the current working directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    example: string,int</span>
+<span class="sd">        Filename or number of the example to run</span>
+<span class="sd">    usempl : bool, default False</span>
+<span class="sd">        For using mpl set to True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">graceplot</span><span class="o">.</span><span class="n">GraceIsInstalled</span><span class="p">:</span>
+        <span class="n">usempl</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+        <span class="n">exfiles</span> <span class="o">=</span> <span class="n">_getexamples</span><span class="p">()</span>
+        <span class="n">example</span> <span class="o">=</span> <span class="n">exfiles</span><span class="p">[</span><span class="n">example</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------------------------&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="c1"># change path to write into subfolder</span>
+    <span class="n">exname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">example</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">temppath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;jscatterExamples&#39;</span><span class="p">,</span> <span class="n">exname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">temppath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">temppath</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">temppath</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">example</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">usempl</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;grace&#39;</span> <span class="ow">in</span> <span class="n">example</span> <span class="ow">or</span> <span class="s1">&#39;makeJ&#39;</span> <span class="ow">in</span> <span class="n">example</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This example is not for mpl.&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">_multiple_replace2</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="p">{</span><span class="sa">r</span><span class="s1">&#39;\.grace\(\d\.?\d?,\s?\d\.?\d?\)&#39;</span><span class="p">:</span> <span class="s2">&quot;.mplot()&quot;</span><span class="p">})</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">_multiple_replace</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mplotreplace</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">graceplot</span><span class="o">.</span><span class="n">_headless</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;headless&#39;</span><span class="p">)</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">_multiple_replace</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">headlessreplace</span><span class="p">)</span>
+            <span class="c1"># append this to close all opened mpl figures</span>
+            <span class="n">file</span><span class="o">+=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">js.mpl.close(&quot;all&quot;)</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="c1"># try and in anny case go back to cwd</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+
+    <span class="c1"># write the executed file to the subfolder</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temppath</span><span class="p">,</span> <span class="n">exname</span><span class="o">+</span><span class="s1">&#39;.py&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_file</span><span class="p">:</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="showExample"><a class="viewcode-back" href="../../examples.html#jscatter.examples.showExample">[docs]</a><span class="k">def</span> <span class="nf">showExample</span><span class="p">(</span><span class="n">example</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">usempl</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Opens example in default editor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    example : string, int</span>
+<span class="sd">        Filename or number.</span>
+<span class="sd">        If &#39;.&#39; the folder with the examples is opened.</span>
+<span class="sd">    usempl : bool, default False</span>
+<span class="sd">        For using mpl set to True.</span>
+<span class="sd">        Then mpl examples are shown.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">graceplot</span><span class="o">.</span><span class="n">GraceIsInstalled</span><span class="p">:</span>
+        <span class="n">usempl</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+        <span class="n">exfiles</span> <span class="o">=</span> <span class="n">_getexamples</span><span class="p">()</span>
+        <span class="n">example</span> <span class="o">=</span> <span class="n">exfiles</span><span class="p">[</span><span class="n">example</span><span class="p">]</span>
+    <span class="n">examplepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_expath</span><span class="p">,</span> <span class="n">example</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">usempl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;grace&#39;</span> <span class="ow">in</span> <span class="n">example</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This example is not for mpl.&#39;</span><span class="p">,</span> <span class="n">example</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">example</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">examplepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">newfile</span> <span class="o">=</span> <span class="n">_multiple_replace</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mplotreplace</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">platformname</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newfile</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="n">examplepath</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                <span class="c1"># open is broken but seem to be fixed in newest MACOS versions</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">&#39;open&#39;</span><span class="p">,))</span>
+            <span class="k">elif</span> <span class="n">platformname</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="n">examplepath</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                <span class="c1"># noinspection PyUnresolvedReferences</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">startfile</span><span class="p">(</span><span class="n">examplepath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">newfile</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="n">examplepath</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">&#39;xdg-open&#39;</span><span class="p">,</span> <span class="n">examplepath</span><span class="p">))</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">examplepath</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">examplepath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platformname</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
+            <span class="c1"># open is broken but seem to be fixed in newest MACOS versions</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">&#39;open&#39;</span><span class="p">,))</span>
+        <span class="k">elif</span> <span class="n">platformname</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
+            <span class="c1"># This should not happen</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">&#39;xdg-open&#39;</span><span class="p">,</span> <span class="n">examplepath</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="runAll"><a class="viewcode-back" href="../../examples.html#jscatter.examples.runAll">[docs]</a><span class="k">def</span> <span class="nf">runAll</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run all examples ( Maybe needs a bit of time ) .</span>
+
+<span class="sd">    Example and saved files go to JscatterExamples/example_name in the current working directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    start,end : int</span>
+<span class="sd">        First and last example to run</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exfiles</span> <span class="o">=</span> <span class="n">_getexamples</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="n">exfiles</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;----------------------------------&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">ff</span><span class="p">))</span>
+        <span class="n">runExample</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BeginnersGuide.html">1. Beginners Guide / Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">13. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">19. Changelog</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.examples</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

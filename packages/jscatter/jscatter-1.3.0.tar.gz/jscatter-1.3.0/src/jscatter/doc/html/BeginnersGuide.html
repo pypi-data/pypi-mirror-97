@@ -1,0 +1,971 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1. Beginners Guide / Help &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. dataArray" href="dataArray.html" />
+    <link rel="prev" title="Jscatter’s documentation" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dataArray.html" title="2. dataArray"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Jscatter’s documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Beginners Guide / Help</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="beginners-guide-help">
+<h1><span class="section-number">1. </span>Beginners Guide / Help<a class="headerlink" href="#beginners-guide-help" title="Permalink to this headline">¶</a></h1>
+<p><strong>Analysis of data consists of several steps that can be done with Jscatter</strong> :</p>
+<ul class="simple">
+<li><p>Reading of measured data</p></li>
+<li><p>Define a model</p></li>
+<li><p>Fit your model (test if it describes data)</p></li>
+<li><p>Save results !!!</p></li>
+</ul>
+<p>These are described in the following.</p>
+<p><strong>Some places to start with Python/Numpy/SciPy</strong> :</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://cs231n.github.io/python-numpy-tutorial/">Python-Numpy-Tutorial</a> A <strong>crash course</strong> with contents as :</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>Basic data types, Containers (Lists, Dictionaries, Sets, Tuples), Functions, Classes</p></li>
+<li><p>Numpy, Arrays, indexing, Datatypes, Array math, Broadcasting</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/tutorial/">The Python Tutorial</a></p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/user/quickstart.html">Numpy Quickstart tutorial</a></p></li>
+<li><p><a class="reference external" href="https://scipy-lectures.org/intro">SciPy : high-level scientific computing</a></p></li>
+</ul>
+<p><strong>How to use, get help and command expansion</strong></p>
+<p>Jscatter works in a <a class="reference external" href="http://linuxcommand.org/lc3_learning_the_shell.php">terminal/shell</a> (open it)
+as basis without a graphical user interface (GUI).</p>
+<p>For convenience we use Ipython (colors highlighting, history, …), start it typing “ipython” in a terminal.</p>
+<p>Optionally Jscatter can also be run in an environment like Jupyter (see <a class="reference internal" href="index.html#jupyter-notebook"><span class="std std-ref">Jupyter Notebook</span></a>).
+Give it a try using a live demo in a Jupyter Notebook at <a class="reference external" href="https://mybinder.org/v2/gl/biehl%2Fjscatter/master?filepath=src%2Fjscatter%2Fexamples%2Fnotebooks"><img alt="link to mybinder" src="https://img.shields.io/badge/launch-jscatter-F5A252.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFkAAABZCAMAAABi1XidAAAB8lBMVEX///9XmsrmZYH1olJXmsr1olJXmsrmZYH1olJXmsr1olJXmsrmZYH1olL1olJXmsr1olJXmsrmZYH1olL1olJXmsrmZYH1olJXmsr1olL1olJXmsrmZYH1olL1olJXmsrmZYH1olL1olL0nFf1olJXmsrmZYH1olJXmsq8dZb1olJXmsrmZYH1olJXmspXmspXmsr1olL1olJXmsrmZYH1olJXmsr1olL1olJXmsrmZYH1olL1olLeaIVXmsrmZYH1olL1olL1olJXmsrmZYH1olLna31Xmsr1olJXmsr1olJXmsrmZYH1olLqoVr1olJXmsr1olJXmsrmZYH1olL1olKkfaPobXvviGabgadXmsqThKuofKHmZ4Dobnr1olJXmsr1olJXmspXmsr1olJXmsrfZ4TuhWn1olL1olJXmsqBi7X1olJXmspZmslbmMhbmsdemsVfl8ZgmsNim8Jpk8F0m7R4m7F5nLB6jbh7jbiDirOEibOGnKaMhq+PnaCVg6qWg6qegKaff6WhnpKofKGtnomxeZy3noG6dZi+n3vCcpPDcpPGn3bLb4/Mb47UbIrVa4rYoGjdaIbeaIXhoWHmZYHobXvpcHjqdHXreHLroVrsfG/uhGnuh2bwj2Hxk17yl1vzmljzm1j0nlX1olL3AJXWAAAAbXRSTlMAEBAQHx8gICAuLjAwMDw9PUBAQEpQUFBXV1hgYGBkcHBwcXl8gICAgoiIkJCQlJicnJ2goKCmqK+wsLC4usDAwMjP0NDQ1NbW3Nzg4ODi5+3v8PDw8/T09PX29vb39/f5+fr7+/z8/Pz9/v7+zczCxgAABC5JREFUeAHN1ul3k0UUBvCb1CTVpmpaitAGSLSpSuKCLWpbTKNJFGlcSMAFF63iUmRccNG6gLbuxkXU66JAUef/9LSpmXnyLr3T5AO/rzl5zj137p136BISy44fKJXuGN/d19PUfYeO67Znqtf2KH33Id1psXoFdW30sPZ1sMvs2D060AHqws4FHeJojLZqnw53cmfvg+XR8mC0OEjuxrXEkX5ydeVJLVIlV0e10PXk5k7dYeHu7Cj1j+49uKg7uLU61tGLw1lq27ugQYlclHC4bgv7VQ+TAyj5Zc/UjsPvs1sd5cWryWObtvWT2EPa4rtnWW3JkpjggEpbOsPr7F7EyNewtpBIslA7p43HCsnwooXTEc3UmPmCNn5lrqTJxy6nRmcavGZVt/3Da2pD5NHvsOHJCrdc1G2r3DITpU7yic7w/7Rxnjc0kt5GC4djiv2Sz3Fb2iEZg41/ddsFDoyuYrIkmFehz0HR2thPgQqMyQYb2OtB0WxsZ3BeG3+wpRb1vzl2UYBog8FfGhttFKjtAclnZYrRo9ryG9uG/FZQU4AEg8ZE9LjGMzTmqKXPLnlWVnIlQQTvxJf8ip7VgjZjyVPrjw1te5otM7RmP7xm+sK2Gv9I8Gi++BRbEkR9EBw8zRUcKxwp73xkaLiqQb+kGduJTNHG72zcW9LoJgqQxpP3/Tj//c3yB0tqzaml05/+orHLksVO+95kX7/7qgJvnjlrfr2Ggsyx0eoy9uPzN5SPd86aXggOsEKW2Prz7du3VID3/tzs/sSRs2w7ovVHKtjrX2pd7ZMlTxAYfBAL9jiDwfLkq55Tm7ifhMlTGPyCAs7RFRhn47JnlcB9RM5T97ASuZXIcVNuUDIndpDbdsfrqsOppeXl5Y+XVKdjFCTh+zGaVuj0d9zy05PPK3QzBamxdwtTCrzyg/2Rvf2EstUjordGwa/kx9mSJLr8mLLtCW8HHGJc2R5hS219IiF6PnTusOqcMl57gm0Z8kanKMAQg0qSyuZfn7zItsbGyO9QlnxY0eCuD1XL2ys/MsrQhltE7Ug0uFOzufJFE2PxBo/YAx8XPPdDwWN0MrDRYIZF0mSMKCNHgaIVFoBbNoLJ7tEQDKxGF0kcLQimojCZopv0OkNOyWCCg9XMVAi7ARJzQdM2QUh0gmBozjc3Skg6dSBRqDGYSUOu66Zg+I2fNZs/M3/f/Grl/XnyF1Gw3VKCez0PN5IUfFLqvgUN4C0qNqYs5YhPL+aVZYDE4IpUk57oSFnJm4FyCqqOE0jhY2SMyLFoo56zyo6becOS5UVDdj7Vih0zp+tcMhwRpBeLyqtIjlJKAIZSbI8SGSF3k0pA3mR5tHuwPFoa7N7reoq2bqCsAk1HqCu5uvI1n6JuRXI+S1Mco54YmYTwcn6Aeic+kssXi8XpXC4V3t7/ADuTNKaQJdScAAAAAElFTkSuQmCC" /></a> to test Jscatter.</p>
+<p>In a shell some simple things help the user.</p>
+<ul class="simple">
+<li><p>The Python docstring of a function can be retrieved by <em>help(command)</em></p></li>
+<li><p>The ‘TAB’ can be used to expand a command or get the list of possible methods/attributes</p></li>
+<li><p>Just typing the name of an object returns a short representation e.g. the content of a dataarray.</p></li>
+<li><p>js.showDoc() opens the documentation in a web browser.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="n">i5</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span> <span class="o">+</span> <span class="s1">&#39;/iqt_1hho.dat&#39;</span><span class="p">)</span>
+
+<span class="c1"># try with some data from below</span>
+<span class="n">help</span><span class="p">(</span><span class="n">i5</span><span class="o">.</span><span class="n">fit</span><span class="p">)</span>
+
+<span class="c1"># command completion by *TAB*</span>
+<span class="n">i5</span><span class="o">.</span><span class="n">a</span>    <span class="c1"># write this and press 2x *TAB* to get *append, aslist, attr*</span>
+
+<span class="c1"># show string representation</span>
+<span class="n">i5</span>
+
+<span class="n">js</span><span class="o">.</span><span class="n">showDoc</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="what-are-dataarray-datalist">
+<h2><span class="section-number">1.1. </span>What are dataArray/dataList<a class="headerlink" href="#what-are-dataarray-datalist" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="dataArray.html#dataarray"><span class="std std-ref">dataArray</span></a> is a container for matrix like data like a spreadsheet.
+Additional to the entries in the spreadsheet we have attributes describing metadata like
+the temperature of the measurement related to the spreadsheet data accessible as <code class="docutils literal notranslate"><span class="pre">data.temperature</span></code>.</p>
+<p><a class="reference internal" href="dataList.html#datalist"><span class="std std-ref">dataList</span></a> is a container for a list of <em>dataArrays</em> with variable size
+e.g. for repeated measurements or a temperature rise.</p>
+<p>In most cases these data are read from a file, as it was stored from an measurement/instrument.</p>
+<p>See <a class="reference internal" href="dataArray.html#dataarray"><span class="std std-ref">dataArray</span></a> and <a class="reference internal" href="dataList.html#datalist"><span class="std std-ref">dataList</span></a> how to create and use both. In short:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">0.5</span><span class="p">]</span>                                  <span class="c1"># creates a 1dim numpy array</span>
+<span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1.234</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">3.141</span><span class="o">*</span><span class="n">x</span><span class="p">)]</span><span class="o">.</span><span class="n">T</span>   <span class="c1"># creates a matrix with x in columns</span>
+<span class="n">data0</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>                              <span class="c1"># creates dataArray from above matrix</span>
+<span class="n">data0</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mf">273.15</span>                         <span class="c1"># adds attribut temperature</span>
+
+<span class="n">data1</span> <span class="o">=</span> <span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">()</span>                                    <span class="c1"># empty dataList</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]:</span>                              <span class="c1"># add several dataArrays</span>
+   <span class="c1"># internal a dataarray is created and appended</span>
+   <span class="n">data1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">,</span> <span class="mf">1.234</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mf">3.141</span><span class="o">*</span><span class="n">x</span><span class="p">)]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>dataArray/dataList</em> have additional methods to treat the contained data.
+This might be simple mathematical operations like <em>add</em> a value to a column or summing,
+averaging, adding another array of data as inherited from <em>numpy arrays</em>
+or methods for fitting and interpolation.</p>
+</div>
+<div class="section" id="first-basic-examples">
+<h2><span class="section-number">1.2. </span>First basic examples<a class="headerlink" href="#first-basic-examples" title="Permalink to this headline">¶</a></h2>
+<p>This shows the basic reading and fitting of some data as a starting point.</p>
+<p>Details of all commands are explained later or in respective chapters.</p>
+<div class="section" id="a-parabolic-fit">
+<h3><span class="section-number">1.2.1. </span>A parabolic fit<a class="headerlink" href="#a-parabolic-fit" title="Permalink to this headline">¶</a></h3>
+<p>A simple example without additional stuff as a skeleton. Additional possibilities are shown later.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># load data into a dataArray</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/exampledata0.dat&#39;</span><span class="p">)</span>
+
+<span class="c1"># Look at some attributes that were stored in the read data</span>
+<span class="n">data</span><span class="o">.</span><span class="n">attr</span>            <span class="c1"># shows a list of attributes as below</span>
+<span class="n">data</span><span class="o">.</span><span class="n">temperature</span>     <span class="c1"># contains the temperature found in the file</span>
+<span class="n">data</span><span class="o">.</span><span class="n">comment</span>         <span class="c1"># contains a comment</span>
+
+<span class="c1"># define model like a mathematical function y = f(q,a,b,c)</span>
+<span class="c1"># test this using e.g parabola(data.X,1,2,3)</span>
+<span class="k">def</span> <span class="nf">parabola</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">):</span>
+   <span class="c1"># q values as numpy array (a list of values), the model returns an array (the y values)</span>
+   <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">c</span>
+   <span class="k">return</span> <span class="n">y</span>
+
+<span class="c1"># fit the data defining free parameters, fixed parameters and map model names to data names.</span>
+<span class="c1"># (map data &#39;X&#39; values (array) to model &#39;q&#39; parameter.)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">model</span><span class="o">=</span><span class="n">parabola</span> <span class="p">,</span><span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">},</span> <span class="n">fixpar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">20</span><span class="p">},</span> <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">})</span>
+<span class="n">data</span><span class="o">.</span><span class="n">showlastErrPlot</span><span class="p">()</span>
+
+<span class="c1"># map additionally the &#39;temperature&#39; in the data for parameter &#39;c&#39;.</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">model</span><span class="o">=</span><span class="n">parabola</span> <span class="p">,</span><span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">},</span> <span class="n">fixpar</span><span class="o">=</span><span class="p">{},</span> <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="s1">&#39;temperature&#39;</span><span class="p">})</span>
+
+<span class="c1"># make nice plot with data and fit</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="p">,</span><span class="n">line</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">symbol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>       <span class="c1"># add result in lastfit</span>
+<span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Noisy parabola&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/basicExamples0.png"><img alt="Basic Example" class="align-left" src="_images/basicExamples0.png" style="width: 300px;" /></a>
+<a class="reference internal image-reference" href="_images/basicExamples0.lastfit.png"><img alt="Basic Example" class="align-center" src="_images/basicExamples0.lastfit.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="a-bit-more-complex-data">
+<h3><span class="section-number">1.2.2. </span>A bit more complex data<a class="headerlink" href="#a-bit-more-complex-data" title="Permalink to this headline">¶</a></h3>
+<p>Here we introduce more possibilities and concepts how to treat the data and introduce models.</p>
+<ul class="simple">
+<li><p>Use  a model from the libraries or change it to your needs.</p></li>
+<li><p>Fit with a condition</p></li>
+<li><p>Simulate fit result with changed parameters.</p></li>
+<li><p>Use a vectorized quadrature to include the distribution of a parameter.</p></li>
+<li><p>Access the fit result</p></li>
+</ul>
+<p>The used data relate to small angle scattering of <strong>spherical particles in solvent</strong>
+with a polydispersity in radius.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># load data</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/exampledata.dat&#39;</span><span class="p">)</span>
+
+<span class="c1"># plot data</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">le</span><span class="o">=</span><span class="s1">&#39;my data&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;I(Q) / cm\S-1&#39;</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Q / nm\S-1&#39;</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Measurement of spheres&#39;</span><span class="p">)</span>
+
+<span class="c1"># use Guinier model from module formfactor (shortcut ff) as first size estimate in limited range q&lt;1/Rg</span>
+<span class="c1"># fit it (with start values) and show result</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">guinier</span><span class="p">,</span><span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Rg&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">},</span>
+                       <span class="n">fixpar</span><span class="o">=</span><span class="p">{},</span>
+                       <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">},</span>
+                       <span class="n">condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">/</span><span class="mf">7.</span><span class="p">)</span>
+
+<span class="c1"># show fit result (The ErrPlot is reused in next fits)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">showlastErrPlot</span><span class="p">(</span><span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span><span class="n">fitlinecolor</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># compare to full dataset in above plot</span>
+<span class="c1"># modelValues recalcs fit result with optional changed parameters (here larger q range)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">modelValues</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mf">0.02</span><span class="p">]),</span> <span class="n">line</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">symbol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="s1">&#39;fit Guinier&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mf">1e6</span><span class="p">)</span>          <span class="c1"># update legend with position</span>
+
+<span class="c1"># define monodisperse sphere model adding amplitude and background</span>
+<span class="c1"># jscatter models return dataArray with X, Y and more attributes</span>
+<span class="c1"># you may return just an array</span>
+<span class="k">def</span> <span class="nf">sphere</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">bgr</span><span class="p">):</span>
+   <span class="n">result</span><span class="o">=</span><span class="n">A</span><span class="o">*</span><span class="n">js</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">sphere</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="n">radius</span><span class="o">=</span><span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">Y</span><span class="o">+</span><span class="n">bgr</span>
+   <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># use sphere model (keywords as *freepar* can be dropped if order of keywords is preserved)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sphere</span><span class="p">,{</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;bgr&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">},{},{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">})</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">modelValues</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">X</span><span class="p">),</span> <span class="n">li</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">sy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="s1">&#39;fit sphere&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># define better sphere model with polydisperse radius</span>
+<span class="c1"># here we reuse the returned dataArray (which includes attributes) and add bgr attribute.</span>
+<span class="k">def</span> <span class="nf">psphere</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">bgr</span><span class="p">,</span><span class="n">dR</span><span class="p">):</span>
+   <span class="c1"># dR is radius width of a Gaussian centered at R (see doc of pDA)</span>
+   <span class="n">result</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">pDA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">sphere</span><span class="p">,</span><span class="n">dR</span><span class="p">,</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="n">radius</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
+   <span class="n">result</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">result</span><span class="o">.</span><span class="n">Y</span> <span class="o">+</span> <span class="n">bgr</span>
+   <span class="n">result</span><span class="o">.</span><span class="n">bgr</span> <span class="o">=</span> <span class="n">bgr</span>
+   <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># use the polydisperse sphere model</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">psphere</span><span class="p">,{</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;bgr&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="s1">&#39;dR&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">},{},{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">})</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">modelValues</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">4</span><span class="p">:</span><span class="mf">0.04</span><span class="p">]),</span> <span class="n">li</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">sy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="s1">&#39;fit polydisperse sphere&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mf">1e6</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># p.save(&#39;myevaluation.agr&#39;)</span>
+<span class="c1"># p.save(&#39;myevaluation.png&#39;)</span>
+
+<span class="c1"># look at result with parameters with errors</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span>          <span class="c1"># model data</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">R</span>        <span class="c1"># fit parameter</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">R_err</span>    <span class="c1"># fit parameter 1-sigma error</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">dR</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">dR_err</span>
+
+<span class="c1"># save the fit result including the fit parameters, errors and covariance matrix</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;myevaluationfitresult.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/basicExamples.png"><img alt="Basic Example" class="align-center" src="_images/basicExamples.png" style="height: 300px;" /></a>
+</div>
+</div>
+<div class="section" id="reading-ascii-files">
+<h2><span class="section-number">1.3. </span>Reading ASCII files<a class="headerlink" href="#reading-ascii-files" title="Permalink to this headline">¶</a></h2>
+<p>A common problem is how to read ASCII files with data as the format is often not
+very intuitive designed. Often there is additional metadata before or after a matrix like block or in the filename.</p>
+<p>Jscatter uses a simple concept to classify lines :</p>
+<ul class="simple">
+<li><p>2 numbers at the beginning of a line are <strong>data</strong> (matrix like data block).</p></li>
+<li><p>a name followed by a number (and more) is an <strong>attribute</strong> with name and content.</p></li>
+<li><p>everything else is <strong>comment</strong> (but can later be converted to an attribute).</p></li>
+<li><p>The filename is <strong>always</strong> stored in attribute <code class="docutils literal notranslate"><span class="pre">.name</span></code></p></li>
+</ul>
+<blockquote>
+<div><p>A new dataArray is created if, while reading a file, a data block with an attribute block
+(preceded or appended) is found or a keyword indicates it (see <a class="reference internal" href="dataList.html#jscatter.dataarray.dataList" title="jscatter.dataarray.dataList"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataList</span></code></a>).</p>
+</div></blockquote>
+<p>Even complex ASCII files can be read with a few changes given as options to fit into this concept.
+New attributes can be generated from content of the comments if not detected automatically.
+This can be done during reading using some simple options in <em>dataArray/dataList</em> creation:</p>
+<ul>
+<li><p>dataArray (js.dA) reads <strong>one</strong> dataset from a file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># create single dataArray from file</span>
+<span class="n">dat</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;singledatafilename.dat&#39;</span><span class="p">)</span>            <span class="c1"># take dataset in file</span>
+<span class="n">dat</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;multidatafilename.dat&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>     <span class="c1"># take dataset index=3 in file (indices start with 0)</span>
+</pre></div>
+</div>
+</li>
+<li><p>dataList  (js.dL) reads <strong>all</strong> datasets from one/multiple files (may differ in shape)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># create dataList</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="s1">&#39;../data/latest_0001.dat&#39;</span><span class="p">)</span>          <span class="c1"># read all dataset in file</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="s1">&#39;../data/latest_0001.dat&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># select only the second dataset in the file</span>
+<span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>                               <span class="c1"># append single dataArray read from above</span>
+</pre></div>
+</div>
+<p><strong>Read all, filter later</strong>
+Create dataList from multiple files (uses <a class="reference external" href="https://docs.python.org/2/library/glob.html#module-glob">glob</a> patterns)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="s1">&#39;../data/latest*.dat&#39;</span><span class="p">)</span>              <span class="c1"># reads all &#39;.dat&#39; files starting with &#39;latest&#39; in data folder.</span>
+<span class="c1"># filter according to attributes or name</span>
+<span class="n">data2</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;latest_conc2&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">Temp</span><span class="o">&gt;</span><span class="mi">100</span><span class="p">))</span>
+<span class="n">data3</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>                             <span class="c1"># drop first and last and use only each 3rd</span>
+
+<span class="c1"># same with glob (using name patterns as ?,*) treating</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">()</span>  <span class="c1"># empty dataList</span>
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;../data/latest*.dat&#39;</span><span class="p">):</span>
+   <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>                       <span class="c1"># you may add options</span>
+
+<span class="c1"># add attributes e.g. from filename or comments</span>
+<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+   <span class="n">dat</span><span class="o">.</span><span class="n">Temp</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>     <span class="c1"># extract attribute from name (which is always the filename read from)</span>
+   <span class="n">dat</span><span class="o">.</span><span class="n">pressure</span><span class="o">=</span><span class="n">dat</span><span class="o">.</span><span class="n">comment</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>     <span class="c1"># if second comment line contains &#39;pressure 1000 mbar&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<hr class="docutils" />
+<p>Options to use:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">replace={‘old’:’new’,’,’:’.’}</span></code>     ==&gt;  replace char and strings</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skiplines=lambda</span> <span class="pre">words:</span> <span class="pre">any(w</span> <span class="pre">in</span> <span class="pre">words</span> <span class="pre">for</span> <span class="pre">w</span> <span class="pre">in</span> <span class="pre">[‘’,’</span> <span class="pre">‘,’NAN’,’*’])</span></code>  ==&gt; skip complete bad lines</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">takeline='ATOM'</span></code>   ==&gt; select specific lines</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore='#'</span></code>       ==&gt; skip lines starting with this character</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">usecols=[1,2,5]</span></code>  ==&gt; select specific columns</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lines2parameter=[2,3,4]</span></code>  ==&gt; use these data lines as comment and not as data.</p></li>
+</ul>
+<p>See <a class="reference internal" href="dataArray.html#jscatter.dataarray.dataArray" title="jscatter.dataarray.dataArray"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataArray()</span></code></a> for all options and how to use them.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>If there is more information in comments or filename this can be extracted by using the comment lines.</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">data.getfromcomment('nameatfirstcolumn')</span></code> ==&gt; extract a list of words in this line</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data.name</span></code>  ==&gt; filename, see below examples.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Set columns for <em>X,.Y,.Z,.W</em> and respective errors by <code class="docutils literal notranslate"><span class="pre">data.setColumnIndex(ix=2,iy=4,iey=None)</span></code> to pick the columns
+that are for interest. See <a class="reference internal" href="#manipulating-dataarray-datalist"><span class="std std-ref">Manipulating dataArray/dataList</span></a></p></li>
+</ul>
+<p><strong>How to extract information from comment lines</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># lines as &#39;pressure 1013 14&#39; are used automatically to set an attribute as .pressure</span>
+<span class="c1"># if data.name is a string as &#39;adh_Temp273_conc02.dat&#39; extract Temp and conc like</span>
+<span class="n">temp</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Temp</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">4</span><span class="p">:])</span>
+<span class="n">data</span><span class="o">.</span><span class="n">conc</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+<span class="c1">#</span>
+<span class="c1"># if same line is in comment use</span>
+<span class="n">temp</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">comment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+<span class="c1"># or use data.getfromComment(...)</span>
+</pre></div>
+</div>
+<p><strong>Some examples and how to read them</strong></p>
+<p>filename: data1_273K_10mM.dat (e.g. Instrument <a class="reference external" href="mailto:JNSE&#37;&#52;&#48;MLZ">JNSE<span>&#64;</span>MLZ</a>, Garching)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">this</span> <span class="ow">is</span> <span class="n">just</span> <span class="n">a</span> <span class="n">comment</span> <span class="ow">or</span> <span class="n">description</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span>
+<span class="n">temp</span>     <span class="mi">293</span>
+<span class="n">pressure</span> <span class="mi">1013</span> <span class="mi">14</span>
+<span class="n">detectorsetting</span> <span class="n">up</span>
+<span class="n">name</span>     <span class="n">temp1bsa</span>
+<span class="mf">0.854979E-01</span>  <span class="mf">0.178301E+03</span>  <span class="mf">0.383044E+02</span>
+<span class="mf">0.882382E-01</span>  <span class="mf">0.156139E+03</span>  <span class="mf">0.135279E+02</span>
+<span class="mf">0.909785E-01</span>  <span class="mf">0.150313E+03</span>  <span class="mf">0.110681E+02</span>
+<span class="mf">0.937188E-01</span>  <span class="mf">0.147430E+03</span>  <span class="mf">0.954762E+01</span>
+<span class="mf">0.964591E-01</span>  <span class="mf">0.141615E+03</span>  <span class="mf">0.846613E+01</span>
+<span class="mf">0.991995E-01</span>  <span class="mf">0.141024E+03</span>  <span class="mf">0.750891E+01</span>
+<span class="mf">0.101940E+00</span>  <span class="mf">0.135792E+03</span>  <span class="mf">0.685011E+01</span>
+<span class="mf">0.104680E+00</span>  <span class="mf">0.140996E+03</span>  <span class="mf">0.607993E+01</span>
+</pre></div>
+</div>
+<p>Read by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;data1_273K_10mM.dat&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">getfromComment</span><span class="p">(</span><span class="s1">&#39;detectorsetting&#39;</span><span class="p">)</span>           <span class="c1"># creates attribute detectorsetting with string value &#39;up&#39; found in comments</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Temp</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>    <span class="c1"># extracts the temperature from filename</span>
+<span class="n">data</span><span class="o">.</span><span class="n">conc</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>    <span class="c1"># same for concentration</span>
+<span class="n">data</span><span class="o">.</span><span class="n">pressure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                                 <span class="c1"># use pressure value 1013 # this was created automatically</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Temp</span>                                        <span class="c1"># use temperature value   # this was created explicit</span>
+</pre></div>
+</div>
+<p>NSE measurement from IN15 at ILL Grenoble</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ftime</span>          <span class="n">E_SUM</span>           <span class="n">EERR_SUM</span>        <span class="n">EQ_0</span><span class="o">.</span><span class="mi">0596</span>       <span class="n">EERRQ_0</span><span class="o">.</span><span class="mi">0596</span>    <span class="n">EQ_0</span><span class="o">.</span><span class="mi">0662</span>       <span class="n">EERRQ_0</span><span class="o">.</span><span class="mi">0662</span>    <span class="n">EQ_0</span><span class="o">.</span><span class="mi">0728</span>       <span class="n">EERRQ_0</span><span class="o">.</span><span class="mi">0728</span>    <span class="n">EQ_0</span><span class="o">.</span><span class="mi">0793</span>       <span class="n">EERRQ_0</span><span class="o">.</span><span class="mi">0793</span>    <span class="n">EQ_0</span><span class="o">.</span><span class="mi">0859</span>       <span class="n">EERRQ_0</span><span class="o">.</span><span class="mi">0859</span>
+<span class="n">Amplitude</span>       <span class="o">-</span><span class="mf">1.0000e+00</span>      <span class="mf">0.0000e+00</span>      <span class="mf">3.3149e+00</span>      <span class="mf">1.9984e-03</span>      <span class="mf">3.4203e+00</span>      <span class="mf">2.0375e-03</span>      <span class="mf">3.2560e+00</span>      <span class="mf">1.9803e-03</span>      <span class="mf">2.7188e+00</span>      <span class="mf">1.8161e-03</span>      <span class="mf">1.8634e+00</span>      <span class="mf">1.5032e-03</span>
+<span class="n">Polarisation</span>    <span class="o">-</span><span class="mf">1.0000e+00</span>      <span class="mf">0.0000e+00</span>      <span class="mf">2.3719e+00</span>      <span class="mf">4.4403e-03</span>      <span class="mf">2.3723e+00</span>      <span class="mf">4.6673e-03</span>      <span class="mf">2.1675e+00</span>      <span class="mf">4.6726e-03</span>      <span class="mf">1.7156e+00</span>      <span class="mf">4.4392e-03</span>      <span class="mf">1.1127e+00</span>      <span class="mf">3.7890e-03</span>
+ <span class="mf">0.0000e+00</span>      <span class="mf">1.0000e+00</span>      <span class="mf">1.0318e-03</span>      <span class="mf">1.0000e+00</span>      <span class="mf">1.9261e-03</span>      <span class="mf">1.0000e+00</span>      <span class="mf">2.0252e-03</span>      <span class="mf">1.0000e+00</span>      <span class="mf">2.2186e-03</span>      <span class="mf">1.0000e+00</span>      <span class="mf">2.6615e-03</span>      <span class="mf">1.0000e+00</span>      <span class="mf">3.4992e-03</span>
+ <span class="mf">2.2428e-01</span>      <span class="mf">9.7447e-01</span>      <span class="mf">3.4201e-03</span>      <span class="mf">9.7363e-01</span>      <span class="mf">6.3708e-03</span>      <span class="mf">9.7026e-01</span>      <span class="mf">6.6990e-03</span>      <span class="mf">9.8392e-01</span>      <span class="mf">7.3605e-03</span>      <span class="mf">9.8819e-01</span>      <span class="mf">8.8623e-03</span>      <span class="mf">9.5632e-01</span>      <span class="mf">1.1831e-02</span>
+ <span class="mf">2.9474e-01</span>      <span class="mf">9.8425e-01</span>      <span class="mf">3.3694e-03</span>      <span class="mf">9.9020e-01</span>      <span class="mf">6.1962e-03</span>      <span class="mf">9.7785e-01</span>      <span class="mf">6.5809e-03</span>      <span class="mf">9.9125e-01</span>      <span class="mf">7.2723e-03</span>      <span class="mf">9.8005e-01</span>      <span class="mf">8.8698e-03</span>      <span class="mf">9.9022e-01</span>      <span class="mf">1.1909e-02</span>
+ <span class="mf">3.6520e-01</span>      <span class="mf">9.7910e-01</span>      <span class="mf">3.3071e-03</span>      <span class="mf">9.8269e-01</span>      <span class="mf">6.0875e-03</span>      <span class="mf">9.8190e-01</span>      <span class="mf">6.4363e-03</span>      <span class="mf">9.7275e-01</span>      <span class="mf">7.1155e-03</span>      <span class="mf">9.8566e-01</span>      <span class="mf">8.7117e-03</span>      <span class="mf">9.7766e-01</span>      <span class="mf">1.1829e-02</span>
+ <span class="mf">5.0612e-01</span>      <span class="mf">9.7927e-01</span>      <span class="mf">3.2226e-03</span>      <span class="mf">9.7898e-01</span>      <span class="mf">5.9112e-03</span>      <span class="mf">9.7517e-01</span>      <span class="mf">6.2379e-03</span>      <span class="mf">9.8108e-01</span>      <span class="mf">6.9563e-03</span>      <span class="mf">9.8669e-01</span>      <span class="mf">8.5569e-03</span>      <span class="mf">9.8611e-01</span>      <span class="mf">1.1557e-02</span>
+ <span class="o">...</span>
+</pre></div>
+</div>
+<p>Read by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># column 1,2 are averages over following columns. First line contains q values</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">()</span>   <span class="c1"># empty dataList</span>
+<span class="n">temp</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;017112345.txt&#39;</span><span class="p">)</span>         <span class="c1"># read all then sort later</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">]:</span>
+   <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]])</span>
+   <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Amplitude</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">Amplitude</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+   <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Polarisation</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">Polarisation</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+   <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">comment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>aspirin.pdb: Atomic coordinates for aspirin (<a class="reference external" href="http://ligand-expo.rcsb.org/reports/A/AIN/AIN_ideal.pdb">AIN</a> from <a class="reference external" href="http://www.rcsb.org/ligand/AIN">Protein Data Bank, PDB</a> ):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Header</span>
+<span class="n">Remarks</span> <span class="n">blabla</span>
+<span class="n">Remarks</span> <span class="ow">in</span> <span class="n">pdb</span> <span class="n">files</span> <span class="n">are</span> <span class="n">sometimes</span> <span class="n">more</span> <span class="n">than</span> <span class="mi">100</span> <span class="n">lines</span>
+<span class="n">ATOM</span>      <span class="mi">1</span>  <span class="n">O1</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">1.731</span>   <span class="mf">0.062</span>  <span class="o">-</span><span class="mf">2.912</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">O</span>
+<span class="n">ATOM</span>      <span class="mi">2</span>  <span class="n">C7</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">1.411</span>   <span class="mf">0.021</span>  <span class="o">-</span><span class="mf">1.604</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">3</span>  <span class="n">O2</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">2.289</span>   <span class="mf">0.006</span>  <span class="o">-</span><span class="mf">0.764</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">O</span>
+<span class="n">ATOM</span>      <span class="mi">4</span>  <span class="n">C3</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">0.003</span>  <span class="o">-</span><span class="mf">0.006</span>  <span class="o">-</span><span class="mf">1.191</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">5</span>  <span class="n">C4</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">1.016</span>   <span class="mf">0.010</span>  <span class="o">-</span><span class="mf">2.153</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">6</span>  <span class="n">C5</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">2.337</span>  <span class="o">-</span><span class="mf">0.015</span>  <span class="o">-</span><span class="mf">1.761</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">7</span>  <span class="n">C6</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">2.666</span>  <span class="o">-</span><span class="mf">0.063</span>  <span class="o">-</span><span class="mf">0.416</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">8</span>  <span class="n">C1</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">1.675</span>  <span class="o">-</span><span class="mf">0.085</span>   <span class="mf">0.544</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>      <span class="mi">9</span>  <span class="n">C2</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">0.340</span>  <span class="o">-</span><span class="mf">0.060</span>   <span class="mf">0.168</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>     <span class="mi">10</span>  <span class="n">O3</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">0.634</span>  <span class="o">-</span><span class="mf">0.083</span>   <span class="mf">1.111</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">O</span>
+<span class="n">ATOM</span>     <span class="mi">11</span>  <span class="n">C8</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">0.314</span>   <span class="mf">0.035</span>   <span class="mf">2.410</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>     <span class="mi">12</span>  <span class="n">O4</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">0.824</span>   <span class="mf">0.277</span>   <span class="mf">2.732</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">O</span>
+<span class="n">ATOM</span>     <span class="mi">13</span>  <span class="n">C9</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">1.376</span>  <span class="o">-</span><span class="mf">0.134</span>   <span class="mf">3.466</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">C</span>
+<span class="n">ATOM</span>     <span class="mi">14</span>  <span class="n">HO1</span> <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">2.659</span>   <span class="mf">0.080</span>  <span class="o">-</span><span class="mf">3.183</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">15</span>  <span class="n">H4</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">0.765</span>   <span class="mf">0.047</span>  <span class="o">-</span><span class="mf">3.203</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">16</span>  <span class="n">H5</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">3.119</span>   <span class="mf">0.001</span>  <span class="o">-</span><span class="mf">2.505</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">17</span>  <span class="n">H6</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">3.704</span>  <span class="o">-</span><span class="mf">0.082</span>  <span class="o">-</span><span class="mf">0.117</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">18</span>  <span class="n">H1</span>  <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>      <span class="o">-</span><span class="mf">1.939</span>  <span class="o">-</span><span class="mf">0.123</span>   <span class="mf">1.591</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">19</span>  <span class="n">H91</span> <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">0.931</span>  <span class="o">-</span><span class="mf">0.004</span>   <span class="mf">4.453</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">20</span>  <span class="n">H92</span> <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">1.807</span>  <span class="o">-</span><span class="mf">1.133</span>   <span class="mf">3.391</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">ATOM</span>     <span class="mi">21</span>  <span class="n">H93</span> <span class="n">AIN</span> <span class="n">A</span>   <span class="mi">1</span>       <span class="mf">2.158</span>   <span class="mf">0.610</span>   <span class="mf">3.318</span>  <span class="mf">1.00</span> <span class="mf">10.00</span>           <span class="n">H</span>
+<span class="n">CONECT</span>    <span class="mi">1</span>    <span class="mi">2</span>   <span class="mi">14</span> <span class="n">may</span> <span class="n">appear</span> <span class="n">at</span> <span class="n">the</span> <span class="n">end</span>
+<span class="n">HETATOM</span> <span class="n">lines</span> <span class="n">may</span> <span class="n">appear</span> <span class="n">at</span> <span class="n">the</span> <span class="n">end</span>
+<span class="n">END</span>
+</pre></div>
+</div>
+<p>Read by (several methods):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1.</span>
+<span class="c1"># take &#39;ATOM&#39; lines, but only column 6-8 as x,y,z coordinates.</span>
+<span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/AIN_ideal.pdb&#39;</span><span class="p">,</span><span class="n">takeline</span><span class="o">=</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ATOM&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">},</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">])</span>
+<span class="c1"># 2.</span>
+<span class="c1"># replace &#39;ATOM&#39; string by number and set XYZ for convenience</span>
+<span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/AIN_ideal.pdb&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ATOM&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">},</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span><span class="n">XYeYeX</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1"># 3.</span>
+<span class="c1"># only the Oxygen atoms</span>
+<span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/AIN_ideal.pdb&#39;</span><span class="p">,</span><span class="n">takeline</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;ATOM&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;O&#39;</span><span class="p">),</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ATOM&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">},</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">])</span>
+<span class="c1"># 4.</span>
+<span class="c1"># using regular expressions we can decode the atom specifier into a scattering length</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="n">rHO</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;HO\d&#39;</span><span class="p">)</span> <span class="c1"># 14 is HO1</span>
+<span class="n">rH</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;H\d+&#39;</span><span class="p">)</span>  <span class="c1"># represents something like &#39;H11&#39; or &#39;H1&#39; see regular expressions</span>
+<span class="n">rC</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;C\d+&#39;</span><span class="p">)</span>
+<span class="n">rO</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;O\d+&#39;</span><span class="p">)</span>
+<span class="c1"># replace atom specifier by number and use it as last column</span>
+<span class="n">ain</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/AIN_ideal.pdb&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ATOM&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="n">rC</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="n">rH</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="n">rO</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="n">rHO</span><span class="p">:</span><span class="mi">5</span><span class="p">},</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span><span class="n">XYeYeX</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1"># 5.</span>
+<span class="c1"># read only atoms and use it to retrieve atom data from js.formel.Elements</span>
+<span class="n">atoms</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;AIN_ideal.pdb&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ATOM&#39;</span><span class="p">:</span><span class="s1">&#39;0&#39;</span><span class="p">},</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">XYeYeX</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">array</span>
+<span class="n">al</span><span class="o">=</span><span class="p">[</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">Elements</span><span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>data2.txt:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># this is just a comment or description of the data</span>
+<span class="c1"># temp     ;    293</span>
+<span class="c1"># pressure ; 1013 14  bar</span>
+<span class="c1"># name     ; temp1bsa</span>
+<span class="o">&amp;</span><span class="n">doit</span>
+<span class="mi">0</span><span class="p">,</span><span class="mf">854979E-01</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">178301E+03</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">383044E+02</span>
+<span class="mi">0</span><span class="p">,</span><span class="mf">882382E-01</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">156139E+03</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">135279E+02</span>
+<span class="mi">0</span><span class="p">,</span><span class="mf">909785E-01</span>  <span class="o">*</span>             <span class="mi">0</span><span class="p">,</span><span class="mf">110681E+02</span>
+<span class="mi">0</span><span class="p">,</span><span class="mf">937188E-01</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">147430E+03</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">954762E+01</span>
+<span class="mi">0</span><span class="p">,</span><span class="mf">964591E-01</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">141615E+03</span>  <span class="mi">0</span><span class="p">,</span><span class="mf">846613E+01</span>
+<span class="n">nan</span>           <span class="n">nan</span>           <span class="mi">0</span>
+</pre></div>
+</div>
+<p>Read by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># ignore is by default &#39;#&#39;, so switch it of
+# skip lines with non numbers in data
+# replace some char by others or remove by replacing with empty string &#39;&#39;.
+js.dA(&#39;data2.txt&#39;,replace={&#39;#&#39;:&#39;&#39;,&#39;;&#39;:&#39;&#39;,&#39;,&#39;:&#39;.&#39;},skiplines=[‘*’,&#39;nan&#39;],ignore=&#39;&#39; )
+</pre></div>
+</div>
+<p>pdh format used in some SAXS instruments (first real data point is line 4):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SAXS</span> <span class="n">BOX</span>
+      <span class="mi">2057</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>
+  <span class="mf">0.000000E+00</span>   <span class="mf">3.053389E+02</span>   <span class="mf">0.000000E+00</span>   <span class="mf">1.000000E+00</span>   <span class="mf">1.541800E-01</span>
+  <span class="mf">0.000000E+00</span>   <span class="mf">1.332462E+00</span>   <span class="mf">0.000000E+00</span>   <span class="mf">0.000000E+00</span>   <span class="mf">0.000000E+00</span>
+<span class="o">-</span><span class="mf">1.069281E-01</span>   <span class="mf">2.277691E+03</span>   <span class="mf">1.168599E+00</span>
+<span class="o">-</span><span class="mf">1.037351E-01</span>   <span class="mf">2.239132E+03</span>   <span class="mf">1.275602E+00</span>
+<span class="o">-</span><span class="mf">1.005422E-01</span>   <span class="mf">2.239534E+03</span>   <span class="mf">1.068182E+00</span>
+<span class="o">-</span><span class="mf">9.734922E-02</span>   <span class="mf">2.219594E+03</span>   <span class="mf">1.102175E+00</span>
+<span class="o">......</span>
+</pre></div>
+</div>
+<p>Read by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># this saves the prepended lines in attribute line_2,...</span>
+<span class="n">empty</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;exampleData/buffer_averaged_corrected_despiked.pdh&#39;</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">lines2parameter</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="c1"># next just ignores the first lines (and last 50) and uses every second line,</span>
+<span class="n">empty</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;exampleData/buffer_averaged_corrected_despiked.pdh&#39;</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">block</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Read csv data by (comma separated list)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;data2.txt&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;,&#39;</span><span class="p">:</span><span class="s1">&#39; &#39;</span><span class="p">})</span>
+<span class="c1"># If tabs separate the columns</span>
+<span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;data2.txt&#39;</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;,&#39;</span><span class="p">:</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">:</span><span class="s1">&#39; &#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Get a list of files in a folder with specific names</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="n">files</span><span class="o">=</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;latest*.dat&#39;</span><span class="p">)</span>     <span class="c1"># files starting with &#39;latest&#39; and ending &#39;.dat&#39;</span>
+<span class="n">files</span><span class="o">=</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;latest???.dat&#39;</span><span class="p">)</span>     <span class="c1"># files starting with &#39;latest&#39; and ending &#39;.dat&#39; and 3 char in between</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-from-numpy-arrays">
+<h2><span class="section-number">1.4. </span>Creating from numpy arrays<a class="headerlink" href="#creating-from-numpy-arrays" title="Permalink to this headline">¶</a></h2>
+<p>This demonstrates how to create dataArrays form calculated data with error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">0.5</span><span class="p">]</span>                 <span class="c1"># a list of values</span>
+<span class="n">D</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span><span class="mf">0.99</span><span class="p">,</span><span class="mf">1.2</span>               <span class="c1"># parameters</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span>  <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">*</span><span class="mf">0.05</span><span class="p">,</span>  <span class="n">x</span><span class="o">*</span><span class="mi">0</span><span class="o">+</span><span class="mf">0.05</span><span class="p">]))</span>
+<span class="n">data</span><span class="o">.</span><span class="n">diffusioncoefficient</span><span class="o">=</span><span class="n">D</span>
+<span class="n">data</span><span class="o">.</span><span class="n">amplitude</span><span class="o">=</span><span class="n">A</span>
+<span class="n">data</span><span class="o">.</span><span class="n">wavevector</span><span class="o">=</span><span class="n">q</span>
+
+<span class="c1"># alternative (diffusion with noise and error )</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="mf">0.05</span><span class="p">,</span><span class="n">x</span><span class="o">*</span><span class="mi">0</span><span class="o">+</span><span class="mf">0.05</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">f</span><span class="o">=</span><span class="k">lambda</span> <span class="n">xx</span><span class="p">,</span><span class="n">DD</span><span class="p">,</span><span class="n">qq</span><span class="p">,</span><span class="n">e</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">qq</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">DD</span><span class="o">*</span><span class="n">xx</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">*</span><span class="n">e</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mf">0.05</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="manipulating-dataarray-datalist">
+<h2><span class="section-number">1.5. </span>Manipulating dataArray/dataList<a class="headerlink" href="#manipulating-dataarray-datalist" title="Permalink to this headline">¶</a></h2>
+<p>Changing values uses the same syntax as in numpy arrays with all available methods and additional .X,.Y…</p>
+<ul class="simple">
+<li><p>The columns used for .X,.Y,.Z,.W and respective errors can be changed by <em>.setColumnIndex(ix=2,iy=4,iey=None)</em> .
+Later .Y is used during fits as dependent variable.</p></li>
+<li><p>Default ix,iy,iey = 0,1,2 as one expects this</p></li>
+<li><p>When writing data the attribute line <code class="docutils literal notranslate"><span class="pre">XYeYeX</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">2</span> <span class="pre">-</span> <span class="pre">-</span> <span class="pre">-</span> <span class="pre">-</span> <span class="pre">-</span></code> is used to save the column indices in sequence as given in
+<code class="xref py py-func docutils literal notranslate"><span class="pre">protectedNames()</span></code> -&gt; <em>X, Y, eY, eX, Z, eZ, W, eW</em>.
+When reading the file this attribut information is used to recover the column indices.
+If the line is missing the default <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">1</span> <span class="pre">2</span></code> is used.</p></li>
+</ul>
+<p>dataList elements should be changed individually as dataArray (this can be done in loops)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">i7</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/polymer.dat&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">i7</span><span class="p">:</span>
+   <span class="n">ii</span><span class="o">.</span><span class="n">X</span><span class="o">/=</span><span class="mi">10</span>          <span class="c1"># change scale</span>
+   <span class="n">ii</span><span class="o">.</span><span class="n">Y</span><span class="o">/=</span><span class="n">ii</span><span class="o">.</span><span class="n">conc</span>     <span class="c1"># normalising by concentration</span>
+   <span class="n">ii</span><span class="o">.</span><span class="n">Y</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ii</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+<span class="n">i1</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/a0_336.dat&#39;</span><span class="p">)</span>
+<span class="c1"># all the same to multiply .X by 2</span>
+<span class="n">i1</span><span class="o">.</span><span class="n">X</span><span class="o">*=</span><span class="mi">2</span>
+<span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*=</span><span class="mi">2</span>
+<span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">i1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>        <span class="c1"># most clear writing</span>
+<span class="c1"># multiply each second Y value by 2 (using advanced numpy indexing)</span>
+<span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">,::</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">,::</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>
+<span class="c1"># now more strange: each second gets the value from following *2+1</span>
+<span class="c1"># unlimited possibilities to manipulate data :-)</span>
+<span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">,::</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">i1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># making a Kratky plot</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">()</span>
+<span class="n">i1k</span><span class="o">=</span><span class="n">i1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">i1k</span><span class="o">.</span><span class="n">Y</span><span class="o">=</span><span class="n">i1k</span><span class="o">.</span><span class="n">Y</span><span class="o">*</span><span class="n">i1k</span><span class="o">.</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i1k</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i1</span><span class="o">.</span><span class="n">X</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span><span class="n">i1</span><span class="o">.</span><span class="n">Y</span><span class="o">*</span><span class="n">i1</span><span class="o">.</span><span class="n">X</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indexing-dataarray-datalist-and-reducing">
+<h2><span class="section-number">1.6. </span>Indexing dataArray/dataList and reducing<a class="headerlink" href="#indexing-dataarray-datalist-and-reducing" title="Permalink to this headline">¶</a></h2>
+<p>Basic <strong>Slicing</strong> and <strong>Indexing/Advanced Indexing/Slicing</strong> works as described at
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html">numpy indexing</a> .</p>
+<p>This means accessing parts of the dataArray/dataList by indexing with integers, boolean masks or arrays
+to extract/manipulate a subset of the data.</p>
+<p>[A,B,C] in the following describes A dataList, B dataArray columns and C values in columns.</p>
+<p>The start:end:step notation is used. With missing value start equals 0, end the last and step 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">i5</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/iqt_1hho.dat&#39;</span><span class="p">)</span>
+<span class="c1"># remove first 2 and last 2 datapoints in all dataArrays</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="p">[:,:,:</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="c1"># remove first column and use 1,2,3 columns in all dataArrays</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">,:]</span>
+<span class="c1"># use each second element in dataList and remove last 2 datapoints in all dataArrays</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="p">[::</span><span class="mi">2</span><span class="p">,:,:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="c1"># You can loop over the dataArrays</span>
+<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">i5</span><span class="p">:</span>
+   <span class="n">dat</span><span class="o">.</span><span class="n">X</span><span class="o">=</span><span class="n">dat</span><span class="o">.</span><span class="n">X</span><span class="o">*</span><span class="mi">10</span>
+<span class="c1"># select a subset by explicit list</span>
+<span class="n">i7</span><span class="o">=</span><span class="n">i5</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,]]</span>
+</pre></div>
+</div>
+<p><strong>Reducing data</strong> to a lower number of values can be done by above fancy indexing (loosing data)
+or using <code class="docutils literal notranslate"><span class="pre">data.prune</span></code> (see <a class="reference internal" href="dataList.html#jscatter.dataarray.dataList" title="jscatter.dataarray.dataList"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataList</span></code></a> )</p>
+<p>prune reduces e.g by 2000 points by averaging in intervals to get 100 points.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">i7</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/a0_336.dat&#39;</span><span class="p">)</span>
+<span class="c1"># mean values in interval [0.1,4] with 100 points distributed on logscale</span>
+<span class="n">i7_2</span><span class="o">=</span><span class="n">i7</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">number</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">)</span> <span class="c1">#type=&#39;mean&#39; is default</span>
+</pre></div>
+</div>
+<p>dataList can be <strong>filtered</strong> to use a subset e.g. with restricted attribute values as  .q&gt;1 or temp&gt;300 .</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">i5</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/iqt_1hho.dat&#39;</span><span class="p">)</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">.</span><span class="n">q</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">.</span><span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="n">i6</span><span class="o">=</span><span class="n">i5</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>         <span class="c1"># automatically sorted for these attributes</span>
+</pre></div>
+</div>
+<p>This demonstrates how to filter data values according to some rule.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">0.5</span><span class="p">]</span>
+<span class="n">D</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span><span class="mf">0.99</span><span class="p">,</span><span class="mf">1.2</span>               <span class="c1"># parameters</span>
+<span class="n">rand</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>      <span class="c1"># the noise on the signal</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="n">rand</span><span class="o">*</span><span class="mf">0.05</span><span class="p">,</span><span class="n">x</span><span class="o">*</span><span class="mi">0</span><span class="o">+</span><span class="mf">0.05</span><span class="p">,</span><span class="n">rand</span><span class="p">]))</span> <span class="c1"># generate data with noise</span>
+<span class="c1"># select like this</span>
+<span class="n">newdata</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>         <span class="c1"># take only positive noise in column 3</span>
+<span class="n">newdata</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="n">data</span><span class="o">.</span><span class="n">X</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">]</span>          <span class="c1"># X&gt;2</span>
+<span class="n">newdata</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="n">data</span><span class="o">.</span><span class="n">Y</span><span class="o">&lt;</span><span class="mf">0.9</span><span class="p">]</span>        <span class="c1"># Y&lt;0.9</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fitting-experimental-data">
+<h2><span class="section-number">1.7. </span>Fitting experimental data<a class="headerlink" href="#fitting-experimental-data" title="Permalink to this headline">¶</a></h2>
+<p>We need:</p>
+<ul class="simple">
+<li><p><strong>Data</strong> need to be read and prepared.</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>Data may be a single dataset (usually in a <em>dataArray</em>) or several of these (in a <em>dataList</em>) like
+multiple measurements with same or changing parameters (e.g. wavevectors).
+Coordinates are in <em>.X</em> and values in <em>.Y</em></p></li>
+<li><p>2D data (e.g. a detector image with 2 dimensions) need to be transformed to coordinates
+<em>.X</em>, <em>.Z</em> with values in <em>.Y</em>. This also gives pixels coordinates in an image a physical
+interpretation as e.g. wavevectors.
+See examples <a class="reference internal" href="examples.html#d-fitting"><span class="std std-ref">2D fitting</span></a> and <a class="reference internal" href="examples.html#fitting-the-2d-scattering-of-a-lattice"><span class="std std-ref">Fitting the 2D scattering of a lattice</span></a></p></li>
+<li><p>Attributes need to be extracted from read data (from comments or filename or from a list).
+In the below example the temperature is stored in the data as attribute.</p></li>
+</ul>
+</div></blockquote>
+<ul>
+<li><p>A <strong>model</strong>, which can be defined in different ways.
+See below or in <a class="reference internal" href="examples.html#how-to-build-simple-models"><span class="std std-ref">How to build simple models</span></a> for different ways.</p>
+<p>Avoid using lists as parameters as list are used to discriminate
+between common parameters (a single float) and individual fit parameters
+(a list of float for each) in dataList.</p>
+</li>
+<li><p><strong>Fit algorithm</strong>
+We use methods from the <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize">scipy.optimize</a>
+module that are incorporated in the <em>.fit</em>  method of <em>dataArray/dataList</em>.
+<em>.fit</em> supports different fit algorithms (see dataList.fit Examples how to choose and about speed differences):</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>method=’leastsq’ (default) is what you usually expect by “fitting” including error bars
+(and a covariance matrix for experts….).
+It is a wrapper around MINPACK’s lmdif and lmder, which is a modification of the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Levenberg-Marquardt_algorithm">Levenberg-Marquardt</a> algorithm.
+Errors are <em>1-sigma</em> errors as they are calculated from the covariance matrix and not directly depend
+on the errors of the <em>.eY</em>. Still the relative weight of values according to <em>.eY</em> is relevant.
+Here a numerical approximation for the gradient is used to determine the next step.</p></li>
+<li><p>method=’Nelder-Mead’ <a class="reference external" href="https://en.wikipedia.org/wiki/Nelder-Mead_method">Nelder-Mead</a> (downhill simplex method)
+algorithm is a direct search method based on function comparison  and
+sometimes converges when gradient methods fail (or stuck in local minima).
+However, the Nelder–Mead technique is a heuristic search method that can converge to non-stationary point.
+It returns no error and is slower than ‘leastsquare’.
+Nelder-Mead is able to fit data with integer parameters where a gradient method fails.</p></li>
+<li><p>method=’BFGS’ <a class="reference external" href="https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm">Broyden–Fletcher–Goldfarb–Shanno (BFGS)</a> algorithm.
+Not as fast as ‘leastsq’ but gives also error bars.</p></li>
+<li><p>method=’<a class="reference external" href="https://en.wikipedia.org/wiki/Differential_evolution">differential_evolution</a>’
+is a global optimization method using iterative improving candidate solutions.
+In general it needs a large number of function calls but may find a global minimum.</p></li>
+<li><p>method=’CG’, ….. other <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize">optimization methods</a>.
+These are slower converging than ‘leastsq’ and most give no error bars.
+Some require an explicit gradient function ore more.
+They are more for advanced users if someone really knows why using it in special cases.</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Save results !!!</strong></p>
+<p>The resulting parameters with errors are in <em>.lastfit</em>. <strong>Save the fit result !!!</strong>
+I regularly have to ask PhD students “What are the errors ?” and they
+repeat all their work again.</p>
+<p>Fit results without errors are meaningless.</p>
+</div>
+<p><strong>If the fit finishes it tells if there was success or if it failed.
+For error messages the final parameters are no valid fit results!!! Please always check this.</strong></p>
+<p>A typical example of several datasets from a SAXS measurement (polymer in solution)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jscatter</span> <span class="k">as</span> <span class="nn">js</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># read data</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dL</span><span class="p">(</span><span class="n">js</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">datapath</span><span class="o">+</span><span class="s1">&#39;/polymer.dat&#39;</span><span class="p">)</span>
+<span class="c1"># merge equal Temperatures each measured with two detector distances</span>
+<span class="n">data</span><span class="o">.</span><span class="n">mergeAttribut</span><span class="p">(</span><span class="s1">&#39;Temp&#39;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span><span class="n">isort</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+
+<span class="c1"># define model</span>
+<span class="c1"># q will get the X values from your data as numpy ndarray.</span>
+<span class="k">def</span> <span class="nf">gCpower</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">I0</span><span class="p">,</span><span class="n">Rg</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">bgr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model Gaussian chain  + power law and background&quot;&quot;&quot;</span>
+    <span class="n">gc</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">gaussianChain</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="n">Rg</span><span class="o">=</span><span class="n">Rg</span><span class="p">)</span>
+    <span class="c1"># add power law and background</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">Y</span><span class="o">=</span><span class="n">I0</span><span class="o">*</span><span class="n">gc</span><span class="o">.</span><span class="n">Y</span><span class="o">+</span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="n">beta</span><span class="o">+</span><span class="n">bgr</span>
+    <span class="c1"># add attributes for later documentation, these are additional content of lastfit (see below)</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">A</span><span class="o">=</span><span class="n">A</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">I0</span><span class="o">=</span><span class="n">I0</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">bgr</span><span class="o">=</span><span class="n">bgr</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">comment</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gaussianChain with power law and bgr&#39;</span><span class="p">,</span><span class="s1">&#39;a second comment&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">gc</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">makeErrPlot</span><span class="p">(</span><span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span><span class="n">xscale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>    <span class="c1"># additional errorplot with intermediate output</span>
+<span class="n">data</span><span class="o">.</span><span class="n">setlimit</span><span class="p">(</span><span class="n">bgr</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>                   <span class="c1"># upper and lower soft limit</span>
+
+<span class="c1"># here we use individual parameter ([]) for all except a common beta ( no [] )</span>
+<span class="c1"># please try removing the [] and play with it :-)</span>
+<span class="c1"># mapNames tells that q is *.X* (maps model names to data names )</span>
+<span class="c1"># condition limits the range to fit (may also contain something like (a.Y&gt;0))</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">gCpower</span><span class="p">,</span>
+         <span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;I0&#39;</span><span class="p">:[</span><span class="mf">0.1</span><span class="p">],</span><span class="s1">&#39;Rg&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">],</span><span class="s1">&#39;A&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;bgr&#39;</span><span class="p">:[</span><span class="mf">0.01</span><span class="p">],</span><span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">},</span>
+         <span class="n">fixpar</span><span class="o">=</span><span class="p">{},</span>
+         <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">},</span>
+         <span class="n">condition</span> <span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&gt;</span><span class="mf">0.05</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># to fix a parameter move it to fixpar dict (bgr is automatically extended)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">gCpower</span><span class="p">,</span>
+         <span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;I0&#39;</span><span class="p">:[</span><span class="mf">0.1</span><span class="p">],</span><span class="s1">&#39;Rg&#39;</span><span class="p">:[</span><span class="mi">3</span><span class="p">],</span><span class="s1">&#39;A&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">]},</span>
+         <span class="n">fixpar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bgr&#39;</span><span class="p">:[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0008</span><span class="p">,</span> <span class="mf">0.0009</span><span class="p">],</span><span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">},</span>
+         <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">},</span>
+         <span class="n">condition</span> <span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&gt;</span><span class="mf">0.05</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># result parameter and error (example)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg_err</span>
+<span class="c1"># as result dataArray</span>
+<span class="n">result</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">Tempmean</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg_err</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="c1"># plot it</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="c1"># save the fit result including parameters, errors and covariance matrix</span>
+<span class="c1"># and your model description</span>
+<span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;polymer_fitDebye.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You may want to fit dataArray in a dataList individually.
+Do it in a loop.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># from the above</span>
+<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+   <span class="n">dat</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">gCpower</span><span class="p">,</span>
+        <span class="n">freepar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;I0&#39;</span><span class="p">:</span><span class="mf">0.1</span><span class="p">,</span><span class="s1">&#39;Rg&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,},</span>
+        <span class="n">fixpar</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bgr&#39;</span><span class="p">:</span><span class="mf">0.001</span><span class="p">,</span><span class="s1">&#39;beta&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">},</span>
+        <span class="n">mapNames</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="s1">&#39;X&#39;</span><span class="p">},</span>
+        <span class="n">condition</span> <span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&gt;</span><span class="mf">0.05</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">X</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># each dataArray has its own .lastfit, .errPlot and so on</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">showlastErrPlot</span><span class="p">()</span>
+<span class="c1"># for saving with individual names</span>
+<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+   <span class="n">dat</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;fitresult_Temp</span><span class="si">%2g</span><span class="s1">.dat&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">Tempmean</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>Simulate using the fit result</strong></p>
+<p>To simulate how a certain parameter influences the result we may simulate changes in the best fit parameters
+to observe how model values are changing.</p>
+<p>To simulate we may use <em>.modelValues</em> to get an explicit result or use <em>.showlastErrPlot</em>
+to observe the changes in an errPlot.
+We just add the new parameter when using these functions. Without parameters we get the original values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># after a fit we may use it like this</span>
+<span class="n">data</span><span class="o">.</span><span class="n">modelValues</span><span class="p">(</span><span class="n">Rg</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">showlastErrPlot</span><span class="p">(</span><span class="n">Rg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">A</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="why-fits-may-fail">
+<h2><span class="section-number">1.8. </span>Why Fits may fail<a class="headerlink" href="#why-fits-may-fail" title="Permalink to this headline">¶</a></h2>
+<p>If your fit fails it is most not an error of the fit algorithm.
+Read the message at the end of the fit it gives a hint what happened.</p>
+<ul class="simple">
+<li><p>If your fit results in a not converging solution or maximum steps reached then its not a valid fit result.
+Decrease tolerance, increase maxstep or reduce number of parameter to get a valid result.
+Try more reasonable start parameters.</p></li>
+<li><p>Your model may have dependent parameters. Then the gradient cannot be evaluated.
+Think of it as a valley with a flat ground. Then you have a line as minimum but you ask for a point.</p></li>
+<li><p>Your starting parameters are way of and within the first try the algorithm finds no improvement.
+This may happen if you have a dominating function of high power and bad starting parameters.
+Choose better ones.</p></li>
+<li><p>You may run into a local minimum which also depends on the noise in your data.
+Try different start parameter or a global optimization method.</p></li>
+<li><p>Play with the starting parameters and get an idea how parameters influence your function.
+This helps to get an idea what goes wrong.</p></li>
+</ul>
+<p>And finally :</p>
+<ul class="simple">
+<li><p>You have chosen the wrong model ( not correlated to your measurement),
+units are wrong by orders of magnitude, missing contributions, …..
+So read the docs of the models and maybe choose a better one.</p></li>
+</ul>
+</div>
+<div class="section" id="plot-experimental-data-and-fit-result">
+<h2><span class="section-number">1.9. </span>Plot experimental data and fit result<a class="headerlink" href="#plot-experimental-data-and-fit-result" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot data</span>
+<span class="n">p</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="s1">&#39;measured data&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Q / nm\S-1&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;I(Q) / a.u.&#39;</span><span class="p">)</span>
+<span class="c1"># plot the result of the fit</span>
+<span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="p">,</span><span class="n">symbol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">line</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span><span class="n">legend</span><span class="o">=</span><span class="s1">&#39;fit Rg=$radiusOfGyration I0=$I0&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">grace</span><span class="p">()</span>
+<span class="c1"># Tempmean because of previous mergeAttribut; otherwise data.Temp</span>
+<span class="n">p1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Tempmean</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">Rg_err</span><span class="p">)</span>
+<span class="n">p1</span><span class="o">.</span><span class="n">xaxis</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Temperature / C&#39;</span><span class="p">)</span>
+<span class="n">p1</span><span class="o">.</span><span class="n">yaxis</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Rg / nm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="save-data-and-fit-results">
+<h2><span class="section-number">1.10. </span>Save data and fit results<a class="headerlink" href="#save-data-and-fit-results" title="Permalink to this headline">¶</a></h2>
+<p>Jscatter saves files in a ASCII format including attributes that can be
+reread including the attributes (See first example above and dataArray help).
+In this way no information is lost.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;filename.dat&#39;</span><span class="p">)</span>
+<span class="c1"># later read them again</span>
+<span class="n">data</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">dA</span><span class="p">(</span><span class="s1">&#39;filename.dat&#39;</span><span class="p">)</span>  <span class="c1"># retrieves all attributes</span>
+</pre></div>
+</div>
+<p>If needed, the raw numpy array can be saved (see numpy.savetxt).
+All attribute information is lost.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;test.dat&#39;</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Save fit results by saving the .lastfit attribute (it is in general NOT automatically saved with the above)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">lastfit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;fitresult.filename.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="additional-stuff">
+<h2><span class="section-number">1.11. </span>Additional stuff<a class="headerlink" href="#additional-stuff" title="Permalink to this headline">¶</a></h2>
+<p><strong>Creating grids</strong> as list of points in 3D [Nx3]
+e.g. for 2D scattering images or for integration</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect the later grids by</span>
+<span class="n">js</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">scatter3d</span><span class="p">(</span><span class="n">qxyz</span><span class="p">)</span>
+
+<span class="n">N</span><span class="o">=</span><span class="mi">10</span>  <span class="c1"># number of points</span>
+<span class="n">d</span><span class="o">=</span><span class="mf">0.1</span> <span class="c1"># distance between grid points</span>
+
+<span class="c1"># traditional numpy way</span>
+<span class="c1"># create 2D lattice and append 3rd dimension (2N+1 points in each direction)</span>
+<span class="n">qxy</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">:</span><span class="n">d</span><span class="p">:</span><span class="n">N</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="n">d</span><span class="p">:</span><span class="n">d</span><span class="p">:</span><span class="n">N</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">qxy</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">qxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+<span class="c1"># 2D using 3D lattice</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">sf</span><span class="o">.</span><span class="n">sqLattice</span><span class="p">(</span><span class="n">d</span><span class="p">,[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">])</span><span class="o">.</span><span class="n">XYZ</span>     <span class="c1"># 2D lattice from square lattice</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">sf</span><span class="o">.</span><span class="n">scLattice</span><span class="p">(</span><span class="n">d</span><span class="p">,[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">XYZ</span>   <span class="c1"># 3D lattice Z collapsed</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">sf</span><span class="o">.</span><span class="n">hexLattice</span><span class="p">(</span><span class="n">d</span><span class="p">,[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">XYZ</span>  <span class="c1"># 3D lattice hexagonal Z collapsed</span>
+
+<span class="c1"># quasi 2D, collapsed dimension but multiple atoms in unit cell</span>
+<span class="c1"># cube grid with second point in unit cell (2.5D if second point has Z dimension)</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">sf</span><span class="o">.</span><span class="n">rhombicLattice</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">],[[</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">XYZ</span>
+
+<span class="c1"># 3D grid</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">sf</span><span class="o">.</span><span class="n">scLattice</span><span class="p">(</span><span class="n">d</span><span class="p">,[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">])</span><span class="o">.</span><span class="n">XYZ</span>
+
+<span class="c1"># grid of pseudorandom points</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">randomPointsInCube</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># 3D</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">randomPointsInCube</span><span class="p">(</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span><span class="p">)]</span>  <span class="c1"># 2D plane in 3D</span>
+<span class="n">points</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">parallel</span><span class="o">.</span><span class="n">randomPointsOnSphere</span><span class="p">(</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">qxyz</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">rphitheta2xyz</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">points</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># select half sphere</span>
+
+<span class="c1"># rotate if needed</span>
+<span class="n">rotaxis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>       <span class="c1"># rotation around y axis</span>
+<span class="n">R</span><span class="o">=</span><span class="n">js</span><span class="o">.</span><span class="n">formel</span><span class="o">.</span><span class="n">rotationMatrix</span><span class="p">(</span><span class="n">rotaxis</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="o">-</span><span class="mi">120</span><span class="p">))</span>    <span class="c1"># -120° rotation matrix</span>
+<span class="n">Rqxyz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,kj-&gt;ki&#39;</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">qxyz</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Beginners Guide / Help</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-are-dataarray-datalist">1.1. What are dataArray/dataList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-basic-examples">1.2. First basic examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#a-parabolic-fit">1.2.1. A parabolic fit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-bit-more-complex-data">1.2.2. A bit more complex data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reading-ascii-files">1.3. Reading ASCII files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-from-numpy-arrays">1.4. Creating from numpy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulating-dataarray-datalist">1.5. Manipulating dataArray/dataList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#indexing-dataarray-datalist-and-reducing">1.6. Indexing dataArray/dataList and reducing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fitting-experimental-data">1.7. Fitting experimental data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-fits-may-fail">1.8. Why Fits may fail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot-experimental-data-and-fit-result">1.9. Plot experimental data and fit result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#save-data-and-fit-results">1.10. Save data and fit results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-stuff">1.11. Additional stuff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">13. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">19. Changelog</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Jscatter’s documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dataArray.html"
+                        title="next chapter"><span class="section-number">2. </span>dataArray</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/BeginnersGuide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dataArray.html" title="2. dataArray"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Jscatter’s documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Beginners Guide / Help</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

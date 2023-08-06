@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jscatter.libs.imagehash &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../../_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.libs.imagehash</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for jscatter.libs.imagehash</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2013 Christopher J Pickett, MIT license, https://github.com/bunchesofdonald/photohash</span>
+<span class="c1"># Copyright (c) 2013-2016, Johannes Buchner, BSD 2-Clause &quot;Simplified&quot;</span>
+<span class="c1"># License, https://github.com/JohannesBuchner/imagehash</span>
+<span class="c1"># Copyright (c) 2019, Ralf Biehl, BSD 2-Clause &quot;Simplified&quot; License, https://gitlab.com/biehl/jscatter</span>
+<span class="c1"># All rights reserved.</span>
+
+<span class="c1"># Redistribution and use in source and binary forms, with or without modification, </span>
+<span class="c1"># are permitted provided that the following conditions are met:</span>
+
+<span class="c1"># Redistributions of source code must retain the above copyright notice, this list of conditions </span>
+<span class="c1"># and the following disclaimer.</span>
+<span class="c1"># Redistributions in binary form must reproduce the above copyright notice, this list of conditions </span>
+<span class="c1"># and the following disclaimer in the documentation and/or other materials provided with the </span>
+<span class="c1"># distribution.</span>
+
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR </span>
+<span class="c1"># IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY </span>
+<span class="c1"># AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR </span>
+<span class="c1"># CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL </span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1"># DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, </span>
+<span class="c1"># WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN </span>
+<span class="c1"># ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.fftpack</span>
+
+
+<div class="viewcode-block" id="imageHash"><a class="viewcode-back" href="../../../formel.html#jscatter.formel.imageHash">[docs]</a><span class="k">class</span> <span class="nc">imageHash</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hash encapsulation. Can be used for dictionary keys and comparisons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hashsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">highfreq_factor</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates image hash of an image to find duplicates or similar images in a fast way using the Hamming difference.</span>
+<span class="sd">        </span>
+<span class="sd">        Implements      </span>
+<span class="sd">        * average hashing (`aHash`)</span>
+<span class="sd">        * perception hashing (`pHash`)</span>
+<span class="sd">        * difference hashing (`dHash`)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image : filename, hexstr, PIL image</span>
+<span class="sd">            Image to calculate a hash. </span>
+<span class="sd">            If a hexstr is given to restore a saved hash it must prepend &#39;0x&#39; and the 0-padded length determines </span>
+<span class="sd">            the hash size. type needs to be given additionally.</span>
+<span class="sd">        type : &#39;ahash&#39;, &#39;dhash&#39;, &#39;phash&#39;</span>
+<span class="sd">            Hash type.</span>
+<span class="sd">        hashsize : int , default 16</span>
+<span class="sd">            Hash size as hashsize x hashsize array.</span>
+<span class="sd">        highfreq_factor : int, default=4</span>
+<span class="sd">            For &#39;phash&#39; increase initial image size to hashsize*highfreq_factor for cos-transform to</span>
+<span class="sd">            catch high frequencies.</span>
+
+<span class="sd">        Returns imageHash object</span>
+<span class="sd">            - .bin, .hex, .int return respective representations</span>
+<span class="sd">            - .similarity(other) returns relative Hamming distance.</span>
+<span class="sd">            - imageHash subtractions returns Hamming distance.</span>
+<span class="sd">            - equality checks hashtype and Hamming distance equal zero.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Images similarity cannot be done by bit comparison (e.g. md5sum) but using a simplified </span>
+<span class="sd">        image representation converted to a unique bit representation representing a hash for the image. </span>
+
+<span class="sd">        Similar images should be different only in some bits measured by the Hamming distance </span>
+<span class="sd">        (number of different bits).</span>
+
+<span class="sd">        A typical procedure is </span>
+<span class="sd">         - Reduce color by converting to grayscale.</span>
+<span class="sd">         - Reduce size to e.g. 8x8 pixels by averaging over blocks.</span>
+<span class="sd">         - Calc binary pixel hash pased on pixel values:</span>
+<span class="sd">          - ahash - average hash:  hash[i,j] = pixel &gt; average(pixels)</span>
+<span class="sd">          - dhash - difference hash: hash[i,j] = pixel[i,j+1] &gt; pixel[i,j] </span>
+<span class="sd">          - phash - perceptual hash: </span>
+<span class="sd">             The low frequency part of the image cos-transform are most perceptual.</span>
+<span class="sd">             The cos-transform of the image is used for an average hash.</span>
+<span class="sd">             hash[i,j] = ahash(cos_tranform(pixels))</span>
+<span class="sd">          - radial variance: See radon tranform in [1]_ (not implemented)</span>
+<span class="sd">         - ahash and dhash are faster but phash dicriminates best.</span>
+<span class="sd">         - Image similarity is decribed by the Hamming difference as number of different bits.</span>
+<span class="sd">           A good measure is the relative Hamming difference (my similarity) as Hamming_diff/hash.size.</span>
+<span class="sd">         - Similar images have similarity &lt; 0.1 .</span>
+<span class="sd">         - Random pixel difference results in  similarity=0.5, an iverted image in similarity =1 (all bits different)</span>
+
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        The calibration image migth be not the best choice as demo or a good one. </span>
+<span class="sd">        rotate works not at the center of the beam but for the image center.</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            import jscatter as js</span>
+<span class="sd">            from jscatter.formel import imageHash</span>
+<span class="sd">            from PIL import Image</span>
+<span class="sd">            image = Image.open(js.examples.datapath+&#39;/calibration.tiff&#39;)</span>
+<span class="sd">            type=&#39;dhash&#39;</span>
+<span class="sd">            original_hash = imageHash(image=image, type=type)</span>
+<span class="sd">            rotate_image = image.rotate(-1) </span>
+<span class="sd">            rotate_hash = imageHash(image=rotate_image,type=type)</span>
+<span class="sd">            sim1 = original_hash.similarity(rotate_hash)</span>
+<span class="sd">            </span>
+<span class="sd">            rotate_image = image.rotate(-90)</span>
+<span class="sd">            rotate_hash = imageHash(image=rotate_image, type=type)</span>
+<span class="sd">            sim2 = original_hash.similarity(rotate_hash)</span>
+
+
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] Rihamark: perceptual image hash benchmarking</span>
+<span class="sd">               C. Zauner, M. Steinebach, E. Hermann</span>
+<span class="sd">               Proc. SPIE 7880, Media Watermarking, Security, and Forensics III</span>
+<span class="sd">               https://doi.org/10.1117/12.876617</span>
+
+
+<span class="sd">        Started based on photohash and imagehash</span>
+
+<span class="sd">        Copyright (c) 2013 Christopher J Pickett, MIT license,</span>
+<span class="sd">        https://github.com/bunchesofdonald/photohash</span>
+
+<span class="sd">        Copyright (c) 2013-2016, Johannes Buchner, BSD 2-Clause &quot;Simplified&quot; License,</span>
+<span class="sd">        https://github.com/JohannesBuchner/imagehash</span>
+
+<span class="sd">        Copyright (c) 2019, Ralf Biehl, BSD 2-Clause &quot;Simplified&quot; License, imagehash.py see</span>
+<span class="sd">        https://gitlab.com/biehl/jscatter/tree/master/src/jscatter/libs</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">hashsize</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Hash size must be greater than or equal to 2&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">image</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0x&#39;</span><span class="p">:</span>
+                <span class="c1"># is hex string we convert it to a hash</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+                <span class="n">binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="s1">&#39;{:0&gt;</span><span class="si">{width}</span><span class="s1">b}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="n">size</span> <span class="o">*</span> <span class="n">size</span><span class="p">)])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="n">binary</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">=</span> <span class="nb">type</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;ahash&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ahash</span><span class="p">(</span><span class="n">hashsize</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;dhash&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ahash</span><span class="p">(</span><span class="n">hashsize</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># default type == &#39;phash&#39;:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phash</span><span class="p">(</span><span class="n">hashsize</span><span class="p">,</span> <span class="n">highfreq_factor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">=</span> <span class="s1">&#39;phash&#39;</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hex</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Other hash must not be None.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;imageHashes must be of the same shape.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">hashtype</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;imageHashes must be of the same type.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashtype</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">hashtype</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># this returns a 8 bit integer, intentionally shortening the information</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span> <span class="k">if</span> <span class="n">v</span><span class="p">])</span>
+
+<div class="viewcode-block" id="imageHash.similarity"><a class="viewcode-back" href="../../../formel.html#jscatter.formel.imageHash.similarity">[docs]</a>    <span class="k">def</span> <span class="nf">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Relative Hamming difference.</span>
+
+<span class="sd">        - Similar &lt;0.1</span>
+<span class="sd">        - Random pixels are close to 0.5</span>
+<span class="sd">        - Inverted 1 </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Size of the hash.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shape of the hash.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Binary representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;0b&#39;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integer representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hexadecimal representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">hh</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">hh</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_ahash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hash_size</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">hash_size</span><span class="p">,</span> <span class="n">hash_size</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+        <span class="c1"># find average pixel value; &#39;pixels&#39; is an array of the pixel values, ranging from 0 (black) to 255 (white)</span>
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">avg</span> <span class="o">=</span> <span class="n">pixels</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="c1"># create string of bits</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">pixels</span> <span class="o">&gt;</span> <span class="n">avg</span>
+        <span class="c1"># make a hash</span>
+        <span class="k">return</span> <span class="n">diff</span>
+
+    <span class="k">def</span> <span class="nf">_phash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hash_size</span><span class="p">,</span> <span class="n">highfreq_factor</span><span class="p">):</span>
+        <span class="n">img_size</span> <span class="o">=</span> <span class="n">hash_size</span> <span class="o">*</span> <span class="n">highfreq_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">img_size</span><span class="p">,</span> <span class="n">img_size</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">dct</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fftpack</span><span class="o">.</span><span class="n">dct</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">fftpack</span><span class="o">.</span><span class="n">dct</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dctlowfreq</span> <span class="o">=</span> <span class="n">dct</span><span class="p">[:</span><span class="n">hash_size</span><span class="p">,</span> <span class="p">:</span><span class="n">hash_size</span><span class="p">]</span>
+        <span class="n">med</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">dctlowfreq</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">dctlowfreq</span> <span class="o">&gt;</span> <span class="n">med</span>
+        <span class="k">return</span> <span class="n">diff</span>
+
+    <span class="k">def</span> <span class="nf">_dhash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hash_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">hash_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">hash_size</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="c1"># compute differences between columns</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">pixels</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">&gt;</span> <span class="n">pixels</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">diff</span></div>
+
+
+<span class="k">def</span> <span class="nf">hex_to_hash</span><span class="p">(</span><span class="n">hexstr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a stored hash (hex, as retrieved from str(Imagehash))</span>
+<span class="sd">    back to a Imagehash object.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    1. This algorithm assumes all hashes are bidimensional arrays</span>
+<span class="sd">       with dimensions hashsize * hashsize.</span>
+<span class="sd">    2. This algorithm does not work for hashsize &lt; 2.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hash_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexstr</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">binary_array</span> <span class="o">=</span> <span class="s1">&#39;{:0&gt;</span><span class="si">{width}</span><span class="s1">b}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hexstr</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="n">hash_size</span> <span class="o">*</span> <span class="n">hash_size</span><span class="p">)</span>
+    <span class="n">bit_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">binary_array</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">hash_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">binary_array</span><span class="p">),</span> <span class="n">hash_size</span><span class="p">)]</span>
+    <span class="n">hash_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">bit_rows</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">imageHash</span><span class="p">(</span><span class="n">hash_array</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="../../../index.html">Table of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../BeginnersGuide.html">1. Beginners Guide / Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">13. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">19. Changelog</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.libs.imagehash</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

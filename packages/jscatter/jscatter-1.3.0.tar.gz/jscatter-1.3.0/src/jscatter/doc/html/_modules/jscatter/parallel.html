@@ -1,0 +1,803 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jscatter.parallel &#8212; Jscatter 1.3.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static//default.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    
+    <link rel="shortcut icon" href="../../_static/Jscatter-32x-32.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.parallel</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for jscatter.parallel</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># written by Ralf Biehl at the Forschungszentrum Jülich ,</span>
+<span class="c1"># Jülich Center for Neutron Science 1 and Institute of Complex Systems 1</span>
+<span class="c1">#    Jscatter is a program to read, analyse and plot data</span>
+<span class="c1">#    Copyright (C) 2015-2019  Ralf Biehl</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for parallel computations on a single multi core machine using the standard library multiprocessing.</span>
+
+<span class="sd">Not the programming details, but the way how to speed up some things.</span>
+
+<span class="sd">- If your computation is already fast (e.g. &lt;1s) go on without parallelisation.</span>
+<span class="sd">  In an optimal case you gain a speedup as the number of cpu cores.</span>
+<span class="sd">- If you want to use a cluster with all cpus, this is not the way (you need MPI).</span>
+
+<span class="sd">Parallelisation is no magic and this module is for convenience for non specialist of parallel computing.</span>
+<span class="sd">The main thing is to pass additional parameters to the processes (a pool of workers)</span>
+<span class="sd">and loop only over one parameter given as list.</span>
+<span class="sd">Opening and closing of the pool is hidden in the function.</span>
+<span class="sd">In this way we can use a multicore machine with all cpus.</span>
+
+<span class="sd">During testing I found that shared memory does not really speed up,</span>
+<span class="sd">if we just want to calculate a function e.g. for a list of different</span>
+<span class="sd">Q values dependent on model parameters. Here the pickling of numpy arrays is</span>
+<span class="sd">efficient enough compared to the computation we do.</span>
+<span class="sd">The amount of data pickled should not be too large as each process</span>
+<span class="sd">gets a copy and pickling needs time.</span>
+
+<span class="sd">If speed is an issue and shared memory gets important i advice using Fortran with OpenMP</span>
+<span class="sd">as used for ff.cloudScattering with parallel computation and shared memory.</span>
+<span class="sd">For me this was easier than the different solutions around.</span>
+
+<span class="sd">We use here only non modified input data and return a new dataset,</span>
+<span class="sd">so we dont need to care about what happens if one process changes the data needed</span>
+<span class="sd">in another process (race conditions,...), anyway its not shared.</span>
+<span class="sd">Please keep this in mind and dont complain if you find a way to modify input data.</span>
+
+<span class="sd">For easier debugging (to find the position of an error in the pdb debugger) use the option debug.</span>
+<span class="sd">In this case the multiprocessing is not used and the debugger finds the error correctly.</span>
+
+<span class="sd">See example in doForList.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">constants</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fscatter</span>
+
+    <span class="n">useFortran</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">useFortran</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">_Nrand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_integers</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">floor</span><span class="p">,</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">fmod</span>
+
+
+<div class="viewcode-block" id="haltonSequence"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.haltonSequence">[docs]</a><span class="k">def</span> <span class="nf">haltonSequence</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pseudo random numbers from the  Halton sequence in interval [0,1].</span>
+
+<span class="sd">    To use them as coordinate points transpose the array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    size : int</span>
+<span class="sd">        Samples from the sequence</span>
+<span class="sd">    dim : int</span>
+<span class="sd">        Dimensions</span>
+<span class="sd">    skip : int</span>
+<span class="sd">        Number of points to skip in Halton sequence .</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The visual difference between pseudorandom and random in 2D.</span>
+<span class="sd">    See [2]_ for more details.</span>
+
+<span class="sd">    .. image:: ../../examples/images/comparisonRandom-Pseudorandom.jpg</span>
+<span class="sd">     :align: center</span>
+<span class="sd">     :height: 300px</span>
+<span class="sd">     :alt: comparisonRandom-Pseudorandom</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import numpy as np</span>
+<span class="sd">     import matplotlib.pyplot as plt</span>
+<span class="sd">     from mpl_toolkits.mplot3d import Axes3D</span>
+<span class="sd">     fig = plt.figure()</span>
+<span class="sd">     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">     for i,color in enumerate([&#39;b&#39;,&#39;g&#39;,&#39;r&#39;,&#39;y&#39;]):</span>
+<span class="sd">        # create halton sequence and shift it to needed shape</span>
+<span class="sd">        pxyz=js.parallel.haltonSequence(400,3).T*2-1</span>
+<span class="sd">        ax.scatter(pxyz[:,0],pxyz[:,1],pxyz[:,2],color=color,s=20)</span>
+<span class="sd">     ax.set_xlim([-1,1])</span>
+<span class="sd">     ax.set_ylim([-1,1])</span>
+<span class="sd">     ax.set_zlim([-1,1])</span>
+<span class="sd">     ax.set_aspect(&quot;equal&quot;)</span>
+<span class="sd">     plt.tight_layout()</span>
+<span class="sd">     plt.show(block=False)</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://mail.python.org/pipermail/scipy-user/2013-June/034741.html</span>
+<span class="sd">            Author: Sebastien Paris,  Josef Perktold translation from c</span>
+<span class="sd">    .. [2] https://en.wikipedia.org/wiki/Low-discrepancy_sequence</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">useFortran</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fscatter</span><span class="o">.</span><span class="n">pseudorandom</span><span class="o">.</span><span class="n">halton_sequence</span><span class="p">(</span><span class="n">skip</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">skip</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="n">skip</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">size</span> <span class="o">*</span> <span class="n">dim</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
+        <span class="n">logsize</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">logsize</span> <span class="o">/</span> <span class="n">log</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">p</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">sum_</span> <span class="o">=</span> <span class="n">fmod</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span>
+                    <span class="n">sum_</span> <span class="o">+=</span> <span class="n">fmod</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="n">h</span><span class="p">[</span><span class="n">j</span> <span class="o">*</span> <span class="n">dim</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_</span>
+
+        <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="n">skip</span><span class="p">:]</span></div>
+
+
+<div class="viewcode-block" id="randomPointsOnSphere"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.randomPointsOnSphere">[docs]</a><span class="k">def</span> <span class="nf">randomPointsOnSphere</span><span class="p">(</span><span class="n">NN</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    N quasi random points on sphere of radius r based on low-discrepancy sequence.</span>
+
+<span class="sd">    For numerical integration quasi random numbers are better than random samples as</span>
+<span class="sd">    the error drops faster [1]_. Here we use the Halton sequence to generate the sequence.</span>
+<span class="sd">    Skipping points makes the sequence additive and does not repeat points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    NN : int</span>
+<span class="sd">        Number of points to generate.</span>
+<span class="sd">    r : float</span>
+<span class="sd">        Radius of sphere</span>
+<span class="sd">    skip : int</span>
+<span class="sd">        Number of points to skip in Halton sequence .</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of [r,phi,theta]  pairs in radians</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://en.wikipedia.org/wiki/Low-discrepancy_sequence</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A random sequence of points on sphere surface.</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import numpy as np</span>
+<span class="sd">     import matplotlib.pyplot as plt</span>
+<span class="sd">     from mpl_toolkits.mplot3d import Axes3D</span>
+<span class="sd">     fig = plt.figure()</span>
+<span class="sd">     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">     for i,color in enumerate([&#39;b&#39;,&#39;g&#39;,&#39;r&#39;,&#39;y&#39;]):</span>
+<span class="sd">        points=js.parallel.randomPointsOnSphere(400,skip=400*i)</span>
+<span class="sd">        points=points[points[:,1]&gt;0,:]</span>
+<span class="sd">        pxyz=js.formel.rphitheta2xyz(points)</span>
+<span class="sd">        ax.scatter(pxyz[:,0],pxyz[:,1],pxyz[:,2],color=color,s=20)</span>
+<span class="sd">     ax.set_xlim([-1,1])</span>
+<span class="sd">     ax.set_ylim([-1,1])</span>
+<span class="sd">     ax.set_zlim([-1,1])</span>
+<span class="sd">     fig.axes[0].set_title(&#39;random points on sphere (half shown)&#39;)</span>
+<span class="sd">     plt.tight_layout()</span>
+<span class="sd">     plt.show(block=False)</span>
+<span class="sd">     #fig.savefig(js.examples.imagepath+&#39;/randomPointsOnSphere.jpg&#39;)</span>
+
+<span class="sd">    .. image:: ../../examples/images/randomPointsOnSphere.jpg</span>
+<span class="sd">     :align: center</span>
+<span class="sd">     :height: 300px</span>
+<span class="sd">     :alt: randomPointsOnSphere</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NN</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">NN</span><span class="p">)</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">haltonSequence</span><span class="p">(</span><span class="n">NN</span> <span class="o">+</span> <span class="n">skip</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[(</span><span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                  <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">seq</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))]</span></div>
+
+
+<div class="viewcode-block" id="randomPointsInCube"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.randomPointsInCube">[docs]</a><span class="k">def</span> <span class="nf">randomPointsInCube</span><span class="p">(</span><span class="n">NN</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    N quasi random points in cube of edge 1 based on low-discrepancy sequence.</span>
+
+<span class="sd">    For numerical integration quasi random numbers are better than random samples as</span>
+<span class="sd">    the error drops faster [1]_. Here we use the Halton sequence to generate the sequence.</span>
+<span class="sd">    Skipping points makes the sequence additive and does not repeat points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    NN : int</span>
+<span class="sd">        Number of points to generate.</span>
+<span class="sd">    skip : int</span>
+<span class="sd">        Number of points to skip in Halton sequence .</span>
+<span class="sd">    dim : int, default 3</span>
+<span class="sd">        Dimension of the cube.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of [x,y,z]</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://en.wikipedia.org/wiki/Low-discrepancy_sequence</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    The visual difference between pseudorandom and random in 2D.</span>
+<span class="sd">    See [1]_ for more details.</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import matplotlib.pyplot as pyplot</span>
+<span class="sd">     fig = pyplot.figure(figsize=(10, 5))</span>
+<span class="sd">     fig.add_subplot(1, 2, 1, projection=&#39;3d&#39;)</span>
+<span class="sd">     fig.add_subplot(1, 2, 2, projection=&#39;3d&#39;)</span>
+<span class="sd">     js.sf.randomLattice([2,2],3000).show(fig=fig, ax=fig.axes[0])</span>
+<span class="sd">     fig.axes[0].set_title(&#39;random lattice&#39;)</span>
+<span class="sd">     js.sf.pseudoRandomLattice([2,2],3000).show(fig=fig, ax=fig.axes[1])</span>
+<span class="sd">     fig.axes[1].set_title(&#39;pseudo random lattice \n less holes more homogeneous&#39;)</span>
+<span class="sd">     fig.axes[0].view_init(elev=85, azim=10)</span>
+<span class="sd">     fig.axes[1].view_init(elev=85, azim=10)</span>
+<span class="sd">     #fig.savefig(js.examples.imagepath+&#39;/comparisonRandom-Pseudorandom.jpg&#39;)</span>
+
+<span class="sd">    .. image:: ../../examples/images/comparisonRandom-Pseudorandom.jpg</span>
+<span class="sd">     :align: center</span>
+<span class="sd">     :height: 300px</span>
+<span class="sd">     :alt: comparisonRandom-Pseudorandom</span>
+
+<span class="sd">    Random cubes of random points in cube.</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     # random cubes of random points in cube</span>
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import numpy as np</span>
+<span class="sd">     import matplotlib.pyplot as plt</span>
+<span class="sd">     from mpl_toolkits.mplot3d import Axes3D</span>
+<span class="sd">     fig = plt.figure()</span>
+<span class="sd">     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">     N=30</span>
+<span class="sd">     cubes=js.parallel.randomPointsInCube(20)*3</span>
+<span class="sd">     for i,color in enumerate([&#39;b&#39;,&#39;g&#39;,&#39;r&#39;,&#39;y&#39;,&#39;k&#39;]*3):</span>
+<span class="sd">        points=js.parallel.randomPointsInCube(N,skip=N*i).T</span>
+<span class="sd">        pxyz=points*0.3+cubes[i][:,None]</span>
+<span class="sd">        ax.scatter(pxyz[0,:],pxyz[1,:],pxyz[2,:],color=color,s=20)</span>
+<span class="sd">     ax.set_xlim([0,3])</span>
+<span class="sd">     ax.set_ylim([0,3])</span>
+<span class="sd">     ax.set_zlim([0,3])</span>
+<span class="sd">     ax.set_aspect(&quot;equal&quot;)</span>
+<span class="sd">     plt.tight_layout()</span>
+<span class="sd">     plt.show(block=False)</span>
+<span class="sd">     #fig.savefig(js.examples.imagepath+&#39;/randomRandomCubes.jpg&#39;)</span>
+
+<span class="sd">    .. image:: ../../examples/images/randomRandomCubes.jpg</span>
+<span class="sd">     :align: center</span>
+<span class="sd">     :height: 300px</span>
+<span class="sd">     :alt: randomRandomCubes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">haltonSequence</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">NN</span><span class="p">),</span> <span class="n">dim</span><span class="p">,</span> <span class="n">skip</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+
+<div class="viewcode-block" id="fibonacciLatticePointsOnSphere"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.fibonacciLatticePointsOnSphere">[docs]</a><span class="k">def</span> <span class="nf">fibonacciLatticePointsOnSphere</span><span class="p">(</span><span class="n">NN</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fibonacci lattice points on a sphere with radius r (default r=1)</span>
+
+<span class="sd">    This can be used to integrate efficiently over a sphere with well distributed points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    NN : integer</span>
+<span class="sd">        number of points = 2*N+1</span>
+<span class="sd">    r : float, default 1</span>
+<span class="sd">        radius of sphere</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of [r,phi,theta]  pairs in radians</span>
+<span class="sd">        phi  azimuth -pi&lt;phi&lt;pi; theta polar angle  0&lt;theta&lt;pi</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Measurement of Areas on a Sphere Using Fibonacci and Latitude–Longitude Lattices</span>
+<span class="sd">          Á. González Mathematical Geosciences 42, 49-64 (2009)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import numpy as np</span>
+<span class="sd">     import matplotlib.pyplot as plt</span>
+<span class="sd">     from mpl_toolkits.mplot3d import Axes3D</span>
+<span class="sd">     points=js.formel.fibonacciLatticePointsOnSphere(1000)</span>
+<span class="sd">     pp=list(filter(lambda a:(a[1]&gt;0) &amp; (a[1]&lt;np.pi/2) &amp; (a[2]&gt;0) &amp; (a[2]&lt;np.pi/2),points))</span>
+<span class="sd">     pxyz=js.formel.rphitheta2xyz(pp)</span>
+<span class="sd">     fig = plt.figure()</span>
+<span class="sd">     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">     ax.scatter(pxyz[:,0],pxyz[:,1],pxyz[:,2],color=&quot;k&quot;,s=20)</span>
+<span class="sd">     ax.set_xlim([-1,1])</span>
+<span class="sd">     ax.set_ylim([-1,1])</span>
+<span class="sd">     ax.set_zlim([-1,1])</span>
+<span class="sd">     ax.set_aspect(&quot;equal&quot;)</span>
+<span class="sd">     plt.tight_layout()</span>
+<span class="sd">     plt.show(block=False)</span>
+
+<span class="sd">     points=js.formel.fibonacciLatticePointsOnSphere(1000)</span>
+<span class="sd">     pp=list(filter(lambda a:(a[2]&gt;0.3) &amp; (a[2]&lt;1) ,points))</span>
+<span class="sd">     v=js.formel.rphitheta2xyz(pp)</span>
+<span class="sd">     R=js.formel.rotationMatrix([1,0,0],np.deg2rad(-30))</span>
+<span class="sd">     pxyz=np.dot(R,v.T).T</span>
+<span class="sd">     #points in polar coordinates</span>
+<span class="sd">     prpt=js.formel.xyz2rphitheta(np.dot(R,pxyz.T).T)</span>
+<span class="sd">     fig = plt.figure()</span>
+<span class="sd">     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">     ax.scatter(pxyz[:,0],pxyz[:,1],pxyz[:,2],color=&quot;k&quot;,s=20)</span>
+<span class="sd">     ax.set_xlim([-1,1])</span>
+<span class="sd">     ax.set_ylim([-1,1])</span>
+<span class="sd">     ax.set_zlim([-1,1])</span>
+<span class="sd">     ax.set_aspect(&quot;equal&quot;)</span>
+<span class="sd">     ax.set_xlabel(&#39;x&#39;)</span>
+<span class="sd">     ax.set_ylabel(&#39;y&#39;)</span>
+<span class="sd">     ax.set_zlabel(&#39;z&#39;)</span>
+<span class="sd">     plt.tight_layout()</span>
+<span class="sd">     plt.show(block=False)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[(</span><span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">NN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="o">-</span><span class="n">NN</span><span class="p">:</span><span class="n">NN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">constants</span><span class="o">.</span><span class="n">golden</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="o">-</span><span class="n">NN</span><span class="p">:</span><span class="n">NN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">NN</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="rphitheta2xyz"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.rphitheta2xyz">[docs]</a><span class="k">def</span> <span class="nf">rphitheta2xyz</span><span class="p">(</span><span class="n">RPT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transformation  spherical coordinates [r,phi,theta]  to cartesian coordinates [x,y,z]</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    RPT : array Nx3</span>
+<span class="sd">        | dim Nx3 with [r,phi,theta] coordinates</span>
+<span class="sd">        | r     : float       length</span>
+<span class="sd">        | phi   : float   azimuth     -pi &lt; phi &lt; pi</span>
+<span class="sd">        | theta : float   polar angle  0 &lt; theta  &lt; pi</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Array with same dimension as RPT.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rpt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">RPT</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">rpt</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rpt</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rpt</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rpt</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rpt</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rpt</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xyz</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">ndmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">RPT</span><span class="p">))</span></div>
+
+
+<span class="c1"># noinspection PyIncorrectDocstring</span>
+<div class="viewcode-block" id="psphereAverage"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.psphereAverage">[docs]</a><span class="k">def</span> <span class="nf">psphereAverage</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">relError</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parallel evaluation of spherical average of function.</span>
+<span class="sd">    </span>
+<span class="sd">    A Fibonacci lattice or Monte Carlo integration with pseudo random grid is used.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    funktion : function</span>
+<span class="sd">        Function to evaluate.</span>
+<span class="sd">        Function first argument gets cartesian coordinate [x,y,z] of point on unit sphere.</span>
+<span class="sd">    relError : float, default 300</span>
+<span class="sd">        Determines how points on sphere are selected</span>
+<span class="sd">         - &gt;1  Fibonacci Lattice with relError*2+1 points</span>
+<span class="sd">         - 0&lt;1 Pseudo random points on sphere (see randomPointsOnSphere).</span>
+<span class="sd">               Stops if relative improvement in mean is less than relError (uses steps of 40 new points).</span>
+<span class="sd">               Final error is (stddev of N points) /sqrt(N) as for Monte Carlo methods</span>
+<span class="sd">               even if it is not a correct 1-sigma error in this case.</span>
+<span class="sd">    arg,kwargs : </span>
+<span class="sd">        forwarded to function</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array like with values from function and appended error</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">     - Works also on single core machines.</span>
+<span class="sd">     - For integration over a continuous function as a form factor in scattering the random</span>
+<span class="sd">       points are not statistically independent. Think of neighbouring points on an isosurface</span>
+<span class="sd">       which are correlated and therefore the standard deviation is biased. In this case the</span>
+<span class="sd">       Fibonacci lattice is the better choice as the standard deviation in a random sample</span>
+<span class="sd">       is not a measure of error but more a measure of the differences on the isosurface.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     def f(x,r):</span>
+<span class="sd">        return [js.formel.xyz2rphitheta(x)[1:].sum()*r]</span>
+<span class="sd">     js.parallel.psphereAverage(f,relError=500,r=1)</span>
+<span class="sd">     js.parallel.psphereAverage(f,relError=0.01,r=1)</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">relError</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">relError</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">relError</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;ncpu&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">ncpu</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ncpu</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">ncpu</span><span class="p">)</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">ncpu</span> <span class="o">*</span> <span class="mi">20</span>
+    <span class="k">if</span> <span class="n">relError</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Try again with relError &gt; 0&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">relError</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">rphitheta2xyz</span><span class="p">(</span><span class="n">randomPointsOnSphere</span><span class="p">(</span><span class="n">NN</span><span class="o">=</span><span class="n">steps</span><span class="p">))</span>
+        <span class="n">npoints</span> <span class="o">=</span> <span class="n">steps</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="p">(</span><span class="n">point</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mh">0xFFFF</span><span class="p">))</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+        <span class="n">prevmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">result</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="c1"># prevstd =result.std(axis=0).real</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">rphitheta2xyz</span><span class="p">(</span><span class="n">randomPointsOnSphere</span><span class="p">(</span><span class="n">NN</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">npoints</span><span class="p">))</span>
+            <span class="n">npoints</span> <span class="o">+=</span> <span class="n">steps</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="p">(</span><span class="n">point</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mh">0xFFFF</span><span class="p">))</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+            <span class="c1"># std=results.std(axis=0).real</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prevmean</span> <span class="o">/</span> <span class="n">mean</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">relError</span><span class="p">):</span>
+                <span class="c1"># abs(results[:,0].std()/results[:,0].mean()/np.sqrt(results.shape[0]-1))&lt;relError</span>
+                <span class="c1"># and results.shape[0]&gt;42:</span>
+                <span class="k">break</span>
+            <span class="n">prevmean</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="c1"># prevstd  = std</span>
+    <span class="k">elif</span> <span class="n">relError</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">qfib</span> <span class="o">=</span> <span class="n">fibonacciLatticePointsOnSphere</span><span class="p">(</span><span class="n">relError</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">rphitheta2xyz</span><span class="p">(</span><span class="n">qfib</span><span class="p">)</span>  <span class="c1"># to cartesian</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="p">(</span><span class="n">point</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mh">0xFFFF</span><span class="p">))</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]]</span>
+    <span class="c1"># clean up</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">results</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">results</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">results</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">])]</span></div>
+
+
+<span class="c1"># noinspection PyIncorrectDocstring</span>
+<div class="viewcode-block" id="doForList"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.doForList">[docs]</a><span class="k">def</span> <span class="nf">doForList</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">looplist</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply function with values in looplist in a pool of workers in parallel using multiprocessing.</span>
+<span class="sd">    </span>
+<span class="sd">    Like multiprocessing map_async but distributes automatically all given arguments.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    funktion : function</span>
+<span class="sd">        Function to process with arguments (args, loopover[i]=looplist[j,i], kwargs)</span>
+<span class="sd">        Return value of function should contain parameters or at least the loopover value to allow a check, if desired.</span>
+<span class="sd">    loopover : list of string, default= None</span>
+<span class="sd">        Names of arguments to use for (sync) looping over with values in looplist.</span>
+<span class="sd">        - If not given the first funktion argument is used.</span>
+<span class="sd">        - If loopover is single argument this gets looplist[i,:] .</span>
+<span class="sd">    looplist : list or array N x len(loopover)</span>
+<span class="sd">        List of values to loop over.</span>
+<span class="sd">    ncpu : int, optional</span>
+<span class="sd">        Number of cpus in the pool.</span>
+<span class="sd">         - not given or 0   -&gt; all cpus are used</span>
+<span class="sd">         - int&gt;0      min (ncpu, mp.cpu_count)</span>
+<span class="sd">         - int&lt;0      ncpu not to use</span>
+<span class="sd">    cb : None, function</span>
+<span class="sd">        Callback after each calculation.</span>
+<span class="sd">    debug : int</span>
+<span class="sd">        debug &gt; 0 allows serial output for testing.</span>
+<span class="sd">    output : bool</span>
+<span class="sd">        If False no output is shown.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list : list of function return values as  [result1,result2,.....]</span>
+<span class="sd">           The order of return values is not explicitly synced to looplist.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The return array of function may be prepended with the value looplist[i] as reference.</span>
+<span class="sd">    E.g.::</span>
+
+<span class="sd">     def f(x,a,b,c,d):</span>
+<span class="sd">     result = x+a+b+c+d</span>
+<span class="sd">         return [x, result]</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     import jscatter as js</span>
+<span class="sd">     import numpy as np</span>
+
+<span class="sd">     def f(x,a,b,c,d):</span>
+<span class="sd">        res=x+a+b+c+d</span>
+<span class="sd">        return [x,res]</span>
+
+<span class="sd">     # loop over first argument, here x</span>
+<span class="sd">     res = js.parallel.doForList(f,looplist=np.arange(100),a=1,b=2,c=3,d=11)</span>
+<span class="sd">     # loop over &#39;d&#39; ignoring the given d=11 (which can be omitted here)</span>
+<span class="sd">     res = js.parallel.doForList(f,looplist=np.arange(100),loopover=&#39;d&#39;,x=0,a=1,b=2,c=3,d=11)</span>
+
+<span class="sd">     # using a list of 2 values for x (is first argument)</span>
+<span class="sd">     def f(x,a,b,c,d):</span>
+<span class="sd">        res=x[0]+x[1]+a+b+c+d</span>
+<span class="sd">        return [x[0],res]</span>
+<span class="sd">     loop = np.arange(100).reshape(-1,2)  # has 2 values fin second dimension</span>
+<span class="sd">     res = js.parallel.doForList(f,looplist=loop,a=1,b=2,c=3,d=11)</span>
+
+<span class="sd">     # looping over several variables in sync</span>
+<span class="sd">     loop = np.arange(100).reshape(-1,2)</span>
+<span class="sd">     res = js.parallel.doForList(f,looplist=loop,loopover=[&#39;a&#39;,&#39;b&#39;],x=[100,200],a=1,b=2,c=3,d=11)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">ncpu</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;ncpu&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ncpu</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ncpu</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ncpu</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ncpu</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">])</span>
+        <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span>
+
+    <span class="c1"># check for callback</span>
+    <span class="n">cb</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cb&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># not given defaults to first varname in funktion</span>
+    <span class="n">loopover</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;loopover&#39;</span><span class="p">,</span> <span class="n">funktion</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ncpu</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># in sequence for testing purposes</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start NO pool; this is a test &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">funktion</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">loopover</span><span class="p">:</span> <span class="n">Q</span><span class="p">})))</span>
+                <span class="k">if</span> <span class="n">cb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">cb</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">loopover</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">funktion</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">loopover</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">Q</span><span class="p">})))</span>
+                <span class="k">if</span> <span class="n">cb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">cb</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">funktion</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="n">Q</span><span class="p">)))))</span>
+                <span class="k">if</span> <span class="n">cb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">cb</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># in parallel for production run</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start pool of &#39;</span><span class="p">,</span> <span class="n">ncpu</span><span class="p">)</span>
+
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">ncpu</span><span class="p">)</span>
+        <span class="c1"># we need to create a temporary dict that is given to a job and is not only a view to the updated kwargs</span>
+        <span class="c1"># this is needed as the view changes to each new value in the loop even in the jobs</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">loopover</span><span class="p">:</span> <span class="n">Q</span><span class="p">}),</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span> <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">loopover</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">jobs</span> <span class="o">=</span><span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span> <span class="p">{</span><span class="n">loopover</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">Q</span><span class="p">}),</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span> <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">loopover</span><span class="p">,</span> <span class="n">Q</span><span class="p">))),</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">looplist</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+
+        <span class="c1"># clean up</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;closed pool again&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<span class="c1"># noinspection PyIncorrectDocstring</span>
+<div class="viewcode-block" id="doForQlist"><a class="viewcode-back" href="../../parallel.html#jscatter.formel.doForQlist">[docs]</a><span class="k">def</span> <span class="nf">doForQlist</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="n">qList</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates for qlist the function in a pool of workers using multiprocessing.</span>
+<span class="sd">    </span>
+<span class="sd">    Calcs [function(Qi, *args, **kwargs) for Qi in qlist ] in parallel.</span>
+<span class="sd">    The return value of function will contain the value Qi as reference.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    funktion : function</span>
+<span class="sd">        Function to process with arguments (looplist[i],args,kwargs)</span>
+<span class="sd">    qList : list</span>
+<span class="sd">        List of values for first argument in function.</span>
+<span class="sd">        qList value prepends the arguments args.</span>
+<span class="sd">    ncpu : int, optional</span>
+<span class="sd">        | number of cpus in the pool</span>
+<span class="sd">        | not given or 0   -&gt; all cpus are used</span>
+<span class="sd">        | int&gt;0      min (ncpu, mp.cpu_count)</span>
+<span class="sd">        | int&lt;0      ncpu not to use</span>
+<span class="sd">    cb :function, optional</span>
+<span class="sd">        Callback after each calculation</span>
+<span class="sd">    debug : int</span>
+<span class="sd">        debug &gt; 0 allows serial output for testing</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list : ndim function_return.ndim+1</span>
+<span class="sd">        The list elements will be prepended with the value qlist[i] as reference.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    ::</span>
+
+<span class="sd">     def f(x,a,b,c,d):</span>
+<span class="sd">        return [x+a+b+c+d]</span>
+<span class="sd">     # loop over first argument here x</span>
+<span class="sd">     js.parallel.doForList(f,Qlist=np.arange(100),a=1,b=2,c=3,d=11)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">ncpu</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;ncpu&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ncpu</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ncpu</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ncpu</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ncpu</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">])</span>
+        <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ncpu&#39;</span><span class="p">]</span>
+    <span class="n">cb</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cb&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">jobGetArg</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;jobGetArg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ncpu</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># in sequence for testing purposes</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;debug&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start NO pool  this is a test &#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">qList</span><span class="p">:</span>
+            <span class="c1"># noinspection PyCallingNonCallable</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">funktion</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">Q</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">cb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cb</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># in parallel for production run</span>
+        <span class="c1"># print &#39;start pool of &#39;,ncpu</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">ncpu</span><span class="p">)</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">Q</span><span class="p">,</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">funktion</span><span class="p">,</span> <span class="p">(</span><span class="n">Q</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">))</span> <span class="k">for</span> <span class="n">Q</span> <span class="ow">in</span> <span class="n">qList</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">jobGetArg</span><span class="p">)</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+        <span class="c1"># clean up</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="c1"># print &#39;closed pool again&#39;</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/Jscatter1.gif" alt="Logo"/>
+            </a></p>
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../BeginnersGuide.html">1. Beginners Guide / Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataArray.html">2. dataArray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataList.html">3. dataList</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formel.html">4. formel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sas.html">5. smallanglescattering (sas)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formfactor.html">6. formfactor (ff)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structurefactor.html">7. structurefactor (sf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dynamic.html">8. dynamic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dls.html">9. dls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parallel.html">10. parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GracePlot.html">11. Plotting in XmGrace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mpl.html">12. mpl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">13. Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">14. Extending/Contributing/Fortran</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tips.html">15. Tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Remarks.html">16. Intention and Remarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">17. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">18. Citing Jscatter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">19. Changelog</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Jscatter 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jscatter.parallel</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-19, Ralf Biehl.
+      Last updated on Mar 08, 2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>
