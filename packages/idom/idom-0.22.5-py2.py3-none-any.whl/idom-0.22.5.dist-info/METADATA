@@ -1,0 +1,129 @@
+Metadata-Version: 2.1
+Name: idom
+Version: 0.22.5
+Summary: Control the web with Python
+Home-page: https://github.com/rmorshea/idom
+Author: Ryan Morshead
+Author-email: ryan.morshead@gmail.com
+License: MIT
+Keywords: interactive,widgets,DOM,React
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Multimedia :: Graphics
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: typing-extensions (>=3.7.4)
+Requires-Dist: mypy-extensions (>=0.4.3)
+Requires-Dist: anyio (>=2.0)
+Requires-Dist: jsonpatch (>=1.26)
+Requires-Dist: typer (>=0.3.2)
+Requires-Dist: click-spinner (>=0.1.10)
+Requires-Dist: fastjsonschema (>=2.14.5)
+Requires-Dist: async-generator (>=1.10) ; python_version < "3.7"
+Requires-Dist: async-exit-stack (>=1.0.1) ; python_version < "3.7"
+Provides-Extra: all
+Requires-Dist: sanic (<19.12.0) ; extra == 'all'
+Requires-Dist: sanic-cors (>=0.9.9) ; extra == 'all'
+Requires-Dist: flask ; extra == 'all'
+Requires-Dist: flask-cors ; extra == 'all'
+Requires-Dist: flask-sockets ; extra == 'all'
+Requires-Dist: tornado ; extra == 'all'
+Requires-Dist: selenium ; extra == 'all'
+Requires-Dist: matplotlib ; extra == 'all'
+Requires-Dist: htm ; extra == 'all'
+Requires-Dist: pyalect ; extra == 'all'
+Requires-Dist: tagged ; extra == 'all'
+Provides-Extra: dialect
+Requires-Dist: htm ; extra == 'dialect'
+Requires-Dist: pyalect ; extra == 'dialect'
+Requires-Dist: tagged ; extra == 'dialect'
+Provides-Extra: flask
+Requires-Dist: flask ; extra == 'flask'
+Requires-Dist: flask-cors ; extra == 'flask'
+Requires-Dist: flask-sockets ; extra == 'flask'
+Requires-Dist: tornado ; extra == 'flask'
+Provides-Extra: matplotlib
+Requires-Dist: matplotlib ; extra == 'matplotlib'
+Provides-Extra: sanic
+Requires-Dist: sanic (<19.12.0) ; extra == 'sanic'
+Requires-Dist: sanic-cors (>=0.9.9) ; extra == 'sanic'
+Provides-Extra: stable
+Requires-Dist: sanic (<19.12.0) ; extra == 'stable'
+Requires-Dist: sanic-cors (>=0.9.9) ; extra == 'stable'
+Provides-Extra: testing
+Requires-Dist: selenium ; extra == 'testing'
+
+# IDOM
+
+<a href="https://github.com/idom-team/idom/actions?query=workflow%3ATest">
+  <img alt="Tests" src="https://github.com/idom-team/idom/workflows/Test/badge.svg?event=push" />
+</a>
+<a href="https://codecov.io/gh/rmorshea/idom">
+  <img alt="Code Coverage" src="https://codecov.io/gh/rmorshea/idom/branch/main/graph/badge.svg" />
+</a>
+<a href="https://pypi.python.org/pypi/idom">
+  <img alt="Version Info" src="https://img.shields.io/pypi/v/idom.svg"/>
+</a>
+<a href="https://github.com/rmorshea/idom/blob/main/LICENSE">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-purple.svg">
+</a>
+
+Libraries for creating and controlling interactive web pages with Python 3.7 and above.
+
+**Be sure to [read the Documentation](https://idom-docs.herokuapp.com)**
+
+IDOM is still young. If you have ideas or find a bug, be sure to post an
+[issue](https://github.com/rmorshea/idom/issues)
+or create a
+[pull request](https://github.com/rmorshea/idom/pulls). Thanks in advance!
+
+<h3>
+  <a
+    target="_blank"
+    href="https://mybinder.org/v2/gh/idom-team/idom-jupyter/main?filepath=notebooks%2Fintroduction.ipynb"
+  >
+    Try it Now
+    <img alt="Binder" valign="bottom" height="25px"
+    src="https://mybinder.org/badge_logo.svg"
+    />
+  </a>
+</h3>
+
+Click the badge above to get started! It will take you to a [Jupyter Notebooks](https://jupyter.org/)
+hosted by [Binder](https://mybinder.org/) with some great examples.
+
+### Or Install it Now
+
+```bash
+pip install idom[stable]
+```
+
+# At a Glance
+
+IDOM can be used to create a simple slideshow which changes whenever a user clicks an image.
+
+```python
+import idom
+
+@idom.component
+def Slideshow():
+    index, set_index = idom.hooks.use_state(0)
+    url = f"https://picsum.photos/800/300?image={index}"
+    return idom.html.img({"src": url, "onClick": lambda event: set_index(index + 1)})
+
+idom.run(Slideshow, port=8765)
+```
+
+Running this will serve our slideshow to `"https://localhost:8765/client/index.html"`
+
+<img src='https://picsum.photos/800/300?random'/>
+
+You can even display the same thing in a Jupyter Notebook, just use [`idom_jupyter`](https://github.com/idom-team/idom-jupyter):
+
+
