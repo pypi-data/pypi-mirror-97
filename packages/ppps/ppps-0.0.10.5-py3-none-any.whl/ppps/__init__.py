@@ -1,0 +1,1 @@
+from ppps.test.prototype2 import *
