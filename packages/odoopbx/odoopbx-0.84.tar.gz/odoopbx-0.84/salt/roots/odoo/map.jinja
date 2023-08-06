@@ -1,0 +1,12 @@
+{% import_yaml "odoo/defaults.yaml" as defaults %}
+{% import_yaml "odoo/codenamemap.yaml" as codenamemap %}
+
+{% set odoo = salt['grains.filter_by'](
+    defaults,
+    merge=salt['grains.filter_by'](
+        codenamemap,
+        grain='oscodename',
+        merge=salt['pillar.get']('odoo',{}),
+        ),
+    base='odoo',
+) %}
