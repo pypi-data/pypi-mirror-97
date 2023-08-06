@@ -1,0 +1,56 @@
+Metadata-Version: 2.1
+Name: cdk-ssm-parameter-store
+Version: 0.1.55
+Summary: AWS CDK construct that allows you to get the latest Version of the AWS SSM Parameters
+Home-page: https://github.com/pahud/cdk-ssm-parameter-store.git
+Author: Pahud Hsieh<pahudnet@gmail.com>
+License: Apache-2.0
+Project-URL: Source, https://github.com/pahud/cdk-ssm-parameter-store.git
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: JavaScript
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Typing :: Typed
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: aws-cdk.aws-iam (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-lambda (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.aws-ssm (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.core (<2.0.0,>=1.82.0)
+Requires-Dist: aws-cdk.custom-resources (<2.0.0,>=1.82.0)
+Requires-Dist: constructs (<4.0.0,>=3.2.27)
+Requires-Dist: jsii (<2.0.0,>=1.24.0)
+Requires-Dist: publication (>=0.0.3)
+
+[![NPM version](https://badge.fury.io/js/cdk-ssm-parameter-store.svg)](https://badge.fury.io/js/cdk-ssm-parameter-store)
+[![PyPI version](https://badge.fury.io/py/cdk-ssm-parameter-store.svg)](https://badge.fury.io/py/cdk-ssm-parameter-store)
+![Release](https://github.com/pahud/cdk-ssm-parameter-store/workflows/Release/badge.svg)
+
+# cdk-ssm-parameter-store
+
+AWS CDK construct that allows you to get the latest `Version` of the AWS SSM Parameters.
+
+# Sample
+
+```python
+# Example automatically generated without compilation. See https://github.com/aws/jsii/issues/826
+import cdk_ssm_parameter_store as param
+
+stack = Stack(app, "testing-stack", env=env)
+
+p = param.Provider(stack, "ParameterProvider")
+foo_version = p.get("Foo").get_att_string("Version")
+bar_version = p.get("Bar").get_att_string("Version")
+
+CfnOutput(stack, "FooVersion", value=foo_version)
+CfnOutput(stack, "BarVersion", value=bar_version)
+```
+
+
