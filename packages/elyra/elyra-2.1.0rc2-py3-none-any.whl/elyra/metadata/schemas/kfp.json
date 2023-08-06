@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kubeflow Pipelines runtime configuration",
+  "name": "kfp",
+  "display_name": "Kubeflow Pipelines runtime",
+  "namespace": "runtimes",
+  "uihints": {
+    "title": "Kubeflow Pipelines runtimes",
+    "icon": "elyra:runtimes"
+  },
+  "properties": {
+    "schema_name": {
+      "title": "Schema Name",
+      "description": "The schema associated with this instance",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-_]*[a-z0-9]$",
+      "minLength": 1
+    },
+    "display_name": {
+      "title": "Display Name",
+      "description": "Display name of this Kubeflow Pipelines configuration",
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "description": "Additional data specific to this metadata",
+      "type": "object",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "description": "Description of this Kubeflow Pipelines configuration",
+          "type": "string"
+        },
+        "api_endpoint": {
+          "title": "Kubeflow Pipelines API Endpoint",
+          "description": "The Kubeflow Pipelines API endpoint",
+          "type": "string",
+          "format": "uri",
+          "uihints": {
+            "category": "Kubeflow Pipelines",
+            "placeholder": "https://your-kubeflow-service:port/pipeline"
+          }
+        },
+        "user_namespace": {
+          "title": "Kubeflow Pipelines User Namespace",
+          "description": "The Kubeflow Pipelines user namespace used to create experiments",
+          "type": "string",
+          "pattern": "^[a-z0-9][-a-z0-9]*[a-z0-9]$",
+          "maxLength": 63,
+          "uihints": {
+            "category": "Kubeflow Pipelines"
+          }
+        },
+        "api_username": {
+          "title": "Kubeflow Pipelines API Endpoint Username",
+          "description": "The Kubeflow Pipelines API endpoint username",
+          "type": "string",
+          "uihints": {
+            "category": "Kubeflow Pipelines"
+          }
+        },
+        "api_password": {
+          "title": "Kubeflow Pipelines API Endpoint Password",
+          "description": "Password for the specified username",
+          "type": "string",
+          "uihints": {
+            "secure": true,
+            "category": "Kubeflow Pipelines"
+          }
+        },
+        "engine": {
+          "title": "Kubeflow Pipelines engine",
+          "description": "The Kubeflow Pipelines engine in use ('Argo' or 'Tekton')",
+          "type": "string",
+          "enum": ["Argo", "Tekton"],
+          "default": "Argo",
+          "uihints": {
+            "field_type": "dropdown",
+            "category": "Kubeflow Pipelines"
+          }
+        },
+        "cos_endpoint": {
+          "title": "Cloud Object Storage Endpoint",
+          "description": "The Cloud Object Storage endpoint",
+          "type": "string",
+          "format": "uri",
+          "uihints": {
+            "category": "Cloud Object Storage",
+            "placeholder": "https://your-cos-service:port"
+          }
+        },
+        "cos_username": {
+          "title": "Cloud Object Storage Username",
+          "description": "The Cloud Object Storage username",
+          "type": "string",
+          "uihints": {
+            "category": "Cloud Object Storage"
+          }
+        },
+        "cos_password": {
+          "title": "Cloud Object Storage Password",
+          "description": "The Cloud Object Storage password",
+          "type": "string",
+          "minLength": 8,
+          "uihints": {
+            "secure": true,
+            "category": "Cloud Object Storage"
+          }
+        },
+        "cos_bucket": {
+          "title": "Cloud Object Storage Bucket Name",
+          "description": "The Cloud Object Storage bucket name",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-.]*[a-z0-9]$",
+          "minLength": 3,
+          "maxLength": 222,
+          "uihints": {
+            "category": "Cloud Object Storage"
+          }
+        },
+        "tags": {
+          "title": "Tags",
+          "description": "Tags for categorizing Kubeflow pipelines",
+          "type": "array",
+          "uihints": {
+            "field_type": "tags"
+          }
+        }
+      },
+      "required": [
+        "api_endpoint",
+        "cos_endpoint",
+        "cos_username",
+        "cos_password",
+        "cos_bucket"
+      ]
+    }
+  },
+  "required": ["schema_name", "display_name", "metadata"]
+}
