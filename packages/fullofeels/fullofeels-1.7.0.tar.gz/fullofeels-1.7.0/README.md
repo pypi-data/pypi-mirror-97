@@ -1,0 +1,128 @@
+
+# Full of Eels
+
+
+FullOfEels is an assistant program to generate the skeleton code for
+a handcrafted artisanal Python module to be implemented in native C.
+
+It is not a replacement for SWIG or SIP. If you have an existing C/C++
+library and want to create a Python wrapper with the same API, either
+of those will do just fine. Nor is it a replacement for ctypes.
+
+FullOfEels works in the opposite direction. You start by specifying
+the Python API that you want: module, classes, methods, and functions.
+This program will create the initial .h/.c files for you, generating
+empty C functions with argument parsing code, struct definitions for
+the object and type, module init function ... all the the boring but
+necessary bits. You then fill them out with working C code.
+
+How do you specify the Python API you want? By writing it in Python.
+You create a module that defines _what_ the functions and classes will
+be, with all the arguments and methods, but none of the code that
+defines _how_ it works - methods and functions should all just `pass`.
+FullOfEels keeps docstrings and some globals, but actual statements
+are discarded.
+
+Why might you prefer this? Because you can design a more Pythonic API.
+The great advantage of SWIG/SIP is that the API is already known and
+(ideally) documentation exists. The disadvantage is that you're just
+recreating a C/C++ API in Python, and that programmers will have to
+be able to understand C/C++ to understand the documentation. There are
+times when this is the best solution. Fullofeels is for when it isn't.
+
+Written by Hugh(Hugo) Fisher, Canberra Australia, 2016-now. <br>
+Released under MIT license <br>
+All feedback welcome: hugo.fisher@gmail.com (Yes, hugo not hugh)
+
+
+### Example
+
+The Python "Extending Python with C or C++" web pages
+start by creating a spam module with a single `system()` function.
+With fullOfEels you start this by writing `spam.py` which is just
+
+    def system(command):
+        """Execute a shell command."""
+        pass
+
+Then you run
+
+    python -m fullofeels -print spam.py
+
+which will create
+
+    spam.h
+    spam.c
+    setup.py
+
+Look inside and you'll see all the skeleton code needed for the complete
+Python extension module. Run
+
+    python setup.py build_ext --inplace
+
+and you will have a valid module. From your Python interpreter you can
+import it and invoke the `spam.system("hello")` function, which will just
+print out the function name and arguments (specified by the -print CLI option).
+
+Because fullOfEeels is an assistant, not an automated solution, you still
+need to fill in the function body yourself to make it do anything useful.
+
+
+For the "Defining New Types" web example you would write custom.py:
+
+    class Custom(object):
+        """Custom objects"""
+
+        def __new__(cls):
+            pass
+
+        def __init__(self, first, last, number: int):
+            pass
+
+        def __del__(self):
+            pass
+
+        def name(self) -> str:
+            """Return the name, combining the first and last name"""
+            pass
+
+and again run fullOfEels on it. The generated C code will have the all
+the code necessary to declare and initialize the Custom type structure.
+As before you could build this module, import it, and even create Custom
+objects. But without additional code they won't do anything and won't
+have any attributes or properties.
+
+
+### TODO
+
+Heap allocated types
+
+Look at new Python C API for 3.10+
+
+
+### Tested on
+
+    Python 2.7  Fedora Core 24, MacOS 10.14 XCode 11
+    Python 3.5  Fedora Core 24
+    Python 3.6  Windows 8.1 MSVC 2017
+    Python 3.7  Fedora Core 31, Windows 10 MSVC 2019
+    Python 3.9  Fedora Core 31
+
+
+### Versions
+
+1.7 Mar 2021        Type annotations recognised for parameters
+
+1.6 Feb 2021        Automate testing on Windows, cleanup for PyPI release
+
+1.5 Jan 2019        Replace separate program with -m fullofeels package
+
+1.4 Nov 2017        Generate setup.py for module
+
+1.3 Oct 2017        Properties on class become C fields in object struct
+
+1.2 Feb 2017        Can specify argument types for PyArg_ParseTuple
+
+1.1 Nov 2016        Special slots for collections, numbers, buffer interface
+
+1.0 Apr 2016        Modules, objects, classes, methods
