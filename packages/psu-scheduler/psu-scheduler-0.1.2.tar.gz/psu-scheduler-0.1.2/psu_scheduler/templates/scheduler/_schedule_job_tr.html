@@ -1,0 +1,139 @@
+{% load base_taglib %}
+<tr id="row-{{job.id}}">
+    <td>
+        <a href="{%url 'scheduler:executions'%}?schedule={{job.id}}" target="_blank">
+            {%fa fa-history title="View execution history"%}
+        </a>
+    </td>
+    <td>
+        {{job.endpoint.title}}
+        {%if is_developer%}
+            <br />
+            {{job.endpoint.endpoint.url}}
+        {%endif%}
+    </td>
+    <td>
+        {%if is_developer%}
+            <input type="text" id="performer-{{job.id}}" value="{{job.performer|default:''}}" class="form-control" onchange="update($(this));"/>
+        {%else%}
+            {%fa fa-user title="Performer"%} {{job.performer}}
+            {%if job.performer != current_user.username%}
+                - assign to me -
+            {%endif%}
+        {%endif%}
+    </td>
+    <td>
+        From {{job.start_date|default:job.date_created|date:"d-M-Y"|upper}}<br />
+        <br />
+        Until
+        <input type="text" id="end_date-{{job.id}}" value="{{job.end_cd.timestamp|default:''}}" class="form-control" placeholder="Infinity" onchange="update($(this));"/>
+    </td>
+    <td onchange="update_checkboxes($(this));">
+        <label><input type="checkbox" name="run_days" value="6" {%if '6' in job.run_days%}checked{%endif%} /> Sunday</label><br />
+        <label><input type="checkbox" name="run_days" value="0" {%if '0' in job.run_days%}checked{%endif%} /> Monday</label><br />
+        <label><input type="checkbox" name="run_days" value="1" {%if '1' in job.run_days%}checked{%endif%} /> Tuesday</label><br />
+        <label><input type="checkbox" name="run_days" value="2" {%if '2' in job.run_days%}checked{%endif%} /> Wednesday</label><br />
+        <label><input type="checkbox" name="run_days" value="3" {%if '3' in job.run_days%}checked{%endif%} /> Thursday</label><br />
+        <label><input type="checkbox" name="run_days" value="4" {%if '4' in job.run_days%}checked{%endif%} /> Friday</label><br />
+        <label><input type="checkbox" name="run_days" value="5" {%if '5' in job.run_days%}checked{%endif%} /> Saturday</label><br />
+    </td>
+    <td>
+        {%if job.run_frequency%}
+            {{job.run_time_range}}
+        {%elif job.run_times_csv%}
+            {%for tt in job.run_times_display%}
+                {{tt}},&nbsp;
+            {%endfor%}
+        {%endif%}
+    </td>
+    <td>
+        {%if job.run_frequency%}
+            Every {{job.run_frequency}} Minutes
+        {%else%}
+            At defined times
+        {%endif%}
+    </td>
+    <td>
+
+        {%if job.is_active%}
+            <a href="{%url 'scheduler:toggle' job.id%}">{%fa fa-toggle-on fa-fw title="Job is active"%}</a>
+        {%else%}
+            <a href="{%url 'scheduler:toggle' job.id%}">{%fa fa-toggle-off fa-fw title="Job is inactive"%}</a>
+        {%endif%}
+
+        &nbsp;
+        {%if is_developer%}
+            <a href="{%url 'scheduler:delete_job' job.id%}">{%fa fa-trash-o fa-fw text-danger title="Job is active"%}</a>
+        {%endif%}
+    </td>
+</tr>
+
+<script>
+
+    function update_checkboxes(element){
+        let row = element.closest('tr');
+        let row_id = row.attr('id');
+        let id_split = row_id.split('-');
+        prop = id_split[0];
+        id = id_split[1];
+        let check_values = element.find('input[name=run_days]:checked').map(function()
+                {
+                    return $(this).val();
+                }).get();
+
+        $.ajax({
+            type:   "POST",
+            url:    "{%url 'scheduler:update_job'%}",
+            data:   {
+                id: id, value: check_values, prop: "run_days",
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            beforeSend:function(){
+                clearAjaxIndicators(row);
+            },
+            success:function(data){
+                row.before(data);
+                row.remove();
+                element.addClass('ajax-success');
+            },
+            error:function(){
+                element.addClass('ajax-error');
+                element.after(getAjaxSaveFailedIcon());
+            },
+            complete:function(){}
+        });
+    }
+
+    function update(element){
+        let row = element.closest('tr');
+        let input_id = element.attr('id');
+        let id_split = input_id.split('-');
+        prop = id_split[0];
+        id = id_split[1];
+        value = element.val();
+        $.ajax({
+            type:   "POST",
+            url:    "{%url 'scheduler:update_job'%}",
+            data:   {
+                id: id, value: value, prop: prop,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            beforeSend:function(){
+                clearAjaxIndicators(row);
+                element.addClass('ajax-pending');
+            },
+            success:function(data){
+                row.before(data);
+                row.remove();
+                let new_input = $('#' + input_id);
+                new_input.addClass('ajax-success');
+                new_input.after(getAjaxSavedIcon());
+            },
+            error:function(){
+                element.addClass('ajax-error');
+                element.after(getAjaxSaveFailedIcon());
+            },
+            complete:function(){}
+        });
+    }
+</script>

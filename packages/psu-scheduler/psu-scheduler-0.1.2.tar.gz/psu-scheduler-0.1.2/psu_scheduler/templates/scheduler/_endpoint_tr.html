@@ -1,0 +1,70 @@
+{% load base_taglib %}
+<tr id="row-{{endpoint.id}}">
+    <td>
+        <input type="text" id="title-{{endpoint.id}}" value="{{endpoint.title}}" class="form-control" onchange="update($(this));"/>
+    </td>
+    <td>
+        <input type="text" id="endpoint-{{endpoint.id}}" value="{{endpoint.endpoint}}" class="form-control" onchange="update($(this));"/>
+    </td>
+    <td>
+        {%fa fa-trash-o text-danger title="Delete Endpoint" onclick="delete_endpoint($(this));"%}
+    </td>
+</tr>
+<script type="text/javascript">
+
+    function delete_endpoint(trash_icon){
+        let row = trash_icon.closest('tr');
+        let endpoint_id = row.attr('id').replace('row-', '');
+
+        $.ajax({
+                type:   "POST",
+                url:    "{%url 'scheduler:delete'%}/" + endpoint_id,
+                data:   {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                beforeSend:function(){
+                    trash_icon.after(getAjaxLoadImage());
+                    trash_icon.addClass('hidden');
+                },
+                success:function(data){
+                    row.remove();
+                },
+                error:function(data){
+                    clearAjaxLoadImage(row);
+                    trash_icon.after(getAjaxStatusFailedIcon('Could not delete this window'));
+                },
+                complete:function(){}
+            });
+    }
+
+    function update(element){
+        let row = element.closest('tr');
+        let input_id = element.attr('id');
+        let split = input_id.split('-');
+        prop = split[0];
+        id = split[1];
+        value = element.val();
+        $.ajax({
+            type:   "POST",
+            url:    "{%url 'scheduler:update_endpoint'%}",
+            data:   {
+                id: id, value: value, prop: prop,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            beforeSend:function(){
+                clearAjaxIndicators(row);
+                element.addClass('ajax-pending');
+            },
+            success:function(data){
+                row.before(data);
+                row.remove();
+                let new_input = $('#' + input_id);
+                new_input.addClass('ajax-success');
+                new_input.after(getAjaxSavedIcon());
+            },
+            error:function(){
+                element.addClass('ajax-error');
+                element.after(getAjaxSaveFailedIcon());
+            },
+            complete:function(){}
+        });
+    }
+</script>
