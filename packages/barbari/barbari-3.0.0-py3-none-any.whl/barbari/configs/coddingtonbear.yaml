@@ -1,0 +1,47 @@
+description: |
+  The configuration used by @coddingtonbear
+  for his day-to-day repeatable milling setup.
+  Unlike the standard 'rivets' setup, this configuration
+  requires that footprints be explicitly modified to
+  indicate when voltera rivets should be used.
+drill:
+  voltera:
+    sizes:
+    - 1.5
+    specs:
+    - type: cnc_drill
+      params:
+        tool_size: 1.0
+        drill_z: -2.5
+        travel_z: 2
+        feed_rate: 50
+        spindle_speed: 12000
+    - type: cnc_drill
+      params:
+        tool_size: 1.5
+        drill_z: -2.5
+        travel_z: 2
+        feed_rate: 50
+        spindle_speed: 12000
+slot:
+  small:
+    min_size: 0.6
+    max_size: 1.0
+    specs:
+    - type: mill_slots
+      params:
+        tool_size: 0.6
+        cut_z: -2.5
+        travel_z: 2
+        feed_rate: 25
+        spindle_speed: 12000
+        multi_depth: true
+        depth_per_pass: 0.2
+include:
+  - ./default_isolation_routing.yaml
+  - ./default_alignment_holes.yaml
+  - ./copper_wire_vias.yaml
+  - ./drilled_04_10.yaml
+  - ./milled_10.yaml
+  - ./slots_10.yaml
+  - ./default_edge_cuts.yaml
