@@ -1,0 +1,66 @@
+Metadata-Version: 2.1
+Name: eansearch
+Version: 1.3.0
+Summary: A Python class for EAN and ISBN name lookup and validation using the API on ean-search.org
+Home-page: https://github.com/eansearch/python-ean-search
+Author: Jan Willamowius
+Author-email: info@relaxedcommunications.com
+License: UNKNOWN
+Description: # EANSearch
+        
+        A Python class for EAN and ISBN name lookup and validation using the API on https://www.ean-search.org
+        
+        Compatible with Python 2.x **and** 3.x
+        
+        ```python
+        from eansearch import EANSearch
+        
+        # get a token from https://www.ean-search.org/ean-database-api.html
+        apiToken = "secret"
+        ean = "5099750442227" # Thriller
+        
+        eansearch = EANSearch(apiToken)
+        
+        name = eansearch.barcodeLookup(ean)
+        print(ean, " is ", name)
+        
+        # more detailed result, preferrably in English (1)
+        product = eansearch.barcodeSearch(ean, 1)
+        print(ean, " is ", product["name"].encode("utf-8"), " from category ", product["categoryName"], " issued in ", product["issuingCountry"])
+        
+        ok = eansearch.verifyChecksum(ean)
+        print(ean, " is ", "OK" if ok else "Not OK")
+        
+        eanList = eansearch.productSearch('iPod');
+        for product in eanList:
+        	print(product["ean"], " is ", product["name"].encode("utf-8"))
+        
+        eanList = eansearch.categorySearch(45, 'thriller');
+        for product in eanList:
+        	print(product["ean"], " is ", product["name"].encode("utf-8"))
+        
+        eanList = eansearch.barcodePrefixSearch('4007249146');
+        for product in eanList:
+        	print(product["ean"], " is ", product["name"].encode("utf-8"))
+        
+        
+Keywords: barcode barcodes ean ean13 ean-13 upc gtin isbn13 isbn-13 search lookup find valid validation
+Platform: UNKNOWN
+Classifier: License :: OSI Approved
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Other Audience
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python
+Classifier: Topic :: Office/Business :: Financial :: Point-Of-Sale
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=2.0
+Description-Content-Type: text/markdown
