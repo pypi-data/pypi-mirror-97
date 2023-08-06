@@ -1,0 +1,106 @@
+Metadata-Version: 2.1
+Name: validata-ui
+Version: 0.5.0a1
+Summary: Validata Web UI
+Home-page: https://git.opendatafrance.net/validata/validata-ui
+Author: Validata team
+Author-email: admin-validata@jailbreak.paris
+License: AGPLv3
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
+Requires-Dist: commonmark
+Requires-Dist: ezodf
+Requires-Dist: flask
+Requires-Dist: frictionless (>=4.*)
+Requires-Dist: lxml
+Requires-Dist: pydantic
+Requires-Dist: python-dotenv
+Requires-Dist: pyyaml
+Requires-Dist: requests
+Requires-Dist: requests-cache
+Requires-Dist: toml
+Requires-Dist: opendataschema
+Requires-Dist: validata-core (>=0.7.0a1)
+Provides-Extra: sentry
+Requires-Dist: sentry-sdk[flask] ; extra == 'sentry'
+
+# Validata UI
+
+[![PyPI](https://img.shields.io/pypi/v/validata-ui.svg)](https://pypi.python.org/pypi/validata-ui)
+
+Validata user interface
+
+## Usage
+
+You can use the online instance of Validata:
+
+- user interface: https://go.validata.fr/
+- API: https://go.validata.fr/api/v1/
+- API docs: https://go.validata.fr/api/v1/apidocs
+
+Several software services compose the Validata stack. The recommended way to run it on your computer is to use Docker. Otherwise you can install each component of this stack manually, for example if you want to contribute by developing a new feature or fixing a bug.
+
+## Run with Docker
+
+Read instructions at https://git.opendatafrance.net/validata/validata-docker
+
+## Develop
+
+### Install
+
+We recommend using `venv` standard package:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install the project dependencies:
+
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
+
+PDF report generation uses:
+
+- either [Headless Chromium](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md) (default)
+
+```bash
+apt install -y chromium
+```
+
+- or [browserless.io](https://www.browserless.io/) pdf service
+  (see [.env.example](.env.example) to configure this option)
+
+### Configure
+
+```bash
+cp .env.example .env
+```
+
+Customize the configuration variables in `.env` file.
+
+Do not commit `.env`.
+
+### Serve
+
+Start the web server...
+
+```bash
+./serve.sh
+```
+
+... then open http://localhost:5601/
+
+## Test
+
+UI tests can be launched using [Cypress tool](https://www.cypress.io/)
+
+
