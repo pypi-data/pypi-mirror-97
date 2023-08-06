@@ -1,0 +1,120 @@
+---!
+    import codecs
+    from pygments import highlight
+    from pygments.lexers import get_lexer_by_name
+    from pygments.formatters import HtmlFormatter
+    from pkg_resources import resource_filename
+
+
+-def inline_reveal_file(path)
+    ---
+        path = 'vendor/revealjs/{path}'.format(path=path)
+        filepath = resource_filename('presentations', path)
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = f.read()
+    == data
+
+-def code_block(language, code_id, linenos=False)
+    ---
+        lexer = get_lexer_by_name(language, stripall=True)
+        formatter = HtmlFormatter(linenos=linenos, cssclass="source")
+        with codecs.open('code/{}'.format(code_id), 'rb', 'utf-8') as f:
+            code = f.read()
+        result = highlight(code, lexer, formatter)
+    == result
+
+---
+    CONFIG = {}
+
+
+{{{ presentation_slides }}}
+
+doctype html
+html lang="en"
+
+	head
+		meta charset="utf-8"
+
+		title = CONFIG['presentation'].get('title', '')
+
+		meta name="description" content="A framework for easily creating beautiful presentations using HTML"
+		meta name="author" content="Hakim El Hattab"
+
+		meta name="apple-mobile-web-app-capable" content="yes"
+		meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"
+
+		meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+
+        style = inline_reveal_file("css/reveal.min.css")
+        style#theme = inline_reveal_file("css/theme/{theme}.css".format(theme=CONFIG['presentation'].get('theme', 'default')))
+
+		/ If the query includes 'print-pdf', include the PDF print sheet
+		script
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+
+		<!--[if lt IE 9]>
+		script = inline_reveal_file("lib/js/html5shiv.js")
+		<![endif]-->
+		style
+            ${HtmlFormatter(style='manni').get_style_defs('.source')|n}
+            .source {
+                box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+                }
+            .source PRE {
+                padding:1em;
+                box-shadow:0;
+                }
+            .reveal PRE {
+                box-shadow:none;
+                }
+            .reveal PRE CODE {
+                font-size: 0.80em;
+                line-height: 1.2em;
+                }
+            .pull-right {
+                text-align: right;
+                }
+            .pull-left {
+                text-align: left;
+                }
+
+	body
+        .reveal: .slides = presentation()
+
+		script = inline_reveal_file("lib/js/head.min.js")
+		script = inline_reveal_file("js/reveal.min.js")
+
+		script
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: ${CONFIG['revealjs'].get('controls', 'true')},
+				progress: ${CONFIG['revealjs'].get('progress', 'true')},
+				history: ${CONFIG['revealjs'].get('history', 'true')},
+				center: ${CONFIG['revealjs'].get('center', 'true')},
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+				]
+			});
+
+
+		script = inline_reveal_file("plugin/highlight/highlight.js")
+		script = inline_reveal_file("plugin/zoom-js/zoom.js")
+		script = inline_reveal_file("plugin/notes/notes.js")
