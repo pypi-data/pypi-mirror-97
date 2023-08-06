@@ -1,0 +1,92 @@
+#!python
+"""Converts file format of input ontology and write it to output file(s).
+"""
+import argparse
+
+from rdflib.util import Graph, guess_format
+
+from emmo.utils import convert_imported, squash_imported
+from emmo.factpluspluswrapper.factppgraph import FaCTPPGraph
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        'input',
+        help='IRI/file to OWL source.')
+    parser.add_argument(
+        'output',
+        help='Output file name.')
+    parser.add_argument(
+        '--input-format', '-f',
+        help='Input format (default is to infer from input).  Available '
+        'formats: "xml" (rdf/xml), "n3", "nt", "trix", "rdfa"')
+    parser.add_argument(
+        '--output-format', '-F',
+        help='Output format (default is to infer from output.  Available '
+        'formats: "xml" (rdf/xml), "n3", "turtle", "nt", "pretty-xml", "trix"')
+    parser.add_argument(
+        '--no-catalog', '-n', action='store_false', dest='url_from_catalog',
+         default=None,
+        help='Whether to not read catalog file even if it exists.')
+    parser.add_argument(
+        '--inferred', '-i', action='store_true',
+        help='Add additional relations inferred by the FaCT++ reasoner to '
+        'the converted ontology.  Implies --squash.')
+    parser.add_argument(
+        '--base-iri', '-b',
+        help='Base iri of inferred ontology.  The default is the base iri of '
+        'the input ontology with "-inferred" appended to it.  Used together '
+        'with --inferred.')
+    parser.add_argument(
+        '--recursive', '-r', action='store_true',
+        help='Whether to also convert imported ontologies recursively. '
+        'The output is written to a directory structure matching the input. '
+        'This requires Protege catalog files to be present.')
+    parser.add_argument(
+        '--squash', '-s', action='store_true',
+        help='Whether to also squash imported ontologies into a single output '
+        'file.  Cannot be combined with --recursive.')
+
+    args = parser.parse_args()
+
+    # Inferred default input and output file formats
+    if args.input_format:
+        input_format = args.input_format
+    else:
+        input_format = guess_format(args.input)
+
+    if args.output_format:
+        output_format = args.output_format
+    else:
+        output_format = guess_format(args.output)
+    if not output_format:
+        output_format = 'xml'
+
+    # Perform conversion
+    if args.recursive:
+        convert_imported(args.input, args.output,
+                         input_format=input_format,
+                         output_format=output_format,
+                         url_from_catalog=args.url_from_catalog)
+    elif args.inferred:
+        g = squash_imported(args.input, None,
+                            input_format=input_format)
+        fg = FaCTPPGraph(g)
+        if args.base_iri:
+            fg.base_iri = args.base_iri
+        g2 = fg.inferred_graph()
+        g2.serialize(destination=args.output, format=output_format)
+    elif args.squash:
+        squash_imported(args.input, args.output,
+                        input_format=input_format,
+                        output_format=output_format,
+                        url_from_catalog=args.url_from_catalog)
+    else:
+        g = Graph()
+        g.parse(args.input, format=input_format)
+        g.serialize(destination=args.output, format=output_format)
+
+
+if __name__ == '__main__':
+    main()
