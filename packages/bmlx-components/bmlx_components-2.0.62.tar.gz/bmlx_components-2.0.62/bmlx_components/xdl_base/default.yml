@@ -1,0 +1,46 @@
+# 训练超时时间
+timeout: 3600
+# 两阶段训练
+phases: 2
+# 多长时间打印一次日志
+log_interval: 50
+# 收集上报指标周期 
+metrics_interval: 10
+min_finish_worker_rate: 95
+slave_join_check_interval_s: 30
+
+reader:
+  epoch: 1
+  batch_size: 1024
+  enable_state: true
+  global_schedule: true
+  label_count:
+  threads:
+    packer: 2
+    reader: 4
+  unique_ids: true
+  parser: txt
+  ztype: gz
+  shuffle_file: false
+  shuffle_sample: true
+  keep_skey: true
+  shuffle_queue_min_batch: 5
+  shuffle_queue_max_batch: 10
+  padding: true
+  reverse_file: false
+  multi_shuffle_file: false
+  script: 
+
+hooks:
+  # 这些参数之后要设置成一些比较靠谱的优化参数，现在随便填了一些
+  timeline:
+    interval_steps: 60000
+    total_count:
+    worker_list:
+  checkpoint:
+    interval_hours: 6
+    sync_before_save: false
+  hash_feature_import:
+    var_list: 
+    exclude_vars: 
+    import_threshold:
