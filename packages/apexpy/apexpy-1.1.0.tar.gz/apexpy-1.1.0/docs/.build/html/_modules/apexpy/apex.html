@@ -1,0 +1,1252 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>apexpy.apex &mdash; Apex Python library 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Apex Python library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../maintenance.html">Package Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Apex Python library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>apexpy.apex</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for apexpy.apex</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">helpers</span>
+
+<span class="c1"># Below try..catch required for autodoc to work on readthedocs</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">fortranapex</span> <span class="k">as</span> <span class="n">fa</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;fortranapex module could not be imported, so &quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;apexpy probably won&#39;t work.  Make sure you have &quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;a gfortran compiler. Wheels installation &quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;assumes your compiler lives in /opt/local/bin&quot;</span><span class="p">]))</span>
+    <span class="k">raise</span> <span class="n">err</span>
+
+<span class="c1"># make sure invalid warnings are always shown</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;always&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;.*set to NaN where*&#39;</span><span class="p">,</span>
+                        <span class="n">module</span><span class="o">=</span><span class="s1">&#39;apexpy.apex&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ApexHeightError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Specialized error type definition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex">[docs]</a><span class="k">class</span> <span class="nc">Apex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs coordinate conversions, field-line mapping and base vector</span>
+<span class="sd">    calculations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date : float, :class:`dt.date`, or :class:`dt.datetime`, optional</span>
+<span class="sd">        Determines which IGRF coefficients are used in conversions. Uses</span>
+<span class="sd">        current date as default.  If float, use decimal year.</span>
+<span class="sd">    refh : float, optional</span>
+<span class="sd">        Reference height in km for apex coordinates (the field lines are mapped</span>
+<span class="sd">        to this height)</span>
+<span class="sd">    datafile : str, optional</span>
+<span class="sd">        Path to custom coefficient file</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    year : float</span>
+<span class="sd">        Decimal year used for the IGRF model</span>
+<span class="sd">    refh : float</span>
+<span class="sd">        Reference height in km for apex coordinates</span>
+<span class="sd">    datafile : str</span>
+<span class="sd">        Path to coefficient file</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The calculations use IGRF-13 with coefficients from 1900 to 2025 [1]_.</span>
+
+<span class="sd">    The geodetic reference ellipsoid is WGS84.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Thébault, E. et al. (2015), International Geomagnetic Reference</span>
+<span class="sd">           Field: the 12th generation, Earth, Planets and Space, 67(1), 79,</span>
+<span class="sd">           :doi:`10.1186/s40623-015-0228-9`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">refh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">datafile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fortranlib</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">datafile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;apexsh.dat&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fortranlib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fortranlib</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="vm">__file__</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">=</span> <span class="mf">6371.009</span>  <span class="c1"># mean Earth radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_refh</span><span class="p">(</span><span class="n">refh</span><span class="p">)</span>  <span class="c1"># reference height</span>
+
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">toYearFraction</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Convert date/datetime object to decimal year</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">toYearFraction</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c1"># Failed while finding datetime attribute, so</span>
+                <span class="c1"># date is probably an int or float; use directly</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">date</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Data file does not exist: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datafile</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fortranlib</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Fortran library does not exist: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">fortranlib</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">datafile</span> <span class="o">=</span> <span class="n">datafile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fortranlib</span> <span class="o">=</span> <span class="n">fortranlib</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="c1"># vectorize fortran functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geo2qd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">fa</span><span class="o">.</span><span class="n">apxg2q</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="p">(</span><span class="n">glon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span> <span class="o">-</span> <span class="mi">180</span><span class="p">,</span>
+                                                 <span class="n">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geo2apex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">fa</span><span class="o">.</span><span class="n">apxg2all</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="p">(</span><span class="n">glon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>
+                                                   <span class="o">-</span> <span class="mi">180</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">,</span>
+                                                   <span class="mi">0</span><span class="p">)[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geo2apexall</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">fa</span><span class="o">.</span><span class="n">apxg2all</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="p">(</span><span class="n">glon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>
+                                                   <span class="o">-</span> <span class="mi">180</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">,</span>
+                                                   <span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qd2geo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="n">fa</span><span class="o">.</span><span class="n">apxq2g</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="p">(</span><span class="n">qlon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span>
+                                                            <span class="o">%</span> <span class="mi">360</span> <span class="o">-</span> <span class="mi">180</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span>
+                                                            <span class="n">precision</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basevec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">fa</span><span class="o">.</span><span class="n">apxg2q</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="p">(</span><span class="n">glon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span> <span class="o">-</span> <span class="mi">180</span><span class="p">,</span>
+                                                 <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># vectorize other nonvectorized functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apex2qd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_apex2qd_nonvectorized</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qd2apex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_qd2apex_nonvectorized</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_babs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frompyfunc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_babs_nonvectorized</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Apex.convert"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="mi">50</span> <span class="o">*</span> <span class="mi">6371</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts between geodetic, modified apex, quasi-dipole and MLT.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat : array_like</span>
+<span class="sd">            Latitude</span>
+<span class="sd">        lon : array_like</span>
+<span class="sd">            Longitude/MLT</span>
+<span class="sd">        source : {&#39;geo&#39;, &#39;apex&#39;, &#39;qd&#39;, &#39;mlt&#39;}</span>
+<span class="sd">            Input coordinate system</span>
+<span class="sd">        dest : {&#39;geo&#39;, &#39;apex&#39;, &#39;qd&#39;, &#39;mlt&#39;}</span>
+<span class="sd">            Output coordinate system</span>
+<span class="sd">        height : array_like, optional</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        datetime : :class:`datetime.datetime`</span>
+<span class="sd">            Date and time for MLT conversions (required for MLT conversions)</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees) when converting to geo. A negative</span>
+<span class="sd">            value of this argument produces a low-precision calculation of</span>
+<span class="sd">            geodetic lat/lon based only on their spherical harmonic</span>
+<span class="sd">            representation.</span>
+<span class="sd">            A positive value causes the underlying Fortran routine to iterate</span>
+<span class="sd">            until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces</span>
+<span class="sd">            the input QD lat/lon to within the specified precision (all</span>
+<span class="sd">            coordinates being converted to geo are converted to QD first and</span>
+<span class="sd">            passed through APXG2Q).</span>
+<span class="sd">        ssheight : float, optional</span>
+<span class="sd">            Altitude in km to use for converting the subsolar point from</span>
+<span class="sd">            geographic to magnetic coordinates. A high altitude is used</span>
+<span class="sd">            to ensure the subsolar point is mapped to high latitudes, which</span>
+<span class="sd">            prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        lat : ndarray or float</span>
+<span class="sd">            Converted latitude (if converting to MLT, output latitude is apex)</span>
+<span class="sd">        lat : ndarray or float</span>
+<span class="sd">            Converted longitude/MLT</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">datetime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;mlt&#39;</span> <span class="ow">in</span> <span class="p">[</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;datetime must be given for MLT calculations&#39;</span><span class="p">)</span>
+
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="n">dest</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span>
+        <span class="c1"># from geo</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2apex</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2qd</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2apex</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlon2mlt</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+        <span class="c1"># from apex</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2geo</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2qd</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlon2mlt</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+        <span class="c1"># from qd</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qd2geo</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qd2apex</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span><span class="p">:</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qd2apex</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlon2mlt</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+        <span class="c1"># from mlt (input latitude assumed apex)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;geo&#39;</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlt2mlon</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2geo</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;apex&#39;</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlt2mlon</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;mlt&#39;</span> <span class="ow">and</span> <span class="n">dest</span> <span class="o">==</span> <span class="s1">&#39;qd&#39;</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlt2mlon</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="n">ssheight</span><span class="p">)</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2qd</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="c1"># no other transformations are implemented</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">estr</span> <span class="o">=</span> <span class="s1">&#39;Unknown coordinate transformation: &#39;</span>
+            <span class="n">estr</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> -&gt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">estr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span></div>
+
+<div class="viewcode-block" id="Apex.geo2apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.geo2apex">[docs]</a>    <span class="k">def</span> <span class="nf">geo2apex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts geodetic to modified apex coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glat : array_like</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : array_like</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        alat : ndarray or float</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : ndarray or float</span>
+<span class="sd">            Modified apex longitude</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">glat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;glat&#39;</span><span class="p">)</span>
+
+        <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo2apex</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">alat</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9999</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Apex latitude set to NaN where undefined &#39;</span>
+                          <span class="s1">&#39;(apex height may be &lt; reference height)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">alat</span><span class="p">):</span>
+                <span class="n">alat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">alat</span><span class="p">[</span><span class="n">alat</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9999</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># if array is returned, dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alon</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.apex2geo"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.apex2geo">[docs]</a>    <span class="k">def</span> <span class="nf">apex2geo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts modified apex to geodetic coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        alat : array_like</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : array_like</span>
+<span class="sd">            Modified apex longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees). A negative value of this argument</span>
+<span class="sd">            produces a low-precision calculation of geodetic lat/lon based only</span>
+<span class="sd">            on their spherical harmonic representation. A positive value causes</span>
+<span class="sd">            the underlying Fortran routine to iterate until feeding the output</span>
+<span class="sd">            geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to</span>
+<span class="sd">            within the specified precision.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        glat : ndarray or float</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : ndarray or float</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        error : ndarray or float</span>
+<span class="sd">            The angular difference (degrees) between the input QD coordinates</span>
+<span class="sd">            and the qlat/qlon produced by feeding the output glat and glon</span>
+<span class="sd">            into geo2qd (APXG2Q)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;alat&#39;</span><span class="p">)</span>
+
+        <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2qd</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qd2geo</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">error</span></div>
+
+<div class="viewcode-block" id="Apex.geo2qd"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.geo2qd">[docs]</a>    <span class="k">def</span> <span class="nf">geo2qd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts geodetic to quasi-dipole coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glat : array_like</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : array_like</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        qlat : ndarray or float</span>
+<span class="sd">            Quasi-dipole latitude</span>
+<span class="sd">        qlon : ndarray or float</span>
+<span class="sd">            Quasi-dipole longitude</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">glat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;glat&#39;</span><span class="p">)</span>
+
+        <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo2qd</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># if array is returned, dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">qlat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">qlon</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.qd2geo"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.qd2geo">[docs]</a>    <span class="k">def</span> <span class="nf">qd2geo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts quasi-dipole to geodetic coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qlat : array_like</span>
+<span class="sd">            Quasi-dipole latitude</span>
+<span class="sd">        qlon : array_like</span>
+<span class="sd">            Quasi-dipole longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees). A negative value of this argument</span>
+<span class="sd">            produces a low-precision calculation of geodetic lat/lon based only</span>
+<span class="sd">            on their spherical harmonic representation. A positive value causes</span>
+<span class="sd">            the underlying Fortran routine to iterate until feeding the output</span>
+<span class="sd">            geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to</span>
+<span class="sd">            within the specified precision.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        glat : ndarray or float</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : ndarray or float</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        error : ndarray or float</span>
+<span class="sd">            The angular difference (degrees) between the input QD coordinates</span>
+<span class="sd">            and the qlat/qlon produced by feeding the output glat and glon</span>
+<span class="sd">            into geo2qd (APXG2Q)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">qlat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;qlat&#39;</span><span class="p">)</span>
+
+        <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qd2geo</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
+
+        <span class="c1"># if array is returned, dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">glat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">glon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_apex2qd_nonvectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert from apex to quasi-dipole (not-vectorised)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        alat : (float)</span>
+<span class="sd">            Apex latitude in degrees</span>
+<span class="sd">        alon : (float)</span>
+<span class="sd">            Apex longitude in degrees</span>
+<span class="sd">        height : (float)</span>
+<span class="sd">            Height in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------</span>
+<span class="sd">        qlat : (float)</span>
+<span class="sd">            Quasi-dipole latitude in degrees</span>
+<span class="sd">        qlon : (float)</span>
+<span class="sd">            Quasi-diplole longitude in degrees</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;alat&#39;</span><span class="p">)</span>
+
+        <span class="c1"># convert modified apex to quasi-dipole:</span>
+        <span class="n">qlon</span> <span class="o">=</span> <span class="n">alon</span>
+
+        <span class="c1"># apex height</span>
+        <span class="n">hA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_apex</span><span class="p">(</span><span class="n">alat</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hA</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">hA</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+                <span class="c1"># allow for values that are close</span>
+                <span class="n">hA</span> <span class="o">=</span> <span class="n">height</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">estr</span> <span class="o">=</span> <span class="s1">&#39;height </span><span class="si">{:.3g}</span><span class="s1"> is &gt; apex height&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">height</span><span class="p">))</span>\
+                       <span class="o">+</span> <span class="s1">&#39; </span><span class="si">{:.3g}</span><span class="s1"> for alat </span><span class="si">{:.3g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hA</span><span class="p">,</span> <span class="n">alat</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ApexHeightError</span><span class="p">(</span><span class="n">estr</span><span class="p">)</span>
+
+        <span class="n">salat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">alat</span><span class="p">)</span> <span class="k">if</span> <span class="n">alat</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">qlat</span> <span class="o">=</span> <span class="n">salat</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">height</span><span class="p">)</span> <span class="o">/</span>
+                                                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">hA</span><span class="p">))))</span>
+
+        <span class="k">return</span> <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span>
+
+<div class="viewcode-block" id="Apex.apex2qd"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.apex2qd">[docs]</a>    <span class="k">def</span> <span class="nf">apex2qd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts modified apex to quasi-dipole coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        alat : array_like</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : array_like</span>
+<span class="sd">            Modified apex longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        qlat : ndarray or float</span>
+<span class="sd">            Quasi-dipole latitude</span>
+<span class="sd">        qlon : ndarray or float</span>
+<span class="sd">            Quasi-dipole longitude</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ApexHeightError</span>
+<span class="sd">            if `height` &gt; apex height</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apex2qd</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># if array is returned, the dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">qlat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">qlon</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_qd2apex_nonvectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+
+        <span class="n">qlat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;qlat&#39;</span><span class="p">)</span>
+
+        <span class="n">alon</span> <span class="o">=</span> <span class="n">qlon</span>
+        <span class="n">hA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_apex</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>  <span class="c1"># apex height</span>
+
+        <span class="k">if</span> <span class="n">hA</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">hA</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+                <span class="c1"># allow for values that are close</span>
+                <span class="n">hA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">estr</span> <span class="o">=</span> <span class="s1">&#39;apex height (</span><span class="si">{:.3g}</span><span class="s1">) is &lt; reference height &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hA</span><span class="p">)</span>
+                <span class="n">estr</span> <span class="o">+=</span> <span class="s1">&#39;(</span><span class="si">{:.3g}</span><span class="s1">) for qlat </span><span class="si">{:.3g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">,</span> <span class="n">qlat</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ApexHeightError</span><span class="p">(</span><span class="n">estr</span><span class="p">)</span>
+
+        <span class="n">sqlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">qlat</span><span class="p">)</span> <span class="k">if</span> <span class="n">qlat</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">alat</span> <span class="o">=</span> <span class="n">sqlat</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">)</span> <span class="o">/</span>
+                                                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">hA</span><span class="p">))))</span>
+
+        <span class="k">return</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span>
+
+<div class="viewcode-block" id="Apex.qd2apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.qd2apex">[docs]</a>    <span class="k">def</span> <span class="nf">qd2apex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts quasi-dipole to modified apex coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qlat : array_like</span>
+<span class="sd">            Quasi-dipole latitude</span>
+<span class="sd">        qlon : array_like</span>
+<span class="sd">            Quasi-dipole longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        alat : ndarray or float</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : ndarray or float</span>
+<span class="sd">            Modified apex longitude</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ApexHeightError</span>
+<span class="sd">            if apex height &lt; reference height</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qd2apex</span><span class="p">(</span><span class="n">qlat</span><span class="p">,</span> <span class="n">qlon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># if array is returned, the dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alon</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.mlon2mlt"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.mlon2mlt">[docs]</a>    <span class="k">def</span> <span class="nf">mlon2mlt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="mi">50</span> <span class="o">*</span> <span class="mi">6371</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the magnetic local time at the specified magnetic longitude</span>
+<span class="sd">        and UT.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mlon : array_like</span>
+<span class="sd">            Magnetic longitude (apex and quasi-dipole longitude are always</span>
+<span class="sd">            equal)</span>
+<span class="sd">        datetime : :class:`datetime.datetime`</span>
+<span class="sd">            Date and time</span>
+<span class="sd">        ssheight : float, optional</span>
+<span class="sd">            Altitude in km to use for converting the subsolar point from</span>
+<span class="sd">            geographic to magnetic coordinates. A high altitude is used</span>
+<span class="sd">            to ensure the subsolar point is mapped to high latitudes, which</span>
+<span class="sd">            prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mlt : ndarray or float</span>
+<span class="sd">            Magnetic local time [0, 24)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        To compute the MLT, we find the apex longitude of the subsolar point at</span>
+<span class="sd">        the given time. Then the MLT of the given point will be computed from</span>
+<span class="sd">        the separation in magnetic longitude from this point (1 hour = 15</span>
+<span class="sd">        degrees).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ssglat</span><span class="p">,</span> <span class="n">ssglon</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">subsol</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="n">ssalat</span><span class="p">,</span> <span class="n">ssalon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2apex</span><span class="p">(</span><span class="n">ssglat</span><span class="p">,</span> <span class="n">ssglon</span><span class="p">,</span> <span class="n">ssheight</span><span class="p">)</span>
+
+        <span class="c1"># np.float64 will ensure lists are converted to arrays</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">180</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">mlon</span><span class="p">)</span> <span class="o">-</span> <span class="n">ssalon</span><span class="p">)</span> <span class="o">/</span> <span class="mi">15</span> <span class="o">%</span> <span class="mi">24</span></div>
+
+<div class="viewcode-block" id="Apex.mlt2mlon"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.mlt2mlon">[docs]</a>    <span class="k">def</span> <span class="nf">mlt2mlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mlt</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">ssheight</span><span class="o">=</span><span class="mi">50</span> <span class="o">*</span> <span class="mi">6371</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the magnetic longitude at the specified magnetic local time</span>
+<span class="sd">        and UT.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mlt : array_like</span>
+<span class="sd">            Magnetic local time</span>
+<span class="sd">        datetime : :class:`datetime.datetime`</span>
+<span class="sd">            Date and time</span>
+<span class="sd">        ssheight : float, optional</span>
+<span class="sd">            Altitude in km to use for converting the subsolar point from</span>
+<span class="sd">            geographic to magnetic coordinates. A high altitude is used</span>
+<span class="sd">            to ensure the subsolar point is mapped to high latitudes, which</span>
+<span class="sd">            prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mlon : ndarray or float</span>
+<span class="sd">            Magnetic longitude [0, 360) (apex and quasi-dipole longitude are</span>
+<span class="sd">            always equal)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        To compute the magnetic longitude, we find the apex longitude of the</span>
+<span class="sd">        subsolar point at the given time. Then the magnetic longitude of the</span>
+<span class="sd">        given point will be computed from the separation in magnetic local time</span>
+<span class="sd">        from this point (1 hour = 15 degrees).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ssglat</span><span class="p">,</span> <span class="n">ssglon</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">subsol</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="n">ssalat</span><span class="p">,</span> <span class="n">ssalon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2apex</span><span class="p">(</span><span class="n">ssglat</span><span class="p">,</span> <span class="n">ssglon</span><span class="p">,</span> <span class="n">ssheight</span><span class="p">)</span>
+
+        <span class="c1"># np.float64 will ensure lists are converted to arrays</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">mlt</span><span class="p">)</span> <span class="o">-</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">ssalon</span> <span class="o">+</span> <span class="mi">360</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span></div>
+
+<div class="viewcode-block" id="Apex.map_to_height"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.map_to_height">[docs]</a>    <span class="k">def</span> <span class="nf">map_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">conjugate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs mapping of points along the magnetic field to the closest</span>
+<span class="sd">        or conjugate hemisphere.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glat : array_like</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : array_like</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Source altitude in km</span>
+<span class="sd">        newheight : array_like</span>
+<span class="sd">            Destination altitude in km</span>
+<span class="sd">        conjugate : bool, optional</span>
+<span class="sd">            Map to `newheight` in the conjugate hemisphere instead of the</span>
+<span class="sd">            closest hemisphere</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees). A negative value of this argument</span>
+<span class="sd">            produces a low-precision calculation of geodetic lat/lon based only</span>
+<span class="sd">            on their spherical harmonic representation. A positive value causes</span>
+<span class="sd">            the underlying Fortran routine to iterate until feeding the output</span>
+<span class="sd">            geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to</span>
+<span class="sd">            within the specified precision.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        newglat : ndarray or float</span>
+<span class="sd">            Geodetic latitude of mapped point</span>
+<span class="sd">        newglon : ndarray or float</span>
+<span class="sd">            Geodetic longitude of mapped point</span>
+<span class="sd">        error : ndarray or float</span>
+<span class="sd">            The angular difference (degrees) between the input QD coordinates</span>
+<span class="sd">            and the qlat/qlon produced by feeding the output glat and glon</span>
+<span class="sd">            into geo2qd (APXG2Q)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The mapping is done by converting glat/glon/height to modified apex</span>
+<span class="sd">        lat/lon, and converting back to geographic using newheight (if</span>
+<span class="sd">        conjugate, use negative apex latitude when converting back)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geo2apex</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">conjugate</span><span class="p">:</span>
+            <span class="n">alat</span> <span class="o">=</span> <span class="o">-</span><span class="n">alat</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">newglat</span><span class="p">,</span> <span class="n">newglon</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apex2geo</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span>
+                                                    <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ApexHeightError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ApexHeightError</span><span class="p">(</span><span class="s2">&quot;newheight is &gt; apex height&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">newglat</span><span class="p">,</span> <span class="n">newglon</span><span class="p">,</span> <span class="n">error</span></div>
+
+    <span class="k">def</span> <span class="nf">_map_EV_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">EV</span><span class="p">):</span>
+
+        <span class="c1"># make sure X is array of correct shape</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)):</span>
+            <span class="c1"># raise ValueError because if passing e.g. a (6,) ndarray the</span>
+            <span class="c1"># reshape below will work even though the input is invalid</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">EV</span> <span class="o">+</span> <span class="s1">&#39; must be (3, N) or (3,) ndarray&#39;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basevectors_apex</span><span class="p">(</span>
+            <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;apex&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">EV</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">e1</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">e2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">d1</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">d2</span>
+
+        <span class="c1"># make sure v1 and v2 have shape (3, N)</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">v1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># E dot e1 or V dot d1</span>
+        <span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># E dot e2 or V dot d2</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basevectors_apex</span><span class="p">(</span>
+            <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;apex&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">EV</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">d1</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">d2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">e1</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">e2</span>
+
+        <span class="c1"># make sure v1 and v2 have shape (3, N)</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">X_mapped</span> <span class="o">=</span> <span class="n">X1</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">X2</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">v2</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">X_mapped</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Apex.map_E_to_height"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.map_E_to_height">[docs]</a>    <span class="k">def</span> <span class="nf">map_E_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs mapping of electric field along the magnetic field.</span>
+
+<span class="sd">        It is assumed that the electric field is perpendicular to B.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        alat : (N,) array_like or float</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : (N,) array_like or float</span>
+<span class="sd">            Modified apex longitude</span>
+<span class="sd">        height : (N,) array_like or float</span>
+<span class="sd">            Source altitude in km</span>
+<span class="sd">        newheight : (N,) array_like or float</span>
+<span class="sd">            Destination altitude in km</span>
+<span class="sd">        E : (3,) or (3, N) array_like</span>
+<span class="sd">            Electric field (at `alat`, `alon`, `height`) in geodetic east,</span>
+<span class="sd">            north, and up components</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        E : (3, N) or (3,) ndarray</span>
+<span class="sd">            The electric field at `newheight` (geodetic east, north, and up</span>
+<span class="sd">            components)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_EV_to_height</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.map_V_to_height"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.map_V_to_height">[docs]</a>    <span class="k">def</span> <span class="nf">map_V_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs mapping of electric drift velocity along the magnetic field.</span>
+
+<span class="sd">        It is assumed that the electric field is perpendicular to B.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        alat : (N,) array_like or float</span>
+<span class="sd">            Modified apex latitude</span>
+<span class="sd">        alon : (N,) array_like or float</span>
+<span class="sd">            Modified apex longitude</span>
+<span class="sd">        height : (N,) array_like or float</span>
+<span class="sd">            Source altitude in km</span>
+<span class="sd">        newheight : (N,) array_like or float</span>
+<span class="sd">            Destination altitude in km</span>
+<span class="sd">        V : (3,) or (3, N) array_like</span>
+<span class="sd">            Electric drift velocity (at `alat`, `alon`, `height`) in geodetic</span>
+<span class="sd">            east, north, and up components</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        V : (3, N) or (3,) ndarray</span>
+<span class="sd">            The electric drift velocity at `newheight` (geodetic east, north,</span>
+<span class="sd">            and up components)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_EV_to_height</span><span class="p">(</span><span class="n">alat</span><span class="p">,</span> <span class="n">alon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">newheight</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.basevectors_qd"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.basevectors_qd">[docs]</a>    <span class="k">def</span> <span class="nf">basevectors_qd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns quasi-dipole base vectors f1 and f2 at the specified</span>
+<span class="sd">        coordinates.</span>
+
+<span class="sd">        The vectors are described by Richmond [1995] [2]_ and</span>
+<span class="sd">        Emmert et al. [2010] [3]_.  The vector components are geodetic east and</span>
+<span class="sd">        north.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat : (N,) array_like or float</span>
+<span class="sd">            Latitude</span>
+<span class="sd">        lon : (N,) array_like or float</span>
+<span class="sd">            Longitude</span>
+<span class="sd">        height : (N,) array_like or float</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        coords : {&#39;geo&#39;, &#39;apex&#39;, &#39;qd&#39;}, optional</span>
+<span class="sd">            Input coordinate system</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees) when converting to geo. A negative</span>
+<span class="sd">            value of this argument produces a low-precision calculation of</span>
+<span class="sd">            geodetic lat/lon based only on their spherical harmonic</span>
+<span class="sd">            representation.</span>
+<span class="sd">            A positive value causes the underlying Fortran routine to iterate</span>
+<span class="sd">            until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces</span>
+<span class="sd">            the input QD lat/lon to within the specified precision (all</span>
+<span class="sd">            coordinates being converted to geo are converted to QD first and</span>
+<span class="sd">            passed through APXG2Q).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f1 : (2, N) or (2,) ndarray</span>
+<span class="sd">        f2 : (2, N) or (2,) ndarray</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [2] Richmond, A. D. (1995), Ionospheric Electrodynamics Using</span>
+<span class="sd">               Magnetic Apex Coordinates, Journal of geomagnetism and</span>
+<span class="sd">               geoelectricity, 47(2), 191–212, :doi:`10.5636/jgg.47.191`.</span>
+
+<span class="sd">        .. [3] Emmert, J. T., A. D. Richmond, and D. P. Drob (2010),</span>
+<span class="sd">               A computationally compact representation of Magnetic-Apex</span>
+<span class="sd">               and Quasi-Dipole coordinates with smooth base vectors,</span>
+<span class="sd">               J. Geophys. Res., 115(A8), A08322, :doi:`10.1029/2010JA015326`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                                  <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+
+        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basevec</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># if inputs are not scalar, each vector is an array of arrays,</span>
+        <span class="c1"># so reshape to a single array</span>
+        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+            <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">f2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">return</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span></div>
+
+<div class="viewcode-block" id="Apex.basevectors_apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.basevectors_apex">[docs]</a>    <span class="k">def</span> <span class="nf">basevectors_apex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns base vectors in quasi-dipole and apex coordinates.</span>
+
+<span class="sd">        The vectors are described by Richmond [1995] [4]_ and</span>
+<span class="sd">        Emmert et al. [2010] [5]_.  The vector components are geodetic east,</span>
+<span class="sd">        north, and up (only east and north for `f1` and `f2`).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat : (N,) array_like or float</span>
+<span class="sd">            Latitude</span>
+<span class="sd">        lon : (N,) array_like or float</span>
+<span class="sd">            Longitude</span>
+<span class="sd">        height : (N,) array_like or float</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        coords : {&#39;geo&#39;, &#39;apex&#39;, &#39;qd&#39;}, optional</span>
+<span class="sd">            Input coordinate system</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees) when converting to geo. A negative</span>
+<span class="sd">            value of this argument produces a low-precision calculation of</span>
+<span class="sd">            geodetic lat/lon based only on their spherical harmonic</span>
+<span class="sd">            representation.</span>
+<span class="sd">            A positive value causes the underlying Fortran routine to iterate</span>
+<span class="sd">            until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces</span>
+<span class="sd">            the input QD lat/lon to within the specified precision (all</span>
+<span class="sd">            coordinates being converted to geo are converted to QD first and</span>
+<span class="sd">            passed through APXG2Q).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f3, g1, g2, g3, d1, d2, d3, e1, e2, e3 : (3, N) or (3,) ndarray</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        `f3`, `g1`, `g2`, and `g3` are not part of the Fortran code</span>
+<span class="sd">        by Emmert et al. [2010] [5]_. They are calculated by this</span>
+<span class="sd">        Python library according to the following equations in</span>
+<span class="sd">        Richmond [1995] [4]_:</span>
+
+<span class="sd">        * `g1`: Eqn. 6.3</span>
+<span class="sd">        * `g2`: Eqn. 6.4</span>
+<span class="sd">        * `g3`: Eqn. 6.5</span>
+<span class="sd">        * `f3`: Eqn. 6.8</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        .. [4] Richmond, A. D. (1995), Ionospheric Electrodynamics Using</span>
+<span class="sd">               Magnetic Apex Coordinates, Journal of geomagnetism and</span>
+<span class="sd">               geoelectricity, 47(2), 191–212, :doi:`10.5636/jgg.47.191`.</span>
+
+<span class="sd">        .. [5] Emmert, J. T., A. D. Richmond, and D. P. Drob (2010),</span>
+<span class="sd">               A computationally compact representation of Magnetic-Apex</span>
+<span class="sd">               and Quasi-Dipole coordinates with smooth base vectors,</span>
+<span class="sd">               J. Geophys. Res., 115(A8), A08322, :doi:`10.1029/2010JA015326`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                                  <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+
+        <span class="n">returnvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geo2apexall</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="n">qlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">returnvals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">alat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">returnvals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">returnvals</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span> <span class="o">=</span> <span class="n">returnvals</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+        <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">e3</span> <span class="o">=</span> <span class="n">returnvals</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">14</span><span class="p">]</span>
+
+        <span class="c1"># if inputs are not scalar, each vector is an array of arrays,</span>
+        <span class="c1"># so reshape to a single array</span>
+        <span class="k">if</span> <span class="n">f1</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">object</span><span class="p">:</span>
+            <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">f2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">d3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">d3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">e3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">e3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># make sure arrays are 2D</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">f1</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">f2</span> <span class="o">=</span> <span class="n">f2</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">f2</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">d1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">d1</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">d2</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">d2</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">d3</span> <span class="o">=</span> <span class="n">d3</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">d3</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">e1</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">e1</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">e2</span> <span class="o">=</span> <span class="n">e2</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">e2</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">e3</span> <span class="o">=</span> <span class="n">e3</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">e3</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="c1"># compute f3, g1, g2, g3</span>
+        <span class="n">F1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">f1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">f1</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="n">F2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">f2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">f2</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">F1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">F2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cosI</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">getcosIm</span><span class="p">(</span><span class="n">alat</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">height</span><span class="p">))</span>
+              <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">d1</span> <span class="o">/</span> <span class="n">F</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">F</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">qlat</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">k</span> <span class="o">+</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">height</span><span class="p">))</span>
+                 <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span><span class="p">))</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">/</span> <span class="n">cosI</span><span class="p">)</span>
+        <span class="n">g3</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">F</span>
+        <span class="n">f3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">g1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">g2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">alat</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9999</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;Base vectors g, d, e, and f3 set to NaN &#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;where apex latitude is undefined (apex &#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;height may be &lt; reference height)&#39;</span><span class="p">]))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">alat</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9999</span>
+            <span class="n">f3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">f3</span><span class="p">)</span>
+            <span class="n">g1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">g1</span><span class="p">)</span>
+            <span class="n">g2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span>
+            <span class="n">g3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">g3</span><span class="p">)</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span>
+            <span class="n">d3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">d3</span><span class="p">)</span>
+            <span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">e1</span><span class="p">)</span>
+            <span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span>
+            <span class="n">e3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">e3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                     <span class="p">[</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">g3</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">e3</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Apex.get_apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.get_apex">[docs]</a>    <span class="k">def</span> <span class="nf">get_apex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate apex height</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        lat : (float)</span>
+<span class="sd">            Latitude in degrees</span>
+<span class="sd">        height : (float or NoneType)</span>
+<span class="sd">            Height above the surface of the earth in km or NoneType to use</span>
+<span class="sd">            reference height (default=None)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        apex_height : (float)</span>
+<span class="sd">            Height of the field line apex in km</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">checklat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;alat&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refh</span>
+
+        <span class="n">cos_lat_squared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">apex_height</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RE</span> <span class="o">+</span> <span class="n">height</span><span class="p">)</span> <span class="o">/</span> <span class="n">cos_lat_squared</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">RE</span>
+
+        <span class="k">return</span> <span class="n">apex_height</span></div>
+
+<div class="viewcode-block" id="Apex.set_epoch"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.set_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">set_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the epoch for all subsequent conversions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        year : float</span>
+<span class="sd">            Decimal year</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># f2py</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">fa</span><span class="o">.</span><span class="n">loadapxsh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datafile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">igrf_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;igrf13coeffs.txt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">igrf_fn</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">igrf_fn</span><span class="p">))</span>
+        <span class="n">fa</span><span class="o">.</span><span class="n">cofrm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">igrf_fn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.set_refh"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.set_refh">[docs]</a>    <span class="k">def</span> <span class="nf">set_refh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the apex reference height for all subsequent conversions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        refh : float</span>
+<span class="sd">            Apex reference height in km</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The reference height is the height to which field lines will be mapped,</span>
+<span class="sd">        and is only relevant for conversions involving apex (not quasi-dipole).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refh</span> <span class="o">=</span> <span class="n">refh</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_babs_nonvectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="n">bnorth</span><span class="p">,</span> <span class="n">beast</span><span class="p">,</span> <span class="n">bdown</span><span class="p">,</span> <span class="n">babs</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">feldg</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="c1"># BABS is in guass, so convert to tesla</span>
+        <span class="k">return</span> <span class="n">babs</span> <span class="o">/</span> <span class="mf">10000.0</span>
+
+<div class="viewcode-block" id="Apex.get_babs"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.get_babs">[docs]</a>    <span class="k">def</span> <span class="nf">get_babs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the magnitude of the IGRF magnetic field in tesla.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glat : array_like</span>
+<span class="sd">            Geodetic latitude</span>
+<span class="sd">        glon : array_like</span>
+<span class="sd">            Geodetic longitude</span>
+<span class="sd">        height : array_like</span>
+<span class="sd">            Altitude in km</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        babs : ndarray or float</span>
+<span class="sd">            Magnitude of the IGRF magnetic field</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">babs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_babs</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># if array is returned, the dtype is object, so convert to float</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">babs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Apex.bvectors_apex"><a class="viewcode-back" href="../../reference/Apex.html#apexpy.Apex.bvectors_apex">[docs]</a>    <span class="k">def</span> <span class="nf">bvectors_apex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the magnetic field vectors in apex coordinates.</span>
+
+<span class="sd">        The apex magnetic field vectors described by Richmond [1995] [4]_ and</span>
+<span class="sd">        Emmert et al. [2010] [5]_, specfically the Be3 and Bd3 components. The</span>
+<span class="sd">        vector components are geodetic east, north, and up.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat : (N,) array_like or float</span>
+<span class="sd">            Latitude</span>
+<span class="sd">        lon : (N,) array_like or float</span>
+<span class="sd">            Longitude</span>
+<span class="sd">        height : (N,) array_like or float</span>
+<span class="sd">            Altitude in km</span>
+<span class="sd">        coords : {&#39;geo&#39;, &#39;apex&#39;, &#39;qd&#39;}, optional</span>
+<span class="sd">            Input coordinate system</span>
+<span class="sd">        precision : float, optional</span>
+<span class="sd">            Precision of output (degrees) when converting to geo. A negative</span>
+<span class="sd">            value of this argument produces a low-precision calculation of</span>
+<span class="sd">            geodetic lat/lon based only on their spherical harmonic</span>
+<span class="sd">            representation.</span>
+<span class="sd">            A positive value causes the underlying Fortran routine to iterate</span>
+<span class="sd">            until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces</span>
+<span class="sd">            the input QD lat/lon to within the specified precision (all</span>
+<span class="sd">            coordinates being converted to geo are converted to QD first and</span>
+<span class="sd">            passed through APXG2Q).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Be3: (1, N) or (1,) ndarray</span>
+<span class="sd">        e3 : (3, N) or (3,) ndarray</span>
+<span class="sd">        Bd3: (1, N) or (1,) ndarray</span>
+<span class="sd">        d3 : (3, N) or (3,) ndarray</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Be3 is not equivalent to the magnitude of the IGRF magnitude, but is</span>
+<span class="sd">        instead equal to the IGRF magnitude divided by a scaling factor, D.</span>
+<span class="sd">        Similarly, Bd3 is the IGRF magnitude multiplied by D.</span>
+
+<span class="sd">        See Richmond, A. D. (1995) [4]_ equations 3.13 and 3.14</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Richmond, A. D. (1995) [4]_</span>
+<span class="sd">        Emmert, J. T. et al. (2010) [5]_</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                                  <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
+
+        <span class="n">babs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_babs</span><span class="p">(</span><span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">e3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basevectors_apex</span><span class="p">(</span>
+            <span class="n">glat</span><span class="p">,</span> <span class="n">glon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;geo&#39;</span><span class="p">)</span>
+        <span class="n">d1_cross_d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">d1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">d2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d1_cross_d2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">Be3</span> <span class="o">=</span> <span class="n">babs</span> <span class="o">/</span> <span class="n">D</span>
+        <span class="n">Bd3</span> <span class="o">=</span> <span class="n">babs</span> <span class="o">*</span> <span class="n">D</span>
+
+        <span class="k">return</span> <span class="n">Be3</span><span class="p">,</span> <span class="n">e3</span><span class="p">,</span> <span class="n">Bd3</span><span class="p">,</span> <span class="n">d3</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christer van der Meeren, Angeline G. Burrell
+      <span class="lastupdated">
+        Last updated on Feb 23, 2021.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>apexpy.helpers &mdash; Apex Python library 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Apex Python library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../maintenance.html">Package Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Apex Python library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>apexpy.helpers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for apexpy.helpers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module contains helper functions used by :class:`~apexpy.Apex`.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="checklat"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.checklat">[docs]</a><span class="k">def</span> <span class="nf">checklat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Makes sure the latitude is inside [-90, 90], clipping close values</span>
+<span class="sd">    (tolerance 1e-4).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat : array-like</span>
+<span class="sd">        latitude</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        parameter name to use in the exception message</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lat : ndarray or float</span>
+<span class="sd">        Same as input where values just outside the range have been</span>
+<span class="sd">        clipped to [-90, 90]</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        if any values are too far outside the range [-90, 90]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">90</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; must be in [-90, 90]&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getsinIm"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.getsinIm">[docs]</a><span class="k">def</span> <span class="nf">getsinIm</span><span class="p">(</span><span class="n">alat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes sinIm from modified apex latitude.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alat : array-like</span>
+<span class="sd">        Modified apex latitude</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sinIm : ndarray or float</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">alat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alat</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">alat</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">3</span>
+                                                  <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">alat</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getcosIm"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.getcosIm">[docs]</a><span class="k">def</span> <span class="nf">getcosIm</span><span class="p">(</span><span class="n">alat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes cosIm from modified apex latitude.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alat : array-like</span>
+<span class="sd">        Modified apex latitude</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cosIm : ndarray or float</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">alat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">alat</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">alat</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">3</span>
+                                              <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">alat</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="toYearFraction"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.toYearFraction">[docs]</a><span class="k">def</span> <span class="nf">toYearFraction</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts :class:`datetime.date` or :class:`datetime.datetime` to decimal</span>
+<span class="sd">    year.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date : :class:`datetime.date` or :class:`datetime.datetime`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    year : float</span>
+<span class="sd">        Decimal year</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The algorithm is taken from http://stackoverflow.com/a/6451892/2978652</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">sinceEpoch</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns seconds since epoch&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">timetuple</span><span class="p">())</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">year</span>
+    <span class="n">startOfThisYear</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">startOfNextYear</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">yearElapsed</span> <span class="o">=</span> <span class="n">sinceEpoch</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">-</span> <span class="n">sinceEpoch</span><span class="p">(</span><span class="n">startOfThisYear</span><span class="p">)</span>
+    <span class="n">yearDuration</span> <span class="o">=</span> <span class="n">sinceEpoch</span><span class="p">(</span><span class="n">startOfNextYear</span><span class="p">)</span> <span class="o">-</span> <span class="n">sinceEpoch</span><span class="p">(</span><span class="n">startOfThisYear</span><span class="p">)</span>
+    <span class="n">fraction</span> <span class="o">=</span> <span class="n">yearElapsed</span> <span class="o">/</span> <span class="n">yearDuration</span>
+
+    <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="n">fraction</span></div>
+
+
+<div class="viewcode-block" id="gc2gdlat"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.gc2gdlat">[docs]</a><span class="k">def</span> <span class="nf">gc2gdlat</span><span class="p">(</span><span class="n">gclat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts geocentric latitude to geodetic latitude using WGS84.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    gclat : array-like</span>
+<span class="sd">        Geocentric latitude</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gdlat : ndarray or float</span>
+<span class="sd">        Geodetic latitude</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">WGS84_e2</span> <span class="o">=</span> <span class="mf">0.006694379990141317</span>  <span class="c1"># WGS84 first eccentricity squared</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">gclat</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">WGS84_e2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="subsol"><a class="viewcode-back" href="../../reference/helpers.html#apexpy.helpers.subsol">[docs]</a><span class="k">def</span> <span class="nf">subsol</span><span class="p">(</span><span class="n">datetime</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds subsolar geocentric latitude and longitude.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    datetime : :class:`datetime.datetime` or :class:`numpy.ndarray[datetime64]`</span>
+<span class="sd">        Date and time in UTC (naive objects are treated as UTC)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sbsllat : float</span>
+<span class="sd">        Latitude of subsolar point</span>
+<span class="sd">    sbsllon : float</span>
+<span class="sd">        Longitude of subsolar point</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Based on formulas in Astronomical Almanac for the year 1996, p. C24.</span>
+<span class="sd">    (U.S. Government Printing Office, 1994). Usable for years 1601-2100,</span>
+<span class="sd">    inclusive. According to the Almanac, results are good to at least 0.01</span>
+<span class="sd">    degree latitude and 0.025 degrees longitude between years 1950 and 2050.</span>
+<span class="sd">    Accuracy for other years has not been tested. Every day is assumed to have</span>
+<span class="sd">    exactly 86400 seconds; thus leap seconds that sometimes occur on December</span>
+<span class="sd">    31 are ignored (their effect is below the accuracy threshold of the</span>
+<span class="sd">    algorithm).</span>
+
+<span class="sd">    After Fortran code by A. D. Richmond, NCAR. Translated from IDL</span>
+<span class="sd">    by K. Laundal.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert to year, day of year and seconds since midnight</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">([</span><span class="n">datetime</span><span class="o">.</span><span class="n">year</span><span class="p">])</span>
+        <span class="n">doy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">([</span><span class="n">datetime</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span><span class="p">])</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">([</span><span class="n">datetime</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">minute</span> <span class="o">*</span> <span class="mi">60</span>
+                            <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">second</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="c1"># This conversion works for datetime of wrong precision or unit epoch</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[s]&#39;</span><span class="p">)</span>
+        <span class="n">year_floor</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[Y]&#39;</span><span class="p">)</span>
+        <span class="n">day_floor</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[D]&#39;</span><span class="p">)</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">year_floor</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1970</span>
+        <span class="n">doy</span> <span class="o">=</span> <span class="p">(</span><span class="n">day_floor</span> <span class="o">-</span> <span class="n">year_floor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[s]&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">day_floor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;input must be datetime.datetime or numpy array&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="mi">1601</span> <span class="o">&lt;=</span> <span class="n">year</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">2100</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Year must be in [1601, 2100]&#39;</span><span class="p">)</span>
+
+    <span class="n">yr</span> <span class="o">=</span> <span class="n">year</span> <span class="o">-</span> <span class="mi">2000</span>
+
+    <span class="n">nleap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">year</span> <span class="o">-</span> <span class="mf">1601.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">nleap</span> <span class="o">-=</span> <span class="mi">99</span>
+    <span class="n">mask_1900</span> <span class="o">=</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">1900</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask_1900</span><span class="p">):</span>
+        <span class="n">ncent</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">year</span><span class="p">[</span><span class="n">mask_1900</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1601.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">ncent</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">ncent</span>
+        <span class="n">nleap</span><span class="p">[</span><span class="n">mask_1900</span><span class="p">]</span> <span class="o">=</span> <span class="n">nleap</span><span class="p">[</span><span class="n">mask_1900</span><span class="p">]</span> <span class="o">+</span> <span class="n">ncent</span>
+
+    <span class="n">l0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">79.549</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.238699</span> <span class="o">*</span> <span class="p">(</span><span class="n">yr</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">nleap</span><span class="p">)</span> <span class="o">+</span> <span class="mf">3.08514e-2</span> <span class="o">*</span> <span class="n">nleap</span><span class="p">)</span>
+    <span class="n">g0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.472</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.2558905</span> <span class="o">*</span> <span class="p">(</span><span class="n">yr</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">nleap</span><span class="p">)</span> <span class="o">-</span> <span class="mf">3.79617e-2</span> <span class="o">*</span> <span class="n">nleap</span><span class="p">)</span>
+
+    <span class="c1"># Days (including fraction) since 12 UT on January 1 of IYR:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">ut</span> <span class="o">/</span> <span class="mf">86400.0</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">doy</span>
+
+    <span class="c1"># Mean longitude of Sun:</span>
+    <span class="n">lmean</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="mf">0.9856474</span> <span class="o">*</span> <span class="n">df</span>
+
+    <span class="c1"># Mean anomaly in radians:</span>
+    <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">g0</span> <span class="o">+</span> <span class="mf">0.9856003</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span>
+
+    <span class="c1"># Ecliptic longitude:</span>
+    <span class="n">lmrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lmean</span> <span class="o">+</span> <span class="mf">1.915</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+                       <span class="o">+</span> <span class="mf">0.020</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">grad</span><span class="p">))</span>
+    <span class="n">sinlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lmrad</span><span class="p">)</span>
+
+    <span class="c1"># Obliquity of ecliptic in radians:</span>
+    <span class="n">epsrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">23.439</span> <span class="o">-</span> <span class="mf">4e-7</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span> <span class="o">+</span> <span class="mi">365</span> <span class="o">*</span> <span class="n">yr</span> <span class="o">+</span> <span class="n">nleap</span><span class="p">))</span>
+
+    <span class="c1"># Right ascension:</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">epsrad</span><span class="p">)</span> <span class="o">*</span> <span class="n">sinlm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lmrad</span><span class="p">)))</span>
+
+    <span class="c1"># Declination, which is also the subsolar latitude:</span>
+    <span class="n">sslat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">epsrad</span><span class="p">)</span> <span class="o">*</span> <span class="n">sinlm</span><span class="p">))</span>
+
+    <span class="c1"># Equation of time (degrees):</span>
+    <span class="n">etdeg</span> <span class="o">=</span> <span class="n">lmean</span> <span class="o">-</span> <span class="n">alpha</span>
+    <span class="n">nrot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">etdeg</span> <span class="o">/</span> <span class="mf">360.0</span><span class="p">)</span>
+    <span class="n">etdeg</span> <span class="o">=</span> <span class="n">etdeg</span> <span class="o">-</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="n">nrot</span>
+
+    <span class="c1"># Subsolar longitude calculation. Earth rotates one degree every 240 s.</span>
+    <span class="n">sslon</span> <span class="o">=</span> <span class="mf">180.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">ut</span> <span class="o">/</span> <span class="mf">240.0</span> <span class="o">+</span> <span class="n">etdeg</span><span class="p">)</span>
+    <span class="n">nrot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">sslon</span> <span class="o">/</span> <span class="mf">360.0</span><span class="p">)</span>
+    <span class="n">sslon</span> <span class="o">=</span> <span class="n">sslon</span> <span class="o">-</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="n">nrot</span>
+
+    <span class="c1"># Return a single value from the output if the input was a single value</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sslat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sslon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sslat</span><span class="p">,</span> <span class="n">sslon</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christer van der Meeren, Angeline G. Burrell
+      <span class="lastupdated">
+        Last updated on Feb 23, 2021.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

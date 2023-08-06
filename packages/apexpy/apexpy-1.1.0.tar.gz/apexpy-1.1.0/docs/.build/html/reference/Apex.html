@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>apexpy.Apex &mdash; Apex Python library 1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="apexpy.helpers" href="helpers.html" />
+    <link rel="prev" title="Reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Apex Python library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">apexpy.Apex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html">apexpy.helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fortranapex.html">apexpy.fortranapex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html">Command-line interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../maintenance.html">Package Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Apex Python library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Reference</a> &raquo;</li>
+        
+      <li>apexpy.Apex</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/Apex.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="apexpy-apex">
+<h1>apexpy.Apex<a class="headerlink" href="#apexpy-apex" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Apex</span></code> class is used for all the main functionality (converting between coordinate systems, field line mapping, and calculating base vectors).</p>
+<dl class="py class">
+<dt id="apexpy.Apex">
+<em class="property">class </em><code class="sig-prename descclassname">apexpy.</code><code class="sig-name descname">Apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">refh</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">datafile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fortranlib</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs coordinate conversions, field-line mapping and base vector
+calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> (float, <code class="xref py py-class docutils literal notranslate"><span class="pre">dt.date</span></code>, or <code class="xref py py-class docutils literal notranslate"><span class="pre">dt.datetime</span></code>, optional) – Determines which IGRF coefficients are used in conversions. Uses
+current date as default.  If float, use decimal year.</p></li>
+<li><p><strong>refh</strong> (<em>float, optional</em>) – Reference height in km for apex coordinates (the field lines are mapped
+to this height)</p></li>
+<li><p><strong>datafile</strong> (<em>str, optional</em>) – Path to custom coefficient file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>year</strong> (<em>float</em>) – Decimal year used for the IGRF model</p></li>
+<li><p><strong>refh</strong> (<em>float</em>) – Reference height in km for apex coordinates</p></li>
+<li><p><strong>datafile</strong> (<em>str</em>) – Path to coefficient file</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The calculations use IGRF-13 with coefficients from 1900 to 2025 <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<p>The geodetic reference ellipsoid is WGS84.</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Thébault, E. et al. (2015), International Geomagnetic Reference
+Field: the 12th generation, Earth, Planets and Space, 67(1), 79,
+<a class="reference external" href="http://dx.doi.org/10.1186/s40623-015-0228-9">doi:10.1186/s40623-015-0228-9</a>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="apexpy.Apex.convert">
+<code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">datetime</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em>, <em class="sig-param"><span class="n">ssheight</span><span class="o">=</span><span class="default_value">318550</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts between geodetic, modified apex, quasi-dipole and MLT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>array_like</em>) – Latitude</p></li>
+<li><p><strong>lon</strong> (<em>array_like</em>) – Longitude/MLT</p></li>
+<li><p><strong>source</strong> (<em>{‘geo’, ‘apex’, ‘qd’, ‘mlt’}</em>) – Input coordinate system</p></li>
+<li><p><strong>dest</strong> (<em>{‘geo’, ‘apex’, ‘qd’, ‘mlt’}</em>) – Output coordinate system</p></li>
+<li><p><strong>height</strong> (<em>array_like, optional</em>) – Altitude in km</p></li>
+<li><p><strong>datetime</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – Date and time for MLT conversions (required for MLT conversions)</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees) when converting to geo. A negative
+value of this argument produces a low-precision calculation of
+geodetic lat/lon based only on their spherical harmonic
+representation.
+A positive value causes the underlying Fortran routine to iterate
+until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces
+the input QD lat/lon to within the specified precision (all
+coordinates being converted to geo are converted to QD first and
+passed through APXG2Q).</p></li>
+<li><p><strong>ssheight</strong> (<em>float, optional</em>) – Altitude in km to use for converting the subsolar point from
+geographic to magnetic coordinates. A high altitude is used
+to ensure the subsolar point is mapped to high latitudes, which
+prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>lat</strong> (<em>ndarray or float</em>) – Converted latitude (if converting to MLT, output latitude is apex)</p></li>
+<li><p><strong>lat</strong> (<em>ndarray or float</em>) – Converted longitude/MLT</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.geo2apex">
+<code class="sig-name descname">geo2apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">glat</span></em>, <em class="sig-param"><span class="n">glon</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.geo2apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.geo2apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts geodetic to modified apex coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glat</strong> (<em>array_like</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>array_like</em>) – Geodetic longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alat</strong> (<em>ndarray or float</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>ndarray or float</em>) – Modified apex longitude</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.apex2geo">
+<code class="sig-name descname">apex2geo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alat</span></em>, <em class="sig-param"><span class="n">alon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.apex2geo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.apex2geo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts modified apex to geodetic coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alat</strong> (<em>array_like</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>array_like</em>) – Modified apex longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees). A negative value of this argument
+produces a low-precision calculation of geodetic lat/lon based only
+on their spherical harmonic representation. A positive value causes
+the underlying Fortran routine to iterate until feeding the output
+geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to
+within the specified precision.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>glat</strong> (<em>ndarray or float</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>ndarray or float</em>) – Geodetic longitude</p></li>
+<li><p><strong>error</strong> (<em>ndarray or float</em>) – The angular difference (degrees) between the input QD coordinates
+and the qlat/qlon produced by feeding the output glat and glon
+into geo2qd (APXG2Q)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.geo2qd">
+<code class="sig-name descname">geo2qd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">glat</span></em>, <em class="sig-param"><span class="n">glon</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.geo2qd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.geo2qd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts geodetic to quasi-dipole coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glat</strong> (<em>array_like</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>array_like</em>) – Geodetic longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>qlat</strong> (<em>ndarray or float</em>) – Quasi-dipole latitude</p></li>
+<li><p><strong>qlon</strong> (<em>ndarray or float</em>) – Quasi-dipole longitude</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.qd2geo">
+<code class="sig-name descname">qd2geo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">qlat</span></em>, <em class="sig-param"><span class="n">qlon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.qd2geo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.qd2geo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts quasi-dipole to geodetic coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qlat</strong> (<em>array_like</em>) – Quasi-dipole latitude</p></li>
+<li><p><strong>qlon</strong> (<em>array_like</em>) – Quasi-dipole longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees). A negative value of this argument
+produces a low-precision calculation of geodetic lat/lon based only
+on their spherical harmonic representation. A positive value causes
+the underlying Fortran routine to iterate until feeding the output
+geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to
+within the specified precision.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>glat</strong> (<em>ndarray or float</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>ndarray or float</em>) – Geodetic longitude</p></li>
+<li><p><strong>error</strong> (<em>ndarray or float</em>) – The angular difference (degrees) between the input QD coordinates
+and the qlat/qlon produced by feeding the output glat and glon
+into geo2qd (APXG2Q)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.apex2qd">
+<code class="sig-name descname">apex2qd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alat</span></em>, <em class="sig-param"><span class="n">alon</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.apex2qd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.apex2qd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts modified apex to quasi-dipole coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alat</strong> (<em>array_like</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>array_like</em>) – Modified apex longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>qlat</strong> (<em>ndarray or float</em>) – Quasi-dipole latitude</p></li>
+<li><p><strong>qlon</strong> (<em>ndarray or float</em>) – Quasi-dipole longitude</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ApexHeightError</strong> – if <cite>height</cite> &gt; apex height</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.qd2apex">
+<code class="sig-name descname">qd2apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">qlat</span></em>, <em class="sig-param"><span class="n">qlon</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.qd2apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.qd2apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts quasi-dipole to modified apex coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qlat</strong> (<em>array_like</em>) – Quasi-dipole latitude</p></li>
+<li><p><strong>qlon</strong> (<em>array_like</em>) – Quasi-dipole longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alat</strong> (<em>ndarray or float</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>ndarray or float</em>) – Modified apex longitude</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ApexHeightError</strong> – if apex height &lt; reference height</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.mlon2mlt">
+<code class="sig-name descname">mlon2mlt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mlon</span></em>, <em class="sig-param"><span class="n">datetime</span></em>, <em class="sig-param"><span class="n">ssheight</span><span class="o">=</span><span class="default_value">318550</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.mlon2mlt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.mlon2mlt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the magnetic local time at the specified magnetic longitude
+and UT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mlon</strong> (<em>array_like</em>) – Magnetic longitude (apex and quasi-dipole longitude are always
+equal)</p></li>
+<li><p><strong>datetime</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – Date and time</p></li>
+<li><p><strong>ssheight</strong> (<em>float, optional</em>) – Altitude in km to use for converting the subsolar point from
+geographic to magnetic coordinates. A high altitude is used
+to ensure the subsolar point is mapped to high latitudes, which
+prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>mlt</strong> (<em>ndarray or float</em>) – Magnetic local time [0, 24)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To compute the MLT, we find the apex longitude of the subsolar point at
+the given time. Then the MLT of the given point will be computed from
+the separation in magnetic longitude from this point (1 hour = 15
+degrees).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.mlt2mlon">
+<code class="sig-name descname">mlt2mlon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mlt</span></em>, <em class="sig-param"><span class="n">datetime</span></em>, <em class="sig-param"><span class="n">ssheight</span><span class="o">=</span><span class="default_value">318550</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.mlt2mlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.mlt2mlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the magnetic longitude at the specified magnetic local time
+and UT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mlt</strong> (<em>array_like</em>) – Magnetic local time</p></li>
+<li><p><strong>datetime</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – Date and time</p></li>
+<li><p><strong>ssheight</strong> (<em>float, optional</em>) – Altitude in km to use for converting the subsolar point from
+geographic to magnetic coordinates. A high altitude is used
+to ensure the subsolar point is mapped to high latitudes, which
+prevents the South-Atlantic Anomaly (SAA) from influencing the MLT.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>mlon</strong> (<em>ndarray or float</em>) – Magnetic longitude [0, 360) (apex and quasi-dipole longitude are
+always equal)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To compute the magnetic longitude, we find the apex longitude of the
+subsolar point at the given time. Then the magnetic longitude of the
+given point will be computed from the separation in magnetic local time
+from this point (1 hour = 15 degrees).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.map_to_height">
+<code class="sig-name descname">map_to_height</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">glat</span></em>, <em class="sig-param"><span class="n">glon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">newheight</span></em>, <em class="sig-param"><span class="n">conjugate</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.map_to_height"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.map_to_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs mapping of points along the magnetic field to the closest
+or conjugate hemisphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glat</strong> (<em>array_like</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>array_like</em>) – Geodetic longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Source altitude in km</p></li>
+<li><p><strong>newheight</strong> (<em>array_like</em>) – Destination altitude in km</p></li>
+<li><p><strong>conjugate</strong> (<em>bool, optional</em>) – Map to <cite>newheight</cite> in the conjugate hemisphere instead of the
+closest hemisphere</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees). A negative value of this argument
+produces a low-precision calculation of geodetic lat/lon based only
+on their spherical harmonic representation. A positive value causes
+the underlying Fortran routine to iterate until feeding the output
+geo lat/lon into geo2qd (APXG2Q) reproduces the input QD lat/lon to
+within the specified precision.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>newglat</strong> (<em>ndarray or float</em>) – Geodetic latitude of mapped point</p></li>
+<li><p><strong>newglon</strong> (<em>ndarray or float</em>) – Geodetic longitude of mapped point</p></li>
+<li><p><strong>error</strong> (<em>ndarray or float</em>) – The angular difference (degrees) between the input QD coordinates
+and the qlat/qlon produced by feeding the output glat and glon
+into geo2qd (APXG2Q)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The mapping is done by converting glat/glon/height to modified apex
+lat/lon, and converting back to geographic using newheight (if
+conjugate, use negative apex latitude when converting back)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.map_E_to_height">
+<code class="sig-name descname">map_E_to_height</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alat</span></em>, <em class="sig-param"><span class="n">alon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">newheight</span></em>, <em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.map_E_to_height"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.map_E_to_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs mapping of electric field along the magnetic field.</p>
+<p>It is assumed that the electric field is perpendicular to B.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alat</strong> (<em>(N,) array_like or float</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>(N,) array_like or float</em>) – Modified apex longitude</p></li>
+<li><p><strong>height</strong> (<em>(N,) array_like or float</em>) – Source altitude in km</p></li>
+<li><p><strong>newheight</strong> (<em>(N,) array_like or float</em>) – Destination altitude in km</p></li>
+<li><p><strong>E</strong> (<em>(3,) or (3, N) array_like</em>) – Electric field (at <cite>alat</cite>, <cite>alon</cite>, <cite>height</cite>) in geodetic east,
+north, and up components</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>E</strong> (<em>(3, N) or (3,) ndarray</em>) – The electric field at <cite>newheight</cite> (geodetic east, north, and up
+components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.map_V_to_height">
+<code class="sig-name descname">map_V_to_height</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alat</span></em>, <em class="sig-param"><span class="n">alon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">newheight</span></em>, <em class="sig-param"><span class="n">V</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.map_V_to_height"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.map_V_to_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs mapping of electric drift velocity along the magnetic field.</p>
+<p>It is assumed that the electric field is perpendicular to B.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alat</strong> (<em>(N,) array_like or float</em>) – Modified apex latitude</p></li>
+<li><p><strong>alon</strong> (<em>(N,) array_like or float</em>) – Modified apex longitude</p></li>
+<li><p><strong>height</strong> (<em>(N,) array_like or float</em>) – Source altitude in km</p></li>
+<li><p><strong>newheight</strong> (<em>(N,) array_like or float</em>) – Destination altitude in km</p></li>
+<li><p><strong>V</strong> (<em>(3,) or (3, N) array_like</em>) – Electric drift velocity (at <cite>alat</cite>, <cite>alon</cite>, <cite>height</cite>) in geodetic
+east, north, and up components</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>V</strong> (<em>(3, N) or (3,) ndarray</em>) – The electric drift velocity at <cite>newheight</cite> (geodetic east, north,
+and up components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.basevectors_qd">
+<code class="sig-name descname">basevectors_qd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">coords</span><span class="o">=</span><span class="default_value">'geo'</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.basevectors_qd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.basevectors_qd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns quasi-dipole base vectors f1 and f2 at the specified
+coordinates.</p>
+<p>The vectors are described by Richmond [1995] <a class="footnote-reference brackets" href="#id5" id="id3">2</a> and
+Emmert et al. [2010] <a class="footnote-reference brackets" href="#id6" id="id4">3</a>.  The vector components are geodetic east and
+north.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>(N,) array_like or float</em>) – Latitude</p></li>
+<li><p><strong>lon</strong> (<em>(N,) array_like or float</em>) – Longitude</p></li>
+<li><p><strong>height</strong> (<em>(N,) array_like or float</em>) – Altitude in km</p></li>
+<li><p><strong>coords</strong> (<em>{‘geo’, ‘apex’, ‘qd’}, optional</em>) – Input coordinate system</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees) when converting to geo. A negative
+value of this argument produces a low-precision calculation of
+geodetic lat/lon based only on their spherical harmonic
+representation.
+A positive value causes the underlying Fortran routine to iterate
+until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces
+the input QD lat/lon to within the specified precision (all
+coordinates being converted to geo are converted to QD first and
+passed through APXG2Q).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>f1</strong> (<em>(2, N) or (2,) ndarray</em>)</p></li>
+<li><p><strong>f2</strong> (<em>(2, N) or (2,) ndarray</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dd><p>Richmond, A. D. (1995), Ionospheric Electrodynamics Using
+Magnetic Apex Coordinates, Journal of geomagnetism and
+geoelectricity, 47(2), 191–212, <a class="reference external" href="http://dx.doi.org/10.5636/jgg.47.191">doi:10.5636/jgg.47.191</a>.</p>
+</dd>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
+<dd><p>Emmert, J. T., A. D. Richmond, and D. P. Drob (2010),
+A computationally compact representation of Magnetic-Apex
+and Quasi-Dipole coordinates with smooth base vectors,
+J. Geophys. Res., 115(A8), A08322, <a class="reference external" href="http://dx.doi.org/10.1029/2010JA015326">doi:10.1029/2010JA015326</a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.basevectors_apex">
+<code class="sig-name descname">basevectors_apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">coords</span><span class="o">=</span><span class="default_value">'geo'</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.basevectors_apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.basevectors_apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns base vectors in quasi-dipole and apex coordinates.</p>
+<p>The vectors are described by Richmond [1995] <a class="footnote-reference brackets" href="#id11" id="id7">4</a> and
+Emmert et al. [2010] <a class="footnote-reference brackets" href="#id12" id="id8">5</a>.  The vector components are geodetic east,
+north, and up (only east and north for <cite>f1</cite> and <cite>f2</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>(N,) array_like or float</em>) – Latitude</p></li>
+<li><p><strong>lon</strong> (<em>(N,) array_like or float</em>) – Longitude</p></li>
+<li><p><strong>height</strong> (<em>(N,) array_like or float</em>) – Altitude in km</p></li>
+<li><p><strong>coords</strong> (<em>{‘geo’, ‘apex’, ‘qd’}, optional</em>) – Input coordinate system</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees) when converting to geo. A negative
+value of this argument produces a low-precision calculation of
+geodetic lat/lon based only on their spherical harmonic
+representation.
+A positive value causes the underlying Fortran routine to iterate
+until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces
+the input QD lat/lon to within the specified precision (all
+coordinates being converted to geo are converted to QD first and
+passed through APXG2Q).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>f3, g1, g2, g3, d1, d2, d3, e1, e2, e3</strong> (<em>(3, N) or (3,) ndarray</em>)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><cite>f3</cite>, <cite>g1</cite>, <cite>g2</cite>, and <cite>g3</cite> are not part of the Fortran code
+by Emmert et al. [2010] <a class="footnote-reference brackets" href="#id12" id="id9">5</a>. They are calculated by this
+Python library according to the following equations in
+Richmond [1995] <a class="footnote-reference brackets" href="#id11" id="id10">4</a>:</p>
+<ul class="simple">
+<li><p><cite>g1</cite>: Eqn. 6.3</p></li>
+<li><p><cite>g2</cite>: Eqn. 6.4</p></li>
+<li><p><cite>g3</cite>: Eqn. 6.5</p></li>
+<li><p><cite>f3</cite>: Eqn. 6.8</p></li>
+</ul>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id11"><span class="brackets">4</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id10">2</a>,<a href="#id13">3</a>,<a href="#id15">4</a>,<a href="#id16">5</a>)</span></dt>
+<dd><p>Richmond, A. D. (1995), Ionospheric Electrodynamics Using
+Magnetic Apex Coordinates, Journal of geomagnetism and
+geoelectricity, 47(2), 191–212, <a class="reference external" href="http://dx.doi.org/10.5636/jgg.47.191">doi:10.5636/jgg.47.191</a>.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets">5</span><span class="fn-backref">(<a href="#id8">1</a>,<a href="#id9">2</a>,<a href="#id14">3</a>,<a href="#id17">4</a>)</span></dt>
+<dd><p>Emmert, J. T., A. D. Richmond, and D. P. Drob (2010),
+A computationally compact representation of Magnetic-Apex
+and Quasi-Dipole coordinates with smooth base vectors,
+J. Geophys. Res., 115(A8), A08322, <a class="reference external" href="http://dx.doi.org/10.1029/2010JA015326">doi:10.1029/2010JA015326</a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.get_apex">
+<code class="sig-name descname">get_apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.get_apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.get_apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate apex height</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>(float)</em>) – Latitude in degrees</p></li>
+<li><p><strong>height</strong> (<em>(float or NoneType)</em>) – Height above the surface of the earth in km or NoneType to use
+reference height (default=None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>apex_height</strong> (<em>(float)</em>) – Height of the field line apex in km</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.set_epoch">
+<code class="sig-name descname">set_epoch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">year</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.set_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.set_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the epoch for all subsequent conversions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>year</strong> (<em>float</em>) – Decimal year</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.set_refh">
+<code class="sig-name descname">set_refh</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">refh</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.set_refh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.set_refh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the apex reference height for all subsequent conversions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>refh</strong> (<em>float</em>) – Apex reference height in km</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The reference height is the height to which field lines will be mapped,
+and is only relevant for conversions involving apex (not quasi-dipole).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.get_babs">
+<code class="sig-name descname">get_babs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">glat</span></em>, <em class="sig-param"><span class="n">glon</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.get_babs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.get_babs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the magnitude of the IGRF magnetic field in tesla.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glat</strong> (<em>array_like</em>) – Geodetic latitude</p></li>
+<li><p><strong>glon</strong> (<em>array_like</em>) – Geodetic longitude</p></li>
+<li><p><strong>height</strong> (<em>array_like</em>) – Altitude in km</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>babs</strong> (<em>ndarray or float</em>) – Magnitude of the IGRF magnetic field</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="apexpy.Apex.bvectors_apex">
+<code class="sig-name descname">bvectors_apex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">coords</span><span class="o">=</span><span class="default_value">'geo'</span></em>, <em class="sig-param"><span class="n">precision</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apexpy/apex.html#Apex.bvectors_apex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#apexpy.Apex.bvectors_apex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the magnetic field vectors in apex coordinates.</p>
+<p>The apex magnetic field vectors described by Richmond [1995] <a class="footnote-reference brackets" href="#id11" id="id13">4</a> and
+Emmert et al. [2010] <a class="footnote-reference brackets" href="#id12" id="id14">5</a>, specfically the Be3 and Bd3 components. The
+vector components are geodetic east, north, and up.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>(N,) array_like or float</em>) – Latitude</p></li>
+<li><p><strong>lon</strong> (<em>(N,) array_like or float</em>) – Longitude</p></li>
+<li><p><strong>height</strong> (<em>(N,) array_like or float</em>) – Altitude in km</p></li>
+<li><p><strong>coords</strong> (<em>{‘geo’, ‘apex’, ‘qd’}, optional</em>) – Input coordinate system</p></li>
+<li><p><strong>precision</strong> (<em>float, optional</em>) – Precision of output (degrees) when converting to geo. A negative
+value of this argument produces a low-precision calculation of
+geodetic lat/lon based only on their spherical harmonic
+representation.
+A positive value causes the underlying Fortran routine to iterate
+until feeding the output geo lat/lon into geo2qd (APXG2Q) reproduces
+the input QD lat/lon to within the specified precision (all
+coordinates being converted to geo are converted to QD first and
+passed through APXG2Q).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Be3</strong> (<em>(1, N) or (1,) ndarray</em>)</p></li>
+<li><p><strong>e3</strong> (<em>(3, N) or (3,) ndarray</em>)</p></li>
+<li><p><strong>Bd3</strong> (<em>(1, N) or (1,) ndarray</em>)</p></li>
+<li><p><strong>d3</strong> (<em>(3, N) or (3,) ndarray</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Be3 is not equivalent to the magnitude of the IGRF magnitude, but is
+instead equal to the IGRF magnitude divided by a scaling factor, D.
+Similarly, Bd3 is the IGRF magnitude multiplied by D.</p>
+<p>See Richmond, A. D. (1995) <a class="footnote-reference brackets" href="#id11" id="id15">4</a> equations 3.13 and 3.14</p>
+<p class="rubric">References</p>
+<p>Richmond, A. D. (1995) <a class="footnote-reference brackets" href="#id11" id="id16">4</a>
+Emmert, J. T. et al. (2010) <a class="footnote-reference brackets" href="#id12" id="id17">5</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="helpers.html" class="btn btn-neutral float-right" title="apexpy.helpers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Christer van der Meeren, Angeline G. Burrell
+      <span class="lastupdated">
+        Last updated on Feb 23, 2021.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
