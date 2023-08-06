@@ -1,0 +1,11 @@
+# ListApplicationsResponse
+
+Response object for application list
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**applications** | [**list[Application]**](Application.md) | List of applications | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
