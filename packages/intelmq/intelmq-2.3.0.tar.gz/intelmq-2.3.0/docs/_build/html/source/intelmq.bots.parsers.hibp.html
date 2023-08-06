@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>intelmq.bots.parsers.hibp package &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-bots-parsers-hibp-package">
+<h1>intelmq.bots.parsers.hibp package<a class="headerlink" href="#intelmq-bots-parsers-hibp-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-intelmq.bots.parsers.hibp.parser_callback">
+<span id="intelmq-bots-parsers-hibp-parser-callback-module"></span><h2>intelmq.bots.parsers.hibp.parser_callback module<a class="headerlink" href="#module-intelmq.bots.parsers.hibp.parser_callback" title="Permalink to this headline">¶</a></h2>
+<p>There are two different Formats: Breaches and Pastes
+For Breaches, there are again two different Variants:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Callback Test: has field ‘Email’, Breach is a list of dictionaries</p></li>
+<li><p>Real: has NO field ‘Email’, Breach is a dictionary</p></li>
+</ul>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.hibp.parser_callback.BOT">
+<code class="sig-prename descclassname">intelmq.bots.parsers.hibp.parser_callback.</code><code class="sig-name descname">BOT</code><a class="headerlink" href="#intelmq.bots.parsers.hibp.parser_callback.BOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot" title="intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot">
+<em class="property">class </em><code class="sig-prename descclassname">intelmq.bots.parsers.hibp.parser_callback.</code><code class="sig-name descname">HIBPCallbackParserBot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sighup_event</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disable_multithreading</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="intelmq.lib.html#intelmq.lib.bot.ParserBot" title="intelmq.lib.bot.ParserBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.lib.bot.ParserBot</span></code></a></p>
+<dl class="py method">
+<dt id="intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">report</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator yielding the single elements of the data.</p>
+<p>Comments, headers etc. can be processed here. Data needed by
+<cite>self.parse_line</cite> can be saved in <cite>self.tempdata</cite> (list).</p>
+<p>Default parser yields stripped lines.
+Override for your use or use an existing parser, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parse</span> <span class="o">=</span> <span class="n">ParserBot</span><span class="o">.</span><span class="n">parse_csv</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>You should do that for recovering lines too.</dt><dd><p>recover_line = ParserBot.recover_line_csv</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.parse_line">
+<code class="sig-name descname">parse_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">report</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.parse_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator which can yield one or more messages contained in line.</p>
+<p>Report has the full message, thus you can access some metadata.
+Override for your use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.recover_line">
+<code class="sig-name descname">recover_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.hibp.parser_callback.HIBPCallbackParserBot.recover_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverse of “parse” for single lines.</p>
+<p>Recovers a fully functional report with only the problematic line by
+concatenating all strings in “self.tempdata” with “line” with LF
+newlines. Works fine for most text files.</p>
+<dl class="simple">
+<dt>line<span class="classifier">Optional[str], optional</span></dt><dd><p>The currently process line which should be transferred into it’s
+original appearance. As fallback, “self.current_line” is used if
+available (depending on self.parse).
+The default is None.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If neither the parameter “line” nor the member “self.current_line”
+is available.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>str</dt><dd><p>The reconstructed raw data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.parsers.hibp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-intelmq.bots.parsers.hibp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/source/intelmq.bots.parsers.hibp.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>intelmq.bots.experts.splunk_saved_search package &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-bots-experts-splunk-saved-search-package">
+<h1>intelmq.bots.experts.splunk_saved_search package<a class="headerlink" href="#intelmq-bots-experts-splunk-saved-search-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-intelmq.bots.experts.splunk_saved_search.expert">
+<span id="intelmq-bots-experts-splunk-saved-search-expert-module"></span><h2>intelmq.bots.experts.splunk_saved_search.expert module<a class="headerlink" href="#module-intelmq.bots.experts.splunk_saved_search.expert" title="Permalink to this headline">¶</a></h2>
+<p>Splunk saved search enrichment export bot</p>
+<p>SPDX-FileCopyrightText: 2020 Linköping University &lt;<a class="reference external" href="https://liu.se/">https://liu.se/</a>&gt;
+SPDX-License-Identifier: AGPL-3.0-or-later</p>
+<p>Searches Splunk for fields in an event and adds search results to it.</p>
+<p>This bot is quite slow, since it needs to submit a search job to
+Splunk, get the job ID, poll for the job to complete and then retrieve
+the results. If you have a high query load, run more instances of the
+bot.</p>
+<dl class="field-list">
+<dt class="field-odd">param Generic IntelMQ HTTP parameters</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param auth_token</dt>
+<dd class="field-even"><p>string, Splunk authentication token</p>
+</dd>
+<dt class="field-odd">param url</dt>
+<dd class="field-odd"><p>string, base URL of the Splunk REST API</p>
+</dd>
+<dt class="field-even">param retry_interval</dt>
+<dd class="field-even"><p>integer, optional, default 5, number of seconds to
+wait between polling for search results to be
+available</p>
+</dd>
+<dt class="field-odd">param saved_search</dt>
+<dd class="field-odd"><p>string, name of Splunk saved search to run</p>
+</dd>
+<dt class="field-even">param search_parameters</dt>
+<dd class="field-even"><p>map string-&gt;string, optional, default {},
+IntelMQ event fields to Splunk saved search
+parameters</p>
+</dd>
+<dt class="field-odd">param result_fields</dt>
+<dd class="field-odd"><p>map string-&gt;string, optional, default {}, Splunk
+search result fields to IntelMQ event fields</p>
+</dd>
+<dt class="field-even">param not_found</dt>
+<dd class="field-even"><p>list of strings, default [ “warn”, “send” ], what to do
+if the search returns zero results. All specified
+actions are performed. Any reasonable combination of:
+warn: log a warning message
+send: send the event on unmodified
+drop: drop the message</p>
+</dd>
+<dt class="field-odd">param multiple_result_handling</dt>
+<dd class="field-odd"><p>list of strings, default [ “warn”,
+“use_first”, “send” ], what to do if the
+search returns more than one result. All
+specified actions are performed. Any
+reasonable combination of:
+limit: limit the search so that duplicates</p>
+<blockquote>
+<div><p>are impossible</p>
+</div></blockquote>
+<p>warn: log a warning message
+use_first: use the first search result
+ignore: do not modify the event
+send: send the event on
+drop: drop the message</p>
+</dd>
+<dt class="field-even">param overwrite</dt>
+<dd class="field-even"><p>bool or null, optional, default null, whether search
+results replace existing values in the event. If null,
+trying to set an existing field raises
+intelmq.exceptions.KeyExists.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.BOT">
+<code class="sig-prename descclassname">intelmq.bots.experts.splunk_saved_search.expert.</code><code class="sig-name descname">BOT</code><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.BOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot" title="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot">
+<em class="property">class </em><code class="sig-prename descclassname">intelmq.bots.experts.splunk_saved_search.expert.</code><code class="sig-name descname">SplunkSavedSearchBot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sighup_event</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disable_multithreading</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="intelmq.lib.html#intelmq.lib.bot.Bot" title="intelmq.lib.bot.Bot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.lib.bot.Bot</span></code></a></p>
+<dl class="py method">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.init">
+<code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.is_multithreadable">
+<code class="sig-name descname">is_multithreadable</code><em class="property"> = False</em><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.is_multithreadable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.update_event">
+<code class="sig-name descname">update_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">search_result</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.experts.splunk_saved_search.expert.SplunkSavedSearchBot.update_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.experts.splunk_saved_search">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-intelmq.bots.experts.splunk_saved_search" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/source/intelmq.bots.experts.splunk_saved_search.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

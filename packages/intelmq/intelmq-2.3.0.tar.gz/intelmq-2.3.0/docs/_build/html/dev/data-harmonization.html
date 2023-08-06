@@ -1,0 +1,676 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Harmonization &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Harmonization field names" href="harmonization-fields.html" />
+    <link rel="prev" title="Developers Guide" href="guide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="data-harmonization">
+<h1><a class="toc-backref" href="#id1">Data Harmonization</a><a class="headerlink" href="#data-harmonization" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#data-harmonization" id="id1">Data Harmonization</a></p>
+<ul>
+<li><p><a class="reference internal" href="#overview" id="id2">Overview</a></p></li>
+<li><p><a class="reference internal" href="#rules-for-keys" id="id3">Rules for keys</a></p></li>
+<li><p><a class="reference internal" href="#sections" id="id4">Sections</a></p>
+<ul>
+<li><p><a class="reference internal" href="#feed" id="id5">Feed</a></p></li>
+<li><p><a class="reference internal" href="#time" id="id6">Time</a></p></li>
+<li><p><a class="reference internal" href="#source-identity" id="id7">Source Identity</a></p>
+<ul>
+<li><p><a class="reference internal" href="#source-geolocation-identity" id="id8">Source Geolocation Identity</a></p></li>
+<li><p><a class="reference internal" href="#source-local-identity" id="id9">Source Local Identity</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#destination-identity" id="id10">Destination Identity</a></p>
+<ul>
+<li><p><a class="reference internal" href="#destination-geolocation-identity" id="id11">Destination Geolocation Identity</a></p></li>
+<li><p><a class="reference internal" href="#destination-local-identity" id="id12">Destination Local Identity</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#extra-values" id="id13">Extra values</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#fields-list-and-data-types" id="id14">Fields List and data types</a></p></li>
+<li><p><a class="reference internal" href="#classification" id="id15">Classification</a></p></li>
+<li><p><a class="reference internal" href="#minimum-recommended-requirements-for-events" id="id16">Minimum recommended requirements for events</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id2">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>All messages (reports and events) are Python/JSON dictionaries. The key names and according types are defined by the so called <em>harmonization</em>.</p>
+<p>The purpose of this document is to list and clearly define known <strong>fields</strong> in Abusehelper as well as IntelMQ or similar systems. A field is a <code class="docutils literal notranslate"><span class="pre">`key=value`</span></code> pair. For a clear and unique definition of a field, we must define the <strong>key</strong> (field-name) as well as the possible <strong>values</strong>. A field belongs to an <strong>event</strong>. An event is basically a  structured log record in the form <code class="docutils literal notranslate"><span class="pre">`key=value,</span> <span class="pre">key=value,</span> <span class="pre">key=value,</span> <span class="pre">…`</span></code>. In the <a class="reference internal" href="#data-harmonization-field-list"><span class="std std-ref">List of known fields</span></a>, each field is grouped by a <strong>section</strong>. We describe these sections briefly below.
+Every event <strong>MUST</strong> contain a timestamp field.</p>
+<p>An <a class="reference external" href="https://en.wikipedia.org/wiki/Indicator_of_compromise">IOC</a> (Indicator of compromise) is a single observation like a log line.</p>
+</div>
+<div class="section" id="rules-for-keys">
+<h2><a class="toc-backref" href="#id3">Rules for keys</a><a class="headerlink" href="#rules-for-keys" title="Permalink to this headline">¶</a></h2>
+<p>The keys can be grouped together in sub-fields, e.g. <cite>source.ip</cite> or <cite>source.geolocation.latitude</cite>. Thus, keys must match <cite>^[a-z_](.[a-z0-9_]+)*$</cite>.</p>
+</div>
+<div class="section" id="sections">
+<h2><a class="toc-backref" href="#id4">Sections</a><a class="headerlink" href="#sections" title="Permalink to this headline">¶</a></h2>
+<p>As stated above, every field is organized under some section. The following is a description of the sections and what they imply.</p>
+<div class="section" id="feed">
+<h3><a class="toc-backref" href="#id5">Feed</a><a class="headerlink" href="#feed" title="Permalink to this headline">¶</a></h3>
+<p>Fields listed under this grouping list details about the source feed where information came from.</p>
+</div>
+<div class="section" id="time">
+<h3><a class="toc-backref" href="#id6">Time</a><a class="headerlink" href="#time" title="Permalink to this headline">¶</a></h3>
+<p>The time section lists all fields related to time information.
+This document requires that all the timestamps MUST be normalized to UTC. If the source reports only a date, do not attempt to invent timestamps.</p>
+</div>
+<div class="section" id="source-identity">
+<h3><a class="toc-backref" href="#id7">Source Identity</a><a class="headerlink" href="#source-identity" title="Permalink to this headline">¶</a></h3>
+<p>This section lists all fields related to identification of the source. The source is the identity the IoC is about, as opposed to the destination identity, which is another identity.</p>
+<p>For examples see the table below.</p>
+<p>The abuse type of an event defines the way these events needs to be interpreted. For example, for a botnet drone they refer to the compromised machine, whereas for a command and control server they refer the server itself.</p>
+<div class="section" id="source-geolocation-identity">
+<h4><a class="toc-backref" href="#id8">Source Geolocation Identity</a><a class="headerlink" href="#source-geolocation-identity" title="Permalink to this headline">¶</a></h4>
+<p>We recognize that ip geolocation is not an exact science and analysis of the abuse data has shown that different sources attribution sources have different opinions of the geolocation of an ip. This is why we recommend to enrich the data with as many sources as you have available and make the decision which value to use for the cc IOC based on those answers.</p>
+</div>
+<div class="section" id="source-local-identity">
+<h4><a class="toc-backref" href="#id9">Source Local Identity</a><a class="headerlink" href="#source-local-identity" title="Permalink to this headline">¶</a></h4>
+<p>Some sources report an internal (NATed) IP address.</p>
+</div>
+</div>
+<div class="section" id="destination-identity">
+<h3><a class="toc-backref" href="#id10">Destination Identity</a><a class="headerlink" href="#destination-identity" title="Permalink to this headline">¶</a></h3>
+<p>The abuse type of an event defines the way these IOCs needs to be interpreted. For a botnet drone they refer to the compromised machine, whereas for a command and control server they refer the server itself.</p>
+<div class="section" id="destination-geolocation-identity">
+<h4><a class="toc-backref" href="#id11">Destination Geolocation Identity</a><a class="headerlink" href="#destination-geolocation-identity" title="Permalink to this headline">¶</a></h4>
+<p>We recognize that ip geolocation is not an exact science and analysis of the abuse data has shown that different sources attribution sources have different opinions of the geolocation of an ip. This is why we recommend to enrich the data with as many sources as you have available and make the decision which value to use for the cc IOC based on those answers.</p>
+</div>
+<div class="section" id="destination-local-identity">
+<h4><a class="toc-backref" href="#id12">Destination Local Identity</a><a class="headerlink" href="#destination-local-identity" title="Permalink to this headline">¶</a></h4>
+<p>Some sources report an internal (NATed) IP address.</p>
+</div>
+</div>
+<div class="section" id="extra-values">
+<h3><a class="toc-backref" href="#id13">Extra values</a><a class="headerlink" href="#extra-values" title="Permalink to this headline">¶</a></h3>
+<p>Data which does not fit in the harmonization can be saved in the ‘extra’ namespace. All keys must begin with <cite>extra.</cite>, there are no other rules on key names and values. The values can be get/set like all other fields.</p>
+</div>
+</div>
+<div class="section" id="fields-list-and-data-types">
+<span id="data-harmonization-field-list"></span><h2><a class="toc-backref" href="#id14">Fields List and data types</a><a class="headerlink" href="#fields-list-and-data-types" title="Permalink to this headline">¶</a></h2>
+<p>A list of allowed fields and data types can be found in <a class="reference internal" href="harmonization-fields.html"><span class="doc">Harmonization field names</span></a>.</p>
+</div>
+<div class="section" id="classification">
+<span id="data-harmonization-classification"></span><h2><a class="toc-backref" href="#id15">Classification</a><a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h2>
+<p>IntelMQ classifies events using three labels: taxonomy, type and identifier. This tuple of three values can be used for deduplication of events and describes what happened.
+TODO: examples from chat</p>
+<p>The taxonomy can be automatically added by the taxonomy expert bot based on the given type. The following taxonomy-type mapping is based on <a class="reference external" href="https://www.trusted-introducer.org/Incident-Classification-Taxonomy.pdf">eCSIRT II Taxonomy</a>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 7%" />
+<col style="width: 88%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Taxonomy</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>abusive content</p></td>
+<td><p>spam</p></td>
+<td><p>Or ‘Unsolicited Bulk Email’, this means that the recipient has not granted verifiable permission for the message to be sent and that the message is sent as part of a larger collection of messages, all having a functionally comparable content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>abusive-content</p></td>
+<td><p>harmful-speech</p></td>
+<td><p>Discreditation or discrimination of somebody, e.g. cyber stalking, racism or threats against one or more individuals.</p></td>
+</tr>
+<tr class="row-even"><td><p>abusive-content</p></td>
+<td><p>violence</p></td>
+<td><p>Child pornography, glorification of violence, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p>availability</p></td>
+<td><p>ddos</p></td>
+<td><p>Distributed Denial of Service attack, e.g. SYN-Flood or UDP-based reflection/amplification attacks.</p></td>
+</tr>
+<tr class="row-even"><td><p>availability</p></td>
+<td><p>dos</p></td>
+<td><p>Denial of Service attack, e.g. sending specially crafted requests to a web application which causes the application to crash or slow down.</p></td>
+</tr>
+<tr class="row-odd"><td><p>availability</p></td>
+<td><p>outage</p></td>
+<td><p>Outage caused e.g. by air condition failure or natural disaster.</p></td>
+</tr>
+<tr class="row-even"><td><p>availability</p></td>
+<td><p>sabotage</p></td>
+<td><p>Physical sabotage, e.g cutting wires or malicious arson.</p></td>
+</tr>
+<tr class="row-odd"><td><p>fraud</p></td>
+<td><p>copyright</p></td>
+<td><p>Offering or Installing copies of unlicensed commercial software or other copyright protected materials (Warez).</p></td>
+</tr>
+<tr class="row-even"><td><p>fraud</p></td>
+<td><p>masquerade</p></td>
+<td><p>Type of attack in which one entity illegitimately impersonates the identity of another in order to benefit from it.</p></td>
+</tr>
+<tr class="row-odd"><td><p>fraud</p></td>
+<td><p>phishing</p></td>
+<td><p>Masquerading as another entity in order to persuade the user to reveal private credentials.</p></td>
+</tr>
+<tr class="row-even"><td><p>fraud</p></td>
+<td><p>unauthorized-use-of-resources</p></td>
+<td><p>Using resources for unauthorized purposes including profit-making ventures, e.g. the use of e-mail to participate in illegal profit chain letters or pyramid schemes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>information content security</p></td>
+<td><p>Unauthorised-information-acces</p></td>
+<td><p>Unauthorized access to information, e.g. by abusing stolen login credentials for a system or application, intercepting traffic or gaining access to physical documents.</p></td>
+</tr>
+<tr class="row-even"><td><p>information content security</p></td>
+<td><p>Unauthorised-information-modification</p></td>
+<td><p>Unauthorised modification of information, e.g. by an attacker abusing stolen login credentials for a system or application or a ransomware encrypting data.</p></td>
+</tr>
+<tr class="row-odd"><td><p>information content security</p></td>
+<td><p>data-loss</p></td>
+<td><p>Loss of data, e.g. caused by harddisk failure or physical theft.</p></td>
+</tr>
+<tr class="row-even"><td><p>information content security</p></td>
+<td><p>dropzone</p></td>
+<td><p>This IOC refers to place where the compromised machines store the stolen user data. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>information content security</p></td>
+<td><p>leak</p></td>
+<td><p>IOCs relating to leaked credentials or personal data. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>information gathering</p></td>
+<td><p>scanner</p></td>
+<td><p>Attacks that send requests to a system to discover weaknesses. This also includes testing processes to gather information on hosts, services and accounts. Examples: fingerd, DNS querying, ICMP, SMTP (EXPN, RCPT, …), port scanning.</p></td>
+</tr>
+<tr class="row-odd"><td><p>information-gathering</p></td>
+<td><p>sniffing</p></td>
+<td><p>Observing and recording of network traffic (wiretapping).</p></td>
+</tr>
+<tr class="row-even"><td><p>information-gathering</p></td>
+<td><p>social-engineering</p></td>
+<td><p>Gathering information from a human being in a non-technical way (e.g. lies, tricks, bribes, or threats). This IOC refers to a resource, which has been observed to perform brute-force attacks over a given application protocol.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusion attempts</p></td>
+<td><p>brute-force</p></td>
+<td><p>Multiple login attempts (Guessing / cracking of passwords, brute force).</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusion attempts</p></td>
+<td><p>exploit</p></td>
+<td><p>An attack using an unknown exploit.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusion attempts</p></td>
+<td><p>ids-alert</p></td>
+<td><p>IOCs based on a sensor network. This is a generic IOC denomination, should it be difficult to reliably denote the exact type of activity involved for example due to an anecdotal nature of the rule that triggered the alert.</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusions</p></td>
+<td><p>application-compromise</p></td>
+<td><p>Compromise of an application by exploiting (un)known software vulnerabilities, e.g. SQL injection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusions</p></td>
+<td><p>backdoor</p></td>
+<td><p>This refers to hosts, which have been compromised and backdoored with a remote administration software or Trojan in the traditional sense. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusions</p></td>
+<td><p>burglary</p></td>
+<td><p>Physical intrusion, e.g. into corporate building or data center.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusions</p></td>
+<td><p>compromised</p></td>
+<td><p>This IOC refers to compromised system. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusions</p></td>
+<td><p>defacement</p></td>
+<td><p>This IOC refers to hacktivism related activity. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusions</p></td>
+<td><p>privileged-account-compromise</p></td>
+<td><p>Compromise of a system where the attacker gained administrative privileges.</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusions</p></td>
+<td><p>unauthorized-command</p></td>
+<td><p>The possibly infected device sent unauthorized commands to a remote device with malicious intent. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>intrusions</p></td>
+<td><p>unauthorized-login</p></td>
+<td><p>A possibly infected device logged in to a remote device without authorization. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>intrusions</p></td>
+<td><p>unprivileged-account-compromise</p></td>
+<td><p>Compromise of a system using an unprivileged (user/service) account.</p></td>
+</tr>
+<tr class="row-odd"><td><p>malicious code</p></td>
+<td><p>c2server</p></td>
+<td><p>This is a command and control server in charge of a given number of botnet drones.</p></td>
+</tr>
+<tr class="row-even"><td><p>malicious code</p></td>
+<td><p>dga domain</p></td>
+<td><p>DGA Domains are seen various families of malware that are used to periodically generate a large number of domain names that can be used as rendezvous points with their command and control servers. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>malicious code</p></td>
+<td><p>infected-system</p></td>
+<td><p>This is a compromised machine, which has been observed to make a connection to a command and control server.</p></td>
+</tr>
+<tr class="row-even"><td><p>malicious code</p></td>
+<td><p>malware</p></td>
+<td><p>A URL is the most common resource with reference to malware binary distribution. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>malicious code</p></td>
+<td><p>malware-configuration</p></td>
+<td><p>This is a resource which updates botnet drones with a new configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>malicious code</p></td>
+<td><p>malware-distribution</p></td>
+<td><p>URI used for malware distribution, e.g. a download URL included in fake invoice malware spam.</p></td>
+</tr>
+<tr class="row-odd"><td><p>malicious code</p></td>
+<td><p>ransomware</p></td>
+<td><p>This IOC refers to a specific type of compromised machine, where the computer has been hijacked for ransom by the criminals. Not in ENISA eCSIRT-II taxonomy and deprecated, use ‘infected system instead’.</p></td>
+</tr>
+<tr class="row-even"><td><p>other</p></td>
+<td><p>blacklist</p></td>
+<td><p>Some sources provide blacklists, which clearly refer to abusive behavior, such as spamming, but fail to denote the exact reason why a given identity has been blacklisted. The reason may be that the justification is anecdotal or missing entirely. This type should only be used if the typing fits the definition of a blacklist, but an event specific denomination is not possible for one reason or another.</p></td>
+</tr>
+<tr class="row-odd"><td><p>other</p></td>
+<td><p>other</p></td>
+<td><p>All incidents which don’t fit in one of the given categories should be put into this class.</p></td>
+</tr>
+<tr class="row-even"><td><p>other</p></td>
+<td><p>proxy</p></td>
+<td><p>This refers to the use of proxies from inside your network. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>other</p></td>
+<td><p>tor</p></td>
+<td><p>This IOC refers to incidents related to TOR network infrastructure. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>other</p></td>
+<td><p>unknown</p></td>
+<td><p>Unknown classification. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>test</p></td>
+<td><p>test</p></td>
+<td><p>Meant for testing.</p></td>
+</tr>
+<tr class="row-even"><td><p>vulnerable</p></td>
+<td><p>ddos-amplifier</p></td>
+<td><p>Publicly accessible services that can be abused for conducting DDoS reflection/amplification attacks, e.g. DNS open-resolvers or NTP servers with monlist enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>vulnerable</p></td>
+<td><p>information-disclosure</p></td>
+<td><p>Publicly accessible services potentially disclosing sensitive information, e.g. SNMP or Redis.</p></td>
+</tr>
+<tr class="row-even"><td><p>vulnerable</p></td>
+<td><p>potentially-unwanted-accessible</p></td>
+<td><p>Potentially unwanted publicly accessible services, e.g. Telnet, RDP or VNC.</p></td>
+</tr>
+<tr class="row-odd"><td><p>vulnerable</p></td>
+<td><p>vulnerable client</p></td>
+<td><p>This attribute refers to a badly configured or vulnerable clients, which may be vulnerable and can be compromised by a third party. For example, not-up-to-date clients or client which are misconfigured, such as clients querying public domains for WPAD configurations. In addition, to specify the vulnerability and its potential abuse, one should use the classification.identifier, description and other attributes for that purpose respectively. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-even"><td><p>vulnerable</p></td>
+<td><p>vulnerable service</p></td>
+<td><p>This attribute refers to a badly configured or vulnerable network service, which may be abused by a third party. For example, these services relate to open proxies, open dns resolvers, network time servers (NTP) or character generation services (chargen), simple network management services (SNMP). In addition, to specify the network service and its potential abuse, one should use the protocol, destination port and description attributes for that purpose respectively. Not in ENISA eCSIRT-II taxonomy.</p></td>
+</tr>
+<tr class="row-odd"><td><p>vulnerable</p></td>
+<td><p>vulnerable-system</p></td>
+<td><p>A system which is vulnerable to certain attacks. Example: misconfigured client proxy settings (example: WPAD), outdated operating system version, etc.</p></td>
+</tr>
+<tr class="row-even"><td><p>vulnerable</p></td>
+<td><p>weak-crypto</p></td>
+<td><p>Publicly accessible services offering weak crypto, e.g. web servers susceptible to POODLE/FREAK attacks.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Meaning of source, destination and local values for each classification type and possible identifiers. The identifier is often a normalized malware name, grouping many variants.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 32%" />
+<col style="width: 17%" />
+<col style="width: 12%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Source</p></th>
+<th class="head"><p>Destination</p></th>
+<th class="head"><p>Local</p></th>
+<th class="head"><p>Possible identifiers</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>backdoor</p></td>
+<td><p><em>backdoored device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>blacklist</p></td>
+<td><p><em>blacklisted device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>brute-force</p></td>
+<td><p><em>attacker</em></p></td>
+<td><p>target</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>c2server</p></td>
+<td><p><em>(sinkholed) c&amp;c server</em></p></td>
+<td></td>
+<td></td>
+<td><p>zeus, palevo, feodo</p></td>
+</tr>
+<tr class="row-even"><td><p>compromised</p></td>
+<td><p><em>server</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ddos</p></td>
+<td><p><em>attacker</em></p></td>
+<td><p>target</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>defacement</p></td>
+<td><p><em>defaced website</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>dga domain</p></td>
+<td><p><em>infected device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>dropzone</p></td>
+<td><p><em>server hosting stolen data</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>exploit</p></td>
+<td><p><em>hosting server</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ids-alert</p></td>
+<td><p><em>triggering device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>infected system</p></td>
+<td><p><em>infected device</em></p></td>
+<td><p><em>contacted c2c server</em></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>malware</p></td>
+<td><p><em>infected device</em></p></td>
+<td></td>
+<td><p>internal at source</p></td>
+<td><p>zeus, palevo, feodo</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware configuration</p></td>
+<td><p><em>infected device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>other</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>phishing</p></td>
+<td><p><em>phishing website</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>proxy</p></td>
+<td><p><em>server allowing policy and security bypass</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ransomware</p></td>
+<td><p><em>infected device</em></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>scanner</p></td>
+<td><p><em>scanning device</em></p></td>
+<td><p>scanned device</p></td>
+<td></td>
+<td><p>http,modbus,wordpress</p></td>
+</tr>
+<tr class="row-odd"><td><p>spam</p></td>
+<td><p><em>infected device</em></p></td>
+<td><p>targeted server</p></td>
+<td><p>internal at source</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>test</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>unknown</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>vulnerable service</p></td>
+<td><p><em>vulnerable device</em></p></td>
+<td></td>
+<td></td>
+<td><p>heartbleed, openresolver, snmp</p></td>
+</tr>
+<tr class="row-odd"><td><p>vulnerable client</p></td>
+<td><p><em>vulnerable device</em></p></td>
+<td></td>
+<td></td>
+<td><p>wpad</p></td>
+</tr>
+</tbody>
+</table>
+<p>Field in italics is the interesting one for CERTs.</p>
+<p>Example:</p>
+<p>If you know of an IP address that connects to a zeus c&amp;c server, it’s about the infected device, thus type malware and identifier zeus. If you want to complain about the c&amp;c server, it’s type c&amp;c and identifier zeus. The <cite>malware.name</cite> can have the full name, eg. ‘zeus_p2p’.</p>
+</div>
+<div class="section" id="minimum-recommended-requirements-for-events">
+<h2><a class="toc-backref" href="#id16">Minimum recommended requirements for events</a><a class="headerlink" href="#minimum-recommended-requirements-for-events" title="Permalink to this headline">¶</a></h2>
+<p>Below, we have enumerated the minimum recommended requirements for an actionable abuse event. These keys should to be present for the abuse report to make sense for the end recipient. Please note that if you choose to anonymize your sources, you can substitute <strong>feed</strong> with <strong>feed.code</strong> and that only one of the identity keys <strong>ip</strong>, <strong>domain name</strong>, <strong>url</strong>, <strong>email address</strong> must be present. All the rest of the keys are <strong>optional</strong>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 41%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Category</p></th>
+<th class="head"><p>Key</p></th>
+<th class="head"><p>Terminology</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Feed</p></td>
+<td><p>feed</p></td>
+<td><p>Should</p></td>
+</tr>
+<tr class="row-odd"><td><p>Classification</p></td>
+<td><p>classification.type</p></td>
+<td><p>Should</p></td>
+</tr>
+<tr class="row-even"><td><p>Classification</p></td>
+<td><p>classification.taxonomy</p></td>
+<td><p>Should</p></td>
+</tr>
+<tr class="row-odd"><td><p>Time</p></td>
+<td><p>time.source</p></td>
+<td><p>Should</p></td>
+</tr>
+<tr class="row-even"><td><p>Time</p></td>
+<td><p>time.observation</p></td>
+<td><p>Should</p></td>
+</tr>
+<tr class="row-odd"><td><p>Identity</p></td>
+<td><p>source.ip</p></td>
+<td><p>Should*</p></td>
+</tr>
+<tr class="row-even"><td><p>Identity</p></td>
+<td><p>source.fqdn</p></td>
+<td><p>Should*</p></td>
+</tr>
+<tr class="row-odd"><td><p>Identity</p></td>
+<td><p>source.url</p></td>
+<td><p>Should*</p></td>
+</tr>
+<tr class="row-even"><td><p>Identity</p></td>
+<td><p>source.account</p></td>
+<td><p>Should*</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>only one of them</p></li>
+</ul>
+<p>This list of required fields is <em>not</em> enforced by IntelMQ.</p>
+<p><strong>NOTE:</strong> This document was copied from <a class="reference external" href="https://github.com/abusesa/abusehelper/">AbuseHelper repository</a> and improved.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Developers Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="guide.html" title="previous chapter">Developers Guide</a></li>
+      <li>Next: <a href="harmonization-fields.html" title="next chapter">Harmonization field names</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/dev/data-harmonization.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

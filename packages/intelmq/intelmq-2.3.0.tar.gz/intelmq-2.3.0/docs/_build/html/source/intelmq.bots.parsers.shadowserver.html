@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>intelmq.bots.parsers.shadowserver package &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-bots-parsers-shadowserver-package">
+<h1>intelmq.bots.parsers.shadowserver package<a class="headerlink" href="#intelmq-bots-parsers-shadowserver-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-intelmq.bots.parsers.shadowserver.config">
+<span id="intelmq-bots-parsers-shadowserver-config-module"></span><h2>intelmq.bots.parsers.shadowserver.config module<a class="headerlink" href="#module-intelmq.bots.parsers.shadowserver.config" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (c)2016-2018 by Bundesamt für Sicherheit in der Informationstechnik (BSI)</p>
+<p>Software engineering by BSI &amp; Intevation GmbH</p>
+<p>This is a configuration File for the shadowserver parser</p>
+<p>In the following, <em>intelmqkey</em> are arbitrary keys from intelmq’s harmonization
+and <em>shadowkey</em> is a column name from shadowserver’s data.</p>
+<p>Every bot-type is defined by a dictionary with three values:
+- <cite>required_fields</cite>: A list of tuples containing intelmq’s field name, field</p>
+<blockquote>
+<div><p>name from data and an optional conversion function. Errors are raised, if the
+field does not exists in data.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><cite>optional_fields</cite>: Same format as above, but does not raise errors if the
+field does not exist. If there’s no mapping to an intelmq field, you can set
+the intelmqkey to <cite>extra.</cite> and the field will be added to the extra field
+using the original field name. See section below for possible tuple-values.</p></li>
+<li><p><cite>constant_fields</cite>: A dictionary with a static mapping of field name to data,
+e.g. to set classifications or protocols.</p></li>
+</ul>
+<p>The tuples can be of following format:</p>
+<ul class="simple">
+<li><p><cite>(‘intelmqkey’, ‘shadowkey’)</cite>, the data from the column <em>shadowkey</em> will be
+saved in the event’s field <em>intelmqkey</em>. Logically equivalent to:
+<cite>event[`*intelmqkey*</cite>] = row[<cite>*shadowkey*</cite>]`.</p></li>
+<li><p><cite>(‘intelmqkey’, ‘shadowkey’, conversion_function)</cite>, the given function will be
+used to convert and/or validate the data. Logically equivalent to:
+<cite>event[`*intelmqkey*</cite>] = conversion_function(row[<cite>*shadowkey*</cite>)]`.</p></li>
+<li><p><cite>(‘intelmqkey’, ‘shadowkey’, conversion_function, True)</cite>, the function gets
+two parameters here, the second one is the full row (as dictionary). Logically
+equivalent to:
+<cite>event[`*intelmqkey*</cite>] = conversion_function(row[<cite>*shadowkey*</cite>, row)]`.</p></li>
+<li><p><cite>(‘extra.’, ‘shadowkey’, conversion_function)</cite>, the data will be added to
+extra in this case, the resulting name is <cite>extra.[shadowkey]</cite>. The
+<cite>conversion_function</cite> is optional. Logically equivalent to:
+<cite>event[extra.`*intelmqkey*</cite>] = conversion_function(row[<cite>*shadowkey*</cite>)]`.</p></li>
+<li><p><cite>(False, ‘shadowkey’)</cite>, the column will be ignored.</p></li>
+</ul>
+<p>Mappings are “straight forward” each mapping is a dict
+of at least three keys:</p>
+<ol class="arabic simple">
+<li><p>required fields:
+the parser will work this keys first.</p></li>
+<li><p>optional fields:
+the parser will try to interpret these values.
+if it fails, the value is written to the extra field</p></li>
+<li><p>constant fields:
+Some information about an event may not be explicitly stated in a
+feed because it is implicit in the nature of the feed. For instance
+a feed that is exclusively about HTTP may not have a field for the
+protocol because it’s always TCP.</p></li>
+</ol>
+<p>The first value is the IntelMQ key,
+the second value is the row in the shadowserver csv.</p>
+<dl>
+<dt>Reference material:</dt><dd><ul class="simple">
+<li><p>when setting the classification.* fields,
+please use the taxonomy from the Data Harmonization
+<a class="reference internal" href="../dev/data-harmonization.html#data-harmonization-classification"><span class="std std-ref">Classification</span></a>
+or upstream from <a class="reference external" href="https://github.com/enisaeu/Reference-Security-Incident-Taxonomy-Task-Force/">https://github.com/enisaeu/Reference-Security-Incident-Taxonomy-Task-Force/</a></p></li>
+<li><p>please respect the Data harmonization ontology: <a class="reference internal" href="../dev/data-harmonization.html"><span class="doc">Data Harmonization</span></a></p></li>
+</ul>
+</dd>
+<dt>TODOs:</dt><dd><p>There is a bunch of inline todos.
+Most of them show lines of code were the mapping has to be validated</p>
+<p>&#64; Check-Implementation Tags for parser configs.
+dmth thinks it’s not sufficient. Some CERT-Expertise is needed to
+check if the mappings are correct.</p>
+<p>feed_idx is not complete.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.add_UTC_to_timestamp">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">add_UTC_to_timestamp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.add_UTC_to_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.convert_bool">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">convert_bool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.convert_bool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.convert_date">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">convert_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.convert_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.convert_float">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">convert_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.convert_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an float or None for empty strings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.convert_http_host_and_url">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">convert_http_host_and_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">row</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.convert_http_host_and_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>URLs are split into hostname and path. The column names differ in reports.
+Compromised-Website: http_host, url
+Drone: cc_dns, url
+IPv6-Sinkhole-HTTP-Drone: http_host, http_url
+Microsoft-Sinkhole: http_host, url
+Sinkhole-HTTP-Drone: http_host, url
+With some reports, url/http_url holds only the path, with others the full HTTP request.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.convert_int">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">convert_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.convert_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an int or None for empty strings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.get_feed_by_feedname">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">get_feed_by_feedname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">given_feedname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.get_feed_by_feedname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.get_feed_by_filename">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">get_feed_by_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">given_filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.get_feed_by_filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.invalidate_zero">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">invalidate_zero</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.invalidate_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an int or None for empty strings or ‘0’.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.set_tor_node">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">set_tor_node</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.set_tor_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.validate_fqdn">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">validate_fqdn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.validate_fqdn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.validate_ip">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">validate_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.validate_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove “invalid” IP.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.validate_network">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">validate_network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.validate_network" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.parsers.shadowserver.config.validate_to_none">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.config.</code><code class="sig-name descname">validate_to_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.config.validate_to_none" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.parsers.shadowserver.parser">
+<span id="intelmq-bots-parsers-shadowserver-parser-module"></span><h2>intelmq.bots.parsers.shadowserver.parser module<a class="headerlink" href="#module-intelmq.bots.parsers.shadowserver.parser" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (C) 2016 by Bundesamt für Sicherheit in der Informationstechnik
+Software engineering by Intevation GmbH</p>
+<p>This is an “all-in-one” parser for a lot of shadowserver feeds.
+It depends on the configuration in the file “config.py”
+which holds information on how to treat certain shadowserverfeeds.
+It uses the report field extra.file_name to determine which config should apply,
+so this field is required.</p>
+<p>This parser will only work with csv files named like
+2019-01-01-scan_http-country-geo.csv.</p>
+<dl>
+<dt>Optional parameters:</dt><dd><dl class="simple">
+<dt>overwrite: Bool, default False. If True, it keeps the report’s</dt><dd><p>feed.name and does not override it with the corresponding feed name.</p>
+</dd>
+</dl>
+<p>feedname: The fixed feed name to use if it should not automatically detected.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.shadowserver.parser.BOT">
+<code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.parser.</code><code class="sig-name descname">BOT</code><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.BOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot" title="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot">
+<em class="property">class </em><code class="sig-prename descclassname">intelmq.bots.parsers.shadowserver.parser.</code><code class="sig-name descname">ShadowserverParserBot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sighup_event</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disable_multithreading</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="intelmq.lib.html#intelmq.lib.bot.ParserBot" title="intelmq.lib.bot.ParserBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.lib.bot.ParserBot</span></code></a></p>
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.csv_params">
+<code class="sig-name descname">csv_params</code><em class="property"> = {'dialect': 'unix'}</em><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.csv_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.feedname">
+<code class="sig-name descname">feedname</code><em class="property"> = None</em><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.feedname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.init">
+<code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.mode">
+<code class="sig-name descname">mode</code><em class="property"> = None</em><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">report</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator yielding the single elements of the data.</p>
+<p>Comments, headers etc. can be processed here. Data needed by
+<cite>self.parse_line</cite> can be saved in <cite>self.tempdata</cite> (list).</p>
+<p>Default parser yields stripped lines.
+Override for your use or use an existing parser, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parse</span> <span class="o">=</span> <span class="n">ParserBot</span><span class="o">.</span><span class="n">parse_csv</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>You should do that for recovering lines too.</dt><dd><p>recover_line = ParserBot.recover_line_csv</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.parse_line">
+<code class="sig-name descname">parse_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">report</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.parse_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator which can yield one or more messages contained in line.</p>
+<p>Report has the full message, thus you can access some metadata.
+Override for your use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.recover_line">
+<code class="sig-name descname">recover_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.recover_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts dictionaries to csv. self.csv_fieldnames must be list of fields.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.sparser_config">
+<code class="sig-name descname">sparser_config</code><em class="property"> = None</em><a class="headerlink" href="#intelmq.bots.parsers.shadowserver.parser.ShadowserverParserBot.sparser_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.parsers.shadowserver">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-intelmq.bots.parsers.shadowserver" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/source/intelmq.bots.parsers.shadowserver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

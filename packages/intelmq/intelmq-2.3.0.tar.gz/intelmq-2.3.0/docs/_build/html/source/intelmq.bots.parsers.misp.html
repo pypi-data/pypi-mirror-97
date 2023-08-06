@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>intelmq.bots.parsers.misp package &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-bots-parsers-misp-package">
+<h1>intelmq.bots.parsers.misp package<a class="headerlink" href="#intelmq-bots-parsers-misp-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-intelmq.bots.parsers.misp.parser">
+<span id="intelmq-bots-parsers-misp-parser-module"></span><h2>intelmq.bots.parsers.misp.parser module<a class="headerlink" href="#module-intelmq.bots.parsers.misp.parser" title="Permalink to this headline">¶</a></h2>
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.misp.parser.BOT">
+<code class="sig-prename descclassname">intelmq.bots.parsers.misp.parser.</code><code class="sig-name descname">BOT</code><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.BOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#intelmq.bots.parsers.misp.parser.MISPParserBot" title="intelmq.bots.parsers.misp.parser.MISPParserBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.bots.parsers.misp.parser.MISPParserBot</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="intelmq.bots.parsers.misp.parser.MISPParserBot">
+<em class="property">class </em><code class="sig-prename descclassname">intelmq.bots.parsers.misp.parser.</code><code class="sig-name descname">MISPParserBot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sighup_event</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disable_multithreading</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.MISPParserBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="intelmq.lib.html#intelmq.lib.bot.Bot" title="intelmq.lib.bot.Bot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.lib.bot.Bot</span></code></a></p>
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.misp.parser.MISPParserBot.MISP_TAXONOMY_MAPPING">
+<code class="sig-name descname">MISP_TAXONOMY_MAPPING</code><em class="property"> = {'ecsirt:abusive-content=&quot;spam&quot;': 'spam', 'ecsirt:availability=&quot;ddos&quot;': 'ddos', 'ecsirt:fraud=&quot;phishing&quot;': 'phishing', 'ecsirt:information-content-security=&quot;dropzone&quot;': 'dropzone', 'ecsirt:information-gathering=&quot;scanner&quot;': 'scanner', 'ecsirt:intrusion-attempts=&quot;brute-force&quot;': 'brute-force', 'ecsirt:intrusion-attempts=&quot;exploit&quot;': 'exploit', 'ecsirt:intrusion-attempts=&quot;ids-alert&quot;': 'ids-alert', 'ecsirt:intrusions=&quot;backdoor&quot;': 'backdoor', 'ecsirt:intrusions=&quot;compromised&quot;': 'compromised', 'ecsirt:intrusions=&quot;defacement&quot;': 'defacement', 'ecsirt:malicious-code=&quot;botnet-drone&quot;': 'infected-system', 'ecsirt:malicious-code=&quot;c2server&quot;': 'c2server', 'ecsirt:malicious-code=&quot;malware&quot;': 'malware', 'ecsirt:malicious-code=&quot;malware-configuration&quot;': 'malware-configuration', 'ecsirt:malicious-code=&quot;ransomware&quot;': 'ransomware', 'ecsirt:other=&quot;blacklist&quot;': 'blacklist', 'ecsirt:other=&quot;unknown&quot;': 'unknown', 'ecsirt:test=&quot;test&quot;': 'test', 'ecsirt:vulnerable=&quot;vulnerable-service&quot;': 'vulnerable service'}</em><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.MISPParserBot.MISP_TAXONOMY_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.misp.parser.MISPParserBot.MISP_TYPE_MAPPING">
+<code class="sig-name descname">MISP_TYPE_MAPPING</code><em class="property"> = {'domain': 'source.fqdn', 'email-src': 'source.account', 'hostname': 'source.fqdn', 'ip-dst': 'source.ip', 'ip-src': 'source.ip', 'md5': 'malware.hash.md5', 'sha1': 'malware.hash.sha1', 'url': 'source.url'}</em><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.MISPParserBot.MISP_TYPE_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="intelmq.bots.parsers.misp.parser.MISPParserBot.SUPPORTED_MISP_CATEGORIES">
+<code class="sig-name descname">SUPPORTED_MISP_CATEGORIES</code><em class="property"> = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'Network activity']</em><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.MISPParserBot.SUPPORTED_MISP_CATEGORIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.parsers.misp.parser.MISPParserBot.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.parsers.misp.parser.MISPParserBot.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.parsers.misp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-intelmq.bots.parsers.misp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/source/intelmq.bots.parsers.misp.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

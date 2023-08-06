@@ -1,0 +1,787 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Harmonization field names &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Release procedure" href="release-procedure.html" />
+    <link rel="prev" title="Data Harmonization" href="data-harmonization.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="harmonization-field-names">
+<h1>Harmonization field names<a class="headerlink" href="#harmonization-field-names" title="Permalink to this headline">¶</a></h1>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 3%" />
+<col style="width: 4%" />
+<col style="width: 3%" />
+<col style="width: 89%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Section</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Classification</p></td>
+<td><p>classification.identifier</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The lowercase identifier defines the actual software or service (e.g. <code class="docutils literal notranslate"><span class="pre">heartbleed</span></code> or <code class="docutils literal notranslate"><span class="pre">ntp_version</span></code>) or standardized malware name (e.g. <code class="docutils literal notranslate"><span class="pre">zeus</span></code>). Note that you MAY overwrite this field during processing for your individual setup. This field is not standardized across IntelMQ setups/users.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Classification</p></td>
+<td><p>classification.taxonomy</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>We recognize the need for the CSIRT teams to apply a static (incident) taxonomy to abuse data. With this goal in mind the type IOC will serve as a basis for this activity. Each value of the dynamic type mapping translates to a an element in the static taxonomy. The European CSIRT teams for example have decided to apply the eCSIRT.net incident classification. The value of the taxonomy key is thus a derivative of the dynamic type above. For more information about check <a class="reference external" href="http://www.enisa.europa.eu/activities/cert/support/incident-management/browsable/incident-handling-process/incident-taxonomy/existing-taxonomies">ENISA taxonomies</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>Classification</p></td>
+<td><p>classification.type</p></td>
+<td><p><a class="reference internal" href="#classificationtype"><span class="std std-ref">ClassificationType</span></a></p></td>
+<td><p>The abuse type IOC is one of the most crucial pieces of information for any given abuse event. The main idea of dynamic typing is to keep our ontology flexible, since we need to evolve with the evolving threatscape of abuse data. In contrast with the static taxonomy below, the dynamic typing is used to perform business decisions in the abuse handling pipeline. Furthermore, the value data set should be kept as minimal as possible to avoid <em>type explosion</em>, which in turn dilutes the business value of the dynamic typing. In general, we normally have two types of abuse type IOC: ones referring to a compromised resource or ones referring to pieces of the criminal infrastructure, such as a command and control servers for example.</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>comment</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Free text commentary about the abuse event inserted by an analyst.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.abuse_contact</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>Abuse contact for destination address. A comma separated list.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.account</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>An account name or email address, which has been identified to relate to the destination of an abuse event.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.allocated</p></td>
+<td><p><a class="reference internal" href="#datetime"><span class="std std-ref">DateTime</span></a></p></td>
+<td><p>Allocation date corresponding to BGP prefix.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.as_name</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The autonomous system name to which the connection headed.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.asn</p></td>
+<td><p><a class="reference internal" href="#asn"><span class="std std-ref">ASN</span></a></p></td>
+<td><p>The autonomous system number to which the connection headed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.domain_suffix</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>The suffix of the domain from the public suffix list.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.fqdn</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>A DNS name related to the host from which the connection originated. DNS allows even binary data in DNS, so we have to allow everything. A final point is stripped, string is converted to lower case characters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.cc</p></td>
+<td><p><a class="reference internal" href="#uppercasestring"><span class="std std-ref">UppercaseString</span></a></p></td>
+<td><p>Country-Code according to ISO3166-1 alpha-2 for the destination IP.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.city</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to city-level geolocation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.country</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The country name derived from the ISO3166 country code (assigned to cc field).</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.latitude</p></td>
+<td><p><a class="reference internal" href="#float"><span class="std std-ref">Float</span></a></p></td>
+<td><p>Latitude coordinates derived from a geolocation service, such as MaxMind geoip db.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.longitude</p></td>
+<td><p><a class="reference internal" href="#float"><span class="std std-ref">Float</span></a></p></td>
+<td><p>Longitude coordinates derived from a geolocation service, such as MaxMind geoip db.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.region</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to region-level geolocation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination Geolocation</p></td>
+<td><p>destination.geolocation.state</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to state-level geolocation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.ip</p></td>
+<td><p><a class="reference internal" href="#ipaddress"><span class="std std-ref">IPAddress</span></a></p></td>
+<td><p>The IP which is the target of the observed connections.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.local_hostname</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some sources report a internal hostname within a NAT related to the name configured for a compromized system</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.local_ip</p></td>
+<td><p><a class="reference internal" href="#ipaddress"><span class="std std-ref">IPAddress</span></a></p></td>
+<td><p>Some sources report a internal (NATed) IP address related a compromized system. N.B. RFC1918 IPs are OK here.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.network</p></td>
+<td><p><a class="reference internal" href="#ipnetwork"><span class="std std-ref">IPNetwork</span></a></p></td>
+<td><p>CIDR for an autonomous system. Also known as BGP prefix. If multiple values are possible, select the most specific.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.port</p></td>
+<td><p><a class="reference internal" href="#integer"><span class="std std-ref">Integer</span></a></p></td>
+<td><p>The port to which the connection headed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.registry</p></td>
+<td><p><a class="reference internal" href="#registry"><span class="std std-ref">Registry</span></a></p></td>
+<td><p>The IP registry a given ip address is allocated by.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.reverse_dns</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>Reverse DNS name acquired through a reverse DNS query on an IP address. N.B. Record types other than PTR records may also appear in the reverse DNS tree. Furthermore, unfortunately, there is no rule prohibiting people from writing anything in a PTR record. Even JavaScript will work. A final point is stripped, string is converted to lower case characters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.tor_node</p></td>
+<td><p><a class="reference internal" href="#boolean"><span class="std std-ref">Boolean</span></a></p></td>
+<td><p>If the destination IP was a known tor node.</p></td>
+</tr>
+<tr class="row-even"><td><p>Destination</p></td>
+<td><p>destination.url</p></td>
+<td><p><a class="reference internal" href="#url"><span class="std std-ref">URL</span></a></p></td>
+<td><p>A URL denotes on IOC, which refers to a malicious resource, whose interpretation is defined by the abuse type. A URL with the abuse type phishing refers to a phishing resource.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Destination</p></td>
+<td><p>destination.urlpath</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The path portion of an HTTP or related network request.</p></td>
+</tr>
+<tr class="row-even"><td><p>Event_Description</p></td>
+<td><p>event_description.target</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some sources denominate the target (organization) of a an attack.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Event_Description</p></td>
+<td><p>event_description.text</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A free-form textual description of an abuse event.</p></td>
+</tr>
+<tr class="row-even"><td><p>Event_Description</p></td>
+<td><p>event_description.url</p></td>
+<td><p><a class="reference internal" href="#url"><span class="std std-ref">URL</span></a></p></td>
+<td><p>A description URL is a link to a further description of the the abuse event in question.</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>event_hash</p></td>
+<td><p><a class="reference internal" href="#uppercasestring"><span class="std std-ref">UppercaseString</span></a></p></td>
+<td><p>Computed event hash with specific keys and values that identify a unique event. At present, the hash should default to using the SHA1 function. Please note that for an event hash to be able to match more than one event (deduplication) the receiver of an event should calculate it based on a minimal set of keys and values present in the event. Using for example the observation time in the calculation will most likely render the checksum useless for deduplication purposes.</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>extra</p></td>
+<td><p><a class="reference internal" href="#jsondict"><span class="std std-ref">JSONDict</span></a></p></td>
+<td><p>All anecdotal information, which cannot be parsed into the data harmonization elements. E.g. os.name, os.version, etc.  <strong>Note</strong>: this is only intended for mapping any fields which can not map naturally into the data harmonization. It is not intended for extending the data harmonization with your own fields.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Feed</p></td>
+<td><p>feed.accuracy</p></td>
+<td><p><a class="reference internal" href="#accuracy"><span class="std std-ref">Accuracy</span></a></p></td>
+<td><p>A float between 0 and 100 that represents how accurate the data in the feed is</p></td>
+</tr>
+<tr class="row-even"><td><p>Feed</p></td>
+<td><p>feed.code</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Code name for the feed, e.g. DFGS, HSDAG etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Feed</p></td>
+<td><p>feed.documentation</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A URL or hint where to find the documentation of this feed.</p></td>
+</tr>
+<tr class="row-even"><td><p>Feed</p></td>
+<td><p>feed.name</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Name for the feed, usually found in collector bot configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Feed</p></td>
+<td><p>feed.provider</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Name for the provider of the feed, usually found in collector bot configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>Feed</p></td>
+<td><p>feed.url</p></td>
+<td><p><a class="reference internal" href="#url"><span class="std std-ref">URL</span></a></p></td>
+<td><p>The URL of a given abuse feed, where applicable</p></td>
+</tr>
+<tr class="row-odd"><td><p>Malware Hash</p></td>
+<td><p>malware.hash.md5</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A string depicting an MD5 checksum for a file, be it a malware sample for example.</p></td>
+</tr>
+<tr class="row-even"><td><p>Malware Hash</p></td>
+<td><p>malware.hash.sha1</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A string depicting a SHA1 checksum for a file, be it a malware sample for example.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Malware Hash</p></td>
+<td><p>malware.hash.sha256</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A string depicting a SHA256 checksum for a file, be it a malware sample for example.</p></td>
+</tr>
+<tr class="row-even"><td><p>Malware</p></td>
+<td><p>malware.name</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>The malware name in lower case.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Malware</p></td>
+<td><p>malware.version</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>A version string for an identified artifact generation, e.g. a crime-ware kit.</p></td>
+</tr>
+<tr class="row-even"><td><p>Misp</p></td>
+<td><p>misp.attribute_uuid</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>MISP - Malware Information Sharing Platform &amp; Threat Sharing UUID of an attribute.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Misp</p></td>
+<td><p>misp.event_uuid</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>MISP - Malware Information Sharing Platform &amp; Threat Sharing UUID.</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>output</p></td>
+<td><p><a class="reference internal" href="#json"><span class="std std-ref">JSON</span></a></p></td>
+<td><p>Event data converted into foreign format, intended to be exported by output plugin.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Protocol</p></td>
+<td><p>protocol.application</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>e.g. vnc, ssh, sip, irc, http or smtp.</p></td>
+</tr>
+<tr class="row-even"><td><p>Protocol</p></td>
+<td><p>protocol.transport</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>e.g. tcp, udp, icmp.</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>raw</p></td>
+<td><p><a class="reference internal" href="#base64"><span class="std std-ref">Base64</span></a></p></td>
+<td><p>The original line of the event from encoded in base64.</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>rtir_id</p></td>
+<td><p><a class="reference internal" href="#integer"><span class="std std-ref">Integer</span></a></p></td>
+<td><p>Request Tracker Incident Response ticket id.</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>screenshot_url</p></td>
+<td><p><a class="reference internal" href="#url"><span class="std std-ref">URL</span></a></p></td>
+<td><p>Some source may report URLs related to a an image generated of a resource without any metadata. Or an URL pointing to resource, which has been rendered into a webshot, e.g. a PNG image and the relevant metadata related to its retrieval/generation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.abuse_contact</p></td>
+<td><p><a class="reference internal" href="#lowercasestring"><span class="std std-ref">LowercaseString</span></a></p></td>
+<td><p>Abuse contact for source address. A comma separated list.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.account</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>An account name or email address, which has been identified to relate to the source of an abuse event.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.allocated</p></td>
+<td><p><a class="reference internal" href="#datetime"><span class="std std-ref">DateTime</span></a></p></td>
+<td><p>Allocation date corresponding to BGP prefix.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.as_name</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The autonomous system name from which the connection originated.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.asn</p></td>
+<td><p><a class="reference internal" href="#asn"><span class="std std-ref">ASN</span></a></p></td>
+<td><p>The autonomous system number from which originated the connection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.domain_suffix</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>The suffix of the domain from the public suffix list.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.fqdn</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>A DNS name related to the host from which the connection originated. DNS allows even binary data in DNS, so we have to allow everything. A final point is stripped, string is converted to lower case characters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.cc</p></td>
+<td><p><a class="reference internal" href="#uppercasestring"><span class="std std-ref">UppercaseString</span></a></p></td>
+<td><p>Country-Code according to ISO3166-1 alpha-2 for the source IP.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.city</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to city-level geolocation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.country</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The country name derived from the ISO3166 country code (assigned to cc field).</p></td>
+</tr>
+<tr class="row-even"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.cymru_cc</p></td>
+<td><p><a class="reference internal" href="#uppercasestring"><span class="std std-ref">UppercaseString</span></a></p></td>
+<td><p>The country code denoted for the ip by the Team Cymru asn to ip mapping service.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.geoip_cc</p></td>
+<td><p><a class="reference internal" href="#uppercasestring"><span class="std std-ref">UppercaseString</span></a></p></td>
+<td><p>MaxMind Country Code (ISO3166-1 alpha-2).</p></td>
+</tr>
+<tr class="row-even"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.latitude</p></td>
+<td><p><a class="reference internal" href="#float"><span class="std std-ref">Float</span></a></p></td>
+<td><p>Latitude coordinates derived from a geolocation service, such as MaxMind geoip db.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.longitude</p></td>
+<td><p><a class="reference internal" href="#float"><span class="std std-ref">Float</span></a></p></td>
+<td><p>Longitude coordinates derived from a geolocation service, such as MaxMind geoip db.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.region</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to region-level geolocation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source Geolocation</p></td>
+<td><p>source.geolocation.state</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some geolocation services refer to state-level geolocation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.ip</p></td>
+<td><p><a class="reference internal" href="#ipaddress"><span class="std std-ref">IPAddress</span></a></p></td>
+<td><p>The ip observed to initiate the connection</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.local_hostname</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Some sources report a internal hostname within a NAT related to the name configured for a compromised system</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.local_ip</p></td>
+<td><p><a class="reference internal" href="#ipaddress"><span class="std std-ref">IPAddress</span></a></p></td>
+<td><p>Some sources report a internal (NATed) IP address related a compromised system. N.B. RFC1918 IPs are OK here.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.network</p></td>
+<td><p><a class="reference internal" href="#ipnetwork"><span class="std std-ref">IPNetwork</span></a></p></td>
+<td><p>CIDR for an autonomous system. Also known as BGP prefix. If multiple values are possible, select the most specific.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.port</p></td>
+<td><p><a class="reference internal" href="#integer"><span class="std std-ref">Integer</span></a></p></td>
+<td><p>The port from which the connection originated.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.registry</p></td>
+<td><p><a class="reference internal" href="#registry"><span class="std std-ref">Registry</span></a></p></td>
+<td><p>The IP registry a given ip address is allocated by.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.reverse_dns</p></td>
+<td><p><a class="reference internal" href="#fqdn"><span class="std std-ref">FQDN</span></a></p></td>
+<td><p>Reverse DNS name acquired through a reverse DNS query on an IP address. N.B. Record types other than PTR records may also appear in the reverse DNS tree. Furthermore, unfortunately, there is no rule prohibiting people from writing anything in a PTR record. Even JavaScript will work. A final point is stripped, string is converted to lower case characters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.tor_node</p></td>
+<td><p><a class="reference internal" href="#boolean"><span class="std std-ref">Boolean</span></a></p></td>
+<td><p>If the source IP was a known tor node.</p></td>
+</tr>
+<tr class="row-even"><td><p>Source</p></td>
+<td><p>source.url</p></td>
+<td><p><a class="reference internal" href="#url"><span class="std std-ref">URL</span></a></p></td>
+<td><p>A URL denotes an IOC, which refers to a malicious resource, whose interpretation is defined by the abuse type. A URL with the abuse type phishing refers to a phishing resource.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source.urlpath</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>The path portion of an HTTP or related network request.</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>status</p></td>
+<td><p><a class="reference internal" href="#string"><span class="std std-ref">String</span></a></p></td>
+<td><p>Status of the malicious resource (phishing, dropzone, etc), e.g. online, offline.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Time</p></td>
+<td><p>time.observation</p></td>
+<td><p><a class="reference internal" href="#datetime"><span class="std std-ref">DateTime</span></a></p></td>
+<td><p>The time the collector of the local instance processed (observed) the event.</p></td>
+</tr>
+<tr class="row-even"><td><p>Time</p></td>
+<td><p>time.source</p></td>
+<td><p><a class="reference internal" href="#datetime"><span class="std std-ref">DateTime</span></a></p></td>
+<td><p>The time of occurrence of the event as reported the feed (source).</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><p>tlp</p></td>
+<td><p><a class="reference internal" href="#tlp"><span class="std std-ref">TLP</span></a></p></td>
+<td><p>Traffic Light Protocol level of the event.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="harmonization-types">
+<h2>Harmonization types<a class="headerlink" href="#harmonization-types" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="asn">
+<span id="id1"></span><h2>ASN<a class="headerlink" href="#asn" title="Permalink to this headline">¶</a></h2>
+<p>ASN type. Derived from Integer with forbidden values.</p>
+<p>Only valid are: 0 &lt; asn &lt;= 4294967295
+See <a class="reference external" href="https://en.wikipedia.org/wiki/Autonomous_system_(Internet">https://en.wikipedia.org/wiki/Autonomous_system_(Internet</a>)
+&gt; The first and last ASNs of the original 16-bit integers, namely 0 and
+&gt; 65,535, and the last ASN of the 32-bit numbers, namely 4,294,967,295 are
+&gt; reserved and should not be used by operators.</p>
+</div>
+<div class="section" id="accuracy">
+<span id="id2"></span><h2>Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline">¶</a></h2>
+<p>Accuracy type. A Float between 0 and 100.</p>
+</div>
+<div class="section" id="base64">
+<span id="id3"></span><h2>Base64<a class="headerlink" href="#base64" title="Permalink to this headline">¶</a></h2>
+<p>Base64 type. Always gives unicode strings.</p>
+<p>Sanitation encodes to base64 and accepts binary and unicode strings.</p>
+</div>
+<div class="section" id="boolean">
+<span id="id4"></span><h2>Boolean<a class="headerlink" href="#boolean" title="Permalink to this headline">¶</a></h2>
+<p>Boolean type. Without sanitation only python bool is accepted.</p>
+<p>Sanitation accepts string ‘true’ and ‘false’ and integers 0 and 1.</p>
+</div>
+<div class="section" id="classificationtype">
+<span id="id5"></span><h2>ClassificationType<a class="headerlink" href="#classificationtype" title="Permalink to this headline">¶</a></h2>
+<p><cite>classification.type</cite> type.</p>
+<p>The mapping follows
+Reference Security Incident Taxonomy Working Group – RSIT WG
+<a class="reference external" href="https://github.com/enisaeu/Reference-Security-Incident-Taxonomy-Task-Force/">https://github.com/enisaeu/Reference-Security-Incident-Taxonomy-Task-Force/</a>
+with extensions.</p>
+<dl class="simple">
+<dt>These old values are automatically mapped to the new ones:</dt><dd><p>‘botnet drone’ -&gt; ‘infected-system’
+‘ids alert’ -&gt; ‘ids-alert’
+‘c&amp;c’ -&gt; ‘c2server’
+‘infected system’ -&gt; ‘infected-system’
+‘malware configuration’ -&gt; ‘malware-configuration’</p>
+</dd>
+<dt>Allowed values are:</dt><dd><ul class="simple">
+<li><p>application-compromise</p></li>
+<li><p>backdoor</p></li>
+<li><p>blacklist</p></li>
+<li><p>brute-force</p></li>
+<li><p>burglary</p></li>
+<li><p>c2server</p></li>
+<li><p>compromised</p></li>
+<li><p>copyright</p></li>
+<li><p>data-loss</p></li>
+<li><p>ddos</p></li>
+<li><p>ddos-amplifier</p></li>
+<li><p>defacement</p></li>
+<li><p>dga domain</p></li>
+<li><p>dos</p></li>
+<li><p>dropzone</p></li>
+<li><p>exploit</p></li>
+<li><p>harmful-speech</p></li>
+<li><p>ids-alert</p></li>
+<li><p>infected-system</p></li>
+<li><p>information-disclosure</p></li>
+<li><p>leak</p></li>
+<li><p>malware</p></li>
+<li><p>malware-configuration</p></li>
+<li><p>malware-distribution</p></li>
+<li><p>masquerade</p></li>
+<li><p>other</p></li>
+<li><p>outage</p></li>
+<li><p>phishing</p></li>
+<li><p>potentially-unwanted-accessible</p></li>
+<li><p>privileged-account-compromise</p></li>
+<li><p>proxy</p></li>
+<li><p>ransomware</p></li>
+<li><p>sabotage</p></li>
+<li><p>scanner</p></li>
+<li><p>sniffing</p></li>
+<li><p>social-engineering</p></li>
+<li><p>spam</p></li>
+<li><p>test</p></li>
+<li><p>tor</p></li>
+<li><p>Unauthorised-information-access</p></li>
+<li><p>Unauthorised-information-modification</p></li>
+<li><p>unauthorized-command</p></li>
+<li><p>unauthorized-login</p></li>
+<li><p>unauthorized-use-of-resources</p></li>
+<li><p>unknown</p></li>
+<li><p>unprivileged-account-compromise</p></li>
+<li><p>violence</p></li>
+<li><p>vulnerable client</p></li>
+<li><p>vulnerable service</p></li>
+<li><p>vulnerable-system</p></li>
+<li><p>weak-crypto</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="datetime">
+<span id="id6"></span><h2>DateTime<a class="headerlink" href="#datetime" title="Permalink to this headline">¶</a></h2>
+<p>Date and time type for timestamps.</p>
+<p>Valid values are timestamps with time zone and in the format ‘%Y-%m-%dT%H:%M:%S+00:00’.
+Invalid are missing times and missing timezone information (UTC).
+Microseconds are also allowed.</p>
+<p>Sanitation normalizes the timezone to UTC, which is the only allowed timezone.</p>
+<p>The following additional conversions are available with the convert function:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>timestamp</p></li>
+<li><p>windows_nt: From Windows NT / AD / LDAP</p></li>
+<li><p>epoch_millis: From Milliseconds since Epoch</p></li>
+<li><p>from_format: From a given format, eg. ‘from_format|%H %M %S %m %d %Y %Z’</p></li>
+<li><p>from_format_midnight: Date from a given format and assume midnight, e.g. ‘from_format_midnight|%d-%m-%Y’</p></li>
+<li><p>utc_isoformat: Parse date generated by datetime.isoformat()</p></li>
+<li><p>fuzzy (or None): Use dateutils’ fuzzy parser, default if no specific parser is given</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="fqdn">
+<span id="id7"></span><h2>FQDN<a class="headerlink" href="#fqdn" title="Permalink to this headline">¶</a></h2>
+<p>Fully qualified domain name type.</p>
+<p>All valid lowercase domains are accepted, no IP addresses or URLs. Trailing
+dot is not allowed.</p>
+<p>To prevent values like ‘10.0.0.1:8080’ (#1235), we check for the
+non-existence of ‘:’.</p>
+</div>
+<div class="section" id="float">
+<span id="id8"></span><h2>Float<a class="headerlink" href="#float" title="Permalink to this headline">¶</a></h2>
+<p>Float type. Without sanitation only python float/integer/long is
+accepted. Boolean is explicitly denied.</p>
+<p>Sanitation accepts strings and everything float() accepts.</p>
+</div>
+<div class="section" id="ipaddress">
+<span id="id9"></span><h2>IPAddress<a class="headerlink" href="#ipaddress" title="Permalink to this headline">¶</a></h2>
+<p>Type for IP addresses, all families. Uses the ipaddress module.</p>
+<p>Sanitation accepts integers, strings and objects of ipaddress.IPv4Address and ipaddress.IPv6Address.</p>
+<p>Valid values are only strings. 0.0.0.0 is explicitly not allowed.</p>
+</div>
+<div class="section" id="ipnetwork">
+<span id="id10"></span><h2>IPNetwork<a class="headerlink" href="#ipnetwork" title="Permalink to this headline">¶</a></h2>
+<p>Type for IP networks, all families. Uses the ipaddress module.</p>
+<p>Sanitation accepts strings and objects of ipaddress.IPv4Network and ipaddress.IPv6Network.
+If host bits in strings are set, they will be ignored (e.g 127.0.0.1/32).</p>
+<p>Valid values are only strings.</p>
+</div>
+<div class="section" id="integer">
+<span id="id11"></span><h2>Integer<a class="headerlink" href="#integer" title="Permalink to this headline">¶</a></h2>
+<p>Integer type. Without sanitation only python integer/long is accepted.
+Bool is explicitly denied.</p>
+<p>Sanitation accepts strings and everything int() accepts.</p>
+</div>
+<div class="section" id="json">
+<span id="id12"></span><h2>JSON<a class="headerlink" href="#json" title="Permalink to this headline">¶</a></h2>
+<p>JSON type.</p>
+<p>Sanitation accepts any valid JSON objects.</p>
+<p>Valid values are only unicode strings with JSON objects.</p>
+</div>
+<div class="section" id="jsondict">
+<span id="id13"></span><h2>JSONDict<a class="headerlink" href="#jsondict" title="Permalink to this headline">¶</a></h2>
+<p>JSONDict type.</p>
+<p>Sanitation accepts pythons dictionaries and JSON strings.</p>
+<p>Valid values are only unicode strings with JSON dictionaries.</p>
+</div>
+<div class="section" id="lowercasestring">
+<span id="id14"></span><h2>LowercaseString<a class="headerlink" href="#lowercasestring" title="Permalink to this headline">¶</a></h2>
+<p>Like string, but only allows lower case characters.</p>
+<p>Sanitation lowers all characters.</p>
+</div>
+<div class="section" id="registry">
+<span id="id15"></span><h2>Registry<a class="headerlink" href="#registry" title="Permalink to this headline">¶</a></h2>
+<p>Registry type. Derived from UppercaseString.</p>
+<p>Only valid values: AFRINIC, APNIC, ARIN, LACNIC, RIPE.
+RIPE-NCC and RIPENCC are normalized to RIPE.</p>
+</div>
+<div class="section" id="string">
+<span id="id16"></span><h2>String<a class="headerlink" href="#string" title="Permalink to this headline">¶</a></h2>
+<p>Any non-empty string without leading or trailing whitespace.</p>
+</div>
+<div class="section" id="tlp">
+<span id="id17"></span><h2>TLP<a class="headerlink" href="#tlp" title="Permalink to this headline">¶</a></h2>
+<p>TLP level type. Derived from UppercaseString.</p>
+<p>Only valid values: WHITE, GREEN, AMBER, RED.</p>
+<p>Accepted for sanitation are different cases and the prefix ‘tlp:’.</p>
+</div>
+<div class="section" id="url">
+<span id="id18"></span><h2>URL<a class="headerlink" href="#url" title="Permalink to this headline">¶</a></h2>
+<p>URI type. Local and remote.</p>
+<p>Sanitation converts hxxp and hxxps to http and https.
+For local URIs (file) a missing host is replaced by localhost.</p>
+<p>Valid values must have the host (network location part).</p>
+</div>
+<div class="section" id="uppercasestring">
+<span id="id19"></span><h2>UppercaseString<a class="headerlink" href="#uppercasestring" title="Permalink to this headline">¶</a></h2>
+<p>Like string, but only allows upper case characters.</p>
+<p>Sanitation uppers all characters.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/ecosystem.html">IntelMQ Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/ELK-Stack.html">ELK Stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/MISP-Integrations.html">MISP integrations in IntelMQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/n6-integrations.html">IntelMQ - n6 Integration</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="data-harmonization.html" title="previous chapter">Data Harmonization</a></li>
+      <li>Next: <a href="release-procedure.html" title="next chapter">Release procedure</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/dev/harmonization-fields.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

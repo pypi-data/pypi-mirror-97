@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intelmq Api &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="IntelMQ Manager" href="intelmq-manager.html" />
+    <link rel="prev" title="Frequently asked questions" href="FAQ.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-api">
+<h1>Intelmq Api<a class="headerlink" href="#intelmq-api" title="Permalink to this headline">¶</a></h1>
+<p>intelmq-api is a <a class="reference external" href="http://hug.rest">hug</a> based API for the <a class="reference external" href="https://github.com/certtools/intelmq/">intelmq</a> project.</p>
+<div class="section" id="installing-and-running-intelmq-api">
+<h2>Installing and running intelmq-api<a class="headerlink" href="#installing-and-running-intelmq-api" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> requires the IntelMQ package to be installed on the system (it uses <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> to control the botnet).</p>
+<p>You can install the <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> package using your preferred system package installation mechanism or using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> Python package installer.
+We provide packages for the <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> for the same operating systems as we do for the <code class="docutils literal notranslate"><span class="pre">intelmq</span></code> package itself.
+Our repository page gives <a class="reference external" href="https://software.opensuse.org/download.html?project=home:sebix:intelmq&amp;package=intelmq-api">installation instructions for various operating systems</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> packages ship a configuration file in <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/api-config.json</span></code>, a virtualhost configuration file for Apache 2 in <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/api-apache.conf</span></code> and a sudoers configuration file in <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/api-sudoers.conf</span></code>.
+The value of <code class="docutils literal notranslate"><span class="pre">${PREFIX}</span></code> depends on your installation method- with distribution packages it is simply <code class="docutils literal notranslate"><span class="pre">/</span></code>, when using pip (as root) it is <code class="docutils literal notranslate"><span class="pre">/usr/local/lib/pythonX.Y/dist-packages/</span></code> (where <code class="docutils literal notranslate"><span class="pre">X.Y</span></code> is your Python version.
+Some distribution packages already create a symlink to the sudoers file in the sudoers.d configuration directory and a symlink in the relevant Apache configuration directory to the Apache configuration file, so it should be easy to enable that (i.e. by using <code class="docutils literal notranslate"><span class="pre">a2ensite</span> <span class="pre">intelmq-api</span></code> on Debian based systems).</p>
+<p>But for development purposes and testing you can also run <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> directly using <code class="docutils literal notranslate"><span class="pre">hug</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>hug -m intelmq_api.serve
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> provides the route <code class="docutils literal notranslate"><span class="pre">/api</span></code> for managing the <code class="docutils literal notranslate"><span class="pre">intelmq</span></code> installation.</p>
+</div>
+<div class="section" id="configuring-intelmq-api">
+<h2>Configuring intelmq-api<a class="headerlink" href="#configuring-intelmq-api" title="Permalink to this headline">¶</a></h2>
+<p>Depending on your setup you might have to install <code class="docutils literal notranslate"><span class="pre">sudo</span></code> to make it possible for the <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> to run the <code class="docutils literal notranslate"><span class="pre">intelmq</span></code> command as the user-account usually used to run <code class="docutils literal notranslate"><span class="pre">intelmq</span></code> (which is also often called <code class="docutils literal notranslate"><span class="pre">intelmq</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> is configured using a configuration file in <code class="docutils literal notranslate"><span class="pre">json</span></code> format.
+<code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> tries to load the configuration file from <code class="docutils literal notranslate"><span class="pre">/etc/intelmq/api-config.json</span></code> and <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/api-config.json</span></code>, but you can override the path setting the environment variable <code class="docutils literal notranslate"><span class="pre">INTELMQ_API_CONFIG</span></code>.
+(When using Apache, you can do this by modifying the Apache configuration file shipped with <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code>, the file contains an example)</p>
+<p>When running the API using <code class="docutils literal notranslate"><span class="pre">hug</span></code>, you can set the environment variable like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">INTELMQ_API_CONFIG</span><span class="o">=</span>/etc/intelmq/api-config.json hug -m intelmq_api.serve
+</pre></div>
+</div>
+<p>The default configuration which is shipped with the packages is also listed here for reference:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;intelmq_ctl_cmd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sudo&quot;</span><span class="p">,</span> <span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;intelmq&quot;</span><span class="p">,</span> <span class="s2">&quot;intelmqctl&quot;</span><span class="p">],</span>
+    <span class="nt">&quot;allowed_path&quot;</span><span class="p">:</span> <span class="s2">&quot;/opt/intelmq/var/lib/bots/&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session_store&quot;</span><span class="p">:</span> <span class="s2">&quot;/etc/intelmq/api-session.sqlite&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;session_duration&quot;</span><span class="p">:</span> <span class="mi">86400</span><span class="p">,</span>
+    <span class="nt">&quot;allow_origins&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>On Debian based systems, the default path for the <code class="docutils literal notranslate"><span class="pre">session_store</span></code> is <code class="docutils literal notranslate"><span class="pre">/var/lib/dbconfig-common/sqlite3/intelmq-api/intelmqapi</span></code>, because the Debian package uses the Debian packaging tools to manage the database file.</p>
+<p>The following configuration options are available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">intelmq_ctl_cmd</span></code>: Your <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> command. If this is not set in a configuration file the default is used, which is <code class="docutils literal notranslate"><span class="pre">[&quot;sudo&quot;,</span> <span class="pre">&quot;-u&quot;,</span> <span class="pre">&quot;intelmq&quot;,</span> <span class="pre">&quot;/usr/local/bin/intelmqctl&quot;]</span></code>
+The option <code class="docutils literal notranslate"><span class="pre">&quot;intelmq_ctl_cmd&quot;</span></code> is a list of strings so that we can avoid shell-injection vulnerabilities because no shell is involved when running the command.
+This means that if the command you want to use needs parameters, they have to be separate strings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allowed_path</span></code>: intelmq-api can grant <strong>read-only</strong> access to specific files - this setting defines the path those files can reside in.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">session_store</span></code>: this is an optional path to a sqlite database, which is used for session storage and authentication. If it is not set (which is the default), no authentication is used!</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">session_duration</span></code>: the maximal duration of a session, its 86400 seconds by default</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allow_origins</span></code>: a list of origins the responses of the API can be shared with. Allows every origin by default.</p></li>
+</ul>
+<div class="section" id="permissions">
+<h3>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> tries to write a couple of configuration files in the <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq</span></code> directory - this is only possible if you set the permissions accordingly, given that <code class="docutils literal notranslate"><span class="pre">intelmq-api</span></code> runs under a different user.
+If you’re using the default Apache 2 setup, you might want to set the group of the files to <code class="docutils literal notranslate"><span class="pre">www-data</span></code> and give it write permissions (<code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">g+w</span> <span class="pre">&lt;filename&gt;</span></code>).
+In addition to that, the <code class="docutils literal notranslate"><span class="pre">intelmq-manager</span></code> tries to store the bot positions via the API into the file <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/manager/positions.conf</span></code>.
+You should therefore create the folder <code class="docutils literal notranslate"><span class="pre">${PREFIX}/etc/intelmq/manager</span></code> and the file <code class="docutils literal notranslate"><span class="pre">positions.conf</span></code> in it.</p>
+</div>
+</div>
+<div class="section" id="adding-a-user">
+<h2>Adding a user<a class="headerlink" href="#adding-a-user" title="Permalink to this headline">¶</a></h2>
+<p>If you enable the <code class="docutils literal notranslate"><span class="pre">session_store</span></code> you will have to create user accounts to be able to access the API functionality. You can do this using <code class="docutils literal notranslate"><span class="pre">intelmq-api-adduser</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmq-api-adduser --user &lt;username&gt; --password &lt;password&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-note-on-selinux">
+<h2>A note on SELinux<a class="headerlink" href="#a-note-on-selinux" title="Permalink to this headline">¶</a></h2>
+<p>On systems with SELinux enabled, the API will fail to call intelmqctl.
+Therefore, SELinux needs to be disabled:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setenforce <span class="m">0</span>
+</pre></div>
+</div>
+<p>We welcome contributions to provide SELinux policies.</p>
+</div>
+<div class="section" id="frequent-operational-problems">
+<h2>Frequent operational problems<a class="headerlink" href="#frequent-operational-problems" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="intelmqctlerror">
+<h3>IntelMQCtlError<a class="headerlink" href="#intelmqctlerror" title="Permalink to this headline">¶</a></h3>
+<p>If the command is not configured correctly, you’ll see exceptions on startup like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmq_manager.runctl.IntelMQCtlError: &lt;ERROR_MESSAGE&gt;
+</pre></div>
+</div>
+<p>This means the intelmqctl command could not be executed as a subprocess.
+The <code class="docutils literal notranslate"><span class="pre">&lt;ERROR_MESSAGE&gt;</span></code> should indicate why.</p>
+</div>
+<div class="section" id="access-denied-authentication-required-please-provide-valid-token-verification-credentials">
+<h3>Access Denied / Authentication Required “Please provide valid Token verification credentials”<a class="headerlink" href="#access-denied-authentication-required-please-provide-valid-token-verification-credentials" title="Permalink to this headline">¶</a></h3>
+<p>If you see the IntelMQ Manager interface and menu, but the API calls to the back-end querying configuration and status of IntelMQ fail with “Access Denied” or “Authentication Required: Please provide valid Token verification credentials” errors, you are maybe not logged in while the API requires authentication.</p>
+<p>By default, the API requires authentication. Create user accounts and login with them or - if you have other protection means in place - deactivate the authentication requirement by removing or renaming the <cite>session_store</cite> parameter in the configuration.</p>
+</div>
+<div class="section" id="internal-server-error">
+<h3>Internal Server Error<a class="headerlink" href="#internal-server-error" title="Permalink to this headline">¶</a></h3>
+<p>There can be various reasons for internal server errors. You need to look at the error log of your web server, for example <code class="docutils literal notranslate"><span class="pre">/var/log/apache2/error.log</span></code> or <code class="docutils literal notranslate"><span class="pre">/var/log/httpd/error_log</span></code> for Apache 2. It could be that the sudo-setup is not functional, the configuration file or session database file can not be read or written or other errors in regards to the execution of the API program.</p>
+</div>
+<div class="section" id="can-i-just-install-it-from-the-deb-rpm-packages-while-installing-intelmq-from-a-different-source">
+<h3>Can I just install it from the deb/rpm packages while installing IntelMQ from a different source?<a class="headerlink" href="#can-i-just-install-it-from-the-deb-rpm-packages-while-installing-intelmq-from-a-different-source" title="Permalink to this headline">¶</a></h3>
+<p>Yes, you can install the API and the Manager from the deb/rpm repositories, and install your IntelMQ from a somewhere else, e.g. a local repository.
+However, knowledge about Python system administration experience and is recommended if you do so.</p>
+<p>The packages install IntelMQ to <code class="docutils literal notranslate"><span class="pre">/usr/lib/python3*/site-packages/intelmq/</span></code>.
+Installing with <code class="docutils literal notranslate"><span class="pre">pip</span></code> results in <code class="docutils literal notranslate"><span class="pre">/usr/local/lib/python3*/site-packages/intelmq/</span></code> (and some other accompaning resources) which overrides the installation in <code class="docutils literal notranslate"><span class="pre">/usr/lib/</span></code>.
+You probably need to adapt the configuration parameter <code class="docutils literal notranslate"><span class="pre">intelmq_ctl_cmd</span></code> to the <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/intelmqctl</span></code> executable and some other tweaks.</p>
+</div>
+</div>
+<div class="section" id="getting-help">
+<h2>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <a class="reference external" href="https://lists.cert.at/cgi-bin/mailman/listinfo/intelmq-users">IntelMQ users mailing lists</a> and <a class="reference external" href="https://github.com/certtools/intelmq-api/issues/new">GitHub issues</a> for getting help and getting in touch with other users and developers. See also the <a class="reference internal" href="introduction.html"><span class="doc">Introduction</span></a> page.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">IntelMQ Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ELK-Stack.html">ELK Stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MISP-Integrations.html">MISP integrations in IntelMQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="n6-integrations.html">IntelMQ - n6 Integration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="FAQ.html" title="previous chapter">Frequently asked questions</a></li>
+      <li>Next: <a href="intelmq-manager.html" title="next chapter">IntelMQ Manager</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/user/intelmq-api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

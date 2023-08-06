@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>intelmq.bots.outputs.elasticsearch package &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="intelmq-bots-outputs-elasticsearch-package">
+<h1>intelmq.bots.outputs.elasticsearch package<a class="headerlink" href="#intelmq-bots-outputs-elasticsearch-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-intelmq.bots.outputs.elasticsearch.output">
+<span id="intelmq-bots-outputs-elasticsearch-output-module"></span><h2>intelmq.bots.outputs.elasticsearch.output module<a class="headerlink" href="#module-intelmq.bots.outputs.elasticsearch.output" title="Permalink to this headline">¶</a></h2>
+<p>The ES-connection can’t be closed explicitly.</p>
+<dl class="py attribute">
+<dt id="intelmq.bots.outputs.elasticsearch.output.BOT">
+<code class="sig-prename descclassname">intelmq.bots.outputs.elasticsearch.output.</code><code class="sig-name descname">BOT</code><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.BOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot" title="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot">
+<em class="property">class </em><code class="sig-prename descclassname">intelmq.bots.outputs.elasticsearch.output.</code><code class="sig-name descname">ElasticsearchOutputBot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">start</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sighup_event</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">disable_multithreading</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="intelmq.lib.html#intelmq.lib.bot.Bot" title="intelmq.lib.bot.Bot"><code class="xref py py-class docutils literal notranslate"><span class="pre">intelmq.lib.bot.Bot</span></code></a></p>
+<dl class="py method">
+<dt id="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.get_index">
+<code class="sig-name descname">get_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event_dict</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">default_date</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>None.datetime.date<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_string</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'unknown-date'</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.get_index" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns the index name to use for the given event,</dt><dd><p>based on the current bot’s settings and the event’s date fields.
+- If the bot should rotate its Elasticsearch index, returns elastic_index-&lt;timestamp&gt;
+based on the bot’s rotation option and the time fields in the event, e.g. intelmq-2018.
+- If the bot should rotate its Elasticsearch index, but no time information is available in the event,
+this will return &lt;elastic_index&gt;-&lt;default&gt;, e.g. intelmq-unknown-date.
+- If the bot should not rotate indices, returns elastic_index, e.g. intelmq.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_dict</strong> – The event (as a dict) to examine.</p></li>
+<li><p><strong>default_date</strong> – (Optional) The default date to use for events with no time information
+(e.g. datetime.today()). Default: None.</p></li>
+<li><p><strong>default_string</strong> – (Optional) The value to append if no time is available in the event.
+Default: ‘unknown-date’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string containing the name of the index which should store the event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.init">
+<code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.should_rotate">
+<code class="sig-name descname">should_rotate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.ElasticsearchOutputBot.should_rotate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.outputs.elasticsearch.output.get_event_date">
+<code class="sig-prename descclassname">intelmq.bots.outputs.elasticsearch.output.</code><code class="sig-name descname">get_event_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event_dict</span><span class="p">:</span> <span class="n">dict</span></em><span class="sig-paren">)</span> &#x2192; None.datetime.date<a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.get_event_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="intelmq.bots.outputs.elasticsearch.output.replace_keys">
+<code class="sig-prename descclassname">intelmq.bots.outputs.elasticsearch.output.</code><code class="sig-name descname">replace_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">key_char</span><span class="o">=</span><span class="default_value">'.'</span></em>, <em class="sig-param"><span class="n">replacement</span><span class="o">=</span><span class="default_value">'_'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intelmq.bots.outputs.elasticsearch.output.replace_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-intelmq.bots.outputs.elasticsearch">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-intelmq.bots.outputs.elasticsearch" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/source/intelmq.bots.outputs.elasticsearch.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

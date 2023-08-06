@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upgrade instructions &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration and Management" href="configuration-management.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="upgrade-instructions">
+<h1><a class="toc-backref" href="#id2">Upgrade instructions</a><a class="headerlink" href="#upgrade-instructions" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#upgrade-instructions" id="id2">Upgrade instructions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#read-news-md" id="id3">Read NEWS.md</a></p></li>
+<li><p><a class="reference internal" href="#stop-intelmq-and-create-a-backup" id="id4">Stop IntelMQ and create a Backup</a></p></li>
+<li><p><a class="reference internal" href="#upgrade-intelmq" id="id5">Upgrade IntelMQ</a></p>
+<ul>
+<li><p><a class="reference internal" href="#packages" id="id6">Packages</a></p></li>
+<li><p><a class="reference internal" href="#docker-beta" id="id7">Docker (beta)</a></p></li>
+<li><p><a class="reference internal" href="#pypi" id="id8">PyPi</a></p></li>
+<li><p><a class="reference internal" href="#local-repository" id="id9">Local repository</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#upgrade-configuration-and-check-the-installation" id="id10">Upgrade configuration and check the installation</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>For installation instructions, see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>.</p>
+<div class="section" id="read-news-md">
+<h2><a class="toc-backref" href="#id3">Read NEWS.md</a><a class="headerlink" href="#read-news-md" title="Permalink to this headline">¶</a></h2>
+<p>Read the <a class="reference external" href="https://github.com/certtools/intelmq/blob/develop/NEWS.md">NEWS.md</a> file to look for things you need to have a look at.</p>
+</div>
+<div class="section" id="stop-intelmq-and-create-a-backup">
+<h2><a class="toc-backref" href="#id4">Stop IntelMQ and create a Backup</a><a class="headerlink" href="#stop-intelmq-and-create-a-backup" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Make sure that your IntelMQ system is completely stopped: <cite>intelmqctl stop</cite></p></li>
+<li><p>Create a backup of IntelMQ Home directory, which includes all configurations. They are not overwritten, but backups are always nice to have!</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo cp -R /opt/intelmq /opt/intelmq-backup
+</pre></div>
+</div>
+</div>
+<div class="section" id="upgrade-intelmq">
+<h2><a class="toc-backref" href="#id5">Upgrade IntelMQ</a><a class="headerlink" href="#upgrade-intelmq" title="Permalink to this headline">¶</a></h2>
+<p>Before upgrading, check that your setup is clean and there are no events in the queues:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmqctl check
+intelmqctl list queues -q
+</pre></div>
+</div>
+<p>The upgrade depends on how you installed IntelMQ.</p>
+<div class="section" id="packages">
+<h3><a class="toc-backref" href="#id6">Packages</a><a class="headerlink" href="#packages" title="Permalink to this headline">¶</a></h3>
+<p>Use your systems package management.</p>
+</div>
+<div class="section" id="docker-beta">
+<h3><a class="toc-backref" href="#id7">Docker (beta)</a><a class="headerlink" href="#docker-beta" title="Permalink to this headline">¶</a></h3>
+<p><strong>ATTENTION</strong> Currently the version published on docker hub is not tagged with the same IntelMQ version. During beta, each version is published with tag <cite>1.0</cite>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker pull certat/intelmq-full:1.0
+
+docker pull certat/intelmq-nginx:latest
+</pre></div>
+</div>
+<p>Alternatively you can use <cite>docker-compose</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose pull
+</pre></div>
+</div>
+<p>You can check the current versions from intelmq &amp; intelmq-manager &amp; intelmq-api via git commit ref.</p>
+<p>The Version format for each included item is <cite>key=value</cite> and they are saparated via <cite>,</cite>. I. e. <cite>IntelMQ=ab12cd34f, IntelMQ-API=xy65z23</cite>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker inspect --format <span class="s1">&#39;{{ index .Config.Labels &quot;org.opencontainers.image.version&quot; }}&#39;</span> intelmq-full:1.0
+</pre></div>
+</div>
+<p>Now restart your container, if you’re using docker-compose you simply write:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose down
+</pre></div>
+</div>
+<p>If you dont use docker-compose, you can restart a single container using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker ps <span class="p">|</span> grep certat
+
+docker stop CONTAINER_ID
+</pre></div>
+</div>
+</div>
+<div class="section" id="pypi">
+<h3><a class="toc-backref" href="#id8">PyPi</a><a class="headerlink" href="#pypi" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -U --no-deps intelmq
+sudo intelmqsetup
+</pre></div>
+</div>
+<p>Using <cite>–no-deps</cite> will not upgrade dependencies, which would probably overwrite the system’s libraries.
+Remove this option to also upgrade dependencies.</p>
+</div>
+<div class="section" id="local-repository">
+<h3><a class="toc-backref" href="#id9">Local repository</a><a class="headerlink" href="#local-repository" title="Permalink to this headline">¶</a></h3>
+<p>If you have an editable installation, refer to the instructions in the <a class="reference internal" href="../dev/guide.html"><span class="doc">Developers Guide</span></a>.</p>
+<p>Update the repository depending on your setup (e.g. <cite>git pull origin master</cite>).</p>
+<p>And run the installation again:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install .
+sudo intelmqsetup
+</pre></div>
+</div>
+<p>For editable installations (development only), run <cite>pip install -e .</cite> instead.</p>
+</div>
+</div>
+<div class="section" id="upgrade-configuration-and-check-the-installation">
+<h2><a class="toc-backref" href="#id10">Upgrade configuration and check the installation</a><a class="headerlink" href="#upgrade-configuration-and-check-the-installation" title="Permalink to this headline">¶</a></h2>
+<p>Go through <a class="reference external" href="https://github.com/certtools/intelmq/blob/develop/NEWS.md">NEWS.md</a> and apply necessary adaptions to your setup.
+If you have adapted IntelMQ’s code, also read the <a class="reference external" href="https://github.com/certtools/intelmq/blob/develop/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<p>Check your installation and configuration to detect any problems:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmqctl upgrade-config
+intelmqctl check
+</pre></div>
+</div>
+<p>## Start IntelMQ</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmqctl start
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="configuration-management.html" title="next chapter">Configuration and Management</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/user/upgrade.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

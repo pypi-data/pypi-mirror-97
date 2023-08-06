@@ -1,0 +1,854 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuration and Management &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Bots" href="bots.html" />
+    <link rel="prev" title="Upgrade instructions" href="upgrade.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration-and-management">
+<h1><a class="toc-backref" href="#id4">Configuration and Management</a><a class="headerlink" href="#configuration-and-management" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#configuration-and-management" id="id4">Configuration and Management</a></p>
+<ul>
+<li><p><a class="reference internal" href="#where-to-get-help" id="id5">Where to get help?</a></p></li>
+<li><p><a class="reference internal" href="#configure-services" id="id6">Configure services</a></p></li>
+<li><p><a class="reference internal" href="#configuration" id="id7">Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#opt-and-lsb-paths" id="id8">/opt and LSB paths</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id9">Overview</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#system-configuration-defaults" id="id10">System Configuration (defaults)</a></p>
+<ul>
+<li><p><a class="reference internal" href="#logging" id="id11">Logging</a></p>
+<ul>
+<li><p><a class="reference internal" href="#log-rotation" id="id12">Log rotation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#error-handling" id="id13">Error Handling</a></p></li>
+<li><p><a class="reference internal" href="#miscellaneous" id="id14">Miscellaneous</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-supervisor-as-process-manager-beta" id="id15">Using supervisor as process manager (Beta)</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#pipeline-configuration" id="id16">Pipeline Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#structure" id="id17">Structure</a></p>
+<ul>
+<li><p><a class="reference internal" href="#source-queue" id="id18">Source queue</a></p></li>
+<li><p><a class="reference internal" href="#destination-queues" id="id19">Destination queues</a></p></li>
+<li><p><a class="reference internal" href="#named-queues-paths" id="id20">Named queues / paths</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#amqp-beta" id="id21">AMQP (Beta)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#runtime-configuration" id="id22">Runtime Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#multithreading-beta" id="id23">Multithreading (Beta)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#harmonization-configuration" id="id24">Harmonization Configuration</a></p></li>
+<li><p><a class="reference internal" href="#utilities" id="id25">Utilities</a></p>
+<ul>
+<li><p><a class="reference internal" href="#management" id="id26">Management</a></p></li>
+<li><p><a class="reference internal" href="#web-interface-intelmq-manager" id="id27">Web interface: IntelMQ Manager</a></p></li>
+<li><p><a class="reference internal" href="#command-line-interface-intelmqctl" id="id28">Command-line interface: intelmqctl</a></p>
+<ul>
+<li><p><a class="reference internal" href="#botnet-concept" id="id29">Botnet Concept</a></p></li>
+<li><p><a class="reference internal" href="#scheduled-run-mode" id="id30">Scheduled Run Mode</a></p></li>
+<li><p><a class="reference internal" href="#continuous-run-mode" id="id31">Continuous Run Mode</a></p></li>
+<li><p><a class="reference internal" href="#reloading" id="id32">Reloading</a></p></li>
+<li><p><a class="reference internal" href="#forcing-reset-pipeline-and-cache-be-careful" id="id33">Forcing reset pipeline and cache (be careful)</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id3" id="id34">Error Handling</a></p>
+<ul>
+<li><p><a class="reference internal" href="#tool-intelmqdump" id="id35">Tool: intelmqdump</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#monitoring-logs" id="id36">Monitoring Logs</a></p></li>
+<li><p><a class="reference internal" href="#uninstall" id="id37">Uninstall</a></p></li>
+<li><p><a class="reference internal" href="#integration-with-ticket-systems-etc" id="id38">Integration with ticket systems, etc.</a></p></li>
+<li><p><a class="reference internal" href="#frequently-asked-questions" id="id39">Frequently Asked Questions</a></p></li>
+<li><p><a class="reference internal" href="#additional-information" id="id40">Additional Information</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bash-completion" id="id41">Bash Completion</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<p>For installation instructions, see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>.
+For upgrade instructions, see <a class="reference internal" href="upgrade.html"><span class="doc">Upgrade instructions</span></a>.</p>
+<div class="section" id="where-to-get-help">
+<h2><a class="toc-backref" href="#id5">Where to get help?</a><a class="headerlink" href="#where-to-get-help" title="Permalink to this headline">¶</a></h2>
+<p>In case you are lost or something is not discussed in this guide, you might want to subscribe to the <a class="reference external" href="https://lists.cert.at/cgi-bin/mailman/listinfo/intelmq-users">IntelMQ Users Mailinglist</a> and ask your questions there.</p>
+<p>With that clarified, let’s dig into the details…</p>
+</div>
+<div class="section" id="configure-services">
+<h2><a class="toc-backref" href="#id6">Configure services</a><a class="headerlink" href="#configure-services" title="Permalink to this headline">¶</a></h2>
+<p>You need to enable and start Redis if not already done. Using systemd it can be done with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>systemctl <span class="nb">enable</span> redis.service
+systemctl start redis.service
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="id1"></span><h2><a class="toc-backref" href="#id7">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="opt-and-lsb-paths">
+<h3><a class="toc-backref" href="#id8">/opt and LSB paths</a><a class="headerlink" href="#opt-and-lsb-paths" title="Permalink to this headline">¶</a></h3>
+<p>If you installed the packages, standard Linux paths (LSB paths) are used: <code class="docutils literal notranslate"><span class="pre">/var/log/intelmq/</span></code>, <code class="docutils literal notranslate"><span class="pre">/etc/intelmq/</span></code>, <code class="docutils literal notranslate"><span class="pre">/var/lib/intelmq/</span></code>, <code class="docutils literal notranslate"><span class="pre">/var/run/intelmq/</span></code>.
+Otherwise, the configuration directory is <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/etc/</span></code>. Using the environment variable <code class="docutils literal notranslate"><span class="pre">INTELMQ_ROOT_DIR</span></code> allows setting any arbitrary root directory.</p>
+<p>You can switch this by setting the environment variables <code class="docutils literal notranslate"><span class="pre">INTELMQ_PATHS_NO_OPT</span></code> and <code class="docutils literal notranslate"><span class="pre">INTELMQ_PATHS_OPT</span></code>, respectively.
+* When installing the Python packages, you can set <code class="docutils literal notranslate"><span class="pre">INTELMQ_PATHS_NO_OPT</span></code> to something non-empty to use LSB-paths.
+* When installing the deb/rpm packages, you can set <code class="docutils literal notranslate"><span class="pre">INTELMQ_PATHS_OPT</span></code> to something non-empty to use <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/</span></code> paths, or a path set with <code class="docutils literal notranslate"><span class="pre">INTELMQ_ROOT_DIR</span></code>.</p>
+<p>The environment variable <code class="docutils literal notranslate"><span class="pre">ROOT_DIR</span></code> is meant to set an alternative root directory instead of <cite>/</cite>. This is primarily meant for package build environments an analogous to setuptools’ <code class="docutils literal notranslate"><span class="pre">--root</span></code> parameter. Thus it is only used in LSB-mode.</p>
+</div>
+<div class="section" id="overview">
+<h3><a class="toc-backref" href="#id9">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<p>All configuration files are in the JSON format.
+For new installations a default setup with some examples is provided by the <cite>intelmqsetup</cite> tool. If this is not the case, make sure the program was run (see installation instructions).</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">defaults.conf</span></code>: default values for all bots and their behavior, e.g. error handling, log options and pipeline configuration. Will be <a class="reference external" href="https://github.com/certtools/intelmq/issues/267">removed in the future</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code>: Configuration for the individual bots. See <a class="reference internal" href="bots.html"><span class="doc">Bots</span></a> for more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.conf</span></code>: Defines source and destination queues per bot (i.e. where does a bot get its data from, where does it send it to?).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BOTS</span></code>: Includes configuration hints for all bots. E.g. feed URLs or database connection parameters. Use this as a template for <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code>. This is also read by the intelmq-manager.</p></li>
+</ul>
+<p>To configure a new bot, you need to define and configure it in <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code> using the template from BOTS.
+Configure source and destination queues in <code class="docutils literal notranslate"><span class="pre">pipeline.conf</span></code>.
+Use the IntelMQ Manager mentioned above to generate the configuration files if unsure.</p>
+<p>In the shipped examples 4 collectors and parsers, 6 common experts and one output are configured. The default collector and the parser handle data from malware domain list, the file output bot writes all data to <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/var/lib/bots/file-output/events.txt</span></code>/<code class="docutils literal notranslate"><span class="pre">/var/lib/intelmq/bots/file-output/events.txt</span></code>.</p>
+</div>
+</div>
+<div class="section" id="system-configuration-defaults">
+<h2><a class="toc-backref" href="#id10">System Configuration (defaults)</a><a class="headerlink" href="#system-configuration-defaults" title="Permalink to this headline">¶</a></h2>
+<p>All bots inherit the default configuration parameters and they can overwrite them using the same parameters in their respective configuration in the <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code> file.
+You can set the parameters from <code class="docutils literal notranslate"><span class="pre">defaults.conf</span></code> per bot as well. The settings will take effect for running bots after the bot re-reads the configuration (restart or reload).</p>
+<div class="section" id="logging">
+<h3><a class="toc-backref" href="#id11">Logging</a><a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h3>
+<p>The logging can be configured with the following parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_handler</span></code>: Can be one of <code class="docutils literal notranslate"><span class="pre">&quot;file&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;syslog&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_level</span></code>: Defines the system-wide log level that will be use by all bots and the intelmqctl tool. Possible values are: <code class="docutils literal notranslate"><span class="pre">&quot;CRITICAL&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ERROR&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;WARNING&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;INFO&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;DEBUG&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_path</span></code>: If <code class="docutils literal notranslate"><span class="pre">logging_handler</span></code> is <code class="docutils literal notranslate"><span class="pre">file</span></code>. Defines the system-wide log-folder that will be use by all bots and the intelmqctl tool. Default value: <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/var/log/</span></code> or <code class="docutils literal notranslate"><span class="pre">/var/log/intelmq/</span></code> respectively.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_syslog</span></code>: If <code class="docutils literal notranslate"><span class="pre">logging_handler</span></code> is <code class="docutils literal notranslate"><span class="pre">syslog</span></code>. Either a list with hostname and UDP port of syslog service, e.g. <code class="docutils literal notranslate"><span class="pre">[&quot;localhost&quot;,</span> <span class="pre">514]</span></code> or a device name/path, e.g. the default <code class="docutils literal notranslate"><span class="pre">&quot;/var/log&quot;</span></code>.</p></li>
+</ul>
+<p>We recommend <code class="docutils literal notranslate"><span class="pre">logging_level</span></code> <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> for production environments and <code class="docutils literal notranslate"><span class="pre">INFO</span></code> if you want more details. In any case, watch your free disk space!</p>
+<div class="section" id="log-rotation">
+<h4><a class="toc-backref" href="#id12">Log rotation</a><a class="headerlink" href="#log-rotation" title="Permalink to this headline">¶</a></h4>
+<p>To rotate the logs, you can use the standard Linux-tool logrotate.
+An example logrotate configuration is given in <code class="docutils literal notranslate"><span class="pre">contrib/logrotate/</span></code> and delivered with all deb/rpm-packages.
+When not using logrotate, IntelMQ can rotate the logs itself, which is not enabled by default! You need to set both values.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_max_size</span></code>: Maximum number of bytes to be stored in one logfile before the file is rotated (default: 0, equivalent to unset).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logging_max_copies</span></code>: Maximum number of logfiles to keep (default: unset). Compression is not supported.</p></li>
+</ul>
+<p>Some information can as well be found in Python’s documentation on the used <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.RotatingFileHandler">RotatingFileHandler</a>.</p>
+</div>
+</div>
+<div class="section" id="error-handling">
+<h3><a class="toc-backref" href="#id13">Error Handling</a><a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="simple">
+<dt><strong>error_log_message</strong> - in case of an error, this option will allow the bot to write the message (report or event) to the log file. Use the following values:</dt><dd><ul class="simple">
+<li><p><strong>true/false</strong> - write or not write message to the log file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>error_log_exception</strong> - in case of an error, this option will allow the bot to write the error exception to the log file. Use the following values:</dt><dd><ul class="simple">
+<li><p><strong>true/false</strong> - write or not write exception to the log file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>error_procedure</strong> - in case of an error, this option defines the procedure that the bot will adopt. Use the following values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>stop</strong> - stop bot after retrying X times (as defined in <code class="docutils literal notranslate"><span class="pre">error_max_retries</span></code>)  with a delay between retries (as defined in <code class="docutils literal notranslate"><span class="pre">error_retry_delay</span></code>). If the bot reaches the <code class="docutils literal notranslate"><span class="pre">error_max_retries</span></code> value, it will remove the message from the pipeline and stop. If the option <code class="docutils literal notranslate"><span class="pre">error_dump_message</span></code> is also enable, the bot will dump the removed message to its dump file (to be found in var/log).</p></li>
+<li><p><strong>pass</strong> - will skip this message and will process the next message after retrying X times, removing the current message from pipeline. If the option <code class="docutils literal notranslate"><span class="pre">error_dump_message</span></code> is also enable, then the bot will dump the removed message to its dump file. After max retries are reached, the rate limit is applied (e.g. a collector bot fetch an unavailable resource does not try forever).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>error_max_retries</strong> - in case of an error, the bot will try to re-start processing the current message X times as defined by this option. int value.</p></li>
+<li><p><strong>error_retry_delay</strong> - defines the number of seconds to wait between subsequent re-tries in case of an error. int value.</p></li>
+<li><dl class="simple">
+<dt><strong>error_dump_message</strong> - specifies if the bot will write queued up messages to its dump file (use intelmqdump to re-insert the message).</dt><dd><ul class="simple">
+<li><p><strong>true/false</strong> - write or not write message to the dump file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>If the path <code class="docutils literal notranslate"><span class="pre">_on_error</span></code> exists for a bot, the message is also sent to this queue, instead of (only) dumping the file if configured to do so.</p>
+</div>
+<div class="section" id="miscellaneous">
+<h3><a class="toc-backref" href="#id14">Miscellaneous</a><a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>load_balance</strong> - this option allows you to choose the behavior of the queue. Use the following values:</dt><dd><ul>
+<li><p><strong>true</strong> - splits the messages into several queues without duplication</p></li>
+<li><p><strong>false</strong> - duplicates the messages into each queue</p></li>
+<li><p>When using AMQP as message broker, take a look at the <a class="reference internal" href="#multithreading"><span class="std std-ref">Multithreading (Beta)</span></a> section and the <code class="docutils literal notranslate"><span class="pre">instances_threads</span></code> parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>broker</strong> - select which broker intelmq can use. Use the following values:</dt><dd><ul>
+<li><p><strong>redis</strong> - Redis allows some persistence but is not so fast as ZeroMQ (in development). But note that persistence has to be manually activated. See <a class="reference external" href="http://redis.io/topics/persistence">http://redis.io/topics/persistence</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>rate_limit</strong> - time interval (in seconds) between messages processing.  int value.</p></li>
+<li><p><strong>ssl_ca_certificate</strong> - trusted CA certificate for IMAP connections (supported by some bots).</p></li>
+<li><p><strong>source_pipeline_host</strong> - broker IP, FQDN or Unix socket that the bot will use to connect and receive messages.</p></li>
+<li><p><strong>source_pipeline_port</strong> - broker port that the bot will use to connect and receive messages. Can be empty for Unix socket.</p></li>
+<li><p><strong>source_pipeline_password</strong> - broker password that the bot will use to connect and receive messages. Can be null for unprotected broker.</p></li>
+<li><p><strong>source_pipeline_db</strong> - broker database that the bot will use to connect and receive messages (requirement from redis broker).</p></li>
+<li><p><strong>destination_pipeline_host</strong> - broker IP, FQDN or Unix socket that the bot will use to connect and send messages.</p></li>
+<li><p><strong>destination_pipeline_port</strong> - broker port that the bot will use to connect and send messages. Can be empty for Unix socket.</p></li>
+<li><p><strong>destination_pipeline_password</strong> - broker password that the bot will use to connect and send messages. Can be null for unprotected broker.</p></li>
+<li><p><strong>destination_pipeline_db</strong> - broker database that the bot will use to connect and send messages (requirement from redis broker).</p></li>
+<li><p><strong>http_proxy</strong> - HTTP proxy the that bot will use when performing HTTP requests (e.g. bots/collectors/collector_http.py). The value must follow <span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1738.html"><strong>RFC 1738</strong></a>.</p></li>
+<li><p><strong>https_proxy</strong> -  HTTPS proxy that the bot will use when performing secure HTTPS requests (e.g. bots/collectors/collector_http.py).</p></li>
+<li><p><strong>http_user_agent</strong> - user-agent string that the bot will use when performing HTTP/HTTPS requests (e.g. bots/collectors/collector_http.py).</p></li>
+<li><dl class="simple">
+<dt><strong>http_verify_cert</strong> - defines if the bot will verify SSL certificates when performing HTTPS requests (e.g. bots/collectors/collector_http.py).</dt><dd><ul>
+<li><p><strong>true/false</strong> - verify or not verify SSL certificates</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="section" id="using-supervisor-as-process-manager-beta">
+<h4><a class="toc-backref" href="#id15">Using supervisor as process manager (Beta)</a><a class="headerlink" href="#using-supervisor-as-process-manager-beta" title="Permalink to this headline">¶</a></h4>
+<p>First of all: Do not use it in production environments yet! It has not been tested thoroughly yet.</p>
+<p><a class="reference external" href="http://supervisord.org">Supervisor</a> is process manager written in Python. The main advantage is that it take care about processes, so if bot process exit with failure (exit code different than 0), supervisor try to run it again. Another advantage is that it not require writing PID files.</p>
+<p>This was tested on Ubuntu 18.04.</p>
+<p>Install supervisor. <code class="docutils literal notranslate"><span class="pre">supervisor_twiddler</span></code> is extension for supervisor, that makes possible to create process dynamically. (Ubuntu <code class="docutils literal notranslate"><span class="pre">supervisor</span></code> package is currently based on Python 2, so <code class="docutils literal notranslate"><span class="pre">supervisor_twiddler</span></code> must be installed with Python 2 <code class="docutils literal notranslate"><span class="pre">pip</span></code>.)</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt install supervisor python-pip
+pip install supervisor_twiddler
+</pre></div>
+</div>
+<p>Create default config <code class="docutils literal notranslate"><span class="pre">/etc/supervisor/conf.d/intelmq.conf</span></code> and restart <code class="docutils literal notranslate"><span class="pre">supervisor</span></code> service:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[rpcinterface:twiddler]</span>
+<span class="na">supervisor.rpcinterface_factory</span><span class="o">=</span><span class="s">supervisor_twiddler.rpcinterface:make_twiddler_rpcinterface</span>
+
+<span class="k">[group:intelmq]</span>
+</pre></div>
+</div>
+<p>Change IntelMQ process manager in the <em>defaults</em> configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;process_manager&quot;</span><span class="p">:</span> <span class="s2">&quot;supervisor&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>After this it is possible to manage bots like before with <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> command.</p>
+</div>
+</div>
+</div>
+<div class="section" id="pipeline-configuration">
+<h2><a class="toc-backref" href="#id16">Pipeline Configuration</a><a class="headerlink" href="#pipeline-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline configuration defines how the data is exchanges between the bots. For each bot, it defines the source queue (there is always only one) and one or multiple destination queues. This section shows the possibilities and definition as well as examples. The configuration of the pipeline can be done by the <a class="reference external" href="https://github.com/certtools/intelmq-manager">IntelMQ Manager</a>  with no need to intervene manually. It is recommended to use this tool as it guarantees that the configuration is correct. The location of the file is <code class="docutils literal notranslate"><span class="pre">etc/pipeline.conf</span></code> in your IntelMQ directory, for example <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/etc/pipeline.conf</span></code> or <code class="docutils literal notranslate"><span class="pre">/etc/intelmq/pipeline.conf</span></code>.</p>
+<div class="section" id="structure">
+<h3><a class="toc-backref" href="#id17">Structure</a><a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h3>
+<p>The pipeline configuration has the same structure on the first level as the runtime configuration, i.e. it’s a dictionary with the bot IDs’ as keys. Each item holds again a dictionary with one entry for each the source and destination queue. A full example can be found later in this section.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;example-bot&quot;: {
+        &quot;source-queue&quot;: &lt;source queue data&gt;,
+        &quot;destination-queues&quot;: &lt;destination queue data&gt;
+    }
+}
+</pre></div>
+</div>
+<div class="section" id="source-queue">
+<h4><a class="toc-backref" href="#id18">Source queue</a><a class="headerlink" href="#source-queue" title="Permalink to this headline">¶</a></h4>
+<p>The source queue is only a string, by convention the bot ID plus “-queue” appended. For example, if the bot ID is <code class="docutils literal notranslate"><span class="pre">example-bot</span></code>, the source queue name is <code class="docutils literal notranslate"><span class="pre">example-bot-queue</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;source-queue&quot;</span><span class="p">:</span> <span class="s2">&quot;example-bot-queue&quot;</span>
+</pre></div>
+</div>
+<p>For collectors, this field does not exist, as the fetch the data from outside the IntelMQ system by definition.</p>
+</div>
+<div class="section" id="destination-queues">
+<h4><a class="toc-backref" href="#id19">Destination queues</a><a class="headerlink" href="#destination-queues" title="Permalink to this headline">¶</a></h4>
+<p>There are multiple possibilities for the destination queues:
+- no value, i.e. the field does not exist. This is the case for outputs, as they push the data outside the IntelMQ system by default.
+- A single string (deprecated) with the name of the source queue of the next bot.
+- A list of strings, each with the name of the source queue of the next bot.
+- <em>Named queues</em>: a dictionary of either strings or lists.</p>
+<p>Before going into the details of named paths, first dive into some simpler cases. A typical configuration may look like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;deduplicator-expert&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;source-queue&quot;</span><span class="p">:</span> <span class="s2">&quot;deduplicator-expert-queue&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;destination-queues&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;taxonomy-expert-queue&quot;</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And a bot with two destination queues:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;cymru-whois-expert&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;source-queue&quot;</span><span class="p">:</span> <span class="s2">&quot;cymru-whois-expert-queue&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;destination-queues&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;file-output-queue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;misp-output-queue&quot;</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>These are the usual configurations you mostly see.</p>
+</div>
+<div class="section" id="named-queues-paths">
+<h4><a class="toc-backref" href="#id20">Named queues / paths</a><a class="headerlink" href="#named-queues-paths" title="Permalink to this headline">¶</a></h4>
+<p>Beginning with version 1.1.0, queues can be “named”, these are the so-called <em>paths</em>. The following two configurations are equivalent:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;destination-queues&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;taxonomy-expert-queue&quot;</span><span class="p">]</span>
+<span class="nt">&quot;destination-queues&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;_default&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;taxonomy-expert-queue&quot;</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>As we can see the <em>default</em> path name is obviously <code class="docutils literal notranslate"><span class="pre">_default</span></code>. Let’s have a look at a more complex and complete example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>&quot;destination-queues&quot;: {
+    &quot;_default&quot;: &quot;&lt;first destination pipeline name&gt;&quot;,
+    &quot;_on_error&quot;: &quot;&lt;optional destination pipeline name in case of errors&gt;&quot;,
+    &quot;other-path&quot;: [
+        &quot;&lt;second destination pipeline name&gt;&quot;,
+        &quot;&lt;third destination pipeline name&gt;&quot;,
+        ...
+        ],
+    ...
+    }
+</pre></div>
+</div>
+<p>In that case, bot will be able to send the message to one of defined paths. The path <code class="docutils literal notranslate"><span class="pre">&quot;_default&quot;</span></code> is used if none is not specified.
+In case of errors during processing, and the optional path <code class="docutils literal notranslate"><span class="pre">&quot;_on_error&quot;</span></code> is specified, the message will be sent to the pipelines given given as on-error.
+Other destination queues can be explicitly addressed by the bots, e.g. bots with filtering capabilities. Some expert bots are capable of sending messages to paths, this feature is explained in their documentation, e.g. the <span class="xref std std-ref">filter expert</span> and the <a class="reference internal" href="bots.html#sieve-expert"><span class="std std-ref">Sieve</span></a>.
+The named queues need to be explicitly addressed by the bot (e.g. filtering) or the core (<code class="docutils literal notranslate"><span class="pre">_on_error</span></code>) to be used. Setting arbitrary paths has no effect.</p>
+</div>
+</div>
+<div class="section" id="amqp-beta">
+<h3><a class="toc-backref" href="#id21">AMQP (Beta)</a><a class="headerlink" href="#amqp-beta" title="Permalink to this headline">¶</a></h3>
+<p>Starting with IntelMQ 1.2 the AMQP protocol is supported as message queue.
+To use it, install a broker, for example RabbitMQ.
+The configuration and the differences are outlined here.
+Keep in mind that it is slower, but has better monitoring capabilities and is more stable.
+The AMQP support is considered beta, so small problems might occur. So far, only RabbitMQ as broker has been tested.</p>
+<p>You can change the broker for single bots (set the parameters in the runtime configuration per bot) or for the whole botnet (in defaults configuration).</p>
+<p>You need to set the parameter <code class="docutils literal notranslate"><span class="pre">source_pipeline_broker</span></code>/<code class="docutils literal notranslate"><span class="pre">destination_pipeline_broker</span></code> to <code class="docutils literal notranslate"><span class="pre">amqp</span></code>. There are more parameters available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_broker</span></code>: <code class="docutils literal notranslate"><span class="pre">&quot;amqp&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_host</span></code> (default: <code class="docutils literal notranslate"><span class="pre">'127.0.0.1'</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_port</span></code> (default: 5672)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_username</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_password</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_socket_timeout</span></code> (default: no timeout)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_amqp_exchange</span></code>: Only change/set this if you know what you do. If set, the destination queues are not declared as queues, but used as routing key. (default: <code class="docutils literal notranslate"><span class="pre">''</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destination_pipeline_amqp_virtual_host</span></code> (default: <code class="docutils literal notranslate"><span class="pre">'/'</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_host</span></code> (default: <code class="docutils literal notranslate"><span class="pre">'127.0.0.1'</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_port</span></code> (default: 5672)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_username</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_password</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_socket_timeout</span></code> (default: no timeout)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_amqp_exchange</span></code>: Only change/set this if you know what you do. If set, the destination queues are not declared as queues, but used as routing key. (default: <cite>‘’</cite>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_pipeline_amqp_virtual_host</span></code> (default: <code class="docutils literal notranslate"><span class="pre">'/'</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">intelmqctl_rabbitmq_monitoring_url</span></code> string, see below (default: <code class="docutils literal notranslate"><span class="pre">&quot;http://{host}:15672&quot;</span></code>)</p></li>
+</ul>
+<p>For getting the queue sizes, <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> needs to connect to the monitoring interface of RabbitMQ. If the monitoring interface is not available under <code class="docutils literal notranslate"><span class="pre">http://{host}:15672</span></code> you can manually set using the parameter <code class="docutils literal notranslate"><span class="pre">intelmqctl_rabbitmq_monitoring_url</span></code>.
+In a RabbitMQ’s default configuration you might not provide a user account, as by default the administrator (<code class="docutils literal notranslate"><span class="pre">guest</span></code>:<code class="docutils literal notranslate"><span class="pre">guest</span></code>) allows full access from localhost. If you create a separate user account, make sure to add the tag “monitoring” to it, otherwise IntelMQ can’t fetch the queue sizes.</p>
+<div class="figure align-default">
+<img alt="RabbitMQ User Account Monitoring Tag" src="../_images/rabbitmq-user-monitoring.png" />
+</div>
+<p>Setting the statistics (and cache) parameters is necessary when the local redis is running under a non-default host/port. If this is the case, you can set them explicitly:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">statistics_database</span></code>: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statistics_host</span></code>: <code class="docutils literal notranslate"><span class="pre">&quot;127.0.0.1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statistics_password</span></code>: <code class="docutils literal notranslate"><span class="pre">null</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statistics_port</span></code>: <code class="docutils literal notranslate"><span class="pre">6379</span></code></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="runtime-configuration">
+<span id="id2"></span><h2><a class="toc-backref" href="#id22">Runtime Configuration</a><a class="headerlink" href="#runtime-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This configuration is used by each bot to load its specific (runtime) parameters. Usually, the <code class="docutils literal notranslate"><span class="pre">BOTS</span></code> file is used to generate <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code>. Also, the IntelMQ Manager generates this configuration. You may edit it manually as well. Be sure to re-load the bot (see the <a class="reference internal" href="intelmqctl.html"><span class="doc">intelmqctl documentation</span></a>).</p>
+<p><strong>Template:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;&lt;bot ID&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;bot type (Collector, Parser, Expert, Output)&gt;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;human-readable bot name&gt;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;bot code (python module)&gt;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;generic description of the bot&gt;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;&lt;parameter 1&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;value 1&gt;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;&lt;parameter 2&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;value 2&gt;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;&lt;parameter 3&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;value 3&gt;&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;malware-domain-list-collector&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;Collector&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;intelmq.bots.collectors.http.collector_http&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List Collector is the bot responsible to get the report from source of information.&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;http_url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.malwaredomainlist.com/updatescsv.php&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;feed&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;rate_limit&quot;</span><span class="p">:</span> <span class="mi">3600</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>More examples can be found in the <code class="docutils literal notranslate"><span class="pre">intelmq/etc/runtime.conf</span></code> directory. See <a class="reference internal" href="bots.html"><span class="doc">Bots</span></a> for more details.</p>
+<p>By default, all of the bots are started when you start the whole botnet, however there is a possibility to <em>disable</em> a bot. This means that the bot will not start every time you start the botnet, but you can start and stop the bot if you specify the bot explicitly. To disable a bot, add the following to your runtime.conf: <code class="docutils literal notranslate"><span class="pre">&quot;enabled&quot;:</span> <span class="pre">false</span></code>. For example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;malware-domain-list-collector&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;Collector&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;intelmq.bots.collectors.http.collector_http&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List Collector is the bot responsible to get the report from source of information.&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;http_url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.malwaredomainlist.com/updatescsv.php&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;feed&quot;</span><span class="p">:</span> <span class="s2">&quot;Malware Domain List&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;rate_limit&quot;</span><span class="p">:</span> <span class="mi">3600</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="multithreading-beta">
+<span id="multithreading"></span><h3><a class="toc-backref" href="#id23">Multithreading (Beta)</a><a class="headerlink" href="#multithreading-beta" title="Permalink to this headline">¶</a></h3>
+<p>First of all: Do not use it in production environments yet! There are a few bugs, see below</p>
+<p>Since IntelMQ 2.0 it is possible to provide the following parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">instances_threads</span></code></p></li>
+</ul>
+<p>Set it to a non-zero integer, then this number of worker threads will be spawn.
+This is useful if bots often wait for system resources or if network-based lookups are a bottleneck.</p>
+<p>However, there are currently a few cavecats:</p>
+<ul class="simple">
+<li><p>This is not possible for all bots, there are some exceptions (collectors and some outputs), see the <a class="reference internal" href="FAQ.html"><span class="doc">Frequently asked questions</span></a> for some reasons.</p></li>
+<li><p>Only use it with the AMQP pipeline, as with Redis, messages may get duplicated because there’s only one internal queue</p></li>
+<li><p>In the logs, you can see the main thread initializing first, then all of the threads which log with the name <code class="docutils literal notranslate"><span class="pre">[bot-id].[thread-id]</span></code>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="harmonization-configuration">
+<h2><a class="toc-backref" href="#id24">Harmonization Configuration</a><a class="headerlink" href="#harmonization-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This configuration is used to specify the fields for all message types. The harmonization library will load this configuration to check, during the message processing, if the values are compliant to the “harmonization” format. Usually, this configuration doesn’t need any change. It is mostly maintained by the intelmq maintainers.</p>
+<p><strong>Template:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;&lt;message type&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;&lt;field 1&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;field 1 description&gt;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;field value type&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;&lt;field 2&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;field 2 description&gt;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;field value type&gt;&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;destination.asn&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The autonomous system number from which originated the connection.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Integer&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;destination.geolocation.cc&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Country-Code according to ISO3166-1 alpha-2 for the destination IP.&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;^[a-zA-Z0-9]{2}$&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>More examples can be found in the <code class="docutils literal notranslate"><span class="pre">intelmq/etc/harmonization.conf</span></code> directory.</p>
+</div>
+<div class="section" id="utilities">
+<h2><a class="toc-backref" href="#id25">Utilities</a><a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="management">
+<h3><a class="toc-backref" href="#id26">Management</a><a class="headerlink" href="#management" title="Permalink to this headline">¶</a></h3>
+<p>IntelMQ has a modular structure consisting of bots. There are four types of bots:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="bots.html#collector-bots"><span class="std std-ref">Collector Bots</span></a> retrieve data from internal or external sources, the output are <em>reports</em> consisting of many individual data sets / log lines.</p></li>
+<li><p><a class="reference internal" href="bots.html#parser-bots"><span class="std std-ref">Parser Bots</span></a> parse the (report) data by splitting it into individual <em>events</em> (log lines) and giving them a defined structure, see also <a class="reference internal" href="../dev/data-harmonization.html"><span class="doc">Data Harmonization</span></a> for the list of fields an event may be split up into.</p></li>
+<li><p><a class="reference internal" href="bots.html#expert-bots"><span class="std std-ref">Expert Bots</span></a> enrich the existing events by e.g. lookup up information such as DNS reverse records, geographic location information (country code) or abuse contacts for an IP address or domain name.</p></li>
+<li><p><a class="reference internal" href="bots.html#output-bots"><span class="std std-ref">Output Bots</span></a> write events to files, databases, (REST)-APIs or any other data sink that you might want to write to.</p></li>
+</ul>
+<p>Each bot has one source queue (except collectors) and can have multiple
+destination queues (except outputs). But multiple bots can write to the same pipeline (queue), resulting in multiple inputs for the next bot.</p>
+<p>Every bot runs in a separate process. A bot is identifiable by a <em>bot id</em>.</p>
+<p>Currently only one instance (i.e. <em>with the same bot id</em>) of a bot can run at the same time. Concepts for multiprocessing are being discussed, see this issue: <a class="reference external" href="https://github.com/certtools/intelmq/issues/186">Multiprocessing per queue is not supported #186</a>.
+Currently you can run multiple processes of the same bot (with <em>different bot ids</em>) in parallel.</p>
+<p>Example: multiple gethostbyname bots (with different bot ids) may run in parallel, with the same input queue and sending to the same output queue. Note that the bot providing the input queue <strong>must</strong> have the <code class="docutils literal notranslate"><span class="pre">load_balance</span></code> option set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</div>
+<div class="section" id="web-interface-intelmq-manager">
+<h3><a class="toc-backref" href="#id27">Web interface: IntelMQ Manager</a><a class="headerlink" href="#web-interface-intelmq-manager" title="Permalink to this headline">¶</a></h3>
+<p>IntelMQ has a tool called IntelMQ Manager that gives users an easy way to configure all pipelines with bots that your team needs. For beginners, it’s recommended to use the IntelMQ Manager to become acquainted with the functionalities and concepts. The IntelMQ Manager offers some of the possibilities of the intelmqctl tool and has a graphical interface for runtime and pipeline configurations.</p>
+<p>See the <a class="reference external" href="https://github.com/certtools/intelmq-manager">IntelMQ Manager</a> repository.</p>
+</div>
+<div class="section" id="command-line-interface-intelmqctl">
+<h3><a class="toc-backref" href="#id28">Command-line interface: intelmqctl</a><a class="headerlink" href="#command-line-interface-intelmqctl" title="Permalink to this headline">¶</a></h3>
+<p><strong>Syntax</strong> see <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">-h</span></code></p>
+<ul class="simple">
+<li><p>Starting a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Stopping a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">stop</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Reloading a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">reload</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Restarting a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">restart</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Get status of a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">status</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Run a bot directly for debugging purpose and temporarily leverage the logging level to DEBUG: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">run</span> <span class="pre">bot-id</span></code></p></li>
+<li><p>Get a pdb (or ipdb if installed) live console. <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">run</span> <span class="pre">bot-id</span> <span class="pre">console</span></code></p></li>
+<li><p>See the message that waits in the input queue. <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">run</span> <span class="pre">bot-id</span> <span class="pre">message</span> <span class="pre">get</span></code></p></li>
+<li><p>See additional help for further explanation. <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">run</span> <span class="pre">bot-id</span> <span class="pre">--help</span></code></p></li>
+<li><p>Starting the botnet (all bots): <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span></code></p></li>
+<li><p>Starting a group of bots: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span> <span class="pre">--group</span> <span class="pre">experts</span></code></p></li>
+<li><p>Get a list of all configured bots: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">list</span> <span class="pre">bots</span></code></p></li>
+<li><p>Get a list of all queues: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">list</span> <span class="pre">queues</span></code>
+If -q is given, only queues with more than one item are listed.</p></li>
+<li><p>Get a list of all queues and status of the bots: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">list</span> <span class="pre">queues-and-status</span></code></p></li>
+<li><p>Clear a queue: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">clear</span> <span class="pre">queue-id</span></code></p></li>
+<li><p>Get logs of a bot: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">log</span> <span class="pre">bot-id</span> <span class="pre">number-of-lines</span> <span class="pre">log-level</span></code>
+Reads the last lines from bot log.
+Log level should be one of DEBUG, INFO, ERROR or CRITICAL.
+Default is INFO. Number of lines defaults to 10, -1 gives all. Result
+can be longer due to our logging format!</p></li>
+<li><p>Upgrade from a previous version: <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">upgrade-config</span></code>
+Make a backup of your configuration first, also including bot’s configuration files.</p></li>
+</ul>
+<div class="section" id="botnet-concept">
+<h4><a class="toc-backref" href="#id29">Botnet Concept</a><a class="headerlink" href="#botnet-concept" title="Permalink to this headline">¶</a></h4>
+<p>The “botnet” represents all currently configured bots which are explicitly enabled. It is, in essence, the graph (pipeline.conf) of the bots which are connected together via their input source queues and destination queues.</p>
+<p>To get an overview which bots are running, use <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">status</span></code> or use the IntelMQ Manager. Set <code class="docutils literal notranslate"><span class="pre">&quot;enabled&quot;:</span> <span class="pre">true</span></code> in the runtime configuration to add a bot to the botnet. By default, bots will be configured as <code class="docutils literal notranslate"><span class="pre">&quot;enabled&quot;:</span> <span class="pre">true</span></code>. See <a class="reference internal" href="bots.html"><span class="doc">Bots</span></a> for more details on configuration.</p>
+<p>Disabled bots can still be started explicitly using <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span> <span class="pre">&lt;bot_id&gt;</span></code>, but will remain in the state <code class="docutils literal notranslate"><span class="pre">disabled</span></code> if stopped (and not be implicitly enabled by the <code class="docutils literal notranslate"><span class="pre">start</span></code> command). They are not started by <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span></code> in analogy to the behavior of widely used initialization systems.</p>
+</div>
+<div class="section" id="scheduled-run-mode">
+<h4><a class="toc-backref" href="#id30">Scheduled Run Mode</a><a class="headerlink" href="#scheduled-run-mode" title="Permalink to this headline">¶</a></h4>
+<p>In many cases, it is useful to schedule a bot at a specific time (i.e. via cron(1)), for example to collect information from a website every day at midnight. To do this, set <code class="docutils literal notranslate"><span class="pre">run_mode</span></code> to <code class="docutils literal notranslate"><span class="pre">scheduled</span></code> in the <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code> for the bot. Check out the following example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;blocklistde-apache-collector&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Generic URL Fetcher&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;Collector&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;intelmq.bots.collectors.http.collector_http&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;All IP addresses which have been reported within the last 48 hours as having run attacks on the service Apache, Apache-DDOS, RFI-Attacks.&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nt">&quot;run_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;scheduled&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;feed&quot;</span><span class="p">:</span> <span class="s2">&quot;Blocklist.de Apache&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;provider&quot;</span><span class="p">:</span> <span class="s2">&quot;Blocklist.de&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;http_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://lists.blocklist.de/lists/apache.txt&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;ssl_client_certificate&quot;</span><span class="p">:</span> <span class="kc">null</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can schedule the bot with a crontab-entry like this:</p>
+<div class="highlight-cron notranslate"><div class="highlight"><pre><span></span>0 0 * * * intelmqctl start blocklistde-apache-collector
+</pre></div>
+</div>
+<p>Bots configured as <code class="docutils literal notranslate"><span class="pre">scheduled</span></code> will exit after the first successful run.
+Setting <code class="docutils literal notranslate"><span class="pre">enabled</span></code> to <code class="docutils literal notranslate"><span class="pre">false</span></code> will cause the bot to not start with <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span></code>, but only with an explicit start, in this example <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">start</span> <span class="pre">blocklistde-apache-collector</span></code>.</p>
+</div>
+<div class="section" id="continuous-run-mode">
+<h4><a class="toc-backref" href="#id31">Continuous Run Mode</a><a class="headerlink" href="#continuous-run-mode" title="Permalink to this headline">¶</a></h4>
+<p>Most of the cases, bots will need to be configured as <code class="docutils literal notranslate"><span class="pre">continuous</span></code> run mode (the default) in order to have them always running and processing events. Usually, the types of bots that will require the continuous mode will be Parsers, Experts and Outputs. To do this, set <code class="docutils literal notranslate"><span class="pre">run_mode</span></code> to <code class="docutils literal notranslate"><span class="pre">continuous</span></code> in the <code class="docutils literal notranslate"><span class="pre">runtime.conf</span></code> for the bot. Check the following example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;blocklistde-apache-parser&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Blocklist.de Parser&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;Parser&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;intelmq.bots.parsers.blocklistde.parser&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Blocklist.DE Parser is the bot responsible to parse the report and sanitize the information.&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nt">&quot;run_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can now start the bot using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmqctl start blocklistde-apache-parser
+</pre></div>
+</div>
+<p>Bots configured as <code class="docutils literal notranslate"><span class="pre">continuous</span></code> will never exit except if there is an error and the error handling configuration requires the bot to exit. See the Error Handling section for more details.</p>
+</div>
+<div class="section" id="reloading">
+<h4><a class="toc-backref" href="#id32">Reloading</a><a class="headerlink" href="#reloading" title="Permalink to this headline">¶</a></h4>
+<p>Whilst restart is a mere stop &amp; start, performing <code class="docutils literal notranslate"><span class="pre">intelmqctl</span> <span class="pre">reload</span> <span class="pre">&lt;bot_id&gt;</span></code> will not stop the bot, permitting it to keep the state: the same common behavior as for (Linux) daemons. It will initialize again (including reading all configuration again) after the current action is finished. Also, the rate limit/sleep is continued (with the <em>new</em> time) and not interrupted like with the restart command. So if you have a collector with a rate limit of 24 h, the reload does not trigger a new fetching of the source at the time of the reload, but just 24 h after the last run – with the new configuration.
+Which state the bots are keeping depends on the bots of course.</p>
+</div>
+<div class="section" id="forcing-reset-pipeline-and-cache-be-careful">
+<h4><a class="toc-backref" href="#id33">Forcing reset pipeline and cache (be careful)</a><a class="headerlink" href="#forcing-reset-pipeline-and-cache-be-careful" title="Permalink to this headline">¶</a></h4>
+<p>If you are using the default broker (Redis), in some test situations you may need to quickly clear all pipelines and caches. Use the following procedure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>redis-cli FLUSHDB
+redis-cli FLUSHALL
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2><a class="toc-backref" href="#id34">Error Handling</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tool-intelmqdump">
+<h3><a class="toc-backref" href="#id35">Tool: intelmqdump</a><a class="headerlink" href="#tool-intelmqdump" title="Permalink to this headline">¶</a></h3>
+<p>When bots are failing due to bad input data or programming errors, they can dump the problematic message to a file along with a traceback, if configured accordingly. These dumps are saved at in the logging directory as <code class="docutils literal notranslate"><span class="pre">[botid].dump</span></code> as JSON files. IntelMQ comes with an inspection and reinjection tool, called <code class="docutils literal notranslate"><span class="pre">intelmqdump</span></code>. It is an interactive tool to show all dumped files and the number of dumps per file. Choose a file by bot-id or listed numeric id. You can then choose to delete single entries from the file with <code class="docutils literal notranslate"><span class="pre">e</span> <span class="pre">1,3,4</span></code>, show a message in more readable format with <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">1</span></code> (prints the raw-message, can be long!), recover some messages and put them back in the pipeline for the bot by <code class="docutils literal notranslate"><span class="pre">a</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">0,4,5</span></code>. Or delete the file with all dumped messages using <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmqdump -h
+usage:
+    intelmqdump <span class="o">[</span>botid<span class="o">]</span>
+    intelmqdump <span class="o">[</span>-h<span class="p">|</span>--help<span class="o">]</span>
+
+intelmqdump can inspect dumped messages, show, delete or reinject them into
+the pipeline. It<span class="s1">&#39;s an interactive tool, directly start it to get a list of</span>
+<span class="s1">available dumps or call it with a known bot id as parameter.</span>
+
+<span class="s1">positional arguments:</span>
+<span class="s1">  botid       botid to inspect dumps of</span>
+
+<span class="s1">optional arguments:</span>
+<span class="s1">  -h, --help  show this help message and exit</span>
+<span class="s1">  --truncate TRUNCATE, -t TRUNCATE</span>
+<span class="s1">                        Truncate raw-data with more characters than given. 0 for no truncating. Default: 1000.</span>
+
+<span class="s1">Interactive actions after a file has been selected:</span>
+<span class="s1">- r, Recover by IDs</span>
+<span class="s1">  &gt; r id{,id} [queue name]</span>
+<span class="s1">  &gt; r 3,4,6</span>
+<span class="s1">  &gt; r 3,7,90 modify-expert-queue</span>
+<span class="s1">  The messages identified by a consecutive numbering will be stored in the</span>
+<span class="s1">  original queue or the given one and removed from the file.</span>
+<span class="s1">- a, Recover all</span>
+<span class="s1">  &gt; a [queue name]</span>
+<span class="s1">  &gt; a</span>
+<span class="s1">  &gt; a modify-expert-queue</span>
+<span class="s1">  All messages in the opened file will be recovered to the stored or given</span>
+<span class="s1">  queue and removed from the file.</span>
+<span class="s1">- e, Delete entries by IDs</span>
+<span class="s1">  &gt; e id{,id}</span>
+<span class="s1">  &gt; e 3,5</span>
+<span class="s1">  The entries will be deleted from the dump file.</span>
+<span class="s1">- d, Delete file</span>
+<span class="s1">  &gt; d</span>
+<span class="s1">  Delete the opened file as a whole.</span>
+<span class="s1">- s, Show by IDs</span>
+<span class="s1">  &gt; s id{,id}</span>
+<span class="s1">  &gt; s 0,4,5</span>
+<span class="s1">  Show the selected IP in a readable format. It&#39;</span>s still a raw format from
+  repr, but with newlines <span class="k">for</span> message and traceback.
+- v, Edit by ID
+  &gt; v id
+  &gt; v <span class="m">0</span>
+  &gt; v <span class="m">1</span>,2
+  Opens an editor <span class="o">(</span>by calling <span class="sb">`</span>sensible-editor<span class="sb">`</span><span class="o">)</span> on the message. The modified message is <span class="k">then</span> saved <span class="k">in</span> the dump.
+- q, Quit
+  &gt; q
+
+$ intelmqdump
+ id: name <span class="o">(</span>bot id<span class="o">)</span>                    content
+  <span class="m">0</span>: alienvault-otx-parser            <span class="m">1</span> dumps
+  <span class="m">1</span>: cymru-whois-expert               <span class="m">8</span> dumps
+  <span class="m">2</span>: deduplicator-expert              <span class="m">2</span> dumps
+  <span class="m">3</span>: dragon-research-group-ssh-parser <span class="m">2</span> dumps
+  <span class="m">4</span>: file-output2                     <span class="m">1</span> dumps
+  <span class="m">5</span>: fraunhofer-dga-parser            <span class="m">1</span> dumps
+  <span class="m">6</span>: spamhaus-cert-parser             <span class="m">4</span> dumps
+  <span class="m">7</span>: test-bot                         <span class="m">2</span> dumps
+Which dump file to process <span class="o">(</span>id or name<span class="o">)</span>? <span class="m">3</span>
+Processing dragon-research-group-ssh-parser: <span class="m">2</span> dumps
+  <span class="m">0</span>: <span class="m">2015</span>-09-03T13:13:22.159014 InvalidValue: invalid value u<span class="s1">&#39;NA&#39;</span> <span class="o">(</span>&lt;<span class="nb">type</span> <span class="s1">&#39;unicode&#39;</span>&gt;<span class="o">)</span> <span class="k">for</span> key u<span class="s1">&#39;source.asn&#39;</span>
+  <span class="m">1</span>: <span class="m">2015</span>-09-01T14:40:20.973743 InvalidValue: invalid value u<span class="s1">&#39;NA&#39;</span> <span class="o">(</span>&lt;<span class="nb">type</span> <span class="s1">&#39;unicode&#39;</span>&gt;<span class="o">)</span> <span class="k">for</span> key u<span class="s1">&#39;source.asn&#39;</span>
+recover <span class="o">(</span>a<span class="o">)</span>ll, delete <span class="o">(</span>e<span class="o">)</span>ntries, <span class="o">(</span>d<span class="o">)</span>elete file, <span class="o">(</span>q<span class="o">)</span>uit, <span class="o">(</span>s<span class="o">)</span>how by ids, <span class="o">(</span>r<span class="o">)</span>ecover by ids? d
+Deleted file /opt/intelmq/var/log/dragon-research-group-ssh-parser.dump
+</pre></div>
+</div>
+<p>Bots and the intelmqdump tool use file locks to prevent writing to already opened files. Bots are trying to lock the file for up to 60 seconds if the dump file is locked already by another process (intelmqdump) and then give up. Intelmqdump does not wait and instead only shows an error message.</p>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">show</span></code> command truncates the <code class="docutils literal notranslate"><span class="pre">raw</span></code> field of messages at 1000 characters to change this limit or disable truncating at all (value 0), use the <code class="docutils literal notranslate"><span class="pre">--truncate</span></code> parameter.</p>
+</div>
+</div>
+<div class="section" id="monitoring-logs">
+<h2><a class="toc-backref" href="#id36">Monitoring Logs</a><a class="headerlink" href="#monitoring-logs" title="Permalink to this headline">¶</a></h2>
+<p>All bots and <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> log to <code class="docutils literal notranslate"><span class="pre">/opt/intelmq/var/log/</span></code>/<code class="docutils literal notranslate"><span class="pre">var/log/intelmq/</span></code> (depending on your installation). In case of failures, messages are dumped to the same directory with the file ending <code class="docutils literal notranslate"><span class="pre">.dump</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tail -f /opt/intelmq/var/log/*.log
+tail -f /var/log/intelmq/*.log
+</pre></div>
+</div>
+</div>
+<div class="section" id="uninstall">
+<h2><a class="toc-backref" href="#id37">Uninstall</a><a class="headerlink" href="#uninstall" title="Permalink to this headline">¶</a></h2>
+<p>If you installed intelmq with native packages: Use the package management tool to remove the package <code class="docutils literal notranslate"><span class="pre">intelmq</span></code>. These tools do not remove configuration by default.</p>
+<p>If you installed manually via pip (note that this also deletes all configuration and possibly data):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3 uninstall intelmq
+rm -r /opt/intelmq
+</pre></div>
+</div>
+</div>
+<div class="section" id="integration-with-ticket-systems-etc">
+<h2><a class="toc-backref" href="#id38">Integration with ticket systems, etc.</a><a class="headerlink" href="#integration-with-ticket-systems-etc" title="Permalink to this headline">¶</a></h2>
+<p>First of all, IntelMQ is a message (event) processing system: it collects feeds, processes them, enriches them, filters them and then stores them somewhere or sends them to another system. It does this in a composable, data flow oriented fashion, based on single events. There are no aggregation or grouping features. Now, if you want to integrate IntelMQ with your ticket system or some other system, you need to send its output to somewhere where your ticket system or other services can pick up IntelMQ’s data. This could be a database, splunk, or you could send your events directly via email to a ticket system.</p>
+<dl class="simple">
+<dt>Different users came up with different solutions for this, each of them fitting their own organisation. Hence these solutions are not part of the core IntelMQ repository.</dt><dd><ul class="simple">
+<li><p>CERT.at uses a postgresql DB (sql output bot) and has a small tool <code class="docutils literal notranslate"><span class="pre">intelmqcli</span></code> which fetches the events in the postgresql DB which are marked as “new” and will group them and send them out via the RT ticket system.</p></li>
+<li><p>Others, including BSI, use a tool called <code class="docutils literal notranslate"><span class="pre">intelmq-mailgen</span></code>. It sends E-Mails to the recipients, optionally PGP-signed with defined text-templates, CSV formatted attachments with grouped events and generated ticket numbers.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The following lists external github repositories which you might consult for examples on how to integrate IntelMQ into your workflow:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/certat/intelmq">certat repository</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Intevation/intelmq-mailgen">Intevation’s Mailgen</a></p></li>
+</ul>
+</div></blockquote>
+<p>If you came up with another solution for integration, we’d like to hear from you! Please reach out to us on the <a class="reference external" href="https://lists.cert.at/cgi-bin/mailman/listinfo/intelmq-users">IntelMQ Users Mailinglist</a>.</p>
+</div>
+<div class="section" id="frequently-asked-questions">
+<h2><a class="toc-backref" href="#id39">Frequently Asked Questions</a><a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h2>
+<p>Consult the <a class="reference internal" href="FAQ.html"><span class="doc">Frequently asked questions</span></a> if you encountered any problems.</p>
+</div>
+<div class="section" id="additional-information">
+<h2><a class="toc-backref" href="#id40">Additional Information</a><a class="headerlink" href="#additional-information" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bash-completion">
+<h3><a class="toc-backref" href="#id41">Bash Completion</a><a class="headerlink" href="#bash-completion" title="Permalink to this headline">¶</a></h3>
+<p>To enable bash completion on <code class="docutils literal notranslate"><span class="pre">intelmqctl</span></code> and <code class="docutils literal notranslate"><span class="pre">intelmqdump</span></code> in order to help you run the commands in an easy manner, follow the installation process <a class="reference external" href="https://github.com/certtools/intelmq/blob/develop/contrib/bash-completion/README.md">here</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">IntelMQ Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ELK-Stack.html">ELK Stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MISP-Integrations.html">MISP integrations in IntelMQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="n6-integrations.html">IntelMQ - n6 Integration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="upgrade.html" title="previous chapter">Upgrade instructions</a></li>
+      <li>Next: <a href="bots.html" title="next chapter">Bots</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/user/configuration-management.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

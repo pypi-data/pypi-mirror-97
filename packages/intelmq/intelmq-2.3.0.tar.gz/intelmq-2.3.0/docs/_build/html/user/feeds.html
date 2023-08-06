@@ -1,0 +1,3256 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feeds &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently asked questions" href="FAQ.html" />
+    <link rel="prev" title="intelmqctl documentation" href="intelmqctl.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="feeds">
+<h1><a class="toc-backref" href="#id12">Feeds</a><a class="headerlink" href="#feeds" title="Permalink to this headline">¶</a></h1>
+<p>The available feeds are grouped by the provider of the feeds.
+For each feed the collector and parser that can be used is documented as well as any feed-specific parameters.
+To add feeds to this file add them to <cite>intelmq/etc/feeds.yaml</cite> and then rebuild the documentation.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#feeds" id="id12">Feeds</a></p>
+<ul>
+<li><p><a class="reference internal" href="#abuse-ch" id="id13">Abuse.ch</a></p>
+<ul>
+<li><p><a class="reference internal" href="#feodo-tracker-browse" id="id14">Feodo Tracker Browse</a></p></li>
+<li><p><a class="reference internal" href="#feodo-tracker-ips" id="id15">Feodo Tracker IPs</a></p></li>
+<li><p><a class="reference internal" href="#urlhaus" id="id16">URLhaus</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#alienvault" id="id17">AlienVault</a></p>
+<ul>
+<li><p><a class="reference internal" href="#otx" id="id18">OTX</a></p></li>
+<li><p><a class="reference internal" href="#reputation-list" id="id19">Reputation List</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#anubisnetworks" id="id20">AnubisNetworks</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cyberfeed-stream" id="id21">Cyberfeed Stream</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#autoshun" id="id22">Autoshun</a></p>
+<ul>
+<li><p><a class="reference internal" href="#shunlist" id="id23">Shunlist</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#bambenek" id="id24">Bambenek</a></p>
+<ul>
+<li><p><a class="reference internal" href="#c2-domains" id="id25">C2 Domains</a></p></li>
+<li><p><a class="reference internal" href="#c2-ips" id="id26">C2 IPs</a></p></li>
+<li><p><a class="reference internal" href="#dga-domains" id="id27">DGA Domains</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#blocklist-de" id="id28">Blocklist.de</a></p>
+<ul>
+<li><p><a class="reference internal" href="#apache" id="id29">Apache</a></p></li>
+<li><p><a class="reference internal" href="#bots" id="id30">Bots</a></p></li>
+<li><p><a class="reference internal" href="#brute-force-logins" id="id31">Brute-force Logins</a></p></li>
+<li><p><a class="reference internal" href="#ftp" id="id32">FTP</a></p></li>
+<li><p><a class="reference internal" href="#imap" id="id33">IMAP</a></p></li>
+<li><p><a class="reference internal" href="#irc-bots" id="id34">IRC Bots</a></p></li>
+<li><p><a class="reference internal" href="#mail" id="id35">Mail</a></p></li>
+<li><p><a class="reference internal" href="#sip" id="id36">SIP</a></p></li>
+<li><p><a class="reference internal" href="#ssh" id="id37">SSH</a></p></li>
+<li><p><a class="reference internal" href="#strong-ips" id="id38">Strong IPs</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#blueliv" id="id39">Blueliv</a></p>
+<ul>
+<li><p><a class="reference internal" href="#crimeserver" id="id40">CrimeServer</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cert-bund" id="id41">CERT-Bund</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cb-report-malware-infections-via-imap" id="id42">CB-Report Malware infections via IMAP</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cert-pl" id="id43">CERT.PL</a></p>
+<ul>
+<li><p><a class="reference internal" href="#n6-stomp-stream" id="id44">N6 Stomp Stream</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cinsscore" id="id45">CINSscore</a></p>
+<ul>
+<li><p><a class="reference internal" href="#army-list" id="id46">Army List</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cz-nic" id="id47">CZ.NIC</a></p>
+<ul>
+<li><p><a class="reference internal" href="#haas" id="id48">HaaS</a></p></li>
+<li><p><a class="reference internal" href="#proki" id="id49">Proki</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#calidog" id="id50">Calidog</a></p>
+<ul>
+<li><p><a class="reference internal" href="#certstream" id="id51">CertStream</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cleanmx" id="id52">CleanMX</a></p>
+<ul>
+<li><p><a class="reference internal" href="#phishing" id="id53">Phishing</a></p></li>
+<li><p><a class="reference internal" href="#virus" id="id54">Virus</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cybercrime-tracker" id="id55">CyberCrime Tracker</a></p>
+<ul>
+<li><p><a class="reference internal" href="#latest" id="id56">Latest</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dshield" id="id57">DShield</a></p>
+<ul>
+<li><p><a class="reference internal" href="#as-details" id="id58">AS Details</a></p></li>
+<li><p><a class="reference internal" href="#block" id="id59">Block</a></p></li>
+<li><p><a class="reference internal" href="#suspicious-domains" id="id60">Suspicious Domains</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#danger-rulez" id="id61">Danger Rulez</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bruteforce-blocker" id="id62">Bruteforce Blocker</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dataplane" id="id63">Dataplane</a></p>
+<ul>
+<li><p><a class="reference internal" href="#sip-query" id="id64">SIP Query</a></p></li>
+<li><p><a class="reference internal" href="#sip-registration" id="id65">SIP Registration</a></p></li>
+<li><p><a class="reference internal" href="#ssh-client-connection" id="id66">SSH Client Connection</a></p></li>
+<li><p><a class="reference internal" href="#ssh-password-authentication" id="id67">SSH Password Authentication</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#eset" id="id68">ESET</a></p>
+<ul>
+<li><p><a class="reference internal" href="#eti-domains" id="id69">ETI Domains</a></p></li>
+<li><p><a class="reference internal" href="#eti-urls" id="id70">ETI URLs</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#fraunhofer" id="id71">Fraunhofer</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dga-archive" id="id72">DGA Archive</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#have-i-been-pwned" id="id73">Have I Been Pwned</a></p>
+<ul>
+<li><p><a class="reference internal" href="#enterprise-callback" id="id74">Enterprise Callback</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id3" id="id75">}</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#malc0de" id="id76">Malc0de</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bind-format" id="id77">Bind Format</a></p></li>
+<li><p><a class="reference internal" href="#ip-blacklist" id="id78">IP Blacklist</a></p></li>
+<li><p><a class="reference internal" href="#windows-format" id="id79">Windows Format</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#malware-domain-list" id="id80">Malware Domain List</a></p>
+<ul>
+<li><p><a class="reference internal" href="#blacklist" id="id81">Blacklist</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#malware-domains" id="id82">Malware Domains</a></p>
+<ul>
+<li><p><a class="reference internal" href="#malicious" id="id83">Malicious</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#malwarepatrol" id="id84">MalwarePatrol</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dansguardian" id="id85">DansGuardian</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#malwareurl" id="id86">MalwareURL</a></p>
+<ul>
+<li><p><a class="reference internal" href="#latest-malicious-activity" id="id87">Latest malicious activity</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#mcafee-advanced-threat-defense" id="id88">McAfee Advanced Threat Defense</a></p>
+<ul>
+<li><p><a class="reference internal" href="#sandbox-reports" id="id89">Sandbox Reports</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#microsoft" id="id90">Microsoft</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bingmurls-via-interflow" id="id91">BingMURLs via Interflow</a></p></li>
+<li><p><a class="reference internal" href="#ctip-c2-via-azure" id="id92">CTIP C2 via Azure</a></p></li>
+<li><p><a class="reference internal" href="#ctip-infected-via-azure" id="id93">CTIP Infected via Azure</a></p></li>
+<li><p><a class="reference internal" href="#ctip-via-interflow" id="id94">CTIP via Interflow</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#netlab-360" id="id95">Netlab 360</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dga" id="id96">DGA</a></p></li>
+<li><p><a class="reference internal" href="#hajime-scanner" id="id97">Hajime Scanner</a></p></li>
+<li><p><a class="reference internal" href="#magnitude-ek" id="id98">Magnitude EK</a></p></li>
+<li><p><a class="reference internal" href="#mirai-scanner" id="id99">Mirai Scanner</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#openphish" id="id100">OpenPhish</a></p>
+<ul>
+<li><p><a class="reference internal" href="#premium-feed" id="id101">Premium Feed</a></p></li>
+<li><p><a class="reference internal" href="#public-feed" id="id102">Public feed</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#phishtank" id="id103">PhishTank</a></p>
+<ul>
+<li><p><a class="reference internal" href="#online" id="id104">Online</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#precisionsec" id="id105">PrecisionSec</a></p>
+<ul>
+<li><p><a class="reference internal" href="#agent-tesla" id="id106">Agent Tesla</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#shadowserver" id="id107">ShadowServer</a></p>
+<ul>
+<li><p><a class="reference internal" href="#via-api" id="id108">Via API</a></p></li>
+<li><p><a class="reference internal" href="#via-imap" id="id109">Via IMAP</a></p></li>
+<li><p><a class="reference internal" href="#via-request-tracker" id="id110">Via Request Tracker</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#spamhaus" id="id111">Spamhaus</a></p>
+<ul>
+<li><p><a class="reference internal" href="#asn-drop" id="id112">ASN Drop</a></p></li>
+<li><p><a class="reference internal" href="#cert" id="id113">CERT</a></p></li>
+<li><p><a class="reference internal" href="#drop" id="id114">Drop</a></p></li>
+<li><p><a class="reference internal" href="#dropv6" id="id115">Dropv6</a></p></li>
+<li><p><a class="reference internal" href="#edrop" id="id116">EDrop</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#strangereal-intel" id="id117">Strangereal Intel</a></p>
+<ul>
+<li><p><a class="reference internal" href="#dailyioc" id="id118">DailyIOC</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#sucuri" id="id119">Sucuri</a></p>
+<ul>
+<li><p><a class="reference internal" href="#hidden-iframes" id="id120">Hidden IFrames</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#surbl" id="id121">Surbl</a></p>
+<ul>
+<li><p><a class="reference internal" href="#malicious-domains" id="id122">Malicious Domains</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#taichung" id="id123">Taichung</a></p>
+<ul>
+<li><p><a class="reference internal" href="#netflow-recent" id="id124">Netflow Recent</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#team-cymru" id="id125">Team Cymru</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cap" id="id126">CAP</a></p></li>
+<li><p><a class="reference internal" href="#full-bogons-ipv4" id="id127">Full Bogons IPv4</a></p></li>
+<li><p><a class="reference internal" href="#full-bogons-ipv6" id="id128">Full Bogons IPv6</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#threatminer" id="id129">Threatminer</a></p>
+<ul>
+<li><p><a class="reference internal" href="#recent-domains" id="id130">Recent domains</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#turris" id="id131">Turris</a></p>
+<ul>
+<li><p><a class="reference internal" href="#greylist" id="id132">Greylist</a></p></li>
+<li><p><a class="reference internal" href="#greylist-with-pgp-signature-verification" id="id133">Greylist with PGP signature verification</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#university-of-toulouse" id="id134">University of Toulouse</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id10" id="id135">Blacklist</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#vxvault" id="id136">VXVault</a></p>
+<ul>
+<li><p><a class="reference internal" href="#urls" id="id137">URLs</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#viriback" id="id138">ViriBack</a></p>
+<ul>
+<li><p><a class="reference internal" href="#unsafe-sites" id="id139">Unsafe sites</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#webinspektor" id="id140">WebInspektor</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id11" id="id141">Unsafe sites</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#zoneh" id="id142">ZoneH</a></p>
+<ul>
+<li><p><a class="reference internal" href="#defacements" id="id143">Defacements</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#capture" id="id144">cAPTure</a></p>
+<ul>
+<li><p><a class="reference internal" href="#ponmocup-domains-cif-format" id="id145">Ponmocup Domains CIF Format</a></p></li>
+<li><p><a class="reference internal" href="#ponmocup-domains-shadowserver-format" id="id146">Ponmocup Domains Shadowserver Format</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="abuse-ch">
+<h2><a class="toc-backref" href="#id13">Abuse.ch</a><a class="headerlink" href="#abuse-ch" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="feodo-tracker-browse">
+<h3><a class="toc-backref" href="#id14">Feodo Tracker Browse</a><a class="headerlink" href="#feodo-tracker-browse" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-03-19</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://feodotracker.abuse.ch/browse">https://feodotracker.abuse.ch/browse</a></p></li>
+<li><p><strong>Description:</strong></p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://feodotracker.abuse.ch/browse</cite></p></li>
+<li><p><cite>name</cite>: <cite>Feodo Tracker Browse</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Abuse.ch</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.html_table.parser</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>time.source,source.ip,malware.name,status,extra.SBL,source.as_name,source.geolocation.cc</cite></p></li>
+<li><p><cite>ignore_values</cite>: <cite>,,,,Not listed,,</cite></p></li>
+<li><p><cite>skip_table_head</cite>: <cite>True</cite></p></li>
+<li><p><cite>type</cite>: <cite>c2server</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="feodo-tracker-ips">
+<h3><a class="toc-backref" href="#id15">Feodo Tracker IPs</a><a class="headerlink" href="#feodo-tracker-ips" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-03-25</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://feodotracker.abuse.ch/">https://feodotracker.abuse.ch/</a></p></li>
+<li><p><strong>Description:</strong> List of botnet Command&amp;Control servers (C&amp;Cs) tracked by Feodo Tracker, associated with Dridex and Emotet (aka Heodo).</p></li>
+<li><p><strong>Additional Information:</strong> <a class="reference external" href="https://feodotracker.abuse.ch/">https://feodotracker.abuse.ch/</a> The data in the column Last Online is used for <cite>time.source</cite> if available, with 00:00 as time. Otherwise first seen is used as <cite>time.source</cite>.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://feodotracker.abuse.ch/downloads/ipblocklist.csv</cite></p></li>
+<li><p><cite>name</cite>: <cite>Feodo Tracker IPs</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Abuse.ch</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.abusech.parser_ip</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="urlhaus">
+<h3><a class="toc-backref" href="#id16">URLhaus</a><a class="headerlink" href="#urlhaus" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2020-07-07</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://urlhaus.abuse.ch/feeds/">https://urlhaus.abuse.ch/feeds/</a></p></li>
+<li><p><strong>Description:</strong> URLhaus is a project from abuse.ch with the goal of sharing malicious URLs that are being used for malware distribution. URLhaus offers a country, ASN (AS number) and Top Level Domain (TLD) feed for network operators / Internet Service Providers (ISPs), Computer Emergency Response Teams (CERTs) and domain registries.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://urlhaus.abuse.ch/feeds/tld/&lt;TLD&gt;/, https://urlhaus.abuse.ch/feeds/country/&lt;CC&gt;/, or https://urlhaus.abuse.ch/feeds/asn/&lt;ASN&gt;/</cite></p></li>
+<li><p><cite>name</cite>: <cite>URLhaus</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Abuse.ch</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.generic.parser_csv</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“time.source”, “source.url”, “status”, “classification.type|__IGNORE__”, “source.fqdn|__IGNORE__”, “source.ip”, “source.asn”, “source.geolocation.cc”]</cite></p></li>
+<li><p><cite>default_url_protocol</cite>: <cite>http://</cite></p></li>
+<li><p><cite>delimiter</cite>: <cite>,</cite></p></li>
+<li><p><cite>skip_header</cite>: <cite>False</cite></p></li>
+<li><p><cite>type_translation</cite>: <cite>{“malware_download”: “malware-distribution”}</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="alienvault">
+<h2><a class="toc-backref" href="#id17">AlienVault</a><a class="headerlink" href="#alienvault" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="otx">
+<h3><a class="toc-backref" href="#id18">OTX</a><a class="headerlink" href="#otx" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://otx.alienvault.com/">https://otx.alienvault.com/</a></p></li>
+<li><p><strong>Description:</strong> AlienVault OTX Collector is the bot responsible to get the report through the API. Report could vary according to subscriptions.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.alienvault_otx.collector</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>api_key</cite>: <cite>{{ your API key }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>OTX</cite></p></li>
+<li><p><cite>provider</cite>: <cite>AlienVault</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.alienvault.parser_otx</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="reputation-list">
+<h3><a class="toc-backref" href="#id19">Reputation List</a><a class="headerlink" href="#reputation-list" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Description:</strong> List of malicious IPs.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://reputation.alienvault.com/reputation.data</cite></p></li>
+<li><p><cite>name</cite>: <cite>Reputation List</cite></p></li>
+<li><p><cite>provider</cite>: <cite>AlienVault</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.alienvault.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="anubisnetworks">
+<h2><a class="toc-backref" href="#id20">AnubisNetworks</a><a class="headerlink" href="#anubisnetworks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cyberfeed-stream">
+<h3><a class="toc-backref" href="#id21">Cyberfeed Stream</a><a class="headerlink" href="#cyberfeed-stream" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-06-15</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.anubisnetworks.com/">https://www.anubisnetworks.com/</a> <a class="reference external" href="https://www.bitsight.com/">https://www.bitsight.com/</a></p></li>
+<li><p><strong>Description:</strong> Fetches and parsers the Cyberfeed data stream.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http_stream</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://prod.cyberfeed.net/stream?key={{ your API key }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>Cyberfeed Stream</cite></p></li>
+<li><p><cite>provider</cite>: <cite>AnubisNetworks</cite></p></li>
+<li><p><cite>strip_lines</cite>: <cite>true</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.anubisnetworks.parser</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>use_malware_familiy_as_classification_identifier</cite>: <cite>True</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="autoshun">
+<h2><a class="toc-backref" href="#id22">Autoshun</a><a class="headerlink" href="#autoshun" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="shunlist">
+<h3><a class="toc-backref" href="#id23">Shunlist</a><a class="headerlink" href="#shunlist" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.autoshun.org/">https://www.autoshun.org/</a></p></li>
+<li><p><strong>Description:</strong> You need to register in order to use the list.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.autoshun.org/download/?api_key=__APIKEY__&amp;format=html</cite></p></li>
+<li><p><cite>name</cite>: <cite>Shunlist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Autoshun</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.autoshun.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="bambenek">
+<h2><a class="toc-backref" href="#id24">Bambenek</a><a class="headerlink" href="#bambenek" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="c2-domains">
+<h3><a class="toc-backref" href="#id25">C2 Domains</a><a class="headerlink" href="#c2-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://osint.bambenekconsulting.com/feeds/">https://osint.bambenekconsulting.com/feeds/</a></p></li>
+<li><p><strong>Description:</strong> Master Feed of known, active and non-sinkholed C&amp;Cs domain names. Requires access credentials.</p></li>
+<li><p><strong>Additional Information:</strong> License: <a class="reference external" href="https://osint.bambenekconsulting.com/license.txt">https://osint.bambenekconsulting.com/license.txt</a></p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://faf.bambenekconsulting.com/feeds/c2-dommasterlist.txt</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>__USERNAME__</cite></p></li>
+<li><p><cite>name</cite>: <cite>C2 Domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Bambenek</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.bambenek.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="c2-ips">
+<h3><a class="toc-backref" href="#id26">C2 IPs</a><a class="headerlink" href="#c2-ips" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://osint.bambenekconsulting.com/feeds/">https://osint.bambenekconsulting.com/feeds/</a></p></li>
+<li><p><strong>Description:</strong> Master Feed of known, active and non-sinkholed C&amp;Cs IP addresses. Requires access credentials.</p></li>
+<li><p><strong>Additional Information:</strong> License: <a class="reference external" href="https://osint.bambenekconsulting.com/license.txt">https://osint.bambenekconsulting.com/license.txt</a></p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://faf.bambenekconsulting.com/feeds/c2-ipmasterlist.txt</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>__USERNAME__</cite></p></li>
+<li><p><cite>name</cite>: <cite>C2 IPs</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Bambenek</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.bambenek.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="dga-domains">
+<h3><a class="toc-backref" href="#id27">DGA Domains</a><a class="headerlink" href="#dga-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://osint.bambenekconsulting.com/feeds/">https://osint.bambenekconsulting.com/feeds/</a></p></li>
+<li><p><strong>Description:</strong> Domain feed of known DGA domains from -2 to +3 days</p></li>
+<li><p><strong>Additional Information:</strong> License: <a class="reference external" href="https://osint.bambenekconsulting.com/license.txt">https://osint.bambenekconsulting.com/license.txt</a></p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://faf.bambenekconsulting.com/feeds/dga-feed.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>DGA Domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Bambenek</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.bambenek.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="blocklist-de">
+<h2><a class="toc-backref" href="#id28">Blocklist.de</a><a class="headerlink" href="#blocklist-de" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="apache">
+<h3><a class="toc-backref" href="#id29">Apache</a><a class="headerlink" href="#apache" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE Apache Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours as having run attacks on the service Apache, Apache-DDOS, RFI-Attacks.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/apache.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Apache</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="bots">
+<h3><a class="toc-backref" href="#id30">Bots</a><a class="headerlink" href="#bots" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE Bots Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours as having run attacks attacks on the RFI-Attacks, REG-Bots, IRC-Bots or BadBots (BadBots = he has posted a Spam-Comment on a open Forum or Wiki).</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/bots.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Bots</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="brute-force-logins">
+<h3><a class="toc-backref" href="#id31">Brute-force Logins</a><a class="headerlink" href="#brute-force-logins" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE Brute-force Login Collector is the bot responsible to get the report from source of information. All IPs which attacks Joomlas, Wordpress and other Web-Logins with Brute-Force Logins.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/bruteforcelogin.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Brute-force Logins</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ftp">
+<h3><a class="toc-backref" href="#id32">FTP</a><a class="headerlink" href="#ftp" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE FTP Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours for attacks on the Service FTP.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/ftp.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>FTP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="imap">
+<h3><a class="toc-backref" href="#id33">IMAP</a><a class="headerlink" href="#imap" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE IMAP Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours for attacks on the service like IMAP, SASL, POP3, etc.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/imap.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>IMAP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="irc-bots">
+<h3><a class="toc-backref" href="#id34">IRC Bots</a><a class="headerlink" href="#irc-bots" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> No description provided by feed provider.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/ircbot.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>IRC Bots</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="mail">
+<h3><a class="toc-backref" href="#id35">Mail</a><a class="headerlink" href="#mail" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE Mail Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours as having run attacks on the service Mail, Postfix.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/mail.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Mail</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="sip">
+<h3><a class="toc-backref" href="#id36">SIP</a><a class="headerlink" href="#sip" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE SIP Collector is the bot responsible to get the report from source of information. All IP addresses that tried to login in a SIP-, VOIP- or Asterisk-Server and are included in the IPs-List from <a class="reference external" href="http://www.infiltrated.net/">http://www.infiltrated.net/</a> (Twitter).</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/sip.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SIP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ssh">
+<h3><a class="toc-backref" href="#id37">SSH</a><a class="headerlink" href="#ssh" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE SSH Collector is the bot responsible to get the report from source of information. All IP addresses which have been reported within the last 48 hours as having run attacks on the service SSH.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/ssh.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SSH</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="strong-ips">
+<h3><a class="toc-backref" href="#id38">Strong IPs</a><a class="headerlink" href="#strong-ips" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.blocklist.de/en/export.html">http://www.blocklist.de/en/export.html</a></p></li>
+<li><p><strong>Description:</strong> Blocklist.DE Strong IPs Collector is the bot responsible to get the report from source of information. All IPs which are older then 2 month and have more then 5.000 attacks.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.blocklist.de/lists/strongips.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Strong IPs</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blocklist.de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blocklistde.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="blueliv">
+<h2><a class="toc-backref" href="#id39">Blueliv</a><a class="headerlink" href="#blueliv" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="crimeserver">
+<h3><a class="toc-backref" href="#id40">CrimeServer</a><a class="headerlink" href="#crimeserver" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.blueliv.com/">https://www.blueliv.com/</a></p></li>
+<li><p><strong>Description:</strong> Blueliv Crimeserver Collector is the bot responsible to get the report through the API.</p></li>
+<li><p><strong>Additional Information:</strong> The service uses a different API for free users and paying subscribers. In ‘CrimeServer’ feed the difference lies in the data points present in the feed. The non-free API available from Blueliv contains, for this specific feed, following extra fields not present in the free API; “_id” - Internal unique ID “subType” - Subtype of the Crime Server “countryName” - Country name where the Crime Server is located, in English “city” - City where the Crime Server is located “domain” - Domain of the Crime Server “host” - Host of the Crime Server “createdAt” - Date when the Crime Server was added to Blueliv CrimeServer database “asnCidr” - Range of IPs that belong to an ISP (registered via Autonomous System Number (ASN)) “asnId” - Identifier of an ISP registered via ASN “asnDesc” Description of the ISP registered via ASN</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.blueliv.collector_crimeserver</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>api_key</cite>: <cite>__APIKEY__</cite></p></li>
+<li><p><cite>name</cite>: <cite>CrimeServer</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Blueliv</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.blueliv.parser_crimeserver</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cert-bund">
+<h2><a class="toc-backref" href="#id41">CERT-Bund</a><a class="headerlink" href="#cert-bund" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cb-report-malware-infections-via-imap">
+<h3><a class="toc-backref" href="#id42">CB-Report Malware infections via IMAP</a><a class="headerlink" href="#cb-report-malware-infections-via-imap" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-08-20</p></li>
+<li><p><strong>Description:</strong> CERT-Bund sends reports for the malware-infected hosts.</p></li>
+<li><p><strong>Additional Information:</strong> Traffic from malware related hosts contacting command-and-control servers is caught and sent to national CERT teams. There are two e-mail feeds with identical CSV structure – one reports on general malware infections, the other on the Avalanche botnet.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.mail.collector_mail_attach</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>attach_regex</cite>: <cite>events.csv</cite></p></li>
+<li><p><cite>extract_files</cite>: <cite>False</cite></p></li>
+<li><p><cite>folder</cite>: <cite>INBOX</cite></p></li>
+<li><p><cite>mail_host</cite>: <cite>__HOST__</cite></p></li>
+<li><p><cite>mail_password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>mail_ssl</cite>: <cite>True</cite></p></li>
+<li><p><cite>mail_user</cite>: <cite>__USERNAME__</cite></p></li>
+<li><p><cite>name</cite>: <cite>CB-Report Malware infections via IMAP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CERT-Bund</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+<li><p><cite>subject_regex</cite>: <cite>^\[CB-Report#.* Malware infections (\(Avalanche\) )?in country</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.generic.parser_csv</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“source.asn”, “source.ip”, “time.source”, “classification.type”, “malware.name”, “source.port”, “destination.ip”, “destination.port”, “destination.fqdn”, “protocol.transport”]</cite></p></li>
+<li><p><cite>default_url_protocol</cite>: <cite>http://</cite></p></li>
+<li><p><cite>delimiter</cite>: <cite>,</cite></p></li>
+<li><p><cite>skip_header</cite>: <cite>True</cite></p></li>
+<li><p><cite>time_format</cite>: <cite>from_format|%Y-%m-%d %H:%M:%S</cite></p></li>
+<li><p><cite>type</cite>: <cite>infected-system</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="cert-pl">
+<h2><a class="toc-backref" href="#id43">CERT.PL</a><a class="headerlink" href="#cert-pl" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="n6-stomp-stream">
+<h3><a class="toc-backref" href="#id44">N6 Stomp Stream</a><a class="headerlink" href="#n6-stomp-stream" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://n6.cert.pl/en/">https://n6.cert.pl/en/</a></p></li>
+<li><p><strong>Description:</strong> N6 Collector - CERT.pl’s N6 Collector - N6 feed via STOMP interface. Note that rate_limit does not apply for this bot as it is waiting for messages on a stream.</p></li>
+<li><p><strong>Additional Information:</strong> Contact cert.pl to get access to the feed.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.stomp.collector</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>exchange</cite>: <cite>{insert your exchange point as given by CERT.pl}</cite></p></li>
+<li><p><cite>name</cite>: <cite>N6 Stomp Stream</cite></p></li>
+<li><p><cite>port</cite>: <cite>61614</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CERT.PL</cite></p></li>
+<li><p><cite>server</cite>: <cite>n6stream.cert.pl</cite></p></li>
+<li><p><cite>ssl_ca_certificate</cite>: <cite>{insert path to CA file for CERT.pl’s n6}</cite></p></li>
+<li><p><cite>ssl_client_certificate</cite>: <cite>{insert path to client cert file for CERTpl’s n6}</cite></p></li>
+<li><p><cite>ssl_client_certificate_key</cite>: <cite>{insert path to client cert key file for CERT.pl’s n6}</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.n6.parser_n6stomp</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cinsscore">
+<h2><a class="toc-backref" href="#id45">CINSscore</a><a class="headerlink" href="#cinsscore" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="army-list">
+<h3><a class="toc-backref" href="#id46">Army List</a><a class="headerlink" href="#army-list" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://cinsscore.com/#list">https://cinsscore.com/#list</a></p></li>
+<li><p><strong>Description:</strong> The CINS Army list is a subset of the CINS Active Threat Intelligence ruleset, and consists of IP addresses that meet one of two basic criteria: 1) The IP’s recent Rogue Packet score factor is very poor, or 2) The IP has tripped a designated number of ‘trusted’ alerts across a given number of our Sentinels deployed around the world.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://cinsscore.com/list/ci-badguys.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Army List</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CINSscore</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.ci_army.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cz-nic">
+<h2><a class="toc-backref" href="#id47">CZ.NIC</a><a class="headerlink" href="#cz-nic" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="haas">
+<h3><a class="toc-backref" href="#id48">HaaS</a><a class="headerlink" href="#haas" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2020-07-22</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://haas.nic.cz/">https://haas.nic.cz/</a></p></li>
+<li><p><strong>Description:</strong> SSH attackers against HaaS (Honeypot as a Service) provided by CZ.NIC, z.s.p.o. The dump is published once a day.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>extract_files</cite>: <cite>True</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://haas.nic.cz/stats/export/{time[%Y/%m/%Y-%m-%d]}.json.gz</cite></p></li>
+<li><p><cite>http_url_formatting</cite>: <cite>{‘days’: -1}</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cznic.parser_haas</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="proki">
+<h3><a class="toc-backref" href="#id49">Proki</a><a class="headerlink" href="#proki" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-08-17</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://csirt.cz/en/proki/">https://csirt.cz/en/proki/</a></p></li>
+<li><p><strong>Description:</strong> Aggregation of various sources on malicious IP addresses (malware spreaders or C&amp;C servers).</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://proki.csirt.cz/api/1/__APIKEY__/data/day/{time[%Y/%m/%d]}</cite></p></li>
+<li><p><cite>http_url_formatting</cite>: <cite>{‘days’: -1}</cite></p></li>
+<li><p><cite>name</cite>: <cite>Proki</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CZ.NIC</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cznic.parser_proki</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="calidog">
+<h2><a class="toc-backref" href="#id50">Calidog</a><a class="headerlink" href="#calidog" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="certstream">
+<h3><a class="toc-backref" href="#id51">CertStream</a><a class="headerlink" href="#certstream" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-06-15</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://medium.com/cali-dog-security/introducing-certstream-3fc13bb98067">https://medium.com/cali-dog-security/introducing-certstream-3fc13bb98067</a></p></li>
+<li><p><strong>Description:</strong> HTTP Websocket Stream from certstream.calidog.io providing data from Certificate Transparency Logs.</p></li>
+<li><p><strong>Additional Information:</strong> Be aware that this feed provides a lot of data and may overload your system quickly.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.calidog.collector_certstream</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>name</cite>: <cite>CertStream</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Calidog</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.calidog.parser_certstream</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cleanmx">
+<h2><a class="toc-backref" href="#id52">CleanMX</a><a class="headerlink" href="#cleanmx" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="phishing">
+<h3><a class="toc-backref" href="#id53">Phishing</a><a class="headerlink" href="#phishing" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://clean-mx.de/">http://clean-mx.de/</a></p></li>
+<li><p><strong>Description:</strong> In order to download the CleanMX feed you need to use a custom user agent and register that user agent.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_timeout_sec</cite>: <cite>120</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>http://support.clean-mx.de/clean-mx/xmlphishing?response=alive&amp;domain=</cite></p></li>
+<li><p><cite>http_user_agent</cite>: <cite>{{ your user agent }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>Phishing</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CleanMX</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cleanmx.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="virus">
+<h3><a class="toc-backref" href="#id54">Virus</a><a class="headerlink" href="#virus" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://clean-mx.de/">http://clean-mx.de/</a></p></li>
+<li><p><strong>Description:</strong> In order to download the CleanMX feed you need to use a custom user agent and register that user agent.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_timeout_sec</cite>: <cite>120</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>http://support.clean-mx.de/clean-mx/xmlviruses?response=alive&amp;domain=</cite></p></li>
+<li><p><cite>http_user_agent</cite>: <cite>{{ your user agent }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>Virus</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CleanMX</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cleanmx.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cybercrime-tracker">
+<h2><a class="toc-backref" href="#id55">CyberCrime Tracker</a><a class="headerlink" href="#cybercrime-tracker" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="latest">
+<h3><a class="toc-backref" href="#id56">Latest</a><a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-03-19</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://cybercrime-tracker.net/index.php">https://cybercrime-tracker.net/index.php</a></p></li>
+<li><p><strong>Description:</strong> C2 servers</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://cybercrime-tracker.net/index.php</cite></p></li>
+<li><p><cite>name</cite>: <cite>Latest</cite></p></li>
+<li><p><cite>provider</cite>: <cite>CyberCrime Tracker</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.html_table.parser</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“time.source”, “source.url”, “source.ip”, “malware.name”, “__IGNORE__”]</cite></p></li>
+<li><p><cite>default_url_protocol</cite>: <cite>http://</cite></p></li>
+<li><p><cite>skip_table_head</cite>: <cite>True</cite></p></li>
+<li><p><cite>type</cite>: <cite>c2server</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="dshield">
+<h2><a class="toc-backref" href="#id57">DShield</a><a class="headerlink" href="#dshield" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="as-details">
+<h3><a class="toc-backref" href="#id58">AS Details</a><a class="headerlink" href="#as-details" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.dshield.org/reports.html">https://www.dshield.org/reports.html</a></p></li>
+<li><p><strong>Description:</strong> No description provided by feed provider.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://dshield.org/asdetailsascii.html?as={{ AS Number }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>AS Details</cite></p></li>
+<li><p><cite>provider</cite>: <cite>DShield</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dshield.parser_asn</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="block">
+<h3><a class="toc-backref" href="#id59">Block</a><a class="headerlink" href="#block" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.dshield.org/reports.html">https://www.dshield.org/reports.html</a></p></li>
+<li><p><strong>Description:</strong> This list summarizes the top 20 attacking class C (/24) subnets over the last three days. The number of ‘attacks’ indicates the number of targets reporting scans from this subnet.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.dshield.org/block.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Block</cite></p></li>
+<li><p><cite>provider</cite>: <cite>DShield</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dshield.parser_block</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="suspicious-domains">
+<h3><a class="toc-backref" href="#id60">Suspicious Domains</a><a class="headerlink" href="#suspicious-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.dshield.org/reports.html">https://www.dshield.org/reports.html</a></p></li>
+<li><p><strong>Description:</strong> There are many suspicious domains on the internet. In an effort to identify them, as well as false positives, we have assembled weighted lists based on tracking and malware lists from different sources. ISC is collecting and categorizing various lists associated with a certain level of sensitivity.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.dshield.org/feeds/suspiciousdomains_High.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Suspicious Domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>DShield</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dshield.parser_domain</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="danger-rulez">
+<h2><a class="toc-backref" href="#id61">Danger Rulez</a><a class="headerlink" href="#danger-rulez" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bruteforce-blocker">
+<h3><a class="toc-backref" href="#id62">Bruteforce Blocker</a><a class="headerlink" href="#bruteforce-blocker" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://danger.rulez.sk/index.php/bruteforceblocker/">http://danger.rulez.sk/index.php/bruteforceblocker/</a></p></li>
+<li><p><strong>Description:</strong> Its main purpose is to block SSH bruteforce attacks via firewall.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://danger.rulez.sk/projects/bruteforceblocker/blist.php</cite></p></li>
+<li><p><cite>name</cite>: <cite>Bruteforce Blocker</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Danger Rulez</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.danger_rulez.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="dataplane">
+<h2><a class="toc-backref" href="#id63">Dataplane</a><a class="headerlink" href="#dataplane" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sip-query">
+<h3><a class="toc-backref" href="#id64">SIP Query</a><a class="headerlink" href="#sip-query" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://dataplane.org/">http://dataplane.org/</a></p></li>
+<li><p><strong>Description:</strong> Entries consist of fields with identifying characteristics of a source IP address that has been seen initiating a SIP OPTIONS query to a remote host. This report lists hosts that are suspicious of more than just port scanning. The hosts may be SIP server cataloging or conducting various forms of telephony abuse. Report is updated hourly.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://dataplane.org/sipquery.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SIP Query</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Dataplane</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dataplane.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="sip-registration">
+<h3><a class="toc-backref" href="#id65">SIP Registration</a><a class="headerlink" href="#sip-registration" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://dataplane.org/">http://dataplane.org/</a></p></li>
+<li><p><strong>Description:</strong> Entries consist of fields with identifying characteristics of a source IP address that has been seen initiating a SIP REGISTER operation to a remote host. This report lists hosts that are suspicious of more than just port scanning. The hosts may be SIP client cataloging or conducting various forms of telephony abuse. Report is updated hourly.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://dataplane.org/sipregistration.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SIP Registration</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Dataplane</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dataplane.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ssh-client-connection">
+<h3><a class="toc-backref" href="#id66">SSH Client Connection</a><a class="headerlink" href="#ssh-client-connection" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://dataplane.org/">http://dataplane.org/</a></p></li>
+<li><p><strong>Description:</strong> Entries below consist of fields with identifying characteristics of a source IP address that has been seen initiating an SSH connection to a remote host. This report lists hosts that are suspicious of more than just port scanning. The hosts may be SSH server cataloging or conducting authentication attack attempts. Report is updated hourly.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://dataplane.org/sshclient.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SSH Client Connection</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Dataplane</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dataplane.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ssh-password-authentication">
+<h3><a class="toc-backref" href="#id67">SSH Password Authentication</a><a class="headerlink" href="#ssh-password-authentication" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://dataplane.org/">http://dataplane.org/</a></p></li>
+<li><p><strong>Description:</strong> Entries below consist of fields with identifying characteristics of a source IP address that has been seen attempting to remotely login to a host using SSH password authentication. The report lists hosts that are highly suspicious and are likely conducting malicious SSH password authentication attacks. Report is updated hourly.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://dataplane.org/sshpwauth.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>SSH Password Authentication</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Dataplane</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dataplane.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="eset">
+<h2><a class="toc-backref" href="#id68">ESET</a><a class="headerlink" href="#eset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="eti-domains">
+<h3><a class="toc-backref" href="#id69">ETI Domains</a><a class="headerlink" href="#eti-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-06-30</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.eset.com/int/business/services/threat-intelligence/">https://www.eset.com/int/business/services/threat-intelligence/</a></p></li>
+<li><p><strong>Description:</strong> Domain data from ESET’s TAXII API.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.eset.collector</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>collection</cite>: <cite>ei.domains v2 (json)</cite></p></li>
+<li><p><cite>endpoint</cite>: <cite>eti.eset.com</cite></p></li>
+<li><p><cite>password</cite>: <cite>&lt;password&gt;</cite></p></li>
+<li><p><cite>time_delta</cite>: <cite>3600</cite></p></li>
+<li><p><cite>username</cite>: <cite>&lt;username&gt;</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.eset.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="eti-urls">
+<h3><a class="toc-backref" href="#id70">ETI URLs</a><a class="headerlink" href="#eti-urls" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-06-30</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.eset.com/int/business/services/threat-intelligence/">https://www.eset.com/int/business/services/threat-intelligence/</a></p></li>
+<li><p><strong>Description:</strong> URL data from ESET’s TAXII API.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.eset.collector</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>collection</cite>: <cite>ei.urls (json)</cite></p></li>
+<li><p><cite>endpoint</cite>: <cite>eti.eset.com</cite></p></li>
+<li><p><cite>password</cite>: <cite>&lt;password&gt;</cite></p></li>
+<li><p><cite>time_delta</cite>: <cite>3600</cite></p></li>
+<li><p><cite>username</cite>: <cite>&lt;username&gt;</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.eset.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="fraunhofer">
+<h2><a class="toc-backref" href="#id71">Fraunhofer</a><a class="headerlink" href="#fraunhofer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dga-archive">
+<h3><a class="toc-backref" href="#id72">DGA Archive</a><a class="headerlink" href="#dga-archive" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://dgarchive.caad.fkie.fraunhofer.de/welcome/">https://dgarchive.caad.fkie.fraunhofer.de/welcome/</a></p></li>
+<li><p><strong>Description:</strong> Fraunhofer DGA collector fetches data from Fraunhofer’s domain generation archive.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_password</cite>: <cite>{{ your password}}</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://dgarchive.caad.fkie.fraunhofer.de/today</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>{{ your username}}</cite></p></li>
+<li><p><cite>name</cite>: <cite>DGA Archive</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Fraunhofer</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.fraunhofer.parser_dga</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="have-i-been-pwned">
+<h2><a class="toc-backref" href="#id73">Have I Been Pwned</a><a class="headerlink" href="#have-i-been-pwned" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enterprise-callback">
+<h3><a class="toc-backref" href="#id74">Enterprise Callback</a><a class="headerlink" href="#enterprise-callback" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2019-09-11</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://haveibeenpwned.com/EnterpriseSubscriber/">https://haveibeenpwned.com/EnterpriseSubscriber/</a></p></li>
+<li><p><strong>Description:</strong> With the Enterprise Subscription of ‘Have I Been Pwned’ you are able to provide a callback URL and any new leak data is submitted to it. It is recommended to put a webserver with Authorization check, TLS etc. in front of the API collector.</p></li>
+<li><p><strong>Additional Information:</strong> “A minimal nginx configuration could look like:</p></li>
+</ul>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
+server {</p>
+<blockquote>
+<div><p>listen 443 ssl http2;
+server_name [your host name];
+client_max_body_size 50M;</p>
+<p>ssl_certificate [path to your key];
+ssl_certificate_key [path to your certificate];</p>
+<dl>
+<dt>location /[your private url] {</dt><dd><blockquote>
+<div><dl class="simple">
+<dt>if ($http_authorization != ‘[your private password]’) {</dt><dd><p>return 403;</p>
+</dd>
+</dl>
+<p>}
+proxy_pass <a class="reference external" href="http://localhost:5001/intelmq/push">http://localhost:5001/intelmq/push</a>;
+proxy_read_timeout 30;
+proxy_connect_timeout 30;</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="section" id="id3">
+<h4><a class="toc-backref" href="#id75">}</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>“</p>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.api.collector_api</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>name</cite>: <cite>Enterprise Callback</cite></p></li>
+<li><p><cite>port</cite>: <cite>5001</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Have I Been Pwned</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.hibp.parser_callback</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="malc0de">
+<h2><a class="toc-backref" href="#id76">Malc0de</a><a class="headerlink" href="#malc0de" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bind-format">
+<h3><a class="toc-backref" href="#id77">Bind Format</a><a class="headerlink" href="#bind-format" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://malc0de.com/dashboard/">http://malc0de.com/dashboard/</a></p></li>
+<li><p><strong>Description:</strong> This feed includes FQDN’s of malicious hosts, the file format is in Bind file format.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://malc0de.com/bl/ZONES</cite></p></li>
+<li><p><cite>name</cite>: <cite>Bind Format</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Malc0de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malc0de.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ip-blacklist">
+<h3><a class="toc-backref" href="#id78">IP Blacklist</a><a class="headerlink" href="#ip-blacklist" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://malc0de.com/dashboard/">http://malc0de.com/dashboard/</a></p></li>
+<li><p><strong>Description:</strong> This feed includes IP Addresses of malicious hosts.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://malc0de.com/bl/IP_Blacklist.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>IP Blacklist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Malc0de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malc0de.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="windows-format">
+<h3><a class="toc-backref" href="#id79">Windows Format</a><a class="headerlink" href="#windows-format" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://malc0de.com/dashboard/">http://malc0de.com/dashboard/</a></p></li>
+<li><p><strong>Description:</strong> This feed includes FQDN’s of malicious hosts, the file format is in Windows Hosts file format.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://malc0de.com/bl/BOOT</cite></p></li>
+<li><p><cite>name</cite>: <cite>Windows Format</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Malc0de</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malc0de.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="malware-domain-list">
+<h2><a class="toc-backref" href="#id80">Malware Domain List</a><a class="headerlink" href="#malware-domain-list" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="blacklist">
+<h3><a class="toc-backref" href="#id81">Blacklist</a><a class="headerlink" href="#blacklist" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.malwaredomainlist.com/">http://www.malwaredomainlist.com/</a></p></li>
+<li><p><strong>Description:</strong> No description provided by feed provider.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://www.malwaredomainlist.com/updatescsv.php</cite></p></li>
+<li><p><cite>name</cite>: <cite>Blacklist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Malware Domain List</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malwaredomainlist.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="malware-domains">
+<h2><a class="toc-backref" href="#id82">Malware Domains</a><a class="headerlink" href="#malware-domains" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="malicious">
+<h3><a class="toc-backref" href="#id83">Malicious</a><a class="headerlink" href="#malicious" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://www.malwaredomains.com/">http://www.malwaredomains.com/</a></p></li>
+<li><p><strong>Description:</strong> Malware Prevention through Domain Blocking (Black Hole DNS Sinkhole)</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://mirror1.malwaredomains.com/files/domains.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Malicious</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Malware Domains</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>172800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malwaredomains.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="malwarepatrol">
+<h2><a class="toc-backref" href="#id84">MalwarePatrol</a><a class="headerlink" href="#malwarepatrol" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dansguardian">
+<h3><a class="toc-backref" href="#id85">DansGuardian</a><a class="headerlink" href="#dansguardian" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.malwarepatrol.net/non-commercial/">https://www.malwarepatrol.net/non-commercial/</a></p></li>
+<li><p><strong>Description:</strong> Malware block list with URLs</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://lists.malwarepatrol.net/cgi/getfile?receipt={{ your API key }}&amp;product=8&amp;list=dansguardian</cite></p></li>
+<li><p><cite>name</cite>: <cite>DansGuardian</cite></p></li>
+<li><p><cite>provider</cite>: <cite>MalwarePatrol</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>180000</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malwarepatrol.parser_dansguardian</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="malwareurl">
+<h2><a class="toc-backref" href="#id86">MalwareURL</a><a class="headerlink" href="#malwareurl" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="latest-malicious-activity">
+<h3><a class="toc-backref" href="#id87">Latest malicious activity</a><a class="headerlink" href="#latest-malicious-activity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-02-05</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.malwareurl.com/">https://www.malwareurl.com/</a></p></li>
+<li><p><strong>Description:</strong> Latest malicious domains/IPs.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.malwareurl.com/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Latest malicious activity</cite></p></li>
+<li><p><cite>provider</cite>: <cite>MalwareURL</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.malwareurl.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="mcafee-advanced-threat-defense">
+<h2><a class="toc-backref" href="#id88">McAfee Advanced Threat Defense</a><a class="headerlink" href="#mcafee-advanced-threat-defense" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sandbox-reports">
+<h3><a class="toc-backref" href="#id89">Sandbox Reports</a><a class="headerlink" href="#sandbox-reports" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-07-05</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.mcafee.com/enterprise/en-us/products/advanced-threat-defense.html">https://www.mcafee.com/enterprise/en-us/products/advanced-threat-defense.html</a></p></li>
+<li><p><strong>Description:</strong> Processes reports from McAfee’s sandboxing solution via the openDXL API.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.opendxl.collector</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>dxl_config_file</cite>: <cite>{{location of dxl configuration file}}</cite></p></li>
+<li><p><cite>dxl_topic</cite>: <cite>/mcafee/event/atd/file/report</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.mcafee.parser_atd</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>verdict_severity</cite>: <cite>4</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="microsoft">
+<h2><a class="toc-backref" href="#id90">Microsoft</a><a class="headerlink" href="#microsoft" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bingmurls-via-interflow">
+<h3><a class="toc-backref" href="#id91">BingMURLs via Interflow</a><a class="headerlink" href="#bingmurls-via-interflow" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-05-29</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange">https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange</a></p></li>
+<li><p><strong>Description:</strong> Collects Malicious URLs detected by Bing from the Interflow API. The feed is available via Microsoft’s Government Security Program (GSP).</p></li>
+<li><p><strong>Additional Information:</strong> Depending on the file sizes you may need to increase the parameter ‘http_timeout_sec’ of the collector.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.microsoft.collector_interflow</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>api_key</cite>: <cite>{{your API key}}</cite></p></li>
+<li><p><cite>file_match</cite>: <cite>^bingmurls_</cite></p></li>
+<li><p><cite>http_timeout_sec</cite>: <cite>300</cite></p></li>
+<li><p><cite>name</cite>: <cite>BingMURLs via Interflow</cite></p></li>
+<li><p><cite>not_older_than</cite>: <cite>2 days</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Microsoft</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.microsoft.parser_bingmurls</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ctip-c2-via-azure">
+<h3><a class="toc-backref" href="#id92">CTIP C2 via Azure</a><a class="headerlink" href="#ctip-c2-via-azure" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-05-29</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange">https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange</a></p></li>
+<li><p><strong>Description:</strong> Collects the CTIP C2 feed from a shared Azure Storage. The feed is available via Microsoft’s Government Security Program (GSP).</p></li>
+<li><p><strong>Additional Information:</strong> The cache is needed for memorizing which files have already been processed, the TTL should be higher than the oldest file available in the storage (currently the last three days are available). The connection string contains endpoint as well as authentication information.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.microsoft.collector_azure</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>connection_string</cite>: <cite>{{your connection string}}</cite></p></li>
+<li><p><cite>container_name</cite>: <cite>ctip-c2</cite></p></li>
+<li><p><cite>name</cite>: <cite>CTIP C2 via Azure</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Microsoft</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+<li><p><cite>redis_cache_db</cite>: <cite>5</cite></p></li>
+<li><p><cite>redis_cache_host</cite>: <cite>127.0.0.1</cite></p></li>
+<li><p><cite>redis_cache_port</cite>: <cite>6379</cite></p></li>
+<li><p><cite>redis_cache_ttl</cite>: <cite>864000</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.microsoft.parser_ctip</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ctip-infected-via-azure">
+<h3><a class="toc-backref" href="#id93">CTIP Infected via Azure</a><a class="headerlink" href="#ctip-infected-via-azure" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-05-29</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange">https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange</a></p></li>
+<li><p><strong>Description:</strong> Collects the CTIP (Sinkhole data) from a shared Azure Storage. The feed is available via Microsoft’s Government Security Program (GSP).</p></li>
+<li><p><strong>Additional Information:</strong> The cache is needed for memorizing which files have already been processed, the TTL should be higher than the oldest file available in the storage (currently the last three days are available). The connection string contains endpoint as well as authentication information.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.microsoft.collector_azure</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>connection_string</cite>: <cite>{{your connection string}}</cite></p></li>
+<li><p><cite>container_name</cite>: <cite>ctip-infected-summary</cite></p></li>
+<li><p><cite>name</cite>: <cite>CTIP Infected via Azure</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Microsoft</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+<li><p><cite>redis_cache_db</cite>: <cite>5</cite></p></li>
+<li><p><cite>redis_cache_host</cite>: <cite>127.0.0.1</cite></p></li>
+<li><p><cite>redis_cache_port</cite>: <cite>6379</cite></p></li>
+<li><p><cite>redis_cache_ttl</cite>: <cite>864000</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.microsoft.parser_ctip</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ctip-via-interflow">
+<h3><a class="toc-backref" href="#id94">CTIP via Interflow</a><a class="headerlink" href="#ctip-via-interflow" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-03-06</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange">https://docs.microsoft.com/en-us/security/gsp/informationsharingandexchange</a></p></li>
+<li><p><strong>Description:</strong> Collects the CTIP Infected feed (Sinkhole data for your country) files from the Interflow API.The feed is available via Microsoft’s Government Security Program (GSP).</p></li>
+<li><p><strong>Additional Information:</strong> Depending on the file sizes you may need to increase the parameter ‘http_timeout_sec’ of the collector. As many IPs occur very often in the data, you may want to use a deduplicator specifically for the feed.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.microsoft.collector_interflow</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>api_key</cite>: <cite>{{your API key}}</cite></p></li>
+<li><p><cite>file_match</cite>: <cite>^ctip_</cite></p></li>
+<li><p><cite>http_timeout_sec</cite>: <cite>300</cite></p></li>
+<li><p><cite>name</cite>: <cite>CTIP via Interflow</cite></p></li>
+<li><p><cite>not_older_than</cite>: <cite>2 days</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Microsoft</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.microsoft.parser_ctip</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="netlab-360">
+<h2><a class="toc-backref" href="#id95">Netlab 360</a><a class="headerlink" href="#netlab-360" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dga">
+<h3><a class="toc-backref" href="#id96">DGA</a><a class="headerlink" href="#dga" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://data.netlab.360.com/dga">http://data.netlab.360.com/dga</a></p></li>
+<li><p><strong>Description:</strong> This feed lists DGA family, Domain, Start and end of valid time(UTC) of a number of DGA families.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://data.netlab.360.com/feeds/dga/dga.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>DGA</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Netlab 360</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.netlab_360.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="hajime-scanner">
+<h3><a class="toc-backref" href="#id97">Hajime Scanner</a><a class="headerlink" href="#hajime-scanner" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-08-01</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://data.netlab.360.com/hajime/">https://data.netlab.360.com/hajime/</a></p></li>
+<li><p><strong>Description:</strong> This feed lists IP address for know Hajime bots network. These IPs data are obtained by joining the DHT network and interacting with the Hajime node</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://data.netlab.360.com/feeds/hajime-scanner/bot.list</cite></p></li>
+<li><p><cite>name</cite>: <cite>Hajime Scanner</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Netlab 360</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.netlab_360.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="magnitude-ek">
+<h3><a class="toc-backref" href="#id98">Magnitude EK</a><a class="headerlink" href="#magnitude-ek" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://data.netlab.360.com/ek">http://data.netlab.360.com/ek</a></p></li>
+<li><p><strong>Description:</strong> This feed lists FQDN and possibly the URL used by Magnitude Exploit Kit. Information also includes the IP address used for the domain and last time seen.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://data.netlab.360.com/feeds/ek/magnitude.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Magnitude EK</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Netlab 360</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.netlab_360.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="mirai-scanner">
+<h3><a class="toc-backref" href="#id99">Mirai Scanner</a><a class="headerlink" href="#mirai-scanner" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://data.netlab.360.com/mirai-scanner/">http://data.netlab.360.com/mirai-scanner/</a></p></li>
+<li><p><strong>Description:</strong> This feed provides IP addresses which actively scan for vulnerable IoT devices and install Mirai Botnet.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://data.netlab.360.com/feeds/mirai-scanner/scanner.list</cite></p></li>
+<li><p><cite>name</cite>: <cite>Mirai Scanner</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Netlab 360</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.netlab_360.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="openphish">
+<h2><a class="toc-backref" href="#id100">OpenPhish</a><a class="headerlink" href="#openphish" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="premium-feed">
+<h3><a class="toc-backref" href="#id101">Premium Feed</a><a class="headerlink" href="#premium-feed" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-02-06</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.openphish.com/phishing_feeds.html">https://www.openphish.com/phishing_feeds.html</a></p></li>
+<li><p><strong>Description:</strong> OpenPhish is a fully automated self-contained platform for phishing intelligence. It identifies phishing sites and performs intelligence analysis in real time without human intervention and without using any external resources, such as blacklists.</p></li>
+<li><p><strong>Additional Information:</strong> Discounts available for Government and National CERTs a well as for Nonprofit and Not-for-Profit organizations.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_password</cite>: <cite>{{ your password}}</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://openphish.com/prvt-intell/</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>{{ your username}}</cite></p></li>
+<li><p><cite>name</cite>: <cite>Premium Feed</cite></p></li>
+<li><p><cite>provider</cite>: <cite>OpenPhish</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.openphish.parser_commercial</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="public-feed">
+<h3><a class="toc-backref" href="#id102">Public feed</a><a class="headerlink" href="#public-feed" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.openphish.com/">https://www.openphish.com/</a></p></li>
+<li><p><strong>Description:</strong> OpenPhish is a fully automated self-contained platform for phishing intelligence. It identifies phishing sites and performs intelligence analysis in real time without human intervention and without using any external resources, such as blacklists.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.openphish.com/feed.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Public feed</cite></p></li>
+<li><p><cite>provider</cite>: <cite>OpenPhish</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.openphish.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="phishtank">
+<h2><a class="toc-backref" href="#id103">PhishTank</a><a class="headerlink" href="#phishtank" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="online">
+<h3><a class="toc-backref" href="#id104">Online</a><a class="headerlink" href="#online" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.phishtank.com/developer_info.php">https://www.phishtank.com/developer_info.php</a></p></li>
+<li><p><strong>Description:</strong> PhishTank is a collaborative clearing house for data and information about phishing on the Internet.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://data.phishtank.com/data/{{ your API key }}/online-valid.csv</cite></p></li>
+<li><p><cite>name</cite>: <cite>Online</cite></p></li>
+<li><p><cite>provider</cite>: <cite>PhishTank</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>28800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.phishtank.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="precisionsec">
+<h2><a class="toc-backref" href="#id105">PrecisionSec</a><a class="headerlink" href="#precisionsec" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="agent-tesla">
+<h3><a class="toc-backref" href="#id106">Agent Tesla</a><a class="headerlink" href="#agent-tesla" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-04-02</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://precisionsec.com/threat-intelligence-feeds/agent-tesla/">https://precisionsec.com/threat-intelligence-feeds/agent-tesla/</a></p></li>
+<li><p><strong>Description:</strong> Agent Tesla IoCs, URLs where the malware is hosted.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://precisionsec.com/threat-intelligence-feeds/agent-tesla/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Agent Tesla</cite></p></li>
+<li><p><cite>provider</cite>: <cite>PrecisionSec</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.html_table.parser</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“source.ip|source.url”, “time.source”]</cite></p></li>
+<li><p><cite>default_url_protocol</cite>: <cite>http://</cite></p></li>
+<li><p><cite>skip_table_head</cite>: <cite>True</cite></p></li>
+<li><p><cite>type</cite>: <cite>malware</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="shadowserver">
+<h2><a class="toc-backref" href="#id107">ShadowServer</a><a class="headerlink" href="#shadowserver" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="via-api">
+<h3><a class="toc-backref" href="#id108">Via API</a><a class="headerlink" href="#via-api" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2020-01-08</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.shadowserver.org/what-we-do/network-reporting/api-documentation/">https://www.shadowserver.org/what-we-do/network-reporting/api-documentation/</a></p></li>
+<li><p><strong>Description:</strong> Shadowserver sends out a variety of reports to subscribers, see documentation.</p></li>
+<li><p><strong>Additional Information:</strong> This configuration fetches user-configurable reports from the Shadowserver Reports API. For a list of reports, have a look at the Shadowserver collector and parser documentation.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.shadowserver.collector_reports_api</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>api_key</cite>: <cite>&lt;API key&gt;</cite></p></li>
+<li><p><cite>country</cite>: <cite>&lt;CC&gt;</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+<li><p><cite>redis_cache_db</cite>: <cite>12</cite></p></li>
+<li><p><cite>redis_cache_host</cite>: <cite>127.0.0.1</cite></p></li>
+<li><p><cite>redis_cache_port</cite>: <cite>6379</cite></p></li>
+<li><p><cite>redis_cache_ttl</cite>: <cite>864000</cite></p></li>
+<li><p><cite>secret</cite>: <cite>&lt;API secret&gt;</cite></p></li>
+<li><p><cite>types</cite>: <cite>&lt;single report or list of reports&gt;</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.shadowserver.parser_json</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="via-imap">
+<h3><a class="toc-backref" href="#id109">Via IMAP</a><a class="headerlink" href="#via-imap" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.shadowserver.org/what-we-do/network-reporting/">https://www.shadowserver.org/what-we-do/network-reporting/</a></p></li>
+<li><p><strong>Description:</strong> Shadowserver sends out a variety of reports (see <a class="reference external" href="https://www.shadowserver.org/wiki/pmwiki.php/Services/Reports">https://www.shadowserver.org/wiki/pmwiki.php/Services/Reports</a>).</p></li>
+<li><p><strong>Additional Information:</strong> The configuration retrieves the data from a e-mails via IMAP from the attachments.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.mail.collector_mail_attach</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>attach_regex</cite>: <cite>csv.zip</cite></p></li>
+<li><p><cite>extract_files</cite>: <cite>True</cite></p></li>
+<li><p><cite>folder</cite>: <cite>INBOX</cite></p></li>
+<li><p><cite>mail_host</cite>: <cite>__HOST__</cite></p></li>
+<li><p><cite>mail_password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>mail_ssl</cite>: <cite>True</cite></p></li>
+<li><p><cite>mail_user</cite>: <cite>__USERNAME__</cite></p></li>
+<li><p><cite>name</cite>: <cite>Via IMAP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>ShadowServer</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+<li><p><cite>subject_regex</cite>: <cite>__REGEX__</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.shadowserver.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="via-request-tracker">
+<h3><a class="toc-backref" href="#id110">Via Request Tracker</a><a class="headerlink" href="#via-request-tracker" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.shadowserver.org/what-we-do/network-reporting/">https://www.shadowserver.org/what-we-do/network-reporting/</a></p></li>
+<li><p><strong>Description:</strong> Shadowserver sends out a variety of reports (see <a class="reference external" href="https://www.shadowserver.org/wiki/pmwiki.php/Services/Reports">https://www.shadowserver.org/wiki/pmwiki.php/Services/Reports</a>).</p></li>
+<li><p><strong>Additional Information:</strong> The configuration retrieves the data from a RT/RTIR ticketing instance via the attachment or an download.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.rt.collector_rt</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>attachment_regex</cite>: <cite>\.csv\.zip$</cite></p></li>
+<li><p><cite>extract_attachment</cite>: <cite>True</cite></p></li>
+<li><p><cite>extract_download</cite>: <cite>False</cite></p></li>
+<li><p><cite>http_password</cite>: <cite>{{ your HTTP Authentication password or null }}</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>{{ your HTTP Authentication username or null }}</cite></p></li>
+<li><p><cite>password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>provider</cite>: <cite>ShadowServer</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+<li><p><cite>search_not_older_than</cite>: <cite>{{ relative time or null }}</cite></p></li>
+<li><p><cite>search_owner</cite>: <cite>nobody</cite></p></li>
+<li><p><cite>search_queue</cite>: <cite>Incident Reports</cite></p></li>
+<li><p><cite>search_requestor</cite>: <cite>autoreports&#64;shadowserver.org</cite></p></li>
+<li><p><cite>search_status</cite>: <cite>new</cite></p></li>
+<li><p><cite>search_subject_like</cite>: <cite>[__COUNTRY__] Shadowserver __COUNTRY__</cite></p></li>
+<li><p><cite>set_status</cite>: <cite>open</cite></p></li>
+<li><p><cite>take_ticket</cite>: <cite>True</cite></p></li>
+<li><p><cite>uri</cite>: <cite>http://localhost/rt/REST/1.0</cite></p></li>
+<li><p><cite>url_regex</cite>: <cite>https://dl.shadowserver.org/[a-zA-Z0-9?_-]*</cite></p></li>
+<li><p><cite>user</cite>: <cite>__USERNAME__</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.shadowserver.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="spamhaus">
+<h2><a class="toc-backref" href="#id111">Spamhaus</a><a class="headerlink" href="#spamhaus" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="asn-drop">
+<h3><a class="toc-backref" href="#id112">ASN Drop</a><a class="headerlink" href="#asn-drop" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.spamhaus.org/drop/">https://www.spamhaus.org/drop/</a></p></li>
+<li><p><strong>Description:</strong> ASN-DROP contains a list of Autonomous System Numbers controlled by spammers or cyber criminals, as well as “hijacked” ASNs. ASN-DROP can be used to filter BGP routes which are being used for malicious purposes.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.spamhaus.org/drop/asndrop.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>ASN Drop</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Spamhaus</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.spamhaus.parser_drop</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="cert">
+<h3><a class="toc-backref" href="#id113">CERT</a><a class="headerlink" href="#cert" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.spamhaus.org/news/article/705/spamhaus-launches-cert-insight-portal">https://www.spamhaus.org/news/article/705/spamhaus-launches-cert-insight-portal</a></p></li>
+<li><p><strong>Description:</strong> Spamhaus CERT Insight Portal. Access limited to CERTs and CSIRTs with national or regional responsibility. .</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>{{ your CERT portal URL }}</cite></p></li>
+<li><p><cite>name</cite>: <cite>CERT</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Spamhaus</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.spamhaus.parser_cert</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="drop">
+<h3><a class="toc-backref" href="#id114">Drop</a><a class="headerlink" href="#drop" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.spamhaus.org/drop/">https://www.spamhaus.org/drop/</a></p></li>
+<li><p><strong>Description:</strong> The DROP list will not include any IP address space under the control of any legitimate network - even if being used by “the spammers from hell”. DROP will only include netblocks allocated directly by an established Regional Internet Registry (RIR) or National Internet Registry (NIR) such as ARIN, RIPE, AFRINIC, APNIC, LACNIC or KRNIC or direct RIR allocations.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.spamhaus.org/drop/drop.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Drop</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Spamhaus</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.spamhaus.parser_drop</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="dropv6">
+<h3><a class="toc-backref" href="#id115">Dropv6</a><a class="headerlink" href="#dropv6" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.spamhaus.org/drop/">https://www.spamhaus.org/drop/</a></p></li>
+<li><p><strong>Description:</strong> The DROPv6 list includes IPv6 ranges allocated to spammers or cyber criminals. DROPv6 will only include IPv6 netblocks allocated directly by an established Regional Internet Registry (RIR) or National Internet Registry (NIR) such as ARIN, RIPE, AFRINIC, APNIC, LACNIC or KRNIC or direct RIR allocations.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.spamhaus.org/drop/dropv6.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Dropv6</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Spamhaus</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.spamhaus.parser_drop</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="edrop">
+<h3><a class="toc-backref" href="#id116">EDrop</a><a class="headerlink" href="#edrop" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.spamhaus.org/drop/">https://www.spamhaus.org/drop/</a></p></li>
+<li><p><strong>Description:</strong> EDROP is an extension of the DROP list that includes sub-allocated netblocks controlled by spammers or cyber criminals. EDROP is meant to be used in addition to the direct allocations on the DROP list.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.spamhaus.org/drop/edrop.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>EDrop</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Spamhaus</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.spamhaus.parser_drop</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="strangereal-intel">
+<h2><a class="toc-backref" href="#id117">Strangereal Intel</a><a class="headerlink" href="#strangereal-intel" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dailyioc">
+<h3><a class="toc-backref" href="#id118">DailyIOC</a><a class="headerlink" href="#dailyioc" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2019-12-05</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://github.com/StrangerealIntel/DailyIOC">https://github.com/StrangerealIntel/DailyIOC</a></p></li>
+<li><p><strong>Description:</strong> Daily IOC from tweets and articles</p></li>
+<li><p><strong>Additional Information:</strong> collector’s <cite>extra_fields</cite> parameter may be any of fields from the github <a class="reference external" href="https://developer.github.com/v3/repos/contents/">content API response</a></p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.github_api.collector_github_contents_api</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>basic_auth_password</cite>: <cite>PASSWORD</cite></p></li>
+<li><p><cite>basic_auth_username</cite>: <cite>USERNAME</cite></p></li>
+<li><p><cite>regex</cite>: <cite>.*.json</cite></p></li>
+<li><p><cite>repository</cite>: <cite>StrangerealIntel/DailyIOC</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.github_feed</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="sucuri">
+<h2><a class="toc-backref" href="#id119">Sucuri</a><a class="headerlink" href="#sucuri" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hidden-iframes">
+<h3><a class="toc-backref" href="#id120">Hidden IFrames</a><a class="headerlink" href="#hidden-iframes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-28</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://labs.sucuri.net/?malware">http://labs.sucuri.net/?malware</a></p></li>
+<li><p><strong>Description:</strong> Latest hidden iframes identified on compromised web sites.</p></li>
+<li><p><strong>Additional Information:</strong> Please note that the parser only extracts the hidden iframes  and the conditional redirects, not the encoded javascript.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://labs.sucuri.net/?malware</cite></p></li>
+<li><p><cite>name</cite>: <cite>Hidden IFrames</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Sucuri</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.sucuri.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="surbl">
+<h2><a class="toc-backref" href="#id121">Surbl</a><a class="headerlink" href="#surbl" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="malicious-domains">
+<h3><a class="toc-backref" href="#id122">Malicious Domains</a><a class="headerlink" href="#malicious-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-09-04</p></li>
+<li><p><strong>Description:</strong> Detected malicious domains. Note that you have to opened up Sponsored Datafeed Service (SDS) access to the SURBL data via rsync for your IP address.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.rsync.collector_rsync</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>file</cite>: <cite>wild.surbl.org.rbldnsd</cite></p></li>
+<li><p><cite>rsync_path</cite>: <cite>blacksync.prolocation.net::surbl-wild/</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.surbl.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="taichung">
+<h2><a class="toc-backref" href="#id123">Taichung</a><a class="headerlink" href="#taichung" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="netflow-recent">
+<h3><a class="toc-backref" href="#id124">Netflow Recent</a><a class="headerlink" href="#netflow-recent" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.tc.edu.tw/net/netflow/lkout/recent/">https://www.tc.edu.tw/net/netflow/lkout/recent/</a></p></li>
+<li><p><strong>Description:</strong> Abnormal flows detected: Attacking (DoS, Brute-Force, Scanners) and malicious hosts (C&amp;C servers, hosting malware)</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.tc.edu.tw/net/netflow/lkout/recent/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Netflow Recent</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Taichung</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.taichung.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="team-cymru">
+<h2><a class="toc-backref" href="#id125">Team Cymru</a><a class="headerlink" href="#team-cymru" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cap">
+<h3><a class="toc-backref" href="#id126">CAP</a><a class="headerlink" href="#cap" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.team-cymru.com/CSIRT-AP.html">https://www.team-cymru.com/CSIRT-AP.html</a> <a class="reference external" href="https://www.cymru.com/$certname/report_info.txt">https://www.cymru.com/$certname/report_info.txt</a></p></li>
+<li><p><strong>Description:</strong> Team Cymru provides daily lists of compromised or abused devices for the ASNs and/or netblocks with a CSIRT’s jurisdiction. This includes such information as bot infected hosts, command and control systems, open resolvers, malware urls, phishing urls, and brute force attacks</p></li>
+<li><p><strong>Additional Information:</strong> “Two feeds types are offered:</p></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><p>The new <a class="reference external" href="https://www.cymru.com/$certname">https://www.cymru.com/$certname</a>/$certname_{time[%Y%m%d]}.txt</p></li>
+<li><p>and the old <a class="reference external" href="https://www.cymru.com/$certname">https://www.cymru.com/$certname</a>/infected_{time[%Y%m%d]}.txt</p></li>
+</ul>
+<p>Both formats are supported by the parser and the new one is recommended.
+As of 2019-09-12 the old format will be retired soon.”</p>
+</div></blockquote>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_password</cite>: <cite>{{your password}}</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://www.cymru.com/$certname/$certname_{time[%Y%m%d]}.txt</cite></p></li>
+<li><p><cite>http_url_formatting</cite>: <cite>True</cite></p></li>
+<li><p><cite>http_username</cite>: <cite>{{your login}}</cite></p></li>
+<li><p><cite>name</cite>: <cite>CAP</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Team Cymru</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cymru.parser_cap_program</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="full-bogons-ipv4">
+<h3><a class="toc-backref" href="#id127">Full Bogons IPv4</a><a class="headerlink" href="#full-bogons-ipv4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.team-cymru.com/bogon-reference-http.html">https://www.team-cymru.com/bogon-reference-http.html</a></p></li>
+<li><p><strong>Description:</strong> Fullbogons are a larger set which also includes IP space that has been allocated to an RIR, but not assigned by that RIR to an actual ISP or other end-user. IANA maintains a convenient IPv4 summary page listing allocated and reserved netblocks, and each RIR maintains a list of all prefixes that they have assigned to end-users. Our bogon reference pages include additional links and resources to assist those who wish to properly filter bogon prefixes within their networks.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Full Bogons IPv4</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Team Cymru</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cymru.parser_full_bogons</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="full-bogons-ipv6">
+<h3><a class="toc-backref" href="#id128">Full Bogons IPv6</a><a class="headerlink" href="#full-bogons-ipv6" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.team-cymru.com/bogon-reference-http.html">https://www.team-cymru.com/bogon-reference-http.html</a></p></li>
+<li><p><strong>Description:</strong> Fullbogons are a larger set which also includes IP space that has been allocated to an RIR, but not assigned by that RIR to an actual ISP or other end-user. IANA maintains a convenient IPv4 summary page listing allocated and reserved netblocks, and each RIR maintains a list of all prefixes that they have assigned to end-users. Our bogon reference pages include additional links and resources to assist those who wish to properly filter bogon prefixes within their networks.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Full Bogons IPv6</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Team Cymru</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.cymru.parser_full_bogons</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="threatminer">
+<h2><a class="toc-backref" href="#id129">Threatminer</a><a class="headerlink" href="#threatminer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="recent-domains">
+<h3><a class="toc-backref" href="#id130">Recent domains</a><a class="headerlink" href="#recent-domains" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-02-06</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://www.threatminer.org/">https://www.threatminer.org/</a></p></li>
+<li><p><strong>Description:</strong> Latest malicious domains.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.threatminer.org/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Recent domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Threatminer</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.threatminer.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="turris">
+<h2><a class="toc-backref" href="#id131">Turris</a><a class="headerlink" href="#turris" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="greylist">
+<h3><a class="toc-backref" href="#id132">Greylist</a><a class="headerlink" href="#greylist" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://project.turris.cz/en/greylist">https://project.turris.cz/en/greylist</a></p></li>
+<li><p><strong>Description:</strong> The data are processed and classified every week and behaviour of IP addresses that accessed a larger number of Turris routers is evaluated. The result is a list of addresses that have tried to obtain information about services on the router or tried to gain access to them. The list also contains a list of tags for each address which indicate what behaviour of the address was observed.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.turris.cz/greylist-data/greylist-latest.csv</cite></p></li>
+<li><p><cite>name</cite>: <cite>Greylist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Turris</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>43200</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.turris.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="greylist-with-pgp-signature-verification">
+<h3><a class="toc-backref" href="#id133">Greylist with PGP signature verification</a><a class="headerlink" href="#greylist-with-pgp-signature-verification" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://project.turris.cz/en/greylist">https://project.turris.cz/en/greylist</a></p></li>
+<li><p><strong>Description:</strong> The data are processed and classified every week and behaviour of</p></li>
+</ul>
+<p>IP addresses that accessed a larger number of Turris routers is evaluated.
+The result is a list of addresses that have tried to obtain information about
+services on the router or tried to gain access to them. The list also
+contains a list of tags for each address which
+indicate what behaviour of the address was observed.</p>
+<p>The Turris Greylist feed provides PGP signatures for the provided files.
+You will need to import the public PGP key from the linked documentation
+page, currently available at
+<a class="reference external" href="https://pgp.mit.edu/pks/lookup?op=vindex&amp;search=0x10876666">https://pgp.mit.edu/pks/lookup?op=vindex&amp;search=0x10876666</a>
+or from below.
+See the URL Fetcher Collector documentation for more information on
+PGP signature verification.</p>
+<p>PGP Public key:
+<a href="#id4"><span class="problematic" id="id5">``</span></a>`
+—–BEGIN PGP PUBLIC KEY BLOCK—–
+Version: SKS 1.1.6
+Comment: Hostname: pgp.mit.edu</p>
+<p>mQINBFRl7D8BEADaRFoDa/+r27Gtqrdn8sZL4aSYTU4Q3gDr3TfigK8H26Un/Y79a/DUL1o0
+o8SRae3uwVcjJDHZ6KDnxThbqF7URfpuCcCYxOs8p/eu3dSueqEGTODHWF4ChIh2japJDc4t
+3FQHbIh2e3GHotVqJGhvxMmWqBFoZ/mlWvhjs99FFBZ87qbUNk7l1UAGEXeWeECgz9nGox40
+3YpCgEsnJJsKC53y5LD/wBf4z+z0GsLg2GMRejmPRgrkSE/d9VjF/+niifAj2ZVFoINSVjjI
+8wQFc8qLiExdzwLdgc+ggdzk5scY3ugI5IBt1zflxMIOG4BxKj/5IWsnhKMG2NLVGUYOODoG
+pKhcY0gCHypw1bmkp2m+BDVyg4KM2fFPgQ554DAX3xdukMCzzZyBxR3UdT4dN7xRVhpph3Y2
+Amh1E/dpde9uwKFk1oRHkRZ3UT1XtpbXtFNY0wCiGXPt6KznJAJcomYFkeLHjJo3nMK0hISV
+GSNetVLfNWlTkeo93E1innbSaDEN70H4jPivjdVjSrLtIGfr2IudUJI84dGmvMxssWuM2qdg
+FSzoTHw9UE9KT3SltKPS+F7u9x3h1J492YaVDncATRjPZUBDhbvo6Pcezhup7XTnI3gbRQc2
+oEUDb933nwuobHm3VsUcf9686v6j8TYehsbjk+zdA4BoS/IdCwARAQABtC5UdXJyaXMgR3Jl
+eWxpc3QgR2VuZXJhdG9yIDxncmV5bGlzdEB0dXJyaXMuY3o+iQI4BBMBAgAiBQJUZew/AhsD
+BgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRDAQrU3EIdmZoH4D/9Jo6j9RZxCAPTaQ9WZ
+WOdb1Eqd/206bObEX+xJAago+8vuy+waatHYBM9/+yxh0SIg2g5whd6J7A++7ePpt5XzX6hq
+bzdG8qGtsCRu+CpDJ40UwHep79Ck6O/A9KbZcZW1z/DhbYT3z/ZVWALy4RtgmyC67Vr+j/C7
+KNQ529bs3kP9AzvEIeBC4wdKl8dUSuZIPFbgf565zRNKLtHVgVhiuDPcxKmBEl4/PLYF30a9
+5Tgp8/PNa2qp1DV/EZjcsxvSRIZB3InGBvdKdSzvs4N/wLnKWedj1GGm7tJhSkJa4MLBSOIx
+yamhTS/3A5Cd1qoDhLkp7DGVXSdgEtpoZDC0jR7nTS6pXojcgQaF7SfJ3cjZaLI5rjsx0YLk
+G4PzonQKCAAQG1G9haCDniD8NrrkZ3eFiafoKEECRFETIG0BJHjPdSWcK9jtNCupBYb7JCiz
+Q0hwLh2wrw/wCutQezD8XfsBFFIQC18TsJAVgdHLZnGYkd5dIbV/1scOcm52w6EGIeMBBYlB
+J2+JNukH5sJDA6zAXNl2I1H1eZsP4+FSNIfB6LdovHVPAjn7qXCw3+IonnQK8+g8YJkbbhKJ
+sPejfg+ndpe5u0zX+GvQCFBFu03muANA0Y/OOeGIQwU93d/akN0P1SRfq+bDXnkRIJQOD6XV
+0ZPKVXlNOjy/z2iN2A==
+=wjkM
+—–END PGP PUBLIC KEY BLOCK—–
+<a href="#id6"><span class="problematic" id="id7">``</span></a><a href="#id8"><span class="problematic" id="id9">`</span></a></p>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://www.turris.cz/greylist-data/greylist-latest.csv</cite></p></li>
+<li><p><cite>name</cite>: <cite>Greylist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>Turris</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>43200</cite></p></li>
+<li><p><cite>signature_url</cite>: <cite>https://www.turris.cz/greylist-data/greylist-latest.csv.asc</cite></p></li>
+<li><p><cite>verify_pgp_signatures</cite>: <cite>False</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.turris.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="university-of-toulouse">
+<h2><a class="toc-backref" href="#id134">University of Toulouse</a><a class="headerlink" href="#university-of-toulouse" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3><a class="toc-backref" href="#id135">Blacklist</a><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://dsi.ut-capitole.fr/blacklists/">https://dsi.ut-capitole.fr/blacklists/</a></p></li>
+<li><p><strong>Description:</strong> Various blacklist feeds</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>extract_files</cite>: <cite>true</cite></p></li>
+<li><p><cite>http_url</cite>: <cite>https://dsi.ut-capitole.fr/blacklists/download/{collection name}.tar.gz</cite></p></li>
+<li><p><cite>name</cite>: <cite>Blacklist</cite></p></li>
+<li><p><cite>provider</cite>: <cite>University of Toulouse</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>43200</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.generic.parser_csv</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>{depends on a collection}</cite></p></li>
+<li><p><cite>delimiter</cite>: <cite>false</cite></p></li>
+<li><p><cite>type</cite>: <cite>{depends on a collection}</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="vxvault">
+<h2><a class="toc-backref" href="#id136">VXVault</a><a class="headerlink" href="#vxvault" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="urls">
+<h3><a class="toc-backref" href="#id137">URLs</a><a class="headerlink" href="#urls" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://vxvault.net/ViriList.php">http://vxvault.net/ViriList.php</a></p></li>
+<li><p><strong>Description:</strong> This feed provides IP addresses hosting Malware.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://vxvault.net/URL_List.php</cite></p></li>
+<li><p><cite>name</cite>: <cite>URLs</cite></p></li>
+<li><p><cite>provider</cite>: <cite>VXVault</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.vxvault.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="viriback">
+<h2><a class="toc-backref" href="#id138">ViriBack</a><a class="headerlink" href="#viriback" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unsafe-sites">
+<h3><a class="toc-backref" href="#id139">Unsafe sites</a><a class="headerlink" href="#unsafe-sites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-06-27</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://viriback.com/">https://viriback.com/</a></p></li>
+<li><p><strong>Description:</strong> Latest detected unsafe sites.</p></li>
+<li><p><strong>Additional Information:</strong> You need to install the lxml library in order to parse this feed.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://tracker.viriback.com/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Unsafe sites</cite></p></li>
+<li><p><cite>provider</cite>: <cite>ViriBack</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>86400</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.html_table.parser</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“malware.name”, “source.url”, “source.ip”, “time.source”]</cite></p></li>
+<li><p><cite>html_parser</cite>: <cite>lxml</cite></p></li>
+<li><p><cite>time_format</cite>: <cite>from_format_midnight|%d-%m-%Y</cite></p></li>
+<li><p><cite>type</cite>: <cite>malware</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="webinspektor">
+<h2><a class="toc-backref" href="#id140">WebInspektor</a><a class="headerlink" href="#webinspektor" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id141">Unsafe sites</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-03-09</p></li>
+<li><p><strong>Description:</strong> Latest detected unsafe sites.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>https://app.webinspector.com/public/recent_detections/</cite></p></li>
+<li><p><cite>name</cite>: <cite>Unsafe sites</cite></p></li>
+<li><p><cite>provider</cite>: <cite>WebInspektor</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>60</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.webinspektor.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="zoneh">
+<h2><a class="toc-backref" href="#id142">ZoneH</a><a class="headerlink" href="#zoneh" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="defacements">
+<h3><a class="toc-backref" href="#id143">Defacements</a><a class="headerlink" href="#defacements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> no</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="https://zone-h.org/">https://zone-h.org/</a></p></li>
+<li><p><strong>Description:</strong> all the information contained in Zone-H’s cybercrime archive were either collected online from public sources or directly notified anonymously to us.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.mail.collector_mail_attach</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>attach_regex</cite>: <cite>csv</cite></p></li>
+<li><p><cite>extract_files</cite>: <cite>False</cite></p></li>
+<li><p><cite>folder</cite>: <cite>INBOX</cite></p></li>
+<li><p><cite>mail_host</cite>: <cite>__HOST__</cite></p></li>
+<li><p><cite>mail_password</cite>: <cite>__PASSWORD__</cite></p></li>
+<li><p><cite>mail_ssl</cite>: <cite>True</cite></p></li>
+<li><p><cite>mail_user</cite>: <cite>__USERNAME__</cite></p></li>
+<li><p><cite>name</cite>: <cite>Defacements</cite></p></li>
+<li><p><cite>provider</cite>: <cite>ZoneH</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>3600</cite></p></li>
+<li><p><cite>sent_from</cite>: <cite>datazh&#64;zone-h.org</cite></p></li>
+<li><p><cite>subject_regex</cite>: <cite>Report</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.zoneh.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="capture">
+<h2><a class="toc-backref" href="#id144">cAPTure</a><a class="headerlink" href="#capture" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ponmocup-domains-cif-format">
+<h3><a class="toc-backref" href="#id145">Ponmocup Domains CIF Format</a><a class="headerlink" href="#ponmocup-domains-cif-format" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2018-01-20</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://security-research.dyndns.org/pub/malware-feeds/">http://security-research.dyndns.org/pub/malware-feeds/</a></p></li>
+<li><p><strong>Description:</strong> List of ponmocup malware redirection domains and infected web-servers from cAPTure. See also <a class="reference external" href="http://security-research.dyndns.org/pub/botnet-links.htm">http://security-research.dyndns.org/pub/botnet-links.htm</a> and <a class="reference external" href="http://c-apt-ure.blogspot.com/search/label/ponmocup">http://c-apt-ure.blogspot.com/search/label/ponmocup</a> The data in the CIF format is not equal to the Shadowserver CSV format. Reasons are unknown.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://security-research.dyndns.org/pub/malware-feeds/ponmocup-infected-domains-CIF-latest.txt</cite></p></li>
+<li><p><cite>name</cite>: <cite>Infected Domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>cAPTure</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.dyn.parser</p></li>
+<li><p><strong>Configuration Parameters:</strong></p></li>
+</ul>
+</div>
+<div class="section" id="ponmocup-domains-shadowserver-format">
+<h3><a class="toc-backref" href="#id146">Ponmocup Domains Shadowserver Format</a><a class="headerlink" href="#ponmocup-domains-shadowserver-format" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Public:</strong> yes</p></li>
+<li><p><strong>Revision:</strong> 2020-07-08</p></li>
+<li><p><strong>Documentation:</strong> <a class="reference external" href="http://security-research.dyndns.org/pub/malware-feeds/">http://security-research.dyndns.org/pub/malware-feeds/</a></p></li>
+<li><p><strong>Description:</strong> List of ponmocup malware redirection domains and infected web-servers from cAPTure. See also <a class="reference external" href="http://security-research.dyndns.org/pub/botnet-links.htm">http://security-research.dyndns.org/pub/botnet-links.htm</a> and <a class="reference external" href="http://c-apt-ure.blogspot.com/search/label/ponmocup">http://c-apt-ure.blogspot.com/search/label/ponmocup</a> The data in the Shadowserver CSV is not equal to the CIF format format. Reasons are unknown.</p></li>
+</ul>
+<p><strong>Collector</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.collectors.http.collector_http</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>http_url</cite>: <cite>http://security-research.dyndns.org/pub/malware-feeds/ponmocup-infected-domains-shadowserver.csv</cite></p></li>
+<li><p><cite>name</cite>: <cite>Infected Domains</cite></p></li>
+<li><p><cite>provider</cite>: <cite>cAPTure</cite></p></li>
+<li><p><cite>rate_limit</cite>: <cite>10800</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Parser</strong></p>
+<ul class="simple">
+<li><p><strong>Module:</strong> intelmq.bots.parsers.generic.parser_csv</p></li>
+<li><dl class="simple">
+<dt><strong>Configuration Parameters:</strong></dt><dd><ul>
+<li><p><cite>columns</cite>: <cite>[“time.source”, “source.ip”, “source.fqdn”, “source.urlpath”, “source.port”, “protocol.application”, “extra.tag”, “extra.redirect_target”, “extra.category”]</cite></p></li>
+<li><p><cite>compose_fields</cite>: <cite>{‘source.url’: ‘http://{0}{1}’}</cite></p></li>
+<li><p><cite>delimiter</cite>: <cite>,</cite></p></li>
+<li><p><cite>skip_header</cite>: <cite>True</cite></p></li>
+<li><p><cite>type</cite>: <cite>malware-distribution</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">IntelMQ Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ELK-Stack.html">ELK Stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MISP-Integrations.html">MISP integrations in IntelMQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="n6-integrations.html">IntelMQ - n6 Integration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/guide.html">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="intelmqctl.html" title="previous chapter">intelmqctl documentation</a></li>
+      <li>Next: <a href="FAQ.html" title="next chapter">Frequently asked questions</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/user/feeds.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

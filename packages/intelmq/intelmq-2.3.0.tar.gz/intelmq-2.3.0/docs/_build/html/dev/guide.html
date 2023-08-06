@@ -1,0 +1,824 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Developers Guide &#8212; intelmq 2.3.0.rc1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Harmonization" href="data-harmonization.html" />
+    <link rel="prev" title="IntelMQ Manager" href="../user/intelmq-manager.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="developers-guide">
+<h1><a class="toc-backref" href="#id6">Developers Guide</a><a class="headerlink" href="#developers-guide" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#developers-guide" id="id6">Developers Guide</a></p>
+<ul>
+<li><p><a class="reference internal" href="#intended-audience" id="id7">Intended Audience</a></p>
+<ul>
+<li><p><a class="reference internal" href="#goals" id="id8">Goals</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#development-environment" id="id9">Development Environment</a></p>
+<ul>
+<li><p><a class="reference internal" href="#installation" id="id10">Installation</a></p></li>
+<li><p><a class="reference internal" href="#how-to-develop" id="id11">How to develop</a></p></li>
+<li><p><a class="reference internal" href="#update" id="id12">Update</a></p></li>
+<li><p><a class="reference internal" href="#testing" id="id13">Testing</a></p>
+<ul>
+<li><p><a class="reference internal" href="#additional-optional-requirements" id="id14">Additional optional requirements</a></p></li>
+<li><p><a class="reference internal" href="#run-the-tests" id="id15">Run the tests</a></p></li>
+<li><p><a class="reference internal" href="#environment-variables" id="id16">Environment variables</a></p></li>
+<li><p><a class="reference internal" href="#configuration-test-files" id="id17">Configuration test files</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#development-guidelines" id="id18">Development Guidelines</a></p>
+<ul>
+<li><p><a class="reference internal" href="#coding-rules" id="id19">Coding-Rules</a></p>
+<ul>
+<li><p><a class="reference internal" href="#unicode" id="id20">Unicode</a></p></li>
+<li><p><a class="reference internal" href="#back-end-independence-and-compatibility" id="id21">Back-end independence and Compatibility</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#layout-rules" id="id22">Layout Rules</a></p>
+<ul>
+<li><p><a class="reference internal" href="#documentation" id="id23">Documentation</a></p></li>
+<li><p><a class="reference internal" href="#directories-hierarchy-on-default-installation" id="id24">Directories Hierarchy on Default Installation</a></p></li>
+<li><p><a class="reference internal" href="#directories-and-files-naming" id="id25">Directories and Files naming</a></p></li>
+<li><p><a class="reference internal" href="#class-names" id="id26">Class Names</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#data-harmonization-rules" id="id27">Data Harmonization Rules</a></p></li>
+<li><p><a class="reference internal" href="#code-submission-rules" id="id28">Code Submission Rules</a></p>
+<ul>
+<li><p><a class="reference internal" href="#releases-repositories-and-branches" id="id29">Releases, Repositories and Branches</a></p></li>
+<li><p><a class="reference internal" href="#branching-model" id="id30">Branching model</a></p></li>
+<li><p><a class="reference internal" href="#how-to-contribute" id="id31">How to Contribute</a></p></li>
+<li><p><a class="reference internal" href="#workflow" id="id32">Workflow</a></p></li>
+<li><p><a class="reference internal" href="#commit-messages" id="id33">Commit Messages</a></p></li>
+<li><p><a class="reference internal" href="#prepare-for-discussion-in-github" id="id34">Prepare for Discussion in GitHub</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#license-and-author-files" id="id35">License and Author files</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#system-overview" id="id36">System Overview</a></p>
+<ul>
+<li><p><a class="reference internal" href="#code-architecture" id="id37">Code Architecture</a></p></li>
+<li><p><a class="reference internal" href="#pipeline" id="id38">Pipeline</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#bot-developer-guide" id="id39">Bot Developer Guide</a></p>
+<ul>
+<li><p><a class="reference internal" href="#template" id="id40">Template</a></p></li>
+<li><p><a class="reference internal" href="#pipeline-interactions" id="id41">Pipeline interactions</a></p></li>
+<li><p><a class="reference internal" href="#logging" id="id42">Logging</a></p>
+<ul>
+<li><p><a class="reference internal" href="#log-messages-format" id="id43">Log Messages Format</a></p></li>
+<li><p><a class="reference internal" href="#log-levels" id="id44">Log Levels</a></p></li>
+<li><p><a class="reference internal" href="#what-to-log" id="id45">What to Log</a></p></li>
+<li><p><a class="reference internal" href="#how-to-log" id="id46">How to Log</a></p>
+<ul>
+<li><p><a class="reference internal" href="#string-formatting-in-logs" id="id47">String formatting in Logs</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#error-handling" id="id48">Error handling</a></p></li>
+<li><p><a class="reference internal" href="#initialization" id="id49">Initialization</a></p></li>
+<li><p><a class="reference internal" href="#custom-configuration-checks" id="id50">Custom configuration checks</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id51">Examples</a></p></li>
+<li><p><a class="reference internal" href="#parsers" id="id52">Parsers</a></p>
+<ul>
+<li><p><a class="reference internal" href="#parse-line" id="id53">parse_line</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#tests" id="id54">Tests</a></p></li>
+<li><p><a class="reference internal" href="#configuration" id="id55">Configuration</a></p></li>
+<li><p><a class="reference internal" href="#cache" id="id56">Cache</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id2" id="id57">Documentation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#feeds-documentation" id="id58">Feeds documentation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#testing-pre-releases" id="id59">Testing Pre-releases</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id5" id="id60">Installation</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="intended-audience">
+<h2><a class="toc-backref" href="#id7">Intended Audience</a><a class="headerlink" href="#intended-audience" title="Permalink to this headline">¶</a></h2>
+<p>This guide is for developers of IntelMQ. It explains the code architecture, coding guidelines as well as ways you can contribute code or documentation.
+If you have not done so, please read the <a class="reference internal" href="../user/introduction.html"><span class="doc">Introduction</span></a> first.
+Once you feel comfortable running IntelMQ with open source bots and you feel adventurous enough to contribute to the project, this guide is for you.
+It does not matter if you are an experienced Python programmer or just a beginner. There are a lot of samples to help you out.</p>
+<p>However, before we go into the details, it is important to observe and internalize some overall project goals.</p>
+<div class="section" id="goals">
+<h3><a class="toc-backref" href="#id8">Goals</a><a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h3>
+<p>It is important, that all developers agree and stick to these meta-guidelines.
+IntelMQ tries to:</p>
+<ul class="simple">
+<li><p>Be well tested. For developers this means, we expect you to write unit tests for bots. Every time.</p></li>
+<li><p>Reduce the complexity of system administration</p></li>
+<li><p>Reduce the complexity of writing new bots for new data feeds</p></li>
+<li><p>Make your code easily and pleasantly readable</p></li>
+<li><p>Reduce the probability of events lost in all process with persistence functionality (even system crash)</p></li>
+<li><p>Strictly adhere to the existing <a class="reference internal" href="data-harmonization.html"><span class="doc">Data Harmonization</span></a> for key-values in events</p></li>
+<li><p>Always use JSON format for all messages internally</p></li>
+<li><p>Help and support the interconnection between IntelMQ and existing tools like AbuseHelper, CIF, etc. or new tools (in other words: we will not accept data-silos!)</p></li>
+<li><p>Provide an easy way to store data into Log Collectors like ElasticSearch, Splunk</p></li>
+<li><p>Provide an easy way to create your own black-lists</p></li>
+<li><p>Provide easy to understand interfaces with other systems via HTTP RESTFUL API</p></li>
+</ul>
+<p>The main take away point from the list above is: things <strong>MUST</strong> stay __intuitive__ and __easy__.
+How do you ultimately test if things are still easy? Let them new programmers test-drive your features and if it is not understandable in 15 minutes, go back to the drawing board.</p>
+<p>Similarly, if code does not get accepted upstream by the main developers, it is usually only because of the ease-of-use argument. Do not give up , go back to the drawing board, and re-submit again.</p>
+</div>
+</div>
+<div class="section" id="development-environment">
+<span id="id1"></span><h2><a class="toc-backref" href="#id9">Development Environment</a><a class="headerlink" href="#development-environment" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installation">
+<h3><a class="toc-backref" href="#id10">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Developers can create a fork repository of IntelMQ in order to commit the new code to this repository and then be able to do pull requests to the main repository. Otherwise you can just use the ‘certtools’ as username below.</p>
+<p>The following instructions will use <cite>pip3 -e</cite>, which gives you a so called <em>editable</em> installation. No code is copied in the libraries directories, there’s just a link to your code. However, configuration files still required to be moved to <cite>/opt/intelmq</cite> as the instructions show.</p>
+<p>In this guide we use <cite>/opt/dev_intelmq</cite> as local repository copy. You can also use other directories as long as they are readable by other unprivileged users (e.g. home directories on Fedora can’t be read by other users by default).
+<cite>/opt/intelmq</cite> is used as root location for IntelMQ installations, this is IntelMQ’s default for this installation method. This directory is used for configurations (<cite>/opt/intelmq/etc</cite>), local states (<cite>/opt/intelmq/var/lib</cite>) and logs (<cite>/opt/intelmq/var/log</cite>).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -s
+
+git clone https://github.com/&lt;your username&gt;/intelmq.git /opt/dev_intelmq
+<span class="nb">cd</span> /opt/dev_intelmq
+
+pip3 install -e .
+
+useradd -d /opt/intelmq -U -s /bin/bash intelmq
+
+intelmqsetup
+</pre></div>
+</div>
+<p><strong>Note:</strong> please do not forget that configuration files, log files will be available on <cite>/opt/intelmq</cite>. However, if your development is somehow related to any shipped configuration file, you need to apply the changes in your repository <cite>/opt/dev_intelmq/intelmq/etc/</cite>.</p>
+</div>
+<div class="section" id="how-to-develop">
+<h3><a class="toc-backref" href="#id11">How to develop</a><a class="headerlink" href="#how-to-develop" title="Permalink to this headline">¶</a></h3>
+<p>After you successfully setup your IntelMQ development environment, you can perform any development on any <cite>.py</cite> file on <cite>/opt/dev_intelmq</cite>. After you change, you can use the normal procedure to run the bots:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>su - intelmq
+
+intelmqctl start spamhaus-drop-collector
+
+tail -f /opt/intelmq/var/log/spamhaus-drop-collector.log
+</pre></div>
+</div>
+<p>You can also add new bots, creating the new <cite>.py</cite> file on the proper directory inside <cite>cd /opt/dev_intelmq/intelmq</cite>. However, your IntelMQ installation with pip3 needs to be updated. Please check the following section.</p>
+</div>
+<div class="section" id="update">
+<h3><a class="toc-backref" href="#id12">Update</a><a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<p>In case you developed a new bot, you need to update your current development installation. In order to do that, please follow this procedure:</p>
+<ol class="arabic simple">
+<li><p>Add the new bot information to <cite>/opt/dev_intelmq/intelmq/bots/BOTS</cite>, not <cite>/opt/intelmq/etc/BOTS</cite>.</p></li>
+<li><p>Make sure that you have your new bot in the right place and the information on BOTS file is correct.</p></li>
+<li><p>Execute the following commands:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -s
+
+<span class="nb">cd</span> /opt/dev_intelmq
+<span class="c1">## necessary for pip metadata update and new executables:</span>
+pip3 install -e .
+<span class="c1">## only necessary if it&#39;s not a link yet</span>
+cp -fs /opt/dev_intelmq/intelmq/bots/BOTS /opt/intelmq/etc/BOTS
+
+find /opt/intelmq/ -type d -exec chmod <span class="m">0770</span> <span class="o">{}</span> <span class="se">\+</span>
+find /opt/intelmq/ -type f -exec chmod <span class="m">0660</span> <span class="o">{}</span> <span class="se">\+</span>
+chown -R intelmq.intelmq /opt/intelmq
+<span class="c1">## if you use the intelmq manager (adapt the webservers&#39; group if needed):</span>
+chown intelmq.www-data /opt/intelmq/etc/*.conf
+</pre></div>
+</div>
+<p>Now you can test run your new bot following this procedure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>su - intelmq
+
+intelmqctl start &lt;bot_id&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing">
+<h3><a class="toc-backref" href="#id13">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="additional-optional-requirements">
+<h4><a class="toc-backref" href="#id14">Additional optional requirements</a><a class="headerlink" href="#additional-optional-requirements" title="Permalink to this headline">¶</a></h4>
+<p>For the documentation tests two additional libraries are required: Cerberus and PyYAML. You can install them with pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3 install Cerberus PyYAML
+</pre></div>
+</div>
+<p>or the package management of your operating system.</p>
+</div>
+<div class="section" id="run-the-tests">
+<h4><a class="toc-backref" href="#id15">Run the tests</a><a class="headerlink" href="#run-the-tests" title="Permalink to this headline">¶</a></h4>
+<p>All changes have to be tested and new contributions should be accompanied by according unit tests.
+Please do not run the tests as root just like any other IntelMQ component for security reasons. Any other unprivileged user is possible.</p>
+<p>You can run the tests by changing to the directory with IntelMQ repository and running either <cite>unittest</cite> or <cite>nosetests</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /opt/dev_intelmq
+sudo -u intelmq python3 -m unittest <span class="o">{</span>discover<span class="p">|</span>filename<span class="o">}</span>  <span class="c1"># or</span>
+sudo -u intelmq nosetests3 <span class="o">[</span>filename<span class="o">]</span>  <span class="c1"># alternatively nosetests or nosetests-3.8 depending on your installation, or</span>
+sudo -u intelmq python3 setup.py <span class="nb">test</span>  <span class="c1"># uses a build environment (no external dependencies)</span>
+</pre></div>
+</div>
+<p>Some bots need local databases to succeed. If you only want to test one explicit test file, give the file path as argument.</p>
+<p>There are multiple <a class="reference external" href="https://github.com/certtools/intelmq/actions">GitHub Action Workflows</a> setup for automatic testing, which are triggered on pull requests. You can also easily activate them for your forks.</p>
+</div>
+<div class="section" id="environment-variables">
+<h4><a class="toc-backref" href="#id16">Environment variables</a><a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h4>
+<p>There are a bunch of environment variables which switch on/off some tests:</p>
+<ul class="simple">
+<li><p><cite>INTELMQ_TEST_DATABASES</cite>: databases such as postgres, elasticsearch, mongodb are not tested by default. Set this environment variable to 1 to test those bots. These tests need preparation, e.g. running databases with users and certain passwords etc. Have a look at the <cite>.github/workflows/nosetests.yml</cite> and the corresponding <cite>.github/workflows/scripts/setup-full.sh</cite> in IntelMQ’s repository for steps to set databases up.</p></li>
+<li><p><cite>INTELMQ_SKIP_INTERNET</cite>: tests requiring internet connection will be skipped if this is set to 1.</p></li>
+<li><p><cite>INTELMQ_SKIP_REDIS</cite>: redis-related tests are ran by default, set this to 1 to skip those.</p></li>
+<li><p><cite>INTELMQ_TEST_EXOTIC</cite>: some bots and tests require libraries which may not be available, those are skipped by default. To run them, set this to 1.</p></li>
+<li><p><cite>INTELMQ_TEST_REDIS_PASSWORD</cite>: Set this value to the password for the local redis database if needed.</p></li>
+</ul>
+<p>For example, to run all tests you can use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">INTELMQ_TEST_DATABASES</span><span class="o">=</span><span class="m">1</span> <span class="nv">INTELMQ_TEST_EXOTIC</span><span class="o">=</span><span class="m">1</span> nosetests3
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration-test-files">
+<h4><a class="toc-backref" href="#id17">Configuration test files</a><a class="headerlink" href="#configuration-test-files" title="Permalink to this headline">¶</a></h4>
+<p>The tests use the configuration files in your working directory, not those installed in <cite>/opt/intelmq/etc/</cite> or <cite>/etc/</cite>.  You can run the tests for a locally changed intelmq without affecting an installation or
+requiring root to run them.</p>
+</div>
+</div>
+</div>
+<div class="section" id="development-guidelines">
+<h2><a class="toc-backref" href="#id18">Development Guidelines</a><a class="headerlink" href="#development-guidelines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="coding-rules">
+<h3><a class="toc-backref" href="#id19">Coding-Rules</a><a class="headerlink" href="#coding-rules" title="Permalink to this headline">¶</a></h3>
+<p>Most important: <strong>KEEP IT SIMPLE</strong>!!
+This can not be over-estimated. Feature creep can destroy any good software project. But if new folks can not understand what you wrote in 10-15 minutes, it is not good. It’s not about the performance, etc. It’s about readability.</p>
+<p>In general, we follow <span class="target" id="index-0"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0008"><strong>PEP 0008</strong></a>.
+We recommend reading it before committing code.</p>
+<p>There are some exceptions: sometimes it does not make sense to check for every PEP8 error (such as whitespace indentation when you want to make a dict=() assignment
+look pretty. Therefore, we do have some exceptions defined in the <cite>setup.cfg</cite> file.</p>
+<p>We support Python 3 only.</p>
+<div class="section" id="unicode">
+<h4><a class="toc-backref" href="#id20">Unicode</a><a class="headerlink" href="#unicode" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Each internal object in IntelMQ (Event, Report, etc) that has strings, their strings MUST be in UTF-8 Unicode format.</p></li>
+<li><p>Any data received from external sources MUST be transformed into UTF-8 Unicode format before add it to IntelMQ objects.</p></li>
+</ul>
+</div>
+<div class="section" id="back-end-independence-and-compatibility">
+<h4><a class="toc-backref" href="#id21">Back-end independence and Compatibility</a><a class="headerlink" href="#back-end-independence-and-compatibility" title="Permalink to this headline">¶</a></h4>
+<p>Any component of the IntelMQ MUST be independent of the message queue technology (Redis, RabbitMQ, etc…).</p>
+</div>
+</div>
+<div class="section" id="layout-rules">
+<h3><a class="toc-backref" href="#id22">Layout Rules</a><a class="headerlink" href="#layout-rules" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>intelmq/
+  lib/
+    bot.py
+    cache.py
+    message.py
+    pipeline.py
+    utils.py
+  bots/
+    collector/
+      &lt;bot name&gt;/
+            collector.py
+    parser/
+      &lt;bot name&gt;/
+            parser.py
+    expert/
+      &lt;bot name&gt;/
+            expert.py
+    output/
+      &lt;bot name&gt;/
+            output.py
+    BOTS
+  /conf
+    pipeline.conf
+    runtime.conf
+    defaults.conf
+</pre></div>
+</div>
+<p>Assuming you want to create a bot for a new ‘Abuse.ch’ feed. It turns out that here it is necessary to create different parsers for the respective kind of events (e.g. malicious URLs). Therefore, the usual hierarchy ‘intelmq/bots/parser/&lt;FEED&gt;/parser.py’ would not be suitable because it is necessary to have more parsers for each Abuse.ch Feed. The solution is to use the same hierarchy with an additional “description” in the file name, separated by underscore. Also see the section <em>Directories and Files naming</em>.</p>
+<p>Example (including the current ones):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">abusech</span><span class="o">/</span><span class="n">parser_domain</span><span class="o">.</span><span class="n">py</span>
+<span class="o">/</span><span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">abusech</span><span class="o">/</span><span class="n">parser_ip</span><span class="o">.</span><span class="n">py</span>
+<span class="o">/</span><span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">abusech</span><span class="o">/</span><span class="n">parser_ransomware</span><span class="o">.</span><span class="n">py</span>
+
+<span class="o">/</span><span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">abusech</span><span class="o">/</span><span class="n">parser_malicious_url</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="section" id="documentation">
+<h4><a class="toc-backref" href="#id23">Documentation</a><a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h4>
+<p>Please document your added/modified code.</p>
+<p>For doc strings, we are using the <a class="reference external" href="http://www.sphinx-doc.org/en/stable/ext/napoleon.html#type-annotations">sphinx-napoleon-google-type-annotation</a>.</p>
+<p>Additionally, Python’s type hints/annotations are used, see <span class="target" id="index-1"></span><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0484"><strong>PEP 484</strong></a>.</p>
+</div>
+<div class="section" id="directories-hierarchy-on-default-installation">
+<h4><a class="toc-backref" href="#id24">Directories Hierarchy on Default Installation</a><a class="headerlink" href="#directories-hierarchy-on-default-installation" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Configuration Files Path: <cite>/opt/intelmq/etc/</cite></p></li>
+<li><p>PID Files Path: <cite>/opt/intelmq/var/run/</cite></p></li>
+<li><p>Logs Files and dumps Path: <cite>/opt/intelmq/var/log/</cite></p></li>
+<li><p>Additional Bot Files Path, e.g. templates or databases: <cite>/opt/intelmq/var/lib/bots/[bot-name]/</cite></p></li>
+</ul>
+</div>
+<div class="section" id="directories-and-files-naming">
+<h4><a class="toc-backref" href="#id25">Directories and Files naming</a><a class="headerlink" href="#directories-and-files-naming" title="Permalink to this headline">¶</a></h4>
+<p>Any directory and file of IntelMQ has to follow the Directories and Files naming. Any file name or folder name has to
+* be represented with lowercase and in case of the name has multiple words, the spaces between them must be removed or replaced by underscores;
+* be self-explaining what the content contains.</p>
+<p>In the bot directories name, the name must correspond to the feed provider. If necessary and applicable the feed name can and should be used as postfix for the filename.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">malwaredomainlist</span><span class="o">/</span><span class="n">parser</span><span class="o">.</span><span class="n">py</span>
+<span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">taichung</span><span class="o">/</span><span class="n">parser</span><span class="o">.</span><span class="n">py</span>
+<span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">cymru</span><span class="o">/</span><span class="n">parser_full_bogons</span><span class="o">.</span><span class="n">py</span>
+<span class="n">intelmq</span><span class="o">/</span><span class="n">bots</span><span class="o">/</span><span class="n">parser</span><span class="o">/</span><span class="n">abusech</span><span class="o">/</span><span class="n">parser_ransomware</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-names">
+<h4><a class="toc-backref" href="#id26">Class Names</a><a class="headerlink" href="#class-names" title="Permalink to this headline">¶</a></h4>
+<p>Class name of the bot (ex: PhishTank Parser) must correspond to the type of the bot (ex: Parser) e.g. <cite>PhishTankParserBot</cite></p>
+</div>
+</div>
+<div class="section" id="data-harmonization-rules">
+<h3><a class="toc-backref" href="#id27">Data Harmonization Rules</a><a class="headerlink" href="#data-harmonization-rules" title="Permalink to this headline">¶</a></h3>
+<p>Any component of IntelMQ MUST respect the “Data Harmonization Ontology”.</p>
+<p><strong>Reference:</strong> IntelMQ Data Harmonization - <a class="reference internal" href="data-harmonization.html"><span class="doc">Data Harmonization</span></a></p>
+</div>
+<div class="section" id="code-submission-rules">
+<h3><a class="toc-backref" href="#id28">Code Submission Rules</a><a class="headerlink" href="#code-submission-rules" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="releases-repositories-and-branches">
+<h4><a class="toc-backref" href="#id29">Releases, Repositories and Branches</a><a class="headerlink" href="#releases-repositories-and-branches" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><p>The main repository is in <a class="reference external" href="https://github.com/certtools/intelmq">github.com/certtools/intelmq</a>.</p></li>
+<li><p>There are a couple of forks which might be regularly merged into the main repository. They are independent and can have incompatible changes and can deviate from the upstream repository.</p></li>
+<li><p>We use <a class="reference external" href="http://semver.org/">semantic versioning</a>. A short summary:
+* a.x are stable releases
+* a.b.x are bugfix/patch releases
+* a.x must be compatible to version a.0 (i.e. API/Config-compatibility)</p></li>
+<li><p>If you contribute something, please fork the repository, create a separate branch and use this for pull requests, see section below.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="branching-model">
+<h4><a class="toc-backref" href="#id30">Branching model</a><a class="headerlink" href="#branching-model" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><p>“master” is the stable branch. It hold the latest stable release. Non-developers should only work on this branch. The recommended log level is WARNING. Code is only added by merges from the maintenance branches.</p></li>
+<li><p>“maintenance/a.b.x” branches accumulate (cherry-picked) patches for a maintenance release (a.b.x). Recommended for experienced users which deploy intelmq themselves. No new features will be added to these branches.</p></li>
+<li><p>“develop” is the development branch for the next stable release (a.x). New features must go there. Developers may want to work on this branch. This branch also holds all patches from maintenance releases if applicable. The recommended log level is DEBUG.</p></li>
+<li><p>Separate branches to develop features or bug fixes may be used by any contributor.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="how-to-contribute">
+<h4><a class="toc-backref" href="#id31">How to Contribute</a><a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><p>Make separate pull requests / branches on GitHub for changes. This allows us to discuss things via GitHub.</p></li>
+<li><p>We prefer one  Pull Request per feature or change. If you have a bunch of small fixes, please don’t create one RP per fix :)</p></li>
+<li><p>Only very small and changes (docs, …) might be committed directly to development branches without Pull Request by the <a class="reference external" href="https://github.com/orgs/certtools/teams/core">core-team</a>.</p></li>
+<li><p>Keep the balance between atomic commits and keeping the amount of commits per PR small. You can use interactive rebasing to squash multiple small commits into one (<cite>rebase -i [base-branch]</cite>). Only do rebasing if the code you are rebasing is yet not used by others or is already merged - because then others may need to run into conflicts.</p></li>
+<li><p>Make sure your PR is merge able in the develop branch and all tests are successful.</p></li>
+<li><p>If possible <a class="reference external" href="https://help.github.com/articles/signing-commits-using-gpg/">sign your commits with GPG</a>.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="workflow">
+<h4><a class="toc-backref" href="#id32">Workflow</a><a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h4>
+<p>We assume here, that origin is your own fork. We first add the upstream repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git remote add upstream https://github.com/certtools/intelmq.git
+</pre></div>
+</div>
+<p>Syncing develop:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout develop
+&gt; git pull upstream develop
+&gt; git push origin develop
+</pre></div>
+</div>
+<p>You can do the same with the branches <cite>master</cite> and <cite>maintenance</cite>.</p>
+<p>Create a separate feature-branch to work on, sync develop with upstream. Create working branch from develop:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout develop
+&gt; git checkout -b bugfix
+<span class="c1"># your work</span>
+&gt; git commit
+</pre></div>
+</div>
+<p>Or, for bugfixes create a separate bugfix-branch to work on, sync maintenance with upstream. Create working branch from maintenance:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout maintenance
+&gt; git checkout -b new-feature
+<span class="c1"># your work</span>
+&gt; git commit
+</pre></div>
+</div>
+<p>Getting upstream’s changes for master or any other branch:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout develop
+&gt; git pull upstream develop
+&gt; git push origin develop
+</pre></div>
+</div>
+<p>There are 2 possibilities to get upstream’s commits into your branch. Rebasing and Merging. Using rebasing, your history is rewritten, putting your changes on top of all other commits. You can use this if your changes are not published yet (or only in your fork).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout bugfix
+&gt; git rebase develop
+</pre></div>
+</div>
+<p>Using the <cite>-i</cite> flag for rebase enables interactive rebasing. You can then remove, reorder and squash commits, rewrite commit messages, beginning with the given branch, e.g. develop.</p>
+<p>Or using merging. This doesn’t break the history. It’s considered more , but also pollutes the history with merge commits.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt; git checkout bugfix
+&gt; git merge develop
+</pre></div>
+</div>
+<p>You can then create a PR with your branch <cite>bugfix</cite> to our upstream repository, using GitHub’s web interface.</p>
+</div>
+<div class="section" id="commit-messages">
+<h4><a class="toc-backref" href="#id33">Commit Messages</a><a class="headerlink" href="#commit-messages" title="Permalink to this headline">¶</a></h4>
+<p>If it fixes an existing issue, please use GitHub syntax, e.g.: <cite>fixes certtools/intelmq#&lt;IssueID&gt;</cite></p>
+</div>
+<div class="section" id="prepare-for-discussion-in-github">
+<h4><a class="toc-backref" href="#id34">Prepare for Discussion in GitHub</a><a class="headerlink" href="#prepare-for-discussion-in-github" title="Permalink to this headline">¶</a></h4>
+<p>If we don’t discuss it, it’s probably not tested.</p>
+</div>
+</div>
+<div class="section" id="license-and-author-files">
+<h3><a class="toc-backref" href="#id35">License and Author files</a><a class="headerlink" href="#license-and-author-files" title="Permalink to this headline">¶</a></h3>
+<p>License and Authors files can be found at the root of repository.</p>
+<ul class="simple">
+<li><p>License file <strong>MUST NOT</strong> be modified except by the explicit written permission by CNCS/CERT.PT or CERT.at</p></li>
+<li><p>Credit to the authors file must be always retained. When a new contributor (person and/or organization) improves in some way the repository content (code or documentation), he or she might add his name to the list of contributors.</p></li>
+</ul>
+<p>License and authors must be only listed in an external file but not inside the code files.</p>
+</div>
+</div>
+<div class="section" id="system-overview">
+<h2><a class="toc-backref" href="#id36">System Overview</a><a class="headerlink" href="#system-overview" title="Permalink to this headline">¶</a></h2>
+<p>In the <cite>intelmq/lib/</cite> directory you can find some libraries:</p>
+<ul class="simple">
+<li><p>Bots: Defines base structure for bots and handling of startup, stop, messages etc.</p></li>
+<li><p>Cache: For some expert bots it does make sense to cache external lookup results. Redis is used here.</p></li>
+<li><p>Harmonization: For defined types, checks and sanitation methods are implemented.</p></li>
+<li><p>Message: Defines Events and Reports classes, uses harmonization to check validity of keys and values according to config.</p></li>
+<li><p>Pipeline: Writes messages to message queues. Implemented for productions use is only Redis, AMQP is beta.</p></li>
+<li><p>Test: Base class for bot tests with predefined test and assert methods.</p></li>
+<li><p>Utils: Utility functions used by system components.</p></li>
+</ul>
+<div class="section" id="code-architecture">
+<h3><a class="toc-backref" href="#id37">Code Architecture</a><a class="headerlink" href="#code-architecture" title="Permalink to this headline">¶</a></h3>
+<img alt="Code Architecture" src="../_images/intelmq-arch-schema.png" />
+</div>
+<div class="section" id="pipeline">
+<h3><a class="toc-backref" href="#id38">Pipeline</a><a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>collector bot</p></li>
+<li><p><strong>TBD</strong></p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="bot-developer-guide">
+<h2><a class="toc-backref" href="#id39">Bot Developer Guide</a><a class="headerlink" href="#bot-developer-guide" title="Permalink to this headline">¶</a></h2>
+<p>There’s a dummy bot including tests at <cite>intelmq/tests/lib/test_parser_bot.py</cite>.</p>
+<p>You can always start any bot directly from command line by calling the executable.
+The executable will be created during installation a directory for binaries. After adding new bots to the code, install IntelMQ to get the files created.
+Don’t forget to give an bot id as first argument. Also, running bots with other users than <cite>intelmq</cite> will raise permission errors.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo -i intelmq
+$ intelmqctl run file-output  <span class="c1"># if configured</span>
+$ intelmq.bots.outputs.file.output file-output
+</pre></div>
+</div>
+<p>You will get all logging outputs directly on stderr as well as in the log file.</p>
+<div class="section" id="template">
+<h3><a class="toc-backref" href="#id40">Template</a><a class="headerlink" href="#template" title="Permalink to this headline">¶</a></h3>
+<p>Please adjust the doc strings accordingly and remove the in-line comments (<cite>#</cite>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Parse data from example.com, be a nice ExampleParserBot.</span>
+
+<span class="sd">Document possible necessary configurations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c1"># imports for additional libraries and intelmq</span>
+<span class="kn">from</span> <span class="nn">intelmq.lib.bot</span> <span class="kn">import</span> <span class="n">Bot</span>
+
+
+<span class="k">class</span> <span class="nc">ExampleParserBot</span><span class="p">(</span><span class="n">Bot</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">receive_message</span><span class="p">()</span>
+
+        <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_event</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>  <span class="c1"># copies feed.name, time.observation</span>
+        <span class="o">...</span> <span class="c1"># implement the logic here</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;source.ip&#39;</span><span class="p">,</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">)</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;extra&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;os.name&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux&quot;</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acknowledge_message</span><span class="p">()</span>
+
+
+<span class="n">BOT</span> <span class="o">=</span> <span class="n">ExampleParserBot</span>
+</pre></div>
+</div>
+<p>There are some names with special meaning. These can be used i.e. called:</p>
+<ul class="simple">
+<li><p><cite>stop</cite>: Shuts the bot down.</p></li>
+<li><p><cite>receive_message</cite>, <cite>send_message</cite>, <cite>acknowledge_message</cite>: see next section</p></li>
+<li><p><cite>parameters</cite>: the bots configuration as object</p></li>
+<li><p><cite>start</cite>: internal method to run the bot</p></li>
+</ul>
+<p>These can be defined:</p>
+<ul class="simple">
+<li><p><cite>init</cite>: called at startup, use it to set up the bot (initializing classes, loading files etc)</p></li>
+<li><p><cite>process</cite>: processes the messages</p></li>
+<li><p><cite>shutdown</cite>: To Gracefully stop the bot, e.g. terminate connections</p></li>
+</ul>
+<p>All other names can be used freely.</p>
+</div>
+<div class="section" id="pipeline-interactions">
+<h3><a class="toc-backref" href="#id41">Pipeline interactions</a><a class="headerlink" href="#pipeline-interactions" title="Permalink to this headline">¶</a></h3>
+<p>We can call three methods related to the pipeline:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>self.receive_message()</cite>: The pipeline handler pops one message from the internal queue if possible. Otherwise one message from the sources list is popped, and added it to an internal queue. In case of errors in process handling, the message can still be found in the internal queue and is not lost. The bot class unravels the message a creates an instance of the Event or Report class.</p></li>
+<li><p><cite>self.send_message(event, path=”_default”)</cite>: Processed message is sent to destination queues. It is possible to change the destination queues by optional <cite>path</cite> parameter.</p></li>
+<li><p><cite>self.acknowledge_message()</cite>: Message formerly received by <cite>receive_message</cite> is removed from the internal queue. This should always be done after processing and after the sending of the new message. In case of errors, this function is not called and the message will stay in the internal queue waiting to be processed again.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="logging">
+<h3><a class="toc-backref" href="#id42">Logging</a><a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="log-messages-format">
+<h4><a class="toc-backref" href="#id43">Log Messages Format</a><a class="headerlink" href="#log-messages-format" title="Permalink to this headline">¶</a></h4>
+<p>Log messages have to be clear and well formatted. The format is the following:</p>
+<p>Format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">timestamp</span><span class="o">&gt;</span> <span class="o">-</span> <span class="o">&lt;</span><span class="n">bot</span> <span class="nb">id</span><span class="o">&gt;</span> <span class="o">-</span> <span class="o">&lt;</span><span class="n">log</span> <span class="n">level</span><span class="o">&gt;</span> <span class="o">-</span> <span class="o">&lt;</span><span class="n">log</span> <span class="n">message</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Rules:
+* the Log message MUST follow the common rules of a sentence, beginning with uppercase and ending with period.
+* the sentence MUST describe the problem or has useful information to give to an inexperienced user a context. Pure stack traces without any further explanation are not helpful.</p>
+<p>When the logger instance is created, the bot id must be given as parameter anyway. The function call defines the log level, see below.</p>
+</div>
+<div class="section" id="log-levels">
+<h4><a class="toc-backref" href="#id44">Log Levels</a><a class="headerlink" href="#log-levels" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p><em>debug</em>: Debugging information includes retrieved and sent messages, detailed status information. Can include sensitive information like passwords and amount can be huge.</p></li>
+<li><p><em>info</em>: Logs include loaded databases, fetched reports or waiting messages.</p></li>
+<li><p><em>warning</em>: Unexpected, but handled behavior.</p></li>
+<li><p><em>error</em>: Errors and Exceptions.</p></li>
+<li><p><em>critical</em> Program is failing.</p></li>
+</ul>
+</div>
+<div class="section" id="what-to-log">
+<h4><a class="toc-backref" href="#id45">What to Log</a><a class="headerlink" href="#what-to-log" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Try to keep a balance between obscuring the source code file with hundreds of log messages and having too little log messages.</p></li>
+<li><p>In general, a bot MUST report error conditions.</p></li>
+</ul>
+</div>
+<div class="section" id="how-to-log">
+<h4><a class="toc-backref" href="#id46">How to Log</a><a class="headerlink" href="#how-to-log" title="Permalink to this headline">¶</a></h4>
+<p>The Bot class creates a logger with that should be used by bots. Other components won’t log anyway currently. Examples:</p>
+<p>The <cite>exception</cite> method automatically appends an exception traceback. The logger instance writes by default to the file <cite>/opt/intelmq/var/log/[bot-id].log</cite> and to stderr.</p>
+<div class="section" id="string-formatting-in-logs">
+<h5><a class="toc-backref" href="#id47">String formatting in Logs</a><a class="headerlink" href="#string-formatting-in-logs" title="Permalink to this headline">¶</a></h5>
+<p>Parameters for string formatting are better passed as argument to the log function, see <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger.debug">https://docs.python.org/3/library/logging.html#logging.Logger.debug</a>
+In case of formatting problems, the error messages will be better. For example:</p>
+</div>
+</div>
+</div>
+<div class="section" id="error-handling">
+<h3><a class="toc-backref" href="#id48">Error handling</a><a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<p>The bot class itself has error handling implemented. The bot itself is allowed to throw exceptions and <strong>intended to fail</strong>! The bot should fail in case of malicious messages, and in case of unavailable but necessary resources. The bot class handles the exception and will restart until the maximum number of tries is reached and fail then. Additionally, the message in question is dumped to the file <cite>/opt/intelmq/var/log/[bot-id].dump</cite> and removed from the queue.</p>
+</div>
+<div class="section" id="initialization">
+<h3><a class="toc-backref" href="#id49">Initialization</a><a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<p>Maybe it is necessary so setup a Cache instance or load a file into memory. Use the <cite>init</cite> function for this purpose:</p>
+</div>
+<div class="section" id="custom-configuration-checks">
+<h3><a class="toc-backref" href="#id50">Custom configuration checks</a><a class="headerlink" href="#custom-configuration-checks" title="Permalink to this headline">¶</a></h3>
+<p>Every bot can define a static method <cite>check(parameters)</cite> which will be called by <cite>intelmqctl check</cite>.
+For example the check function of the ASNLookupExpert:</p>
+</div>
+<div class="section" id="examples">
+<h3><a class="toc-backref" href="#id51">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Check <a class="reference external" href="https://github.com/certtools/intelmq/tree/develop/intelmq/bots/experts">Expert Bots</a></p></li>
+<li><p>Check <a class="reference external" href="https://github.com/certtools/intelmq/tree/develop/intelmq/bots/parsers">Parser Bots</a></p></li>
+</ul>
+</div>
+<div class="section" id="parsers">
+<h3><a class="toc-backref" href="#id52">Parsers</a><a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h3>
+<p>Parsers can use a different, specialized Bot-class. It allows to work on individual elements of a report, splitting the functionality of the parser into multiple functions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>process</cite>: getting and sending data, handling of failures etc.</p></li>
+<li><p><cite>parse</cite>: Parses the report and splits it into single elements (e.g. lines). Can be overridden.</p></li>
+<li><p><cite>parse_line</cite>: Parses elements, returns an Event. Can be overridden.</p></li>
+<li><p><cite>recover_line</cite>: In case of failures and for the field <cite>raw</cite>, this function recovers a fully functional report containing only one element. Can be overridden.</p></li>
+</ul>
+</div></blockquote>
+<p>For common cases, like CSV, existing function can be used, reducing the amount of code to implement. In the best case, only <cite>parse_line</cite> needs to be coded, as only this part interprets the data.</p>
+<p>You can have a look at the implementation <cite>intelmq/lib/bot.py</cite> or at examples, e.g. the DummyBot in <cite>intelmq/tests/lib/test_parser_bot.py</cite>. This is a stub for creating a new Parser, showing the parameters and possible code:</p>
+<div class="section" id="parse-line">
+<h4><a class="toc-backref" href="#id53">parse_line</a><a class="headerlink" href="#parse-line" title="Permalink to this headline">¶</a></h4>
+<p>One line can lead to multiple events, thus <cite>parse_line</cite> can’t just return one Event. Thus, this function is a generator, which allows to easily return multiple values. Use <cite>yield event</cite> for valid Events and <cite>return</cite> in case of a void result (not parseable line, invalid data etc.).</p>
+</div>
+</div>
+<div class="section" id="tests">
+<h3><a class="toc-backref" href="#id54">Tests</a><a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h3>
+<p>In order to do automated tests on the bot, it is necessary to write tests including sample data. Have a look at some existing tests:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The DummyParserBot in <cite>intelmq/tests/lib/test_parser_bot.py</cite>. This test has the example data (report and event) inside the file, defined as dictionary.</p></li>
+<li><p>The parser for malwaregroup at <cite>intelmq/tests/bots/parsers/malwaregroup/test_parser_*.py</cite>. The latter loads a sample HTML file from the same directory, which is the raw report.</p></li>
+<li><p>The test for ASNLookupExpertBot has two event tests, one is an expected fail (IPv6).</p></li>
+</ul>
+</div></blockquote>
+<p>Ideally an example contains not only the ideal case which should succeed, but also a case where should fail instead. (TODO: Implement assertEventNotEqual or assertEventNotcontainsSubset or similar)
+Most existing bots are only tested with one message. For newly written test it is appreciable to have tests including more then one message, e.g. a parser fed with an report consisting of multiple events.</p>
+<p>When calling the file directly, only the tests in this file for the bot will be expected. Some default tests are always executed (via the <cite>test.BotTestCase</cite> class), such as pipeline and message checks, logging, bot naming or empty message handling.</p>
+<p>See the <a class="reference internal" href="#id4"><span class="std std-ref">Testing Pre-releases</span></a> section about how to run the tests.</p>
+</div>
+<div class="section" id="configuration">
+<h3><a class="toc-backref" href="#id55">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>In the end, the new information about the new bot should be added to BOTS file
+located at <cite>intelmq/bots</cite>. Note that the file is sorted!</p>
+</div>
+<div class="section" id="cache">
+<h3><a class="toc-backref" href="#id56">Cache</a><a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h3>
+<p>Bots can use a Redis database as cache instance. Use the <cite>intelmq.lib.utils.Cache</cite> class to set this up and/or look at existing bots, like the <cite>cymru_whois</cite> expert how the cache can be used.
+Bots must set a TTL for all keys that are cached to avoid caches growing endless over time.
+Bots must use the Redis databases <cite>&gt;=</cite> 10, but not those already used by other bots. See <cite>bots/BOTS</cite> what databases are already used.</p>
+<dl class="simple">
+<dt>The databases <cite>&lt;</cite> 10 are reserved for the IntelMQ core:</dt><dd><ul class="simple">
+<li><p>2: pipeline</p></li>
+<li><p>3: statistics</p></li>
+<li><p>4: tests</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="id2">
+<h2><a class="toc-backref" href="#id57">Documentation</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>The documentation is automatically published to <a class="reference external" href="https://intelmq.readthedocs.io/">https://intelmq.readthedocs.io/</a> at every push to the repository.</p>
+<p>To build the documentation you need three packages:
+- Sphinx
+- ReCommonMark
+- <cite>sphinx-markdown-tables</cite></p>
+<p>To install them, you can use pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3 install -r docs/requirements.txt
+</pre></div>
+</div>
+<p>Then use the Makefile to build the documentation using Sphinx:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> docs
+make html
+</pre></div>
+</div>
+<div class="section" id="feeds-documentation">
+<span id="id3"></span><h3><a class="toc-backref" href="#id58">Feeds documentation</a><a class="headerlink" href="#feeds-documentation" title="Permalink to this headline">¶</a></h3>
+<p>The feeds which are known to be working with IntelMQ are documented in the machine-readable file <cite>intelmq/etc/feeds.yaml</cite>. The human-readable documentation is in generated with the Sphinx build as described in the previous section.</p>
+</div>
+</div>
+<div class="section" id="testing-pre-releases">
+<span id="id4"></span><h2><a class="toc-backref" href="#id59">Testing Pre-releases</a><a class="headerlink" href="#testing-pre-releases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id60">Installation</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../user/installation.html"><span class="doc">installation procedures</span></a> need to be adapted only a little bit.</p>
+<p>For native packages, you can find the unstable packages of the next version here: <a class="reference external" href="https://software.opensuse.org/download.html?project=home%3Asebix%3Aintelmq%3Aunstable&amp;package=intelmq">Installation Unstable Native Packages</a>.</p>
+<p>For the installation with pip, use the <cite>–pre</cite> parameter as shown here following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3 install --pre intelmq
+</pre></div>
+</div>
+<p>All other steps are not different. Please report any issues you find in our <a class="reference external" href="https://github.com/certtools/intelmq/issues/new">Issue Tracker</a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/Logo_Intel_MQ.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">IntelMQ is a solution for IT security teams for collecting and processing security feeds using a message queuing protocol.</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=certtools&repo=intelmq&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/upgrade.html">Upgrade instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/configuration-management.html">Configuration and Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/bots.html">Bots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmqctl.html">intelmqctl documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/feeds.html">Feeds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/FAQ.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-api.html">Intelmq Api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/intelmq-manager.html">IntelMQ Manager</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-harmonization.html">Data Harmonization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-fields.html">Harmonization field names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-procedure.html">Release procedure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feeds-wishlist.html">Feeds wishlist</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../user/intelmq-manager.html" title="previous chapter">IntelMQ Manager</a></li>
+      <li>Next: <a href="data-harmonization.html" title="next chapter">Data Harmonization</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, cert.at.
+      
+      |
+      <a href="../_sources/dev/guide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
