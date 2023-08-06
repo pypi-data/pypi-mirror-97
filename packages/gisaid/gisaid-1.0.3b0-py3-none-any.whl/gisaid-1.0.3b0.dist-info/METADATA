@@ -1,0 +1,55 @@
+Metadata-Version: 2.1
+Name: gisaid
+Version: 1.0.3b0
+Summary: Simplified & efficient GISAID interactions.
+Home-page: https://github.com/greysonlalonde/gisaid-uploader
+Author: Greyson R. LaLonde
+Author-email: greyson.r.lalonde@wmich.edu
+License: MIT
+Download-URL: https://github.com/greysonlalonde/gisaid-uploader/archive/1.0.3b0.tar.gz
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: biopython
+Requires-Dist: requests
+
+# gisaid-uploader
+ Simplified uploads to GISAID
+
+1. Register for a [GISAID](https://www.gisaid.org/registration/register/) account
+
+2. Email GISAID & request a client ID
+
+Authenticate once: 
+
+```python
+    >>> import gisaid as gs
+    >>> gs.GiSaid(authenticate=True, client_id='foo',
+    >>>              username='bar', password='foobar', filename='authfile.json')
+    "Authentication successful"
+```
+
+
+CSV + fasta file:
+
+```python
+    >>> import gisaid as gs
+    >>> files = ["upload.csv", "fasta.fa"]
+    >>> x = gs.GiSaid(files)
+    >>> x.upload()
+    "Upload successful"
+```
+
+
+Collated CSV:
+
+```python
+    >>> import gisaid as gs
+    >>> files = ["collated", "upload.csv"]
+    >>> x = gs.GiSaid(files)
+    >>> x.upload()
+    "Upload successful"
+```
+
+
