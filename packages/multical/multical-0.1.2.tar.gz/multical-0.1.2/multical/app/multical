@@ -1,0 +1,27 @@
+#!python
+
+from multical.app import arguments
+
+from multical.app.calibrate import calibrate
+from multical.app.check_boards import show_boards
+from multical.app.show_result import show_result
+
+def main():
+  parser = arguments.parser()
+  args = parser.parse_args()
+
+  if 'which' not in args:
+    parser.print_help()
+  elif args.which == "calibrate":
+    calibrate(args)
+  elif args.which == "show_boards":
+    show_boards(args)
+  elif args.which == "show_result":
+    show_result(args)
+  else:
+    assert False, f"unknown command {args.which}"
+
+
+
+if __name__ == "__main__":
+  main()
