@@ -1,0 +1,208 @@
+Metadata-Version: 2.1
+Name: apicast
+Version: 0.8.1
+Summary: Python client and HTTP service to access bee flight forecast information published by Deutscher Wetterdienst (DWD), the federal meteorological service in Germany.
+Home-page: https://github.com/hiveeyes/apicast
+Author: Andreas Motl
+Author-email: andreas@hiveeyes.org
+License: AGPL 3, EUPL 1.2
+Description: #######
+        Apicast
+        #######
+        
+        .. image:: https://github.com/hiveeyes/apicast/workflows/Tests/badge.svg
+            :target: https://github.com/hiveeyes/apicast/actions?workflow=Tests
+        
+        .. image:: https://img.shields.io/pypi/pyversions/apicast.svg
+            :target: https://python.org
+        
+        .. image:: https://img.shields.io/pypi/v/apicast.svg
+            :target: https://pypi.org/project/apicast/
+        
+        .. image:: https://img.shields.io/pypi/status/apicast.svg
+            :target: https://pypi.org/project/apicast/
+        
+        .. image:: https://img.shields.io/pypi/l/apicast.svg
+            :target: https://pypi.org/project/apicast/
+        
+        .. image:: https://img.shields.io/pypi/dm/apicast.svg
+            :target: https://pypi.org/project/apicast/
+        
+        
+        *****
+        About
+        *****
+        
+        Apicast acquires bee flight forecast information published by Deutscher Wetterdienst (DWD).
+        
+        - **Live API**: http://apicast.hiveeyes.org/
+        - **Development**: https://community.hiveeyes.org/t/dwd-prognose-bienenflug/787
+        
+        
+        *****
+        Setup
+        *****
+        
+        CLI version::
+        
+            pip install apicast
+        
+        HTTP API::
+        
+            pip install apicast[service]
+        
+        
+        ********
+        Synopsis
+        ********
+        
+        Display list of states and sites::
+        
+            apicast beeflight stations
+        
+        Display list of location slugs::
+        
+            apicast beeflight stations --slugs
+        
+        Acquire information for given location slug ``brandenburg/potsdam``::
+        
+            apicast beeflight forecast --station=brandenburg/potsdam
+        
+        Acquire information for given location slug ``brandenburg/potsdam``, output as table in Markdown format::
+        
+            apicast beeflight forecast --station=brandenburg/potsdam --format=table-markdown
+        
+        Output as table in JSON machine readable format::
+        
+            apicast beeflight forecast --station=brandenburg/potsdam --format=json-machine
+        
+        
+        
+        ********
+        HTTP API
+        ********
+        
+        Start HTTP API service::
+        
+            apicast service
+        
+        Start HTTP service with dynamic code reloading::
+        
+            apicast service --reload
+        
+        Then navigate to::
+        
+            open http://localhost:24640/
+        
+        
+        
+        *******
+        Example
+        *******
+        
+        ::
+        
+            apicast beeflight forecast --station=brandenburg/potsdam
+        
+        ::
+        
+            [
+                {
+                    "Datum": "Mo 01.06.",
+                    "morgens": "stark",
+                    "mittags": "intensiv",
+                    "abends": "stark"
+                },
+                {
+                    "Datum": "Di 02.06.",
+                    "morgens": "stark",
+                    "mittags": "intensiv",
+                    "abends": "intensiv"
+                },
+                {
+                    "Datum": "Mi 03.06.",
+                    "morgens": "intensiv",
+                    "mittags": "intensiv",
+                    "abends": "intensiv"
+                }
+            ]
+        
+        
+        *****
+        Tests
+        *****
+        
+        ::
+        
+            make test
+        
+        
+        ********************
+        Content attributions
+        ********************
+        
+        The copyright of data, particular images and pictograms are held by their respective owners, unless otherwise noted.
+        
+        Data
+        ====
+        
+        - **Source**:
+        
+          - https://www.dwd.de/DE/leistungen/biene_flug/bienenflug.html
+          - https://www.dwd.de/DE/fachnutzer/freizeitgaertner/1_gartenwetter/_node.html
+        
+        - **Documentation**:
+        
+          - https://www.dwd.de/DE/fachnutzer/freizeitgaertner/dokumentation/gw_bienenflug
+          - https://www.dwd.de/DE/fachnutzer/freizeitgaertner/dokumentation/gw_bienenflug.pdf?__blob=publicationFile
+        
+        - **Data copyright**: © Deutscher Wetterdienst (DWD), Agricultural Meteorology Department
+        
+        
+        Logo picture
+        ============
+        
+        - **Description**:     	A bee swarm on an oak tree in Plymouth, UK
+        - **Date**:    	        21 June 2009
+        - **Source**: 	        Own work
+        - **Author**: 	        Nilfanion
+        - **Camera location**:	50° 24′ 38.3″ N, 4° 09′ 28.2″ W
+        - **License**:          Creative Commons Attribution-Share Alike 3.0 Unported
+        - **URL**:              https://commons.wikimedia.org/wiki/File:Bee_swarm_in_Plymouth.jpg
+        
+Keywords: honey bee apis mellifera flight forecast information dwd cdc deutscher wetterdienst climate data center weather opendata data acquisition transformation export geospatial temporal timeseries sensor network observation http rest api json markdown
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Communications
+Classifier: Topic :: Database
+Classifier: Topic :: Internet
+Classifier: Topic :: Scientific/Engineering :: Atmospheric Science
+Classifier: Topic :: Scientific/Engineering :: GIS
+Classifier: Topic :: Scientific/Engineering :: Human Machine Interfaces
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Archiving
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Utilities
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Provides-Extra: service
