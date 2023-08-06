@@ -1,0 +1,7 @@
+__author__ = "Jia Jia"
+__author_email__ = "angersax@sina.com"
+__description__ = "Lint AOSP"
+__license__ = "Apache-2.0"
+__title__ = "lintaosp"
+__url__ = "https://github.com/craftslab/lintaosp"
+__version__ = "1.0.2"
