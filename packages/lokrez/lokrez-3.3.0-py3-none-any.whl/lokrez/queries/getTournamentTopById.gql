@@ -1,0 +1,75 @@
+query getTournamentTopBySlug($id:ID,$top:Int)
+{
+    tournament(id:$id)
+    {
+        id
+        slug
+        name
+        startAt
+        venueAddress
+        venueName
+        city
+        countryCode
+        hashtag
+        events
+        {
+            name
+            numEntrants
+            videogame
+            {
+                id
+                name
+            }
+
+            standings(
+                query:
+                {
+                    perPage: $top
+                    page: 1
+                }
+            )
+            {
+                pageInfo
+                {
+                    total
+                }
+
+                nodes
+                {
+                    placement
+                    entrant
+                    {
+                        id
+                        participants
+                        {
+                            gamerTag
+                            prefix
+                            player
+                            {
+                                user
+                                {
+                                    authorizations(types: [TWITTER])
+                                    {
+                                        externalUsername
+                                    }
+                                }
+                            }
+                        }
+
+                        seeds
+                        {
+                            phase
+                            {
+                                name
+                                numSeeds
+                            }
+                            groupSeedNum
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
