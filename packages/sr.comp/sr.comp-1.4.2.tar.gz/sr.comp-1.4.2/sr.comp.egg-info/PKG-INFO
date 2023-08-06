@@ -1,0 +1,86 @@
+Metadata-Version: 1.2
+Name: sr.comp
+Version: 1.4.2
+Summary: Student Robotics Competition Software
+Home-page: https://github.com/PeterJCLaw/srcomp.wiki
+Author: Student Robotics Competition Software SIG
+Author-email: srobo-devel@googlegroups.com
+License: UNKNOWN
+Project-URL: Documentation, https://srcomp.readthedocs.org/
+Project-URL: Code, https://github.com/PeterJCLaw/srcomp
+Project-URL: Issue tracker, https://github.com/PeterJCLaw/srcomp/issues
+Description: SRComp
+        ======
+        
+        |Build Status| |Docs Status|
+        
+        Yet Another attempt at some Competition Software for `Student
+        Robotics <http://srobo.org>`__.
+        
+        The `SRComp wiki <https://github.com/PeterJCLaw/srcomp/wiki>`__ provides
+        an overview of the suite as a whole.
+        
+        This repository provides a python API to accessing information about the
+        state of the competition. That *compstate* is stored as a collection of
+        YAML files in a git repository. This allows the state of the competition
+        to be managed in isolation from the software while still providing
+        consistent representations of that state.
+        
+        Usage
+        -----
+        
+        Python clients should install the library using:
+        
+        .. code:: shell
+        
+            pip install sr.comp
+        
+        Only the ``SRComp`` is class directly exposed, and it should be constructed
+        around the path to a local working copy of a *compstate repo*.
+        
+        .. code:: python
+        
+            from srcomp import SRComp
+            comp = SRComp('/path/to/compstate')
+        
+        **Web clients** should look at using the HTTP API provided by
+        `srcomp-http <https://github.com/PeterJCLaw/srcomp-http>`__
+        rather than implementing their own intermediary.
+        
+        There is also a **command line** interface which provides utilities for
+        managing a *compstate repo*:
+        `srcomp-cli <https://github.com/PeterJCLaw/srcomp-cli>`__.
+        
+        See the
+        `dummy-comp <https://github.com/PeterJCLaw/dummy-comp>`__
+        for an example of the structure and values expected in a *compstate
+        repo*.
+        
+        Development
+        -----------
+        
+        **Install**:
+        ``pip install -e .``
+        
+        **Test**:
+        ``./run-tests``
+        
+        .. |Build Status| image:: https://circleci.com/gh/PeterJCLaw/srcomp.svg?style=svg
+           :target: https://circleci.com/gh/PeterJCLaw/srcomp
+        
+        .. |Docs Status| image:: https://readthedocs.org/projects/srcomp/badge/?version=latest
+           :target: http://srcomp.readthedocs.org/
+        
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Software Development :: Libraries
+Requires-Python: >=3.7
