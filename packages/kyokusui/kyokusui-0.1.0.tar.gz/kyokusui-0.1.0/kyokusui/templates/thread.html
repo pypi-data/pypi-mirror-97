@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block main %}
+{% include "components/thread_form.html" %}
+<div class='container'>
+    <div id='messages'>
+        <header class='card mb-3'>
+            <div class='card-body'>
+                <h2 class='card-title'>{{ thread.title }}</h2>
+                {{ lists.userItem(request.user, small=True) }}
+                <div class='card-text d-flex justify-content-end'><small class='text-muted'>{{ thread.created.strftime('%Y-%m-%d %H:%M:%S') }}</small></div>
+            </div>
+        </header>
+        {% for res in thread.res|sort(attribute='datetime') %}
+        <div class='card mb-3' id="{{loop.index}}">
+            <div class='card-body'>
+                <div class='d-flex justify-content-between'>
+                    <div class='card-title d-flex align-items-center'>
+                        <div class='me-2'><strong>#{{loop.index}}</strong></div>
+                        {{ lists.userItem(res.user, small=True) }}
+                    </div>
+                    <div class='card-text'><small class='text-muted'>{{ res.datetime.strftime('%Y-%m-%d %H:%M:%S') }}</small></div>
+                </div>
+                {{ res.parsed_data.message|hiroyuki|markdown }}
+                <div class='image-list'>
+                    {% for image in res.parsed_data.images %}
+                    {% set s = uuid() %}
+                    <div class='image' data-bs-toggle='modal' data-bs-target='#img-{{s}}'>
+                        <img src='{{ image }}' />
+                    </div>
+                    <div id='img-{{s}}' class='modal fade'>
+                        <div class='modal-dialog'>
+                            <div class='modal-content'>
+                                <img src='{{ image }}' style='width: 100%; height: 100%'/>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card mb-5" id="message_form">
+        <div class='card-body'>
+            <div class='mb-3'>
+                <textarea class='form-control' placeholder='メッセージを入力' id='message'></textarea>
+            </div>
+            <div class='d-flex justify-content-between'>
+                <div>
+                    <label class='btn'>
+                        <i class='bi bi-image'></i>
+                        <input type='file' id='image' style='display: none'/>
+                    </label>
+                </div>
+                <div>
+                    <button data-bs-toggle='modal' data-bs-target='#close_thread_modal' class='btn btn-primary'>スレッドを締める</button>
+                    <button class='btn btn-primary' onclick="send_message()">送信</button>
+                </div>
+            </div>
+            <div class='image-list small mt-3' id='image2send'></div>
+        </div>
+    </div>
+    <div class='modal' id='close_thread_modal'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h5 class='modal-title'>スレッドを締めますか？</h5>
+                    <button type='button' class='btn-close'></button>
+                </div>
+                <div class='modal-body'>
+                    <p>スレッドを締めると、以降新たに発言は書き込めなくなります。</p>
+                </div>
+                <div class='modal-footer'>
+                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>キャンセル</button>
+                    <button type='button' class='btn btn-primary' data-bs-dismiss='modal' onclick="close_thread()">締める</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+var counter = {{ thread.res|length }}
+var images = []
+const textarea = document.querySelector("#message")
+const image_form = document.querySelector("#image")
+const image2send = document.querySelector("#image2send")
+const ws = new WebSocket("{{ fullurl(request, "/api/v0/board/" + board._id + "/" + thread._id + "/socket", scheme="ws") }}")
+image_form.onchange = async e => {
+    const files = await Promise.all(Array.from(e.target.files).map(f => {
+        return new Promise((resolve, reject) => {
+            new Compressor(f, {
+                quality: 0.9,
+                maxWidth: 1000,
+                maxHeight: 1000,
+                success(result) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(result);
+                    reader.onloadend = function() {
+                        const image = document.createElement('div');
+                        image.classList.add('image')
+                        image.innerHTML = `<img src='${reader.result}' />`;
+                        image2send.append(image)
+                        resolve(reader.result)
+                    }
+                }
+            })
+        })
+    }));
+    images = images.concat(files)
+    image_form.value = null;
+}
+textarea.onkeyup = e => {
+    if (event.key == 'Enter' && (event.ctrlKey || event.metaKey)) {
+        send_message()
+    }
+}
+ws.onmessage = e => {
+    const received = JSON.parse(e.data)
+    switch(received.type){
+        case "message":
+            const data = received.data
+            if(!document.querySelector("#res-" + received._id)){
+                counter ++;
+                const mesbox = document.createElement("div");
+                mesbox.classList.add("card")
+                mesbox.classList.add("mb-3")
+                mesbox.innerHTML = `
+                    <div class='card-body'>
+                        <div class='d-flex justify-content-between'>
+                            <div class='card-title d-flex align-items-center'>
+                                <div class='me-2'><strong>#${counter}</strong></div>
+                            </div>
+                            <div class='card-text'><small class='text-muted'>${received.datetime}</small></div>
+                        </div>
+                        ${data.message}
+                        <div class='image-list'>` + (Array.from(data.images ? data.images : []).map((image, i) => `
+                            <div class='image' data-bs-toggle='modal' data-bs-target='#img-${received._id}-${i}'>
+                                <img src='${image}' />
+                            </div>
+                            <div id='img-${received._id}-${i}' class='modal fade'>
+                                <div class='modal-dialog'>
+                                    <div class='modal-content'>
+                                        <img src='${image}' style='width: 100%; height: 100%'/>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')) + `
+                        </div>
+                    </div>
+                `;
+                document.querySelector("#messages").append(mesbox)
+            }
+            break;
+        case "close":
+            ws.close();
+            const form = document.querySelector("#message_form");
+            form.parentNode.removeChild(form)
+    }
+}
+function send_message() {
+    if (textarea.value.trim().length == 0 && images.length == 0) return false
+    ws.send(JSON.stringify({
+        "type": "message",
+        "data": {
+            "message": textarea.value.trim(),
+            "images": images
+        }
+    }))
+    textarea.value = ""
+    images = []
+    image2send.innerHTML = ''
+}
+function close_thread() {
+    ws.send(JSON.stringify({
+        "type": "close"
+    }))
+    ws.close()
+    const form = document.querySelector("#message_form");
+    form.parentNode.removeChild(form)
+}
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block main %}
+{% include "components/thread_form.html" %}
+<div class='container'>
+    <div class='d-flex justify-content-between'>
+        <h2>{{ board.name }}</h2>
+        <div>
+            {% if request.user in board.subscribers %}
+            <button class='btn bi bi-bookmark-plus-fill text-primary' onclick='unsubscribe()'></button>
+            {% else %}
+            <button class='btn bi bi-bookmark-plus-fill' onclick='subscribe()'></button>
+            {% endif %}
+            <button class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#thread_form'>スレッドを立てる</button>
+        </div>
+    </div>
+    <div class='list-group mt-4'>
+        {% for thread in board.threads|selectattr('closed', 'false') %}
+        <a href='{{ url('/' + board._id + '/' + thread._id) }}' class='list-group-item list-group-item-action'>
+            <div class='d-flex w-100 justify-content-between'>
+                <h5 class='mb-1'>
+                    {{ thread.title }}
+                </h5>
+                <small class='text-muted'>{{ thread.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+            </div>
+            {{ lists.userItem(thread.user, small=True) }}
+        </a>
+        {% endfor %}
+    </div>
+    <script>
+        function subscribe() {
+            fetch("{{ url("/api/v0/board/" + board._id + "/subscribe") }}", {
+                method: "POST",
+                credentials: "include",
+            }).then(res => res.json()).then(res => {
+                location.reload()
+            })
+        }
+        function unsubscribe() {
+            fetch("{{ url("/api/v0/board/" + board._id + "/unsubscribe") }}", {
+                method: "POST",
+                credentials: "include",
+            }).then(res => res.json()).then(res => {
+                location.reload()
+            })
+        }
+    </script>
+</div>
+{% endblock %}

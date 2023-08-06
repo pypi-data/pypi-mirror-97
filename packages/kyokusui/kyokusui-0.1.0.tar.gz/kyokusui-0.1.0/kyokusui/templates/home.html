@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block main %}
+{% if is_admin(request.user) %}
+<div class='container'>
+    <div class='d-flex justify-content-between'>
+        <h2>新着スレッド</h2>
+        <a class='btn btn-primary' href='{{ url('/settings') }}'>設定</a>
+    </div>
+    <div class='list-group mt-4'>
+        {% for thread in threads|selectattr('closed', 'false') %}
+        <a href='{{ url('/' + thread.board._id + '/' + thread._id) }}' class='list-group-item list-group-item-action'>
+            <div class='d-flex w-100 justify-content-between'>
+                <div>
+                    <h5 class='mb-2'>
+                        {{ thread.title }}
+                    </h5>
+                    <h6 class='text-secondary'>{{ thread.board.name }}</h6>
+                </div>
+                <small class='text-muted'>{{ thread.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+            </div>
+            {{ lists.userItem(thread.user, small=True) }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

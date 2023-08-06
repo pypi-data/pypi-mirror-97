@@ -1,0 +1,43 @@
+<div id='board_form' class='modal fade'>
+    <form class='modal-dialog modal-dialog-scrollable' method="POST">
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h5 class='modal-title'>板を作成</h5>
+                <button type='button' class='btn-close' data-bs-dismiss='modal'></button>
+            </div>
+            <div class='modal-body'>
+                <div class='mb-3'>
+                    <label class='form-label'>板タイトル</label>
+                    <input type='text' class='form-control' name='name'/>
+                </div>
+                <div class='mb-3'>
+                    <label class='form-label'>板主</label>
+                    <select class='form-control' name='owner'>
+                        <option value='{{ request.user._id }}'>{{ request.user.name }}</option>
+                        {% for node in request.user.groups %}
+                        <option value='{{ node._id }}'>{{ node.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {{ forms.csrf(request) }}
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>閉じる</button>
+                <button type='submit' class='btn btn-primary'>作成</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        document.querySelector('#board_form form').onsubmit = function(e){
+            e.preventDefault()
+            const form = new FormData(this);
+            fetch("{{ url("/api/v0/board") }}", {
+                method: "POST",
+                body: form,
+                credentials: "include"
+            }).then(res => res.json()).then(res => {
+                location.href = "{{ url("/") }}" + res._id
+            });
+        }
+    </script>
+</div>
