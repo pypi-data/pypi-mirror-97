@@ -1,0 +1,32 @@
+declare class Mda {
+    _N1: number;
+    _N2: number;
+    _N3: number;
+    _N4: number;
+    _N5: number;
+    _totalSize: number;
+    _data: Float32Array | Float64Array | Int16Array;
+    constructor(n1?: number, n2?: number, n3?: number, n4?: number, n5?: number);
+    allocate(n1: number, n2: number, n3?: number, n4?: number, n5?: number): void;
+    N1(): number;
+    N2(): number;
+    N3(): number;
+    N4(): number;
+    N5(): number;
+    totalSize(): number;
+    value(i1: number, i2?: number, i3?: number, i4?: number, i5?: number): number;
+    setValue(val: number, i1: number, i2: number, i3?: number, i4?: number, i5?: number): void;
+    data(): Float32Array | Float64Array | Int16Array;
+    dataCopy(): Float32Array | Float64Array | Int16Array;
+    setData(d: Float32Array | Float64Array | Int16Array): void;
+    clone(): Mda;
+    reshape(n1: number, n2: number, n3?: number, n4?: number, n5?: number): void;
+    getChunk(i: number, size: number): Mda;
+    subArray(arg1: number, arg2: number, arg3?: number, arg4?: number, arg5?: number, arg6?: number): Mda;
+    setFromArrayBuffer(buf: ArrayBuffer): void;
+    setFromBase64(x: string): void;
+    minimum(): number;
+    maximum(): number;
+    toList(): number[];
+}
+export default Mda;
